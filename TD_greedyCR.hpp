@@ -75,7 +75,6 @@ void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx, std::
 #ifndef FUNC_NEW_ROBBER_SPACE
 #define FUNC_NEW_ROBBER_SPACE
 
-//computes the new robber space with respect to X and R and saves it in newR
 template <typename G_t>
 void new_robber_space(G_t G, std::set<unsigned int> &X, std::set<unsigned int> &R, std::set<unsigned int> &newR){
     //G \ X
@@ -107,6 +106,29 @@ void new_robber_space(G_t G, std::set<unsigned int> &X, std::set<unsigned int> &
     }
 }
 
+//computes the new robber space with respect to X and R and saves it in newR
+template <typename G_t>
+void new_robber_space2(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, std::set<unsigned int> &newR){
+    //G \ X
+    std::vector<bool> visited(boost::num_vertices(G), false);
+
+    for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++)
+        visited[*sIt] = true;
+
+    //compute new robber space
+    std::vector<std::set<unsigned int> > components;
+    get_components_provided_map(G, components, visited);  
+
+    for(unsigned int i = 0; i < components.size(); i++){
+        for(std::set<unsigned int>::iterator sIt1 = components[i].begin(); sIt1 != components[i].end(); sIt1++){
+            if(R.find(*sIt1) != R.end()){
+                newR.insert(components[i].begin(), components[i].end());
+                break;
+            }
+        }
+    }
+}
+
 #endif
 
 #ifndef FUNC_IS_MONOTONE
@@ -114,7 +136,7 @@ void new_robber_space(G_t G, std::set<unsigned int> &X, std::set<unsigned int> &
 
 //checks if robber_space(G\(X ^ X')) == robber_space(G\X)
 template <typename G_t>
-bool is_monotone(G_t G, std::set<unsigned int> &X, std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::set<unsigned int> &newR){ 
+bool is_monotone(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::set<unsigned int> &newR){ 
     if(X == X_prime)
         return false;
 
@@ -129,9 +151,7 @@ bool is_monotone(G_t G, std::set<unsigned int> &X, std::set<unsigned int> &X_pri
     new_robber_space(G, X, R, newR2);
     
     if(newR1 == newR2){
-        newR = newR1;
-        for(std::set<unsigned int>::iterator sIt = X_prime.begin(); sIt != X_prime.end(); sIt++)
-            newR.erase(*sIt);
+        std::set_difference(newR1.begin(), newR1.end(), X_prime.begin(), X_prime.end(), std::inserter(newR, newR.begin()));
               
         return true;
     }
@@ -169,32 +189,21 @@ void CR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned int> &b
 #define CR_NEW_ROBBER_COMPONENTS
 
 template<typename G_t>
-void new_robber_components(G_t G, std::set<unsigned int> &newR, std::vector<std::set<unsigned int> > &newRcomps){
-    std::set<unsigned int> cR;
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        cR.insert(G[*vIt].id);
+void new_robber_components(G_t &G, std::set<unsigned int> &newR, std::vector<std::set<unsigned int> > &newRcomps){
+    std::vector<bool> visited(boost::num_vertices(G), true);
+
     for(std::set<unsigned int>::iterator sIt = newR.begin(); sIt != newR.end(); sIt++)
-        cR.erase(*sIt);
-        
-    for(unsigned int t = 0; t < cR.size(); t++){
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(cR.find(G[*vIt].id) !=  cR.end()){
-                boost::clear_vertex(*vIt, G);
-                boost::remove_vertex(*vIt, G);
-                break;
-            }
-        }
-    }
+        visited[*sIt] = false;
 
     std::vector<std::set<unsigned int> > components;
-    get_components(G, components);  
-    
-    newRcomps = components;
+    get_components_provided_map(G, newRcomps, visited);  
 }
 
 #endif
 
+
+#ifndef CR_HUNT
+#define CR_HUNT
 
 template <typename G_t>
 bool hunt(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, unsigned int k, std::vector<std::vector<std::set<unsigned int> > > &monotone_turns){
@@ -210,8 +219,7 @@ bool hunt(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, unsigned
 	std::set<unsigned int> newR;
         if(!is_monotone(G, X, subs[i], R, newR))
             continue;
-        
-        
+
         //new robber space components
         std::vector<std::set<unsigned int> > newRcomps;
         new_robber_components(G, newR, newRcomps);
@@ -220,7 +228,7 @@ bool hunt(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, unsigned
 
         bool all_monotone = true;
         for(unsigned int j = 0; j < newRcomps.size(); j++){
-            if(newRcomps[j].size() == 0)
+            if(newRcomps[j].empty())
                 continue;
 
             all_monotone = all_monotone && hunt(G, subs[i], newRcomps[j], k, monotone_turns);
@@ -228,8 +236,7 @@ bool hunt(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, unsigned
                 break;
         }
         if(!all_monotone){
-            for(unsigned int l = 0; l < monotone_turns.size()-idx; l++)
-                monotone_turns.pop_back();
+            monotone_turns.erase(monotone_turns.begin()+idx, monotone_turns.end());
             continue;
         }
 
@@ -242,6 +249,8 @@ bool hunt(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &R, unsigned
     }
     return false;
 }
+
+#endif
 
 template <typename G_t, typename T_t>
 void CR_greedy_decomp(G_t &G, T_t &T, int lb){

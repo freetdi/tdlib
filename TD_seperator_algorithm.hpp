@@ -93,14 +93,13 @@ void disjoint_subsets(std::set<unsigned int> &X, unsigned int min_card, unsigned
     }
     
     for(unsigned int i = 0; i < subsX.size(); i++){  
-        std::set<unsigned int> difference = X;
-        for(std::set<unsigned int>::iterator sIt = subsX[i].begin(); sIt != subsX[i].end(); sIt++)
-            difference.erase(*sIt);
+        std::set<unsigned int> difference; 
+        std::set_difference(X.begin(), X.end(), subsX[i].begin(), subsX[i].end(), std::inserter(difference, difference.begin()));
             
-        int maximum = (difference.size() > max_card)? max_card : difference.size();
+        unsigned int maximum = (difference.size() > max_card)? max_card : difference.size();
         
         std::vector<std::set<unsigned int> > subsXY;
-        for(int t = 1; t <= maximum; t++){
+        for(unsigned int t = 1; t <= maximum; t++){
             subsets(difference, difference.size(), t, 0, sub, subsXY);
         }
         subsY.push_back(subsXY);

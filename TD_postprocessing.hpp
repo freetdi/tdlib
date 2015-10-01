@@ -240,8 +240,7 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
  */
 template <typename G_t>
 void minimalChordal(G_t G, std::vector<unsigned int> &old_elimination_ordering, std::vector<unsigned int> &new_elimination_ordering){
-    
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(boost::num_vertices(G)+1); 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap; 
     make_index_map(G, idxMap);
     
     std::vector<std::set<unsigned int> > C; 

@@ -103,7 +103,7 @@ void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsigned int
     for(unsigned int i = 0; i < Rcomps.size(); i++){
         std::set<unsigned int> intersection;  
         std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(), X_prime.begin(), X_prime.end(), std::inserter(intersection, intersection.begin()));
-        if(intersection.size() != 0){
+        if(!intersection.empty()){
             R.insert(Rcomps[i].begin(), Rcomps[i].end());
         }
     }
@@ -235,9 +235,17 @@ void make_tree_decomposition(T_t &T, std::vector<std::vector<boost::tuple<std::s
 }
 
 template <typename G_t, typename T_t>
-void _CR_dynamic_decomp(G_t &G, T_t &T, int lb){
+void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     std::set<unsigned int> vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+
+    if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+        typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
+    	for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+            T[t].bag.insert(G[*vIt].id);
+
+        return;
+    }
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         vertices.insert(G[*vIt].id);
@@ -246,15 +254,6 @@ void _CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     unsigned int k = (unsigned int)lb;
     
     while(true){
-        //it will be assumed, that a tree decomposition is not a trivial one
-        if(boost::num_vertices(G) == 0 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-	    typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-    	    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-                T[t].bag.insert(G[*vIt].id);
-
-            return;
-        }
-
         k++;
         for(unsigned int i = 0; i < vertices.size(); i++){
             if(make_layer(G, W, vertices, k, i)){
@@ -267,46 +266,7 @@ void _CR_dynamic_decomp(G_t &G, T_t &T, int lb){
         W.resize(1);
     }   
 }
-
-template <typename G_t, typename T_t>
-void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
-    //compute a treedecomposition for each connected component of G and glue the decompositions together
-    std::vector<std::set<unsigned int> > components;
-    get_components(G, components);
-
-    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
-
-    for(unsigned int i = 0; i < components.size(); i++){
-        G_t G_ = get_induced_subgraph(G, components[i]);
-        T_t T_;
-
-        _CR_dynamic_decomp(G_, T_, lb);
-
-        //copy T_ to T and add an edge from root to an arbitrary vertex of T_
-        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> idxMap(boost::num_vertices(T_));
-        std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
-        unsigned int id = 0;
-        for(boost::tie(tIt, tEnd) = boost::vertices(T_); tIt != tEnd; tIt++){
-            idxMap[id] = boost::add_vertex(T);
-            vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id));
-            T[idxMap[id++]].bag = T_[*tIt].bag;
-        }
-
-        typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
-        for(boost::tie(eIt, eEnd) = boost::edges(T_); eIt != eEnd; eIt++){
-            typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
-            v = vertex_map.find(boost::source(*eIt, T_));
-            w = vertex_map.find(boost::target(*eIt, T_));
-
-            boost::add_edge(idxMap[v->second], idxMap[w->second], T);
-        }
-
-        boost::add_edge(root, idxMap[0], T);
-    }
-}
           
-
 
 template <typename G_t, typename T_t>
 void CR_dynamic_decomp(G_t &G, T_t &T){
