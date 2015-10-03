@@ -236,15 +236,16 @@ bool Buddy(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int>
                 boost::add_edge(dN.at(0), dN.at(1), G);
                 boost::add_edge(dN.at(0), dN.at(2), G);
                 boost::add_edge(dN.at(1), dN.at(2), G);
-                
+      
                 bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt1].id, N1));
-                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt2].id, N1));
+                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt2].id, N2));
                 
                 boost::clear_vertex(*vertexIt1, G);
                 boost::clear_vertex(*vertexIt2, G);
                 
                 low = (low > 3)? low : 3;
                 applied = true;
+                break;
             }
         }
     }
@@ -410,7 +411,7 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned
                 bag.insert(G[*neighbourIt].id);
 
             bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
-            
+  
             boost::clear_vertex(*vertexIt, G);
 
             low = (low > (int)bag.size())? low : (int)bag.size();
@@ -499,7 +500,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
                 bag.insert(G[*neighbourIt].id);
 
             bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
-            
+       
             boost::clear_vertex(*vertexIt, G);
 
             low = (low > (int)bag.size())? low : (int)bag.size();
@@ -518,26 +519,30 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
         bag.insert(preprocessed_node);
         typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
         T[t_dec_node].bag = bag;
+
         return;
     }
         
     typename boost::graph_traits<T_t>::vertex_iterator vertexIt, vertexEnd;
     
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
-        std::set<unsigned int>::iterator sIt = bag.begin();
-        if(std::includes(T[*vertexIt].bag.begin(), T[*vertexIt].bag.end(), sIt, bag.end())){
+        if(std::includes(T[*vertexIt].bag.begin(), T[*vertexIt].bag.end(), bag.begin(), bag.end())){
             bag.insert(preprocessed_node);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
             T[t_dec_node].bag = bag;
+
             boost::add_edge(*vertexIt, t_dec_node, T);
             return;
         }
     }
+
+    //case for a disconnected graph
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     bag.insert(preprocessed_node);
     T[t_dec_node].bag = bag;
     boost::tie(vertexIt, vertexEnd) = boost::vertices(T);
     boost::add_edge(*vertexIt, t_dec_node, T);
+
 }
 
 //recursively applies preprocessing rules and glues corresponding bags with current tree decomposition

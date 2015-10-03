@@ -32,8 +32,6 @@
 #ifndef TD_MISC
 #define TD_MISC
 
-#define DEBUG
-
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 #include "simple_graph_algos.hpp"
@@ -55,12 +53,8 @@ int is_valid_treedecomposition(G_t &G, T_t T){
     //checks if T is a tree
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
-    if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
-#ifdef DEBUG
-        std::cout << "decomposition is not a tree!" << std::endl;
-#endif
+    if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1)
         return -1;
-    }
 
     //checks if exactly the vertices of G are covered
     std::set<unsigned int> coded_vertices;
@@ -73,9 +67,8 @@ int is_valid_treedecomposition(G_t &G, T_t T){
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         vertices.insert(G[*vIt].id);
 
-    if(coded_vertices != vertices){
+    if(coded_vertices != vertices)
         return -2;
-    }
 
     //checks if all edges are covered
     std::vector<std::set<unsigned int> > edges;
@@ -98,43 +91,31 @@ int is_valid_treedecomposition(G_t &G, T_t T){
                 break;
             }
         }
-        if(!isSubset){
+        if(!isSubset)
             //not all edges covered
-#ifdef DEBUG
-            std::cout << "not all edges covered!" << std::endl;
-#endif
             return -3;
-        }
     }
     std::set<unsigned int> forgotten;
 
     while(boost::num_vertices(T) != 1){
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(T[*tIt].bag.size() == 0 || boost::out_degree(*tIt, T) == 0){
-                boost::clear_vertex(*tIt, T);
-                boost::remove_vertex(*tIt, T);
-                break;
-            }
-            if(boost::out_degree(*tIt, T) == 1){
+            unsigned int degree = boost::out_degree(*tIt, T);
+            if(degree == 1 || degree == 0){
                 std::set<unsigned int> intersection;
                 std::set_intersection(forgotten.begin(), forgotten.end(), T[*tIt].bag.begin(), T[*tIt].bag.end(), std::inserter(intersection, intersection.begin()));
-                if(!intersection.empty()){
+                if(!intersection.empty())
                     //there are coded vertices, that are not connected in T
-#ifdef DEBUG
-                    std::cout << "decomposition not connected!" << std::endl;
-#endif
                     return -4;
+                
+                if(degree == 1){
+                    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+                    typename boost::graph_traits<T_t>::vertex_descriptor parent;
+                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++)
+                        parent = *nIt;
+                
+                    std::set_difference(T[*tIt].bag.begin(), T[*tIt].bag.end(), T[parent].bag.begin(), T[parent].bag.end(), std::inserter(forgotten, forgotten.begin()));
                 }
-                
-                typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-                typename boost::graph_traits<T_t>::vertex_descriptor parent;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
-                    parent = *nIt;
-                }
-                
-                std::set_difference(T[*tIt].bag.begin(), T[*tIt].bag.end(), T[parent].bag.begin(), T[parent].bag.end(), std::inserter(forgotten, forgotten.begin()));
-
-                
+ 
                 boost::clear_vertex(*tIt, T);
                 boost::remove_vertex(*tIt, T);
                 break;
@@ -212,40 +193,36 @@ template <typename T_t>
 void make_small(T_t &T){
     while(true){
         bool modified = false;
+        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor > N;
+        typename boost::graph_traits<T_t>::vertex_descriptor child, parent;
+
         typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-#ifdef A
-            if(T[*tIt].bag.size() == 0 || boost::out_degree(*tIt, T) == 0){
-                boost::clear_vertex(*tIt, T);
-                boost::remove_vertex(*tIt, T);
-                continue;
-            }
-#endif
-            if(boost::out_degree(*tIt, T) == 1){
-                typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-                boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T);
-
+            typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
+                if(*tIt == *nIt)
+                    continue;
                 if(std::includes(T[*nIt].bag.begin(), T[*nIt].bag.end(), T[*tIt].bag.begin(), T[*tIt].bag.end())){
-                    boost::clear_vertex(*tIt, T);
-                    boost::remove_vertex(*tIt, T);
+                    child = *tIt;
+                    parent = *nIt;
+
+                    typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
+                    for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){
+                        if(*nIt2 != parent)
+                            N.push_back(*nIt2);
+                    }
+                
                     modified = true;
                     break;
                 }
             }
-            else if(boost::out_degree(*tIt, T) == 2){
-                 typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-                 std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> N;
-                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++)
-                     N.push_back(*nIt);
+            if(modified){
+                for(unsigned int i = 0; i < N.size(); i++)
+                    boost::add_edge(parent, N[i], T);
 
-                 if(std::includes(T[N[0]].bag.begin(), T[N[0]].bag.end(), T[*tIt].bag.begin(), T[*tIt].bag.end())
-                 || std::includes(T[N[1]].bag.begin(), T[N[1]].bag.end(), T[*tIt].bag.begin(), T[*tIt].bag.end())){
-                     boost::add_edge(N[0], N[1], T);
-                     boost::clear_vertex(*tIt, T);
-                     boost::remove_vertex(*tIt, T);
-                     modified = true;
-                     break;
-                 }
+                boost::clear_vertex(child, T);
+                boost::remove_vertex(child, T);
+                break;
             }
         }
         if(!modified)

@@ -43,6 +43,8 @@
 // void exact_cutset(G_t &G, T_t &T)
 //
 
+#define TEST
+
 namespace treedec{
 
 template <typename G_t>
@@ -55,57 +57,55 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
         component.insert(cut.begin(), cut.end());
         results.push_back(component);
         results.push_back(cut);
+
         return true;
     }
 
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> candidates;
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = cut.begin(); sIt != cut.end(); sIt++){
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-            if(component.find(*nIt) != component.end())
-                candidates.push_back(*nIt);
-        }
-    }
+    
+    //it is not sufficient to just consider the neighbourhood of cut in component
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = component.begin(); sIt != component.end(); sIt++)
+            candidates.push_back(*sIt);
 
+    for(unsigned int i = 0; i < candidates.size(); i++){
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
+        cut_ext.insert(candidates[i]);
 
-   for(unsigned int i = 0; i < candidates.size(); i++){
-       std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
-       cut_ext.insert(candidates[i]);
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = component;
+        component_red.erase(candidates[i]);
 
+        std::vector<bool> visited(boost::num_vertices(G), true);
 
-       std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = component;
-       component_red.erase(candidates[i]);
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = component_red.begin(); sIt != component_red.end(); sIt++)
+            visited[G[*sIt].id] = false;
 
-       std::vector<bool> visited(boost::num_vertices(G), true);
-       
-       for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = component_red.begin(); sIt != component_red.end(); sIt++)
-           visited[G[*sIt].id] = false;
+        typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > new_components;
+        get_components_provided_map(G, new_components, visited);
 
-       typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > new_components;
-       get_components_provided_map(G, new_components, visited);
+        bool all_successful = true;
 
-       bool all_successful = true;
+        for(unsigned int t = 0; t < new_components.size(); t++){
+            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_red;
 
-       for(unsigned int t = 0; t < new_components.size(); t++){
-           typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_red;
+            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = cut_ext.begin(); sIt != cut_ext.end(); sIt++){
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
+                    if(new_components[t].find(*nIt) != new_components[t].end())
+                        cut_red.insert(*sIt);
+                }
+            }
 
-           for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = cut_ext.begin(); sIt != cut_ext.end(); sIt++){
-               typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-               for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-                   if(new_components[t].find(*nIt) != new_components[t].end())
-                       cut_red.insert(*sIt);
-               }
-           }
+         unsigned int idx = results.size();
 
-           if(!explore_cutsets(G, cut_red, new_components[t], results, k)){
-               all_successful = false;
-               break;
-           }
-           results.push_back(cut_red);
-           results.push_back(cut_ext);
-           results.push_back(cut_ext);
-           results.push_back(cut);
-           
+            if(!explore_cutsets(G, cut_red, new_components[t], results, k)){
+                all_successful = false;
+                results.erase(results.begin()+idx, results.end());
+                break;
+            }
+            results.push_back(cut_red);
+            results.push_back(cut_ext);
+            results.push_back(cut_ext);
+            results.push_back(cut);
         }
 
         if(all_successful)
