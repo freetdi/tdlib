@@ -529,8 +529,9 @@ int deltaC_max_d(G_t &G){
 
 template <typename G_t>
 int _deltaC_least_c(G_t &G){
+    //checking whether G is a complete graph
     if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return -1;
+        return boost::num_vertices(G)-1;
     }
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
@@ -543,7 +544,7 @@ int _deltaC_least_c(G_t &G){
 
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree < min_degree){
+            if(degree > 0 && degree < min_degree){
                 min_degree = degree;
                 min_vertex = *vIt;
             }
@@ -551,10 +552,8 @@ int _deltaC_least_c(G_t &G){
         
         lb = (lb>min_degree)? lb : min_degree;
 
-        if(min_degree == 0){
-            boost::remove_vertex(min_vertex, G);
-            continue;
-        }
+        if(min_degree == boost::num_vertices(G))
+            return (int)lb;
 
         //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -587,15 +586,14 @@ int _deltaC_least_c(G_t &G){
         
         //contract the edge between min_vertex and w
         typename boost::graph_traits<G_t>::vertex_descriptor new_v = boost::add_vertex(G);
-        G[new_v].id = G[min_vertex].id;
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)
-            boost::add_edge(new_v, *sIt, G);
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++){
+            if(!boost::edge(new_v, *sIt, G).second)
+                boost::add_edge(new_v, *sIt, G);
+        }
         
         boost::clear_vertex(min_vertex, G);
         boost::clear_vertex(w, G);
-        boost::remove_vertex(min_vertex, G);
-        boost::remove_vertex(w, G);
     }
     return (int)lb;
 }
