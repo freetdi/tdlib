@@ -61,6 +61,7 @@
 #include <set>
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_preprocessing.hpp"
+#include "TD_lower_bounds.hpp"
 #include "TD_elimination_orderings.hpp"
 #include "TD_postprocessing.hpp"
 #include "TD_greedyCR.hpp"
@@ -237,6 +238,10 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
 
     lb = (low > lb)? low : lb;
 
+    int lb_deltaC = treedec::lb::deltaC_least_c(G);
+
+    lb = (lb_deltaC > lb)? lb_deltaC : lb;
+
     //compute a treedecomposition for each connected component of G and glue the decompositions together
     std::vector<std::set<unsigned int> > components;
     get_components(G, components);
@@ -273,8 +278,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     }
     
     treedec::preprocessing_glue_bags(bags, T);
-
-    treedec::make_small(T);
 }
 
 template <typename G_t, typename T_t>
