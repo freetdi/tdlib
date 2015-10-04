@@ -580,17 +580,16 @@ int _deltaC_least_c(G_t &G){
                 min_common = cnt_common;
             }
         }
-        
+
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++)
             N.insert(*nIt);
-        
+
         //contract the edge between min_vertex and w
         typename boost::graph_traits<G_t>::vertex_descriptor new_v = boost::add_vertex(G);
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++){
-            if(!boost::edge(new_v, *sIt, G).second)
-                boost::add_edge(new_v, *sIt, G);
-        }
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)
+            boost::add_edge(new_v, *sIt, G);
+
         
         boost::clear_vertex(min_vertex, G);
         boost::clear_vertex(w, G);
