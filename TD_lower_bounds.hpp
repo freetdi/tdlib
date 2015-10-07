@@ -529,10 +529,11 @@ int deltaC_max_d(G_t &G){
 
 template <typename G_t>
 int _deltaC_least_c(G_t &G){
-    //checking whether G is a complete graph
-    if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
-    }
+    if(boost::num_vertices(G) == 0)
+        return -1;
+    else if(boost::num_edges(G) == 0)
+        return 0;
+
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
 
@@ -552,9 +553,6 @@ int _deltaC_least_c(G_t &G){
         
         lb = (lb>min_degree)? lb : min_degree;
 
-        if(min_degree == boost::num_vertices(G))
-            return (int)lb;
-
         //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
@@ -563,7 +561,8 @@ int _deltaC_least_c(G_t &G){
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
             N.insert(*nIt);
         
-        unsigned int cnt_common, min_common = N.size();
+        unsigned int cnt_common = 0;
+        unsigned int min_common = N.size()+1;
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
         
         for(sIt1 = N.begin(); sIt1 != N.end(); sIt1++){
@@ -571,8 +570,7 @@ int _deltaC_least_c(G_t &G){
             sIt2 = sIt1;
             sIt2++;
             for(; sIt2 != N.end(); sIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, G);
-                if(existsEdge.second)
+                if(boost::edge(*sIt1, *sIt2, G).second)
                     cnt_common += 1;
             }
             if(cnt_common < min_common){
@@ -584,14 +582,11 @@ int _deltaC_least_c(G_t &G){
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++)
             N.insert(*nIt);
 
-        //contract the edge between min_vertex and w
-        typename boost::graph_traits<G_t>::vertex_descriptor new_v = boost::add_vertex(G);
-
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)
-            boost::add_edge(new_v, *sIt, G);
-
+        N.erase(min_vertex);
         
-        boost::clear_vertex(min_vertex, G);
+        for(sIt1 = N.begin(); sIt1 != N.end(); sIt1++)
+            boost::add_edge(min_vertex, *sIt1, G);
+        
         boost::clear_vertex(w, G);
     }
     return (int)lb;
