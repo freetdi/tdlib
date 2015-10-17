@@ -48,7 +48,7 @@ struct Vertex_VI_PD{
 #define TD_TYPEDEF_DIGRAPH
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_VI_PD> digraph_t;
-typedef boost::adjacency_list<boost::listS, boost::listS, boost::bidirectionalS, Vertex> H_t;
+typedef boost::adjacency_list<boost::listS, boost::listS, boost::bidirectionalS, Vertex_VI_PD> H_t;
 
 #endif
 

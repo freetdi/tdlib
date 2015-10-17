@@ -436,7 +436,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
         bool specialNeighbourFound = false;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator nIt1, nIt2;
         typename boost::graph_traits<G_t>::vertex_descriptor cand1, cand2, specialNeighbour;
-	specialNeighbour = NULL;
+        specialNeighbour = NULL;
         unsigned int missingEdgesCount;
         
         for(nIt1 = N.begin(); nIt1 != N.end(); nIt1++){
@@ -478,9 +478,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
 
         }
         if(isClique){
-            //
-
-            //adding the edges, if specialNeighbour == NULL, N is a clique and vertexIt is a simplicial vertex
+            //adding the edges, if specialNeighbourFound is true, N is a clique and vertexIt is a simplicial vertex
             if(specialNeighbour != NULL){
                 for(unsigned int i = 0; i < N.size(); i++){
                     if(N.at(i) != specialNeighbour) 
