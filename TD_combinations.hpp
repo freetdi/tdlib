@@ -231,7 +231,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
 
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    if(boost::num_vertices(G) == 0){
+    if(boost::num_edges(G) == 0){
         treedec::preprocessing_glue_bags(bags, T);
         return;
     }

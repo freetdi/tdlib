@@ -48,51 +48,64 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_elimination_orderings.hpp"
 #include "TD_NetworkFlow.hpp"
+#include "TD_misc.hpp"
 #include "simple_graph_algos.hpp"
 
 namespace treedec{
 
 //creates a modified induced subgraph of the bag "T[t_desc].bag"
 template <typename G_t, typename T_t>
-bool is_improvement_bag(G_t &H, typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T){
-    H = get_induced_subgraph(G, T[t_desc].bag);
+bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T){
+    induced_subgraph(H, G, T[t_desc].bag);
     
-    //test of completeness
-    if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
-        H.clear();
-        return false;
+    //adding additional edge, if a non-edge "occures" in another bag of the current tree decomposition (neighbour-bags of the refinement bag are sufficient)    
+    typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
+    for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
+        vIt2 = vIt1;
+        vIt2++;
+        for(; vIt2 != vEnd; vIt2++){
+            if(!boost::edge(*vIt1, *vIt2, H).second){
+                typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
+                    if(T[*nIt].bag.find(H[*vIt1].id) != T[*nIt].bag.end() && T[*nIt].bag.find(H[*vIt2].id) != T[*nIt].bag.end()){
+                        boost::add_edge(*vIt1, *vIt2, H);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
-    //collect all non-edges
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > not_edges;
-    
-    typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
+    //find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y 
+
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
             std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*vIt1, *vIt2, H);
             if(!existsEdge.second){
-                std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> not_edge;
-                not_edge.push_back(*vIt1);
-                not_edge.push_back(*vIt2);
-                not_edges.push_back(not_edge);
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
+                    X.insert(H[*nIt].id);
+                    
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++)
+                    Y.insert(H[*nIt].id);
+                    
+                disabled[H[*vIt1].id] = true;
+                disabled[H[*vIt2].id] = true;
+                    
+                goto BREAK_LOOP;
             }
         }
     }
-    
-    //adding additional edge, if a non-edge "occures" in another bag of the current tree decomposition (neighbour-bags of the refinement bag are sufficient)
-    for(unsigned int i = 0; i < not_edges.size(); i++){
-        typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
-            if(T[*nIt].bag.find(H[not_edges[i][0]].id) != T[*nIt].bag.end() && T[*nIt].bag.find(H[not_edges[i][1]].id) != T[*nIt].bag.end())
-                boost::add_edge(not_edges[i][0], not_edges[i][1], H);
-        }
-    }
+
+    BREAK_LOOP:
         
-    //test of completeness
+    //test for completeness
     if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
         H.clear();
+        X.clear();
+        Y.clear();
         return false;
     }
     
@@ -107,19 +120,21 @@ bool is_improvement_bag(G_t &H, typename boost::graph_traits<T_t>::vertex_descri
 template <typename G_t, typename T_t>
 void MSVS(G_t &G, T_t &T){
     while(true){
-        //compute width of T
-        unsigned int max = 0;
-        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++)
-            max = (T[*tIt].bag.size() > max)? T[*tIt].bag.size() : max;
+        unsigned int width = treedec::get_width(T);
         
         //check all maximum sized bags, whether they can be improved or not. take the first improvable
         G_t H;
+        std::set<unsigned int> X, Y;
+        std::vector<bool> disabled(boost::num_vertices(G), false);
+
+        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor refinement_bag;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(T[*tIt].bag.size() == max){
-                if(is_improvement_bag(H, *tIt, G, T)){
+            if(T[*tIt].bag.size() == width+1){
+                std::vector<bool> disabled_(disabled);
+                if(is_improvement_bag(H, disabled_, X, Y, *tIt, G, T)){
                     refinement_bag = *tIt;
+                    disabled = disabled_;
                     break;
                 }
             }
@@ -127,54 +142,23 @@ void MSVS(G_t &G, T_t &T){
         
         //no improvement possible
         if(boost::num_vertices(H) == 0)
-            break;
-        
-        //needed for computing connected components
-        G_t iG;
-        TD_copy_graph(H, iG);
-        
-        //find a non-edge, collect the neighbours of its "incident" vertices 
-        std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > not_edges;
-        typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-        std::set<unsigned int> S, X, Y, X_tmp, Y_tmp;
-        bool not_edge_found = false;
-        
-        for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
-            vIt2 = vIt1;
-            vIt2++;
-            for(; vIt2 != vEnd; vIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*vIt1, *vIt2, H);
-                if(!existsEdge.second){
-                    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
-                        X.insert(H[*nIt].id);
-                    
-                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++)
-                        Y.insert(H[*nIt].id);
-                    
-                    X_tmp.insert(H[*vIt1].id);
-                    Y_tmp.insert(H[*vIt2].id);
-                    
-                    boost::clear_vertex(*vIt1, H);
-                    boost::remove_vertex(*vIt1, H);
-                    boost::clear_vertex(*vIt2, H);
-                    boost::remove_vertex(*vIt2, H);
-                    
-                    not_edge_found = true;
-                    break;
-                }
-            }
-            if(not_edge_found)
-                break;
-        }
+            return;
         
         //compute a seperating set S
-        seperate_vertices(H, X, Y, S);
-        
+        std::set<unsigned int> S;
+        seperate_vertices2(H, disabled, X, Y, S);
+
         //do the refinement
-        G_t cG = graph_after_deletion(iG, S);
+        std::vector<bool> visited(boost::num_vertices(G), true);
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++)
+            visited[H[*vIt].id] = false;
+
+        for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
+            visited[*sIt] = true;
+
         std::vector<std::set<unsigned int> > components;
-        get_components(cG, components);
+        get_components_provided_map(H, components, visited);
         
         typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN;

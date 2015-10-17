@@ -563,7 +563,7 @@ void LEX_M_minimal_ordering(G_t &G, std::vector<unsigned int> &alpha){
         max = (G[*vIt].id > max)? G[*vIt].id : max;
     
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
-    treedec::make_index_map(G, idxMap);
+    make_index_map(G, idxMap);
     
     alpha.resize(boost::num_vertices(G));
     

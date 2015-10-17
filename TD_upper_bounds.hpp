@@ -23,6 +23,7 @@
 #ifndef TD_UPPER_BOUNDS
 #define TD_UPPER_BOUNDS
 
+#include <vector>
 #include <boost/graph/adjacency_list.hpp>
 
 namespace treedec{

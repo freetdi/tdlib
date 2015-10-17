@@ -29,48 +29,63 @@
 // - bool seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k)
 //
 
-#ifndef TD_NETWORK_FLOW
-#define TD_NETWORK_FLOW
-
 #include <boost/graph/adjacency_list.hpp>
-#include <climits>
+#include <boost/graph/copy.hpp>
 #include "simple_graph_algos.hpp"
 
-#ifndef TD_STRUCT_VERTEX
-#define TD_STRUCT_VERTEX
+#ifndef TD_STRUCT_VERTEX_VI_PD
+#define TD_STRUCT_VERTEX_VI_PD
 
-struct Vertex{
+struct Vertex_VI_PD{
     unsigned int id;
+    //bool visited;
+    //int predecessor;
 };
 
 #endif
 
-typedef boost::adjacency_list<boost::setS, boost::listS, boost::bidirectionalS, Vertex> digraph_t;
+#ifndef TD_TYPEDEF_DIGRAPH
+#define TD_TYPEDEF_DIGRAPH
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_VI_PD> digraph_t;
 typedef boost::adjacency_list<boost::listS, boost::listS, boost::bidirectionalS, Vertex> H_t;
 
+#endif
 
-//makes G a digraph. adds a source to H, connected with vertices in X, that are not on paths in P
+#ifndef TD_NETWORKFLOW
+#define TD_NETWORKFLOW
+
+//Makes G a digraph, resulting in the graph H. Adds a source to H, connected with vertices in X, that are not on paths in P
 template <typename G_t>
-digraph_t::vertex_descriptor make_digraph(G_t &G, digraph_t &H, std::set<unsigned int> &X, std::vector<std::vector<std::vector<unsigned int> > > &P, std::vector<digraph_t::vertex_descriptor> &idxMap, unsigned int max){
+digraph_t::vertex_descriptor make_digraph(G_t &G, std::vector<bool> &disabled, digraph_t &H, std::vector<digraph_t::vertex_descriptor> &idxMap, unsigned int max){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
+    unsigned int i = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        idxMap[G[*vIt].id] = boost::add_vertex(H);
-        H[idxMap[G[*vIt].id]].id = G[*vIt].id;
+        if(!disabled[G[*vIt].id]){
+            idxMap[G[*vIt].id] = boost::add_vertex(H);
+            H[i++].id = G[*vIt].id;
+        }
     }
     
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
-        boost::add_edge(idxMap[G[boost::target(*eIt, G)].id], idxMap[G[boost::source(*eIt, G)].id], H);
+        if(!disabled[G[boost::source(*eIt, G)].id] && !disabled[G[boost::target(*eIt, G)].id]){
+            boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
+            boost::add_edge(idxMap[G[boost::target(*eIt, G)].id], idxMap[G[boost::source(*eIt, G)].id], H);
+        }
     }
 
 
     digraph_t::vertex_descriptor source = boost::add_vertex(H);
     H[source].id = max+1;
     idxMap[max+1] = source; 
+    
+    return source;
+}
 
+void modify_digraph(digraph_t &H, std::set<unsigned int> &X, std::vector<std::vector<std::vector<unsigned int> > > &P, std::vector<digraph_t::vertex_descriptor> &idxMap, digraph_t::vertex_descriptor source){
     for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++)
         boost::add_edge(source, idxMap[*sIt], H);
     
@@ -83,12 +98,10 @@ digraph_t::vertex_descriptor make_digraph(G_t &G, digraph_t &H, std::set<unsigne
     //remove the edges from the source to vertices in X, that are on a path
     for(unsigned int i = 0; i < P.size(); i++)
         boost::remove_edge(source, idxMap[P[i][0][0]], H);
-    
-    return source;
 }
 
 //follows the edge set of H beginning on the start_vertex (a vertex in Y), aborting, if a vertex in X is reached, saving the path in new_path
-inline void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, std::vector<std::vector<unsigned int> > &new_path, std::set<unsigned int> &X){
+void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, std::vector<std::vector<unsigned int> > &new_path, std::set<unsigned int> &X){
     boost::graph_traits<H_t>::adjacency_iterator nIt, nEnd;
     while(true){
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, H);
@@ -109,7 +122,7 @@ inline void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, s
 //computes the symmetric difference between edges on the walk and on paths in P
 //inserts the edges in the symmetric difference into an empty graph and follows the paths starting in Y
 //function is called, if there exists a P-alternating walk
-inline void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y, 
+void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y, 
                   std::vector<std::vector<unsigned int> > &walk, std::vector<std::vector<std::vector<unsigned int> > > &P, unsigned int source){
     //unfold the edges on P
     std::vector<std::vector<unsigned int> > edgesP;
@@ -208,7 +221,7 @@ inline void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y,
 
 //takes the last vertex on each path, that could be reached by a P-alternating walk, that does not end in a vertex in Y
 //if no such one exists, the first vertex on a path is taken
-inline void calculate_seperator(std::vector<std::vector<std::vector<unsigned int> > > &P, std::set<unsigned int> &cS, std::set<unsigned int> &S){
+void calculate_seperator(std::vector<std::vector<std::vector<unsigned int> > > &P, std::set<unsigned int> &cS, std::set<unsigned int> &S){
     for(unsigned int i = 0; i < P.size(); i++){
         for(unsigned int j = P[i].size(); j > 0; j--){
             if(cS.find(P[i][j-1][1]) != cS.end()){
@@ -222,7 +235,7 @@ inline void calculate_seperator(std::vector<std::vector<std::vector<unsigned int
 }
 
 //collects the neighbourhood of v and modifies the neighbourhood if v is on a path in P                
-inline bool t_search_disjoint_ways(digraph_t &diG, digraph_t::vertex_descriptor v, std::set<unsigned int> &Y, std::vector<boost::tuple<bool, int> > &visited, 
+bool t_search_disjoint_ways(digraph_t &diG, digraph_t::vertex_descriptor v, std::set<unsigned int> &Y, std::vector<boost::tuple<bool, int> > &visited, 
    std::vector<std::vector<unsigned int> > &walk, std::vector<digraph_t::vertex_descriptor> &idxMap, bool edge_used, int source, std::set<unsigned int> &dangerous,
     std::set<unsigned int> &cS
 ){
@@ -282,14 +295,22 @@ inline bool t_search_disjoint_ways(digraph_t &diG, digraph_t::vertex_descriptor 
 }
 
 template <typename G_t> 
-inline bool _disjoint_ways(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k){ 
+bool _disjoint_ways(G_t &G, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k){ 
     //evaluate maximum id
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     unsigned int max = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        max = (G[*vIt].id > max)? G[*vIt].id : max;
-    
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(!disabled[G[*vIt].id])
+            max = (G[*vIt].id > max)? G[*vIt].id : max;
+    }
+  
     std::vector<boost::tuple<bool, int> > visited(max+2);
+
+    //make G a digraph, add a new source, connect the source with vertices in X
+    digraph_t diG;
+    std::vector<digraph_t::vertex_descriptor> idxMap(max+2);
+    digraph_t::vertex_descriptor source = make_digraph(G, disabled, diG, idxMap, max);
+
     std::vector<std::vector<unsigned int> > walk;
     std::vector<std::vector<std::vector<unsigned int> > > P;
     
@@ -301,11 +322,11 @@ inline bool _disjoint_ways(G_t &G, std::set<unsigned int> &X, std::set<unsigned 
         if(S.size()+iter > k)
             return false;
   
-        //make G a digraph, add a new source, connect the source with vertices in X
-        digraph_t diG;
-        std::vector<digraph_t::vertex_descriptor> idxMap(max+2);
-        digraph_t::vertex_descriptor source = make_digraph(G, diG, X, P, idxMap, max);
         cS.clear();
+
+        digraph_t diG_;
+        boost::copy_graph(diG, diG_);
+        modify_digraph(diG_, X, P, idxMap, source);
         
         for(unsigned int i = 0; i < visited.size(); i++){
             visited[i].get<0>() = false;
@@ -321,7 +342,7 @@ inline bool _disjoint_ways(G_t &G, std::set<unsigned int> &X, std::set<unsigned 
         
         //start extended DFS at source
         std::set<unsigned int> dangerous;
-        if(!t_search_disjoint_ways(diG, source, Y, visited, walk, idxMap, false, (int)diG[source].id, dangerous, cS))
+        if(!t_search_disjoint_ways(diG_, source, Y, visited, walk, idxMap, false, (int)diG[source].id, dangerous, cS))
             break;
 
         modify_paths(X, Y, walk, P, max+1);
@@ -332,26 +353,7 @@ inline bool _disjoint_ways(G_t &G, std::set<unsigned int> &X, std::set<unsigned 
 }
 
 template <typename G_t> 
-void seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S){  
-    //common neighbours must be contained in a seperator 
-    std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(S, S.begin()));
-    
-    for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
-        X.erase(*sIt);
-    
-    for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
-        Y.erase(*sIt);
-
-    if(X.size() == 0 || Y.size() == 0)
-        return;
-
-    delete_vertices(G, S);
-
-    _disjoint_ways(G, X, Y, S, UINT_MAX);
-}
-
-template <typename G_t> 
-bool seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k){ 
+bool seperate_vertices(G_t &G, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k){ 
     //common neighbours must be contained in a seperator 
     std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(S, S.begin()));
     
@@ -367,9 +369,16 @@ bool seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int>
     if(X.size() == 0 || Y.size() == 0)
         return true;
 
-    delete_vertices(G, S); 
+    //delete_vertices(G, S); 
+    for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
+        disabled[*sIt] = true;
  
-    return _disjoint_ways(G, X, Y, S, k);
+    return _disjoint_ways(G, disabled, X, Y, S, k);
+}
+
+template <typename G_t> 
+void seperate_vertices(G_t &G, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S){  
+    seperate_vertices(G, disabled, X, Y, S, UINT_MAX);
 }
 
 #endif

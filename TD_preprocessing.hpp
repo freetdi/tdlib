@@ -113,8 +113,7 @@ void remove_isolated_vertices(G_t &G){
 template <typename G_t>
 bool Twig(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
-    bool applied = false;
-    
+
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
         if(boost::out_degree(*vertexIt, G) == 1){
             std::set<unsigned int> bag;
@@ -128,17 +127,16 @@ bool Twig(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
             boost::clear_vertex(*vertexIt, G);
 
             low = (low > 1)? low : 1;
-            applied = true;
+            return true;
         }
     }
-    return applied;
+    return false;
 }
 
 //checks if there exists a degree-2-vertex
 template <typename G_t>
 bool Series(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
-    bool applied = false;
     
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
         if(boost::out_degree(*vertexIt, G) == 2){  
@@ -157,17 +155,16 @@ bool Series(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int
             boost::add_edge(N.at(0), N.at(1), G);
 
             low = (low > 2)? low : 2;
-            applied = true;
+            return true;
         }
     }
-    return applied;
+    return false;
 }
 
 //checks if there exists a degree-3-vertex, such that at least one edge exists in its neighbourhood (Triangle)
 template <typename G_t>
 bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
-    bool applied = false;
      
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
         if(boost::out_degree(*vertexIt, G) == 3){
@@ -194,18 +191,17 @@ bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned i
                 boost::clear_vertex(*vertexIt, G);
 
                 low = (low > 3)? low : 3;
-                applied = true;
+                return true;
             }          
         }
     }
-    return applied;
+    return false;
 }
 
 //checks if there exists two degree-3-vertices, such that they share their neighbours (Buddies)
 template <typename G_t>
 bool Buddy(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator  vertexIt1, vertexEnd;
-    bool applied = false;
 
     for(boost::tie(vertexIt1, vertexEnd) = boost::vertices(G); vertexIt1 != vertexEnd; vertexIt1++){
         if(boost::out_degree(*vertexIt1, G) != 3)
@@ -244,19 +240,17 @@ bool Buddy(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int>
                 boost::clear_vertex(*vertexIt2, G);
                 
                 low = (low > 3)? low : 3;
-                applied = true;
-                break;
+                return true;
             }
         }
     }
-    return applied;
+    return false;
 }
 
 //checks if the Cube rule is applicable
 template <typename G_t>
 bool Cube(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    bool applied = false;
     
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(boost::out_degree(*vIt, G) != 3)
@@ -364,17 +358,16 @@ bool Cube(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
             boost::add_edge(w, x, G);       
                 
             low = (low > 3)? low : 3;
-            applied = true;
+            return true;
         }
     }
-    return applied;
+    return false;
 }
 
 //checks if there exists a vertex, such that its neighbours induce a clique (Simplicial)
 template <typename G_t>
 bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
-    bool applied = false;
     
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
         if(boost::out_degree(*vertexIt, G) == 0)
@@ -415,10 +408,10 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned
             boost::clear_vertex(*vertexIt, G);
 
             low = (low > (int)bag.size())? low : (int)bag.size();
-            applied = true;
+            return true;
         }
     }
-    return applied;
+    return false;
 }
 
 
@@ -561,10 +554,7 @@ void _preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsi
 template <typename G_t>
 void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     Islet(G, bags, low);
-
     _preprocessing(G, bags, low);
-
-    remove_isolated_vertices(G);
 }
 
 template <typename G_t>

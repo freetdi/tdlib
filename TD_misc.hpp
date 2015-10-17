@@ -230,20 +230,6 @@ void make_small(T_t &T){
     }
 }
 
-
-template <typename G_t>
-void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    unsigned int max = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        max = (G[*vIt].id > max)? G[*vIt].id : max;
-    
-    idxMap.resize(max+1);
-    
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        idxMap[G[*vIt].id] = *vIt; 
-}
-
 //glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
 template <typename T_t>
 void glue_decompositions(T_t &T1, T_t &T2){
@@ -283,6 +269,29 @@ void reorder_ids_graph(G_t &G, std::vector<unsigned int> &id_map){
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         id_map[k] = G[*vIt].id;
         G[*vIt].id = k++; 
+    }
+}
+
+template <typename G_t>
+void undo_reorder_ids_graph(G_t &G, std::vector<unsigned int> &id_map){
+    unsigned int k = 0;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+        G[*vIt].id = id_map[k++];
+}
+
+template <typename G_t>
+void descriptor_bag_to_id_bag(G_t &G, std::set<unsigned int> &id_bag, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag){
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = desc_bag.begin(); sIt != desc_bag.end(); sIt++)
+        id_bag.insert(G[*sIt].id);
+}
+
+template <typename G_t>
+void id_bag_to_descriptor_bag(G_t &G, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag, std::set<unsigned int> &id_bag){
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(id_bag.find(G[*vIt].id) != id_bag.end())
+            desc_bag.insert(*vIt);
     }
 }
 
