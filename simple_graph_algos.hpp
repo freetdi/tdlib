@@ -46,7 +46,7 @@ G_t graph_after_deletion(G_t G, std::set<unsigned int> &X){
 
 
 template <typename G_t>
-void TD_copy_graph(G_t &G, G_t &H){
+void TD_copy_graph(const G_t &G, G_t &H){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     unsigned int max = 0;
@@ -64,7 +64,7 @@ void TD_copy_graph(G_t &G, G_t &H){
 }
 
 template <typename G_t>
-void TD_copy_graph(G_t &G, G_t &H, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &map){
+void TD_copy_graph(const G_t &G, G_t &H, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &map){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     unsigned int max = 0;

@@ -75,7 +75,7 @@ namespace lb{
 
 //smallest vertex-degree in G
 template <typename G_t>
-int delta(G_t &G){
+int delta(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
 
@@ -90,14 +90,17 @@ int delta(G_t &G){
 
 //second smallest vertex-degree in G
 template <typename G_t>
-int delta2(G_t &G){
+int delta2(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
+    else if(boost::num_vertices(G) == 1)
+        return 0;
+
+    unsigned int min = boost::num_vertices(G);
+    unsigned int snd = min;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::vertex_descriptor v_min;
-    unsigned int min = boost::num_vertices(G);
-    unsigned int snd = boost::num_vertices(G);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::out_degree(*vIt, G);
         if(degree <= min){
@@ -110,31 +113,40 @@ int delta2(G_t &G){
     return (int)snd;
 }
 
-//maximum degree of minimal degree of not with an edge incident vertices
 template <typename G_t>
-int gamma(G_t &G){
-    if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
-        return boost::num_vertices(G)-1;
-
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
-    //sort the vertices of G according to rising degree -> degree_sequence
+inline void _make_degree_sequence(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence){
     unsigned int max_degree = 0;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::out_degree(*vIt, G);
         max_degree = (degree>max_degree)? degree : max_degree;
     }
+
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::out_degree(*vIt, G);
-        buckets[degree].push_back(*vIt);
+        if(degree > 0)
+            buckets[degree].push_back(*vIt);
     }
-    for(unsigned int i = 0; i <= max_degree; i++){
-        for(unsigned int j = 0; j < buckets[i].size(); j++){
+    for(unsigned int i = 1; i <= max_degree; i++){
+        for(unsigned int j = 0; j < buckets[i].size(); j++)
             degree_sequence.push_back(buckets[i][j]);
-        }
-    }
+    } 
+}
+
+template <typename G_t>
+int gamma(const G_t &G){
+    if(boost::num_vertices(G) == 0)
+        return -1;
+    else if(boost::num_vertices(G) == 1 || boost::num_edges(G) == 0)
+        return 0;
+    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+        return boost::num_vertices(G)-1;
+    
+    //sort the vertices of G according to rising degree -> degree_sequence
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
+    _make_degree_sequence(G, degree_sequence);
+
     //take the degree of the right vertex in the first not-edge
     for(unsigned int i = 0; i < boost::num_vertices(G); i++){
         for(unsigned int j = 0; j < i; j++){
@@ -182,7 +194,7 @@ int deltaD(G_t G){
 
 //assume each vertex as the minimal one and do deltaD
 template <typename G_t>
-int delta2D(G_t &G){
+int delta2D(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
 
@@ -225,29 +237,12 @@ int delta2D(G_t &G){
 
 template <typename G_t>
 void _gammaD_left(G_t &G, unsigned int &lb){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
-    //sort the vertices of G according to rising degree -> degree_sequence
-    unsigned int max_degree = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        max_degree = (degree>max_degree)? degree : max_degree;
-    }
-
-    if(max_degree == 0)
+    if(boost::num_edges(G) == 0)
         return;
 
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
+    //sort the vertices of G according to rising degree -> degree_sequence
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        if(degree > 0)
-            buckets[degree].push_back(*vIt);
-    }
-    for(unsigned int i = 1; i <= max_degree; i++){
-        for(unsigned int j = 0; j < buckets[i].size(); j++)
-            degree_sequence.push_back(buckets[i][j]);
-    }
+    _make_degree_sequence(G, degree_sequence);
 
     for(unsigned int i = 0; i < degree_sequence.size(); i++){
         for(unsigned int j = 0; j < i; j++){
@@ -273,7 +268,7 @@ int gammaD_left(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         return boost::num_vertices(G)-1;
     }
 
@@ -284,30 +279,12 @@ int gammaD_left(G_t G){
 
 template <typename G_t>
 void _gammaD_right(G_t &G, unsigned int &lb){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
-    //sort the vertices of G according to rising degree -> degree_sequence
-    unsigned int max_degree = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        max_degree = (degree>max_degree)? degree : max_degree;
-    }
-
-    if(max_degree == 0)
+    if(boost::num_edges(G) == 0)
         return;
 
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
+    //sort the vertices of G according to rising degree -> degree_sequence
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        if(degree > 0)
-            buckets[degree].push_back(*vIt);
-    }
-    for(unsigned int i = 1; i <= max_degree; i++){
-        for(unsigned int j = 0; j < buckets[i].size(); j++){
-            degree_sequence.push_back(buckets[i][j]);
-        }
-    }
+    _make_degree_sequence(G, degree_sequence);
 
     for(unsigned int i = 0; i < degree_sequence.size(); i++){
         for(unsigned int j = 0; j < i; j++){
@@ -332,7 +309,7 @@ int gammaD_right(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         return boost::num_vertices(G)-1;
     }
 
@@ -343,35 +320,16 @@ int gammaD_right(G_t G){
 
 template <typename G_t>
 void _gammaD_min_e(G_t &G, unsigned int &lb){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
-    //sort the vertices of G according to rising degree -> degree_sequence
-    unsigned int max_degree = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        max_degree = (degree>max_degree)? degree : max_degree;
-    }
-
-    if(max_degree == 0)
+    if(boost::num_edges(G) == 0)
         return;
 
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
+    //sort the vertices of G according to rising degree -> degree_sequence
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::out_degree(*vIt, G);
-        if(degree > 0)
-            buckets[degree].push_back(*vIt);
-    }
-    for(unsigned int i = 1; i <= max_degree; i++){
-        for(unsigned int j = 0; j < buckets[i].size(); j++){
-            degree_sequence.push_back(buckets[i][j]);
-        }
-    }
+    _make_degree_sequence(G, degree_sequence);
 
     for(unsigned int i = 0; i < degree_sequence.size(); i++){
         for(unsigned int j = 0; j < i; j++){
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(degree_sequence[i], degree_sequence[j], G);
-            if(existsEdge.second)
+            if(boost::edge(degree_sequence[i], degree_sequence[j], G).second)
                 continue;
             
             //gammaD-min-e heuristic
@@ -401,7 +359,7 @@ int gammaD_min_e(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         return boost::num_vertices(G)-1;
     }
 
@@ -410,50 +368,58 @@ int gammaD_min_e(G_t G){
     return lb;
 }
 
+//assumes that some edge exists
+template <typename G_t>
+inline typename boost::graph_traits<G_t>::vertex_descriptor _min_degree_vertex(const G_t &G){
+    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+    unsigned int min_degree = boost::num_vertices(G);
+
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned int degree = boost::out_degree(*vIt, G);
+        if(degree <= min_degree && degree > 0){
+            min_degree = degree;
+            min_vertex = *vIt;
+        }
+    }
+    return min_vertex;
+}
+
+template <typename G_t>
+inline void _contract_edge(G_t &G, const typename boost::graph_traits<G_t>::vertex_descriptor &v, const typename boost::graph_traits<G_t>::vertex_descriptor &w){
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
+        if(*nIt != v)
+            boost::add_edge(v, *nIt, G);
+    }
+        
+    boost::clear_vertex(w, G);
+}
+
+
 template <typename G_t>
 int _deltaC_min_d(G_t &G){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
         //search a minimum-degree-vertex
-        unsigned int min_degree_v = boost::num_vertices(G);
-
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree <= min_degree_v && degree > 0){
-                min_degree_v = degree;
-                min_vertex = *vIt;
-            }
-        }
-        
-        lb = (lb>min_degree_v)? lb : min_degree_v;
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(G);       
+        lb = (lb>boost::out_degree(min_vertex, G))? lb : boost::out_degree(min_vertex, G);
 
         //min_d heuristic: search a neighbour of min_vertex with minimal degree
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         unsigned int min_degree_w = boost::num_vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor w;
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; nIt1++){
-            unsigned int degree = boost::out_degree(*nIt1, G);
+
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
+            unsigned int degree = boost::out_degree(*nIt, G);
             if(degree <= min_degree_w){
                 min_degree_w = degree;
-                w = *nIt1;
+                w = *nIt;
             }
         }
         
-        //contract the edge between min_vertex and w
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-        for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(w, G); nIt2 != nEnd2; nIt2++)
-            N.insert(*nIt2);
-
-        N.erase(min_vertex);
-         
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)
-            boost::add_edge(min_vertex, *sIt, G);
-        
-        boost::clear_vertex(w, G);
+        _contract_edge(G, min_vertex, w);
     }
     return (int)lb;
 }
@@ -464,7 +430,7 @@ int deltaC_min_d(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         return boost::num_vertices(G)-1;
     }
 
@@ -473,48 +439,27 @@ int deltaC_min_d(G_t G){
 
 template <typename G_t>
 int _deltaC_max_d(G_t &G){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
         //search a minimum-degree-vertex
-        unsigned int min_degree = boost::num_vertices(G);
-
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree < min_degree && degree > 0){
-                min_degree = degree;
-                min_vertex = *vIt;
-            }
-        }
-        
-        lb = (lb>min_degree)? lb : min_degree;
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(G);       
+        lb = (lb>boost::out_degree(min_vertex, G))? lb : boost::out_degree(min_vertex, G);
 
         //max_d heuristic: search the neighbour of min_vertex with maximal degree
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         unsigned int max_degree = 0;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; nIt1++){
-            unsigned int degree = boost::out_degree(*nIt1, G);
+
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
+            unsigned int degree = boost::out_degree(*nIt, G);
             if(degree > max_degree){
                 max_degree = degree;
-                w = *nIt1;
+                w = *nIt;
             }
         }
 
-        //contract the edge between min_vertex and w
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-        for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(w, G); nIt2 != nEnd2; nIt2++)
-            N.insert(*nIt2);
-
-        N.erase(min_vertex);
-        
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)
-            boost::add_edge(min_vertex, *sIt, G);
-        
-        boost::clear_vertex(w, G);
+        _contract_edge(G, min_vertex, w);
     }
     return (int)lb;
 }
@@ -525,7 +470,7 @@ int deltaC_max_d(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     return _deltaC_max_d(G);
@@ -533,66 +478,104 @@ int deltaC_max_d(G_t G){
 
 template <typename G_t>
 int _deltaC_least_c(G_t &G){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
         //search a minimum-degree-vertex
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
         unsigned int min_degree = boost::num_vertices(G);
 
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree > 0 && degree < min_degree){
+            if(degree <= min_degree && degree > 0){
                 min_degree = degree;
                 min_vertex = *vIt;
             }
-        }
-        
+        }    
+
         lb = (lb>min_degree)? lb : min_degree;
 
-        if(min_degree == boost::num_vertices(G))
-            return (int)lb;
-
         //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-        
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
-            N.insert(*nIt);
-        
-        unsigned int cnt_common, min_common = N.size();
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-        
-        for(sIt1 = N.begin(); sIt1 != N.end(); sIt1++){
-            cnt_common = 0;
-            sIt2 = sIt1;
-            sIt2++;
-            for(; sIt2 != N.end(); sIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, G);
-                if(existsEdge.second)
-                    cnt_common += 1;
+
+        unsigned int min_common = boost::out_degree(min_vertex, G);
+        min_common++;
+
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
+            unsigned int cnt_common = 0;
+            nIt2 = nIt1;
+            nIt2++;
+            for(; nIt2 != nEnd; nIt2++){
+                if(boost::edge(*nIt1, *nIt2, G).second)
+                    cnt_common++;
             }
             if(cnt_common < min_common){
-                w = *sIt1;
+                w = *nIt1;
                 min_common = cnt_common;
             }
         }
         
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++)
-            N.insert(*nIt);
-        
         //contract the edge between min_vertex and w
-        typename boost::graph_traits<G_t>::vertex_descriptor new_v = boost::add_vertex(G);
-
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++){
-            if(!boost::edge(new_v, *sIt, G).second)
-                boost::add_edge(new_v, *sIt, G);
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(w, G); nIt1 != nEnd; nIt1++){
+            if(*nIt1 != min_vertex)
+                boost::add_edge(min_vertex, *nIt1, G);
         }
-        
-        boost::clear_vertex(min_vertex, G);
+
+        boost::clear_vertex(w, G);
+    }
+    return (int)lb;
+}
+
+//quite faster as the above version if vecS is the container for the edges
+template <typename G_t>
+int _deltaC_least_c_fast(G_t &G){
+    unsigned int lb = 0;
+
+    while(boost::num_edges(G) > 0){
+        //search a minimum-degree-vertex
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+        unsigned int min_degree = boost::num_vertices(G);
+
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            unsigned int degree = boost::out_degree(*vIt, G);
+            if(degree <= min_degree && degree > 0){
+                min_degree = degree;
+                min_vertex = *vIt;
+            }
+        }    
+
+        lb = (lb>min_degree)? lb : min_degree;
+
+        //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+        typename boost::graph_traits<G_t>::vertex_descriptor w;
+
+        unsigned int min_common = boost::out_degree(min_vertex, G);
+        min_common++;
+
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
+            unsigned int cnt_common = 0;
+            nIt2 = nIt1;
+            nIt2++;
+            for(; nIt2 != nEnd; nIt2++){
+                if(boost::edge(*nIt1, *nIt2, G).second)
+                    cnt_common++;
+            }
+            if(cnt_common < min_common){
+                w = *nIt1;
+                min_common = cnt_common;
+            }
+        }
+
+        //contract the edge between min_vertex and w
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(w, G); nIt1 != nEnd; nIt1++){
+            if(*nIt1 != min_vertex && !boost::edge(min_vertex, *nIt1, G).second)
+                boost::add_edge(min_vertex, *nIt1, G);
+        }
+
         boost::clear_vertex(w, G);
     }
     return (int)lb;
@@ -604,7 +587,7 @@ int deltaC_least_c(G_t G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     return _deltaC_least_c(G);
@@ -646,12 +629,12 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
 
 
 template <typename G_t>
-int LBN_deltaD(G_t &G){
+int LBN_deltaD(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaD(G);
@@ -661,7 +644,7 @@ int LBN_deltaD(G_t &G){
         TD_copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
 
-        if(deltaD(H) > lb)
+        if(_deltaD(H) > lb)
             lb++;
         else
             break;   
@@ -670,12 +653,12 @@ int LBN_deltaD(G_t &G){
 }
 
 template <typename G_t>
-int LBN_deltaC(G_t &G){
+int LBN_deltaC(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaC_least_c(G);
@@ -685,12 +668,38 @@ int LBN_deltaC(G_t &G){
         TD_copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
         
-        if(deltaC_least_c(H) > lb)
+        if(_deltaC_least_c(H) > lb)
             lb++;
         else
             break;   
     }
     return lb;
+}
+
+
+//assumes that some edge exists
+template <typename G_t>
+inline typename boost::graph_traits<G_t>::vertex_descriptor _least_c(const G_t &G, const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex){
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    typename boost::graph_traits<G_t>::vertex_descriptor w;
+
+    unsigned int min_common = boost::out_degree(min_vertex, G);
+    min_common++;
+
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
+        unsigned int cnt_common = 0;
+        nIt2 = nIt1;
+        nIt2++;
+        for(; nIt2 != nEnd; nIt2++){
+            if(boost::edge(*nIt1, *nIt2, G).second)
+                cnt_common++;
+        }
+        if(cnt_common < min_common){
+            w = *nIt1;
+            min_common = cnt_common;
+        }
+    }
+    return w;
 }
 
 
@@ -700,7 +709,7 @@ int LBNC_deltaD(G_t &G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaD(G);
@@ -717,54 +726,11 @@ int LBNC_deltaD(G_t &G){
             if(new_lb > lb)
                 break;
             
-            //compute a min-degree-vertex
-            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-            unsigned int min_degree = boost::num_vertices(H);
-            for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
-                unsigned int degree = boost::out_degree(*vIt, H);
-                if(degree < min_degree && degree > 0){
-                    min_degree = degree;
-                    min_vertex = *vIt;
-                }
-            }
-            
-            //compute a neighbour of min_vertex, such that they share a minimal count of vertices
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor w;
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
+            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(H); 
 
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, H); nIt != nEnd; nIt++)
-                N2.insert(*nIt);
+            typename boost::graph_traits<G_t>::vertex_descriptor w = _least_c(H, min_vertex);
 
-            unsigned int cnt_common, min_common = boost::out_degree(min_vertex, H);
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-                
-            for(sIt1 = N2.begin(); sIt1 != N2.end(); sIt1++){
-                cnt_common = 0;
-                sIt2 = sIt1;
-                sIt2++;
-                for(; sIt2 != N2.end(); sIt2++){
-                    std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                    if(existsEdge.second)
-                        cnt_common += 1;
-                }
-                if(cnt_common < min_common){
-                    w = *sIt1;
-                    min_common = cnt_common;
-                }
-            }
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, H); nIt != nEnd; nIt++)
-                N1.insert(*nIt);
-
-            N1.erase(min_vertex);
-
-            //contract the edge between min_vertex and w
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N1.begin(); sIt != N1.end(); sIt++)
-                boost::add_edge(min_vertex, *sIt, H);
-                
-            boost::clear_vertex(w, H);
+            _contract_edge(H, min_vertex, w);
 
             k_neighbour_improved_graph(H, lb+1);
         }
@@ -782,7 +748,7 @@ int LBNC_deltaC(G_t &G){
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaC_least_c(G);
@@ -799,54 +765,11 @@ int LBNC_deltaC(G_t &G){
             if(new_lb > lb)
                 break;
             
-            //compute a min-degree-vertex
-            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-            unsigned int min_degree = boost::num_vertices(H);
-            for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
-                unsigned int degree = boost::out_degree(*vIt, H);
-                if(degree < min_degree && degree > 0){
-                    min_degree = degree;
-                    min_vertex = *vIt;
-                }
-            }
+            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(H); 
 
-            //compute a neighbour of min_vertex, such that they share a minimal count of vertices
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor w;
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
+            typename boost::graph_traits<G_t>::vertex_descriptor w = _least_c(H, min_vertex);
 
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, H); nIt != nEnd; nIt++)
-                N2.insert(*nIt);
-
-            unsigned int cnt_common, min_common = N2.size();
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-                
-            for(sIt1 = N2.begin(); sIt1 != N2.end(); sIt1++){
-                cnt_common = 0;
-                sIt2 = sIt1;
-                sIt2++;
-                for(; sIt2 != N2.end(); sIt2++){
-                    std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                    if(existsEdge.second)
-                        cnt_common += 1;
-                }
-                if(cnt_common < min_common){
-                    w = *sIt1;
-                    min_common = cnt_common;
-                }
-            }
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, H); nIt != nEnd; nIt++)
-                N1.insert(*nIt);
-
-            N1.erase(min_vertex);
-
-            //contract the edge between min_vertex and w
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N1.begin(); sIt != N1.end(); sIt++)
-                boost::add_edge(min_vertex, *sIt, H);
-
-            boost::clear_vertex(w, H);
+            _contract_edge(H, min_vertex, w);
 
             k_neighbour_improved_graph(H, lb+1);
         }
@@ -895,12 +818,12 @@ void k_path_improved_graph(G_t &G, unsigned int k){
 }
 
 template <typename G_t>
-int LBP_deltaD(G_t &G){
+int LBP_deltaD(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaD(G);
@@ -913,7 +836,7 @@ int LBP_deltaD(G_t &G){
 
         k_path_improved_graph(H, lb+1);
         
-        if(deltaD(H) > lb)
+        if(_deltaD(H) > lb)
             lb++;
         else
             break;   
@@ -922,12 +845,12 @@ int LBP_deltaD(G_t &G){
 }
 
 template <typename G_t>
-int LBP_deltaC(G_t &G){
+int LBP_deltaC(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaC_least_c(G);
@@ -940,7 +863,7 @@ int LBP_deltaC(G_t &G){
 
         k_path_improved_graph(H, lb+1);
 
-        if(deltaC_least_c(H) > lb)
+        if(_deltaC_least_c(H) > lb)
             lb++;
         else
             break;   
@@ -949,12 +872,12 @@ int LBP_deltaC(G_t &G){
 }
 
 template <typename G_t>
-int LBPC_deltaD(G_t &G){
+int LBPC_deltaD(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaD(G);
@@ -974,54 +897,11 @@ int LBPC_deltaD(G_t &G){
             if(new_lb > lb)
                 break;
             
-            //compute a min-degree-vertex
-            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-            unsigned int min_degree = boost::num_vertices(H);
-            for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
-                unsigned int degree = boost::out_degree(*vIt, H);
-                if(degree < min_degree && degree > 0){
-                    min_degree = degree;
-                    min_vertex = *vIt;
-                }
-            }
-            
-            //compute a neighbour of min_vertex, such that they share a minimal count of vertices
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor w;
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, H); nIt != nEnd; nIt++)
-                N2.insert(*nIt);
-                
-            unsigned int cnt_common, min_common = N2.size();
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-                
-            for(sIt1 = N2.begin(); sIt1 != N2.end(); sIt1++){
-                cnt_common = 0;
-                sIt2 = sIt1;
-                sIt2++;
-                for(; sIt2 != N2.end(); sIt2++){
-                    std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                    if(existsEdge.second)
-                        cnt_common += 1;
-                }
-                if(cnt_common < min_common){
-                    w = *sIt1;
-                    min_common = cnt_common;
-                }
-            }
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, H); nIt != nEnd; nIt++)
-                N1.insert(*nIt);
+            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(H); 
 
-            N1.erase(min_vertex);
+            typename boost::graph_traits<G_t>::vertex_descriptor w = _least_c(H, min_vertex);
 
-            //contract the edge between min_vertex and w
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N1.begin(); sIt != N1.end(); sIt++)
-                boost::add_edge(min_vertex, *sIt, H);
-                
-            boost::clear_vertex(w, H);
+            _contract_edge(H, min_vertex, w);
 
             k_path_improved_graph(H, lb+1);
 
@@ -1035,12 +915,12 @@ int LBPC_deltaD(G_t &G){
 }
 
 template <typename G_t>
-int LBPC_deltaC(G_t &G){
+int LBPC_deltaC(const G_t &G){
     if(boost::num_vertices(G) == 0)
         return -1;
     else if(boost::num_edges(G) == 0)
         return 0;
-    else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
     int lb = deltaC_least_c(G);
@@ -1061,54 +941,11 @@ int LBPC_deltaC(G_t &G){
             if(new_lb > lb)
                 break;
             
-            //compute a min-degree-vertex
-            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-            unsigned int min_degree = boost::num_vertices(H);
-            for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
-                unsigned int degree = boost::out_degree(*vIt, H);
-                if(degree < min_degree && degree > 0){
-                    min_degree = degree;
-                    min_vertex = *vIt;
-                }
-            }
+            typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(H); 
 
-            //compute a neighbour of min_vertex, such that they share a minimal count of vertices
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            typename boost::graph_traits<G_t>::vertex_descriptor w;
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, H); nIt != nEnd; nIt++)
-                N2.insert(*nIt);
-                
-            unsigned int cnt_common, min_common = N2.size();
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-                
-            for(sIt1 = N2.begin(); sIt1 != N2.end(); sIt1++){
-                cnt_common = 0;
-                sIt2 = sIt1;
-                sIt2++;
-                for(; sIt2 != N2.end(); sIt2++){
-                    std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                    if(existsEdge.second)
-                        cnt_common += 1;
-                }
-                if(cnt_common < min_common){
-                    w = *sIt1;
-                    min_common = cnt_common;
-                }
-            }
-                
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, H); nIt != nEnd; nIt++)
-                N1.insert(*nIt);
+            typename boost::graph_traits<G_t>::vertex_descriptor w = _least_c(H, min_vertex);
 
-            N1.erase(min_vertex);
-
-            //contract the edge between min_vertex and w
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N1.begin(); sIt != N1.end(); sIt++)
-                boost::add_edge(min_vertex, *sIt, H);
-
-            boost::clear_vertex(w, H);
+            _contract_edge(H, min_vertex, w);
 
             k_path_improved_graph(H, lb+1);
         }
@@ -1175,6 +1012,22 @@ std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_single(G_t
 
 template <typename G_t>
 std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_all_start_vertices(G_t &G, int &lb){
+    if(boost::num_vertices(G) == 0){
+        lb = -1;
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
+        return rtn;
+    }
+    else if(boost::num_edges(G) == 0){
+        lb = 0;
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
+        return rtn;
+    }
+    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+        lb = boost::num_vertices(G)-1;
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
+        return rtn;
+    }
+
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int last_lb = lb;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data, rtn;
@@ -1207,6 +1060,19 @@ void MCS_random(G_t &G, int &lb){
 
 template <typename G_t>
 void MCSC_min_deg(G_t H, int &lb){
+    if(boost::num_vertices(H) == 0){
+        lb = -1;
+        return;
+    }
+    else if(boost::num_edges(H) == 0){
+        lb = 0;
+        return;
+    }
+    else if(2*boost::num_edges(H) == boost::num_vertices(H)*(boost::num_vertices(H)-1)){
+        lb = boost::num_vertices(H)-1;
+        return;
+    }
+
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
@@ -1250,7 +1116,7 @@ void MCSC_min_deg(G_t H, int &lb){
         int deg, min_deg = (int)boost::num_vertices(H);
         for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
             deg = boost::out_degree(*vIt, H);
-            if(deg < min_deg){
+            if(deg < min_deg && deg > 0){
                 min_deg = deg;
                 v = *vIt;
             }
@@ -1260,6 +1126,19 @@ void MCSC_min_deg(G_t H, int &lb){
 
 template <typename G_t>
 void MCSC_last_mcs(G_t H, int &lb){
+    if(boost::num_vertices(H) == 0){
+        lb = -1;
+        return;
+    }
+    else if(boost::num_edges(H) == 0){
+        lb = 0;
+        return;
+    }
+    else if(2*boost::num_edges(H) == boost::num_vertices(H)*(boost::num_vertices(H)-1)){
+        lb = boost::num_vertices(H)-1;
+        return;
+    }
+
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
@@ -1307,6 +1186,19 @@ void MCSC_last_mcs(G_t H, int &lb){
 
 template <typename G_t>
 void MCSC_max_mcs(G_t H, int &lb){
+    if(boost::num_vertices(H) == 0){
+        lb = -1;
+        return;
+    }
+    else if(boost::num_edges(H) == 0){
+        lb = 0;
+        return;
+    }
+    else if(2*boost::num_edges(H) == boost::num_vertices(H)*(boost::num_vertices(H)-1)){
+        lb = boost::num_vertices(H)-1;
+        return;
+    }
+
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
