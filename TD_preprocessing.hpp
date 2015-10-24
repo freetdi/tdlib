@@ -59,6 +59,7 @@
 #include <vector>
 #include <set>
 #include <boost/tuple/tuple.hpp>
+#include "TD_misc.hpp"
 
 namespace treedec{
 
@@ -86,28 +87,6 @@ void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int>
             bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, std::set<unsigned int>()));
     }
 }
-
-#ifndef REMOVE_ISOLATED_VERTICES
-#define REMOVE_ISOLATED_VERTICES
-
-template <typename G_t>
-void remove_isolated_vertices(G_t &G){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-
-    bool exists_isolated = true;
-    while(exists_isolated){
-        exists_isolated = false;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){     
-            if(boost::out_degree(*vIt, G) == 0){
-                boost::remove_vertex(*vIt, G);
-                exists_isolated = true;
-                break;
-            }
-        }
-    }
-}
-
-#endif
 
 //checks if there exists a degree-1-vertex
 template <typename G_t>

@@ -39,12 +39,12 @@
 //
 // These functions are most likely to be interesting for outside use:
 //
-// void preprocessing_MD(G_t &G, T_t &T)
-// void preprocessing_MD(G_t &G, T_t &T, int &low)
-// void preprocessing_FI(G_t &G, T_t &T)
-// void preprocessing_FI(G_t &G, T_t &T, int &low)
-// void preprocessing_FI_TM(G_t &G, T_t &T)
-// void preprocessing_FI_TM(G_t &G, T_t &T, int &low)
+// void PP_MD(G_t &G, T_t &T)
+// void PP_MD(G_t &G, T_t &T, int &low)
+// void PP_FI(G_t &G, T_t &T)
+// void PP_FI(G_t &G, T_t &T, int &low)
+// void PP_FI_TM(G_t &G, T_t &T)
+// void PP_FI_TM(G_t &G, T_t &T, int &low)
 // void FI_TM(G_t &G, T_t &T)
 // void FI_TM(G_t &G, T_t &T, int &low)
 // void exact_decomposition_cutset(G_t &G, T_t &T)
@@ -70,36 +70,44 @@ namespace treedec{
 //recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
-void preprocessing_MD(G_t &G, T_t &T, int &low){
+void PP_MD(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    if(boost::num_edges(G) != 0)
-        treedec::minDegree_decomp(G, T);
+    if(boost::num_edges(G) > 0)
+        treedec::_minDegree_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
 //recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
-void preprocessing_FI(G_t &G, T_t &T, int &low){
+void PP_FI(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    treedec::fillIn_decomp(G, T);
+    treedec::_fillIn_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
 //recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
 //this version applies the fillIn-heuristic followed by triangulation minimization on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
-void preprocessing_FI_TM(G_t &G, T_t &T, int &low){
+void PP_FI_TM(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    treedec::remove_isolated_vertices(G);
-    if(boost::num_edges(G) != 0){
-        std::vector<unsigned int> old_elim_ordering, new_elim_ordering;
-        treedec::fillIn_ordering(G, old_elim_ordering);
-        treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-        treedec::ordering_to_treedec(G, new_elim_ordering, T);
+    if(boost::num_edges(G) > 0){
+        std::vector<unsigned int> old_elim_ordering;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
+
+        G_t H;
+        treedec::remove_isolated_vertices(H, G);  
+        std::vector<unsigned int> id_map;
+        treedec::reorder_ids_graph(H, id_map);
+
+        treedec::fillIn_ordering(H, old_elim_ordering);
+        treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
+        treedec::ordering_to_treedec(H, new_elim_ordering, T);
+        
+        treedec::reorder_ids_decomposition(T, id_map);
     }
     treedec::preprocessing_glue_bags(bags, T); 
 }
@@ -107,16 +115,11 @@ void preprocessing_FI_TM(G_t &G, T_t &T, int &low){
 //this version applies the fillIn-heuristic followed by triangulation minimization
 template <typename G_t, typename T_t>
 void FI_TM(G_t &G, T_t &T, int &low){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
-    treedec::Islet(G, bags, low);
-    if(boost::num_edges(G) != 0){
-        treedec::remove_isolated_vertices(G);
-        std::vector<unsigned int> old_elim_ordering, new_elim_ordering;
-        treedec::fillIn_ordering(G, old_elim_ordering);
-        treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-        treedec::ordering_to_treedec(G, new_elim_ordering, T);
-    }
-    treedec::preprocessing_glue_bags(bags, T); 
+    std::vector<unsigned int> old_elim_ordering;
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
+    treedec::fillIn_ordering(G, old_elim_ordering);
+    treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
+    treedec::ordering_to_treedec(G, new_elim_ordering, T);
 }
 
 template <typename G_t, typename T_t>
@@ -231,21 +234,21 @@ void exact_decomposition_chordal(G_t &G, T_t &T){
 }
 
 template <typename G_t, typename T_t>
-void preprocessing_MD(G_t &G, T_t &T){
+void PP_MD(G_t &G, T_t &T){
     int low = -1;
-    preprocessing_MD(G, T, low);
+    PP_MD(G, T, low);
 }
 
 template <typename G_t, typename T_t>
-void preprocessing_FI(G_t &G, T_t &T){
+void PP_FI(G_t &G, T_t &T){
     int low = -1;
-    preprocessing_FI(G, T, low);
+    PP_FI(G, T, low);
 }
 
 template <typename G_t, typename T_t>
-void preprocessing_FI_TM(G_t &G, T_t &T){
+void PP_FI_TM(G_t &G, T_t &T){
     int low = -1;
-    preprocessing_FI_TM(G, T, low);
+    PP_FI_TM(G, T, low);
 }
 
 template <typename G_t, typename T_t>

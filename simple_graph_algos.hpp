@@ -28,24 +28,6 @@
 #include <set>
 
 template <typename G_t>
-G_t graph_after_deletion(G_t G, std::set<unsigned int> &X){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> to_delete;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-       if(X.find(G[*vIt].id) != X.end())
-           to_delete.push_back(*vIt);
-    }
-    
-    for(unsigned int i = 0; i < to_delete.size(); i++){
-        boost::clear_vertex(to_delete[i], G);
-        boost::remove_vertex(to_delete[i], G);
-    }
-    return G;
-}
-
-
-template <typename G_t>
 void TD_copy_graph(const G_t &G, G_t &H){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
@@ -116,18 +98,6 @@ void delete_edges(G_t &G, std::vector<std::vector<unsigned int> > &edges){
     }
 }
                 
-template <typename G_t>
-G_t get_induced_subgraph(G_t &G, std::set<unsigned int> &X){
-    std::set<unsigned int> complement;
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        complement.insert(G[*vIt].id);
-    for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++)
-        complement.erase(*sIt);
-    
-    return graph_after_deletion(G, complement);
-}
-
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G, std::set<unsigned int> &X){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(boost::num_vertices(G));

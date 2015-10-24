@@ -146,7 +146,7 @@ void MSVS(G_t &G, T_t &T){
         
         //compute a seperating set S
         std::set<unsigned int> S;
-        seperate_vertices2(H, disabled, X, Y, S);
+        seperate_vertices(H, disabled, X, Y, S);
 
         //do the refinement
         std::vector<bool> visited(boost::num_vertices(G), true);
@@ -194,36 +194,36 @@ void MSVS(G_t &G, T_t &T){
     }
 }
 
-
 template <typename G_t>
 bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vector<unsigned int> &elimination_ordering, G_t &M, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
     bool is_cand = true;
+
+    //pos i in elimination_ordering_ will store store the "elimination date" of vertex i
+    std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
+    for(unsigned int t = 0; t < elimination_ordering.size(); t++)
+        elimination_ordering_[elimination_ordering[t]] = t;
+
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[edge[0]], M); nIt != nEnd; nIt++){
-        for(unsigned int j = i+1; j < elimination_ordering.size(); j++){
-            if(elimination_ordering[j] == M[*nIt].id){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(idxMap[edge[1]], *nIt, M);
-                if(existsEdge.second){
-                    existsEdge = boost::edge(*nIt, idxMap[elimination_ordering[i]], M);
-                    if(!existsEdge.second)
-                        return false;
-                }
-            }
-        }
+        if(elimination_ordering_[M[*nIt].id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second)
+            return false;
     }
     return true;
 }
 
 
+
+
+
 /* minimalChordal-algorithm 
  * 
  * Computes possibly redundant fill-in-edges and runs LEX-M to check,
- * if the graph without one of the fill-in-edges in chordal after removal.
+ * if the graph after removal of a fill-in-edge is chordal.
  * Finally, the algorithm computes a new perfect elimination ordering, that
  * possibly causes lower tree width. 
  */
 template <typename G_t>
-void minimalChordal(G_t G, std::vector<unsigned int> &old_elimination_ordering, std::vector<unsigned int> &new_elimination_ordering){
+void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap; 
     make_index_map(G, idxMap);
     
@@ -242,7 +242,8 @@ void minimalChordal(G_t G, std::vector<unsigned int> &old_elimination_ordering, 
             }
         }
         if(candidate.size() != 0){
-            G_t W_i = get_induced_subgraph(G, incident);
+            G_t W_i; 
+            induced_subgraph(W_i, G, incident);
             delete_edges(W_i, candidate);
             
             std::vector<std::vector<unsigned int> > keep_fill;
@@ -263,6 +264,7 @@ void minimalChordal(G_t G, std::vector<unsigned int> &old_elimination_ordering, 
     }
     LEX_M_minimal_ordering(G, new_elimination_ordering);
 }
+
 
 }
 
