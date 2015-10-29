@@ -346,45 +346,36 @@ bool Cube(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
 //checks if there exists a vertex, such that its neighbours induce a clique (Simplicial)
 template <typename G_t>
 bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
-    
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 0)
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 0)
             continue;
-
-        typename boost::graph_traits<G_t>::adjacency_iterator neighbourIt, neighbourEnd;
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-        N.push_back(*vertexIt);
-  
-        for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++)
-            N.push_back(*neighbourIt);
 
         //N is a clique, if no "edge miss" occures 
         bool isClique = true;
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator nIt1, nIt2;
-        
-        for(nIt1 = N.begin(); nIt1 != N.end(); nIt1++){
+
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;       
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++){
             nIt2 = nIt1;
             nIt2++;
-            for(; nIt2 != N.end(); nIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*nIt1, *nIt2, G);
-                if(!existsEdge.second){
+            for(; nIt2 != nEnd; nIt2++){
+                if(!boost::edge(*nIt1, *nIt2, G).second){
                     isClique = false;
-                    break;
+                    goto DOUBLE_BREAK;
                 }
             }
-            if(!isClique)
-                break;
         }
+
+        DOUBLE_BREAK:
   
         if(isClique){       
             std::set<unsigned int> bag;    
-            for(boost::tie(neighbourIt, neighbourEnd) = adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++)
-                bag.insert(G[*neighbourIt].id);
+            for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++)
+                bag.insert(G[*nIt1].id);
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vIt].id, bag));
   
-            boost::clear_vertex(*vertexIt, G);
+            boost::clear_vertex(*vIt, G);
 
             low = (low > (int)bag.size())? low : (int)bag.size();
             return true;
@@ -397,25 +388,24 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned
 //checks if there exists a almost simplicial vertex in G (includes the case of a simplicial vertex)
 template <typename G_t>
 bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 0)
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 0)
             continue;
 
-        typename boost::graph_traits<G_t>::adjacency_iterator neighbourIt, neighbourEnd;
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-        N.push_back(*vertexIt);
-  
-        for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++)
-            N.push_back(*neighbourIt);
+        N.push_back(*vIt);
 
-        //N except one vertex now potentially is a clique 
-        bool isClique = true;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;  
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++)
+            N.push_back(*nIt);
+
+        //N except one vertex now potentially is a clique
+        bool isAlmostSimplicial = true; 
         bool specialNeighbourFound = false;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator nIt1, nIt2;
         typename boost::graph_traits<G_t>::vertex_descriptor cand1, cand2, specialNeighbour;
-        specialNeighbour = NULL;
         unsigned int missingEdgesCount;
         
         for(nIt1 = N.begin(); nIt1 != N.end(); nIt1++){
@@ -423,16 +413,14 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
             nIt2++;
             missingEdgesCount = 0;
             for(; nIt2 != N.end(); nIt2++){
-                if(*nIt1 == specialNeighbour || *nIt2 == specialNeighbour){
+                if(specialNeighbourFound && (*nIt1 == specialNeighbour || *nIt2 == specialNeighbour))
                     continue;
-                }
-                
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*nIt1, *nIt2, G);
-                if(!existsEdge.second){
+
+                if(!boost::edge(*nIt1, *nIt2, G).second){
                     if(specialNeighbourFound){
                         //#special neighbours > 1
-                        isClique = false;
-                        break;
+                        isAlmostSimplicial = false;
+                        goto DOUBLE_BREAK;
                     }
                     //*nIt1 or *nIt2 is a special neighbour
                     cand1 = *nIt1;
@@ -452,13 +440,13 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
                 }
                 specialNeighbourFound = true;
             }
-            if(!isClique)
-                break;
-
         }
-        if(isClique){
+
+        DOUBLE_BREAK:
+
+        if(isAlmostSimplicial){
             //adding the edges, if specialNeighbourFound is true, N is a clique and vertexIt is a simplicial vertex
-            if(specialNeighbour != NULL){
+            if(specialNeighbourFound){
                 for(unsigned int i = 0; i < N.size(); i++){
                     if(N.at(i) != specialNeighbour) 
                         boost::add_edge(specialNeighbour, N.at(i), G);
@@ -466,18 +454,16 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
             }
 
             std::set<unsigned int> bag;
-            for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++)
-                bag.insert(G[*neighbourIt].id);
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++)
+                bag.insert(G[*nIt].id);
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vIt].id, bag));
        
-            boost::clear_vertex(*vertexIt, G);
+            boost::clear_vertex(*vIt, G);
 
             low = (low > (int)bag.size())? low : (int)bag.size();
             return true;
         }
-        BREAK_LOOP:
-            continue;
     }
     return false;
 }

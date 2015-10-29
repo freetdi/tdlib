@@ -50,6 +50,9 @@
 // void seperator_algorithm(G_t &G, T_t &T)
 //
 
+#ifndef TD_SEPERATOR_ALGORITHM
+#define TD_SEPERATOR_ALGORITHM
+
 #include <set>
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
@@ -272,3 +275,5 @@ void seperator_algorithm(G_t &G, T_t &T){
 }
 
 }
+
+#endif

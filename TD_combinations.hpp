@@ -51,6 +51,9 @@
 // void exact_decomposition_cutset(G_t &G, T_t &T, int low)
 // void exact_decomposition_dynamic(G_t &G, T_t &T)
 // void exact_decomposition_dynamic(G_t &G, T_t &T, int low)
+// void seperator_algorithm_MSVS(G_t &G, T_t &T)
+// void seperator_algorithm_TM(G_t &G, T_t &T)
+// void MSVS_trivial(G_t &G, T_t &T)
 //
 
 #ifndef TD_COMBINATIONS
@@ -64,6 +67,7 @@
 #include "TD_postprocessing.hpp"
 #include "TD_dynamicCR.hpp"
 #include "TD_exact_cutset.hpp"
+#include "TD_seperator_algorithm.hpp"
 
 namespace treedec{
 
@@ -231,6 +235,29 @@ void exact_decomposition_chordal(G_t &G, T_t &T){
     std::vector<unsigned int> elim_ordering;
     treedec::LEX_M_minimal_ordering(G, elim_ordering);
     treedec::ordering_to_treedec(G, elim_ordering, T);
+}
+
+template <typename G_t, typename T_t>
+void seperator_algorithm_MSVS(G_t &G, T_t &T){
+    treedec::seperator_algorithm(G, T);
+    treedec::MSVS(G, T);
+}
+
+template <typename G_t, typename T_t>
+void seperator_algorithm_TM(G_t &G, T_t &T){
+    treedec::seperator_algorithm(G, T);
+    std::vector<unsigned int> old_elim_ordering;
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
+    treedec::treedec_to_ordering(T, old_elim_ordering);
+    treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
+    T.clear();
+    treedec::ordering_to_treedec(G, new_elim_ordering, T);
+}
+
+template <typename G_t, typename T_t>
+void MSVS_trivial(G_t &G, T_t &T){
+    treedec::trivial_decomposition(G, T);
+    treedec::MSVS(G, T);
 }
 
 template <typename G_t, typename T_t>

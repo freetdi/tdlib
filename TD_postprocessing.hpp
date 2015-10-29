@@ -196,9 +196,7 @@ void MSVS(G_t &G, T_t &T){
 
 template <typename G_t>
 bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vector<unsigned int> &elimination_ordering, G_t &M, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    bool is_cand = true;
-
-    //pos i in elimination_ordering_ will store store the "elimination date" of vertex i
+    //pos i in elimination_ordering_ will store the "elimination date" of vertex i
     std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
     for(unsigned int t = 0; t < elimination_ordering.size(); t++)
         elimination_ordering_[elimination_ordering[t]] = t;
