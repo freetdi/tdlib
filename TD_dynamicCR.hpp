@@ -48,8 +48,8 @@
 
 #include <map>
 #include <boost/graph/adjacency_list.hpp>
-#include "simple_graph_algos.hpp"
 #include "boost/tuple/tuple.hpp"
+#include "TD_simple_graph_algos.hpp"
 
 namespace treedec{
     

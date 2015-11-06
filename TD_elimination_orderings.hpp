@@ -59,7 +59,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <climits>
-#include "simple_graph_algos.hpp"
+#include "TD_simple_graph_algos.hpp"
 #include "TD_preprocessing.hpp"
 #include "TD_misc.hpp"
 

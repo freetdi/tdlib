@@ -1,5 +1,5 @@
 pkginclude_HEADERS = \
-  simple_graph_algos.hpp \
+  TD_simple_graph_algos.hpp \
   TD_branch_decomposition.hpp \
   TD_combinations.hpp \
   TD_dynamicCR.hpp \

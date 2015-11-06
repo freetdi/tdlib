@@ -63,7 +63,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
-#include "simple_graph_algos.hpp"
+#include "TD_simple_graph_algos.hpp"
 
 namespace treedec{
     

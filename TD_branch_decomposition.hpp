@@ -21,7 +21,7 @@
 #define TD_BRANCH_DECOMPOSITION
 
 #include <boost/graph/adjacency_list.hpp>
-#include "simple_graph_algos.hpp"
+#include "TD_simple_graph_algos.hpp"
 
 namespace treedec{
 

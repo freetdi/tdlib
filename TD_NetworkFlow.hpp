@@ -31,7 +31,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
-#include "simple_graph_algos.hpp"
+#include "TD_simple_graph_algos.hpp"
 
 #ifndef TD_STRUCT_VERTEX_VI_PD
 #define TD_STRUCT_VERTEX_VI_PD
