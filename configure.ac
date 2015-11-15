@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([tdlib], [0.3.1], [larisch@informatik.uni-frankfurt.de])
-AC_CONFIG_SRCDIR([TD_misc.hpp])
+AC_CONFIG_SRCDIR([src/TD_misc.hpp])
 #AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([])
 
