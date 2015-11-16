@@ -5,7 +5,7 @@ SOFLAGS=-shared -Wl,-soname,libtd.so
 all: interface cythonize pylib partial_clean test
 
 interface: python_tdlib.cpp python_tdlib.hpp
-	$(CC) $(LDFLAGS) $(SOFLAGS) -I./../lib -fPIC -o libtd.so python_tdlib.cpp -c
+	$(CC) $(LDFLAGS) $(SOFLAGS) -I./../src -o libtd.so python_tdlib.cpp -c
 
 cythonize: tdlib.pyx tdlib.pxd
 	cython --cplus tdlib.pyx

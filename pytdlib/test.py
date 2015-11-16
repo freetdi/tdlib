@@ -18,6 +18,19 @@ V_Pappus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 E_Pappus = [(0, 1), (0, 5), (0, 6), (1, 2), (1, 7), (2, 3), (2, 8), (3, 4), (3, 9), (4, 5), (4, 10), (5, 11), (6, 13), (6, 17), (7, 12), (7, 14), (8, 13), (8, 15), (9, 14), (9, 16), (10, 15), (10, 17), (11, 12), (11, 16), (12, 15), (13, 16), (14, 17)]
 
 
+#random graphs
+def randomGNP(n, p):
+    import random
+    V = []
+    E = []
+    for i in range(0, n):
+        V.append(i)
+        for j in range(i+1,n):
+            if random.randint(0, 100) <= p*100:
+                E.append((i, j))
+    return V, E
+
+
 class TestTdLib(unittest.TestCase):
     def test_preprocessing(self):
         V_, E_, B, lb = tdlib.preprocessing(V_P6, E_P6)
@@ -171,12 +184,12 @@ class TestTdLib(unittest.TestCase):
         O = tdlib.fillIn_ordering(V_Pappus, E_Pappus)
         self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, 10, 3, 5, 6, 8, 12, 14, 16])
 
-    """
+
     def test_treedec_to_ordering(self):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         O = tdlib.treedec_to_ordering(V, E)
         self.assertEqual(O, [1, 2, 3, 4, 5, 6])
-    """
+
 
     def test_ordering_to_treedec(self):
         V, E, lb = tdlib.ordering_to_treedec(V_P6, E_P6, [1,3,0,2,4,5])
@@ -212,10 +225,10 @@ class TestTdLib(unittest.TestCase):
         status = tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E, message=False)
         self.assertEqual(status, 0)
 
+"""
 if __name__ == '__main__':
     unittest.main()
-
-
+"""
 
 """
 print("---preprocessing_glue_bags---")
@@ -223,4 +236,64 @@ print("---MSVS---")
 print("---minimalChordal---")
 """
 
+
+def validate_decompositions():
+    c = 0
+    for n in range(0, 13):
+        for i in range(0, 10):
+            c += 1
+            V, E = randomGNP(n, 0.3)
+            N, M, tw = tdlib.exact_decomposition_cutset(V, E)    
+            status = tdlib.is_valid_treedecomposition(V, E, N, M, message=True)
+            if(status < 0):
+                print("error!!!!")
+                print(str(V))
+                print(str(E))
+                import sys
+                sys.exit(-1)
+
+errors = []
+
+def validate_width():
+    c = 0
+    for n in range(0, 13):
+        for i in range(0, 1000):
+            c += 1
+            V, E = randomGNP(n, 0.3)
+            N, M, w1 = tdlib.exact_decomposition_cutset(V, E)    
+            Q, R, w2 = tdlib.PP_FI_TM(V, E)
+            if(w1 > w2):
+                print("error!!!!")
+                errors.append([V, E])
+
+
+print("####################")
+print("validate decompositions")
+validate_decompositions()
+
+
+print("####################")
+print("validate width")
+validate_width()
+
+"""
+print(str(errors[0][0]))
+print(str(errors[0][1]))
+
+
+V = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+E = [(0, 1), (0, 3), (0, 4), (0, 6), (0, 7), (0, 9), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (2, 8), (2, 9), (3, 7), (3, 8), (3, 9), (4, 8), (4, 9), (5, 6), (5, 8), (6, 7), (7, 8), (8, 9)]
+
+N, M, w1 = tdlib.exact_decomposition_cutset(V, E)
+Q, R, w2 = tdlib.PP_FI_TM(V, E)
+
+V_, E_, B, lb = tdlib.preprocessing(V, E)
+
+print(str(N))
+print(str(Q))
+print(str(B))
+
+print(str(w1))
+print(str(w2))
+"""
 

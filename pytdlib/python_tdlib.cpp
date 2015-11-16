@@ -146,7 +146,7 @@ int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std
 
     make_python_decomp(T, V_T, E_T);
 
-    return lb;
+    return treedec::get_width(T);
 }
 
 
@@ -162,7 +162,7 @@ int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, 
 
     make_python_decomp(T, V_T, E_T);
 
-    return lb;
+    return treedec::get_width(T);
 }
 
 int gc_preprocessing_glue_bags(std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<std::vector<int> > &bags){

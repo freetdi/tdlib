@@ -7,14 +7,18 @@ decompositions written by Lukas Larisch.
 
 Definition:
 
-A tree decomposition of a graph G is a pair (T, b) consisting of a tree T and 
-a function b: V(T) -> 2^{V(G)} associating with each node t in V(T) a set of 
-vertices b(t), that are subsets of V(G) such that 
+A tree decomposition of a graph G is a pair (T, b) consisting of a graph T and 
+a function b: V(T) -> 2^{V(G)} associating with each vertex t in V(T) a set of 
+vertices b(t), called bags of T, that are subsets of V(G) such that 
 
-(T1) for every edge e in E(G) there is a node t in V(T) with e is a subset of 
+(T1) T is a tree,
+
+(T2) every vertex v in V(G) is contained in some bag of T,
+
+(T3) for every edge e in E(G) there is a node t in V(T) with e is a subset of 
 b(t), and
 
-(T2) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty 
+(T4) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty 
 and connected in T.
 
 The width of (T, b) is defined as max{|b(t)|-1: t in V(T) }.
@@ -185,18 +189,21 @@ def preprocessing(V, E):
     graph and the results of the reductions, that have been made so far
     as a list of bags.
 
-    INPUT:
+    INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tuple (V(G'), E(G'), encoded_bags, lb) where (V(G'), E(G') is the 
-      reduced instance of G, encoded_bags is an encoding of the bags, 
-      that belong to a tree decomposition of the whole graph G and lb
-      is a lower bound on tw(G) iff V(G') is not empty, otherwise tw(G). 
+    - V_G : a list of vertices of the reduced input graph
+
+    - E_G : a list of edges of the reduced input graph
+
+    - bags
+
+    - lb : a lower bounds on treewidth of (V_G, E_G)
 
     EXAMPLES:
 
@@ -222,15 +229,19 @@ def PP_MD(V, E):
     successivly eliminates a vertex of minimal degree. The returned tree
     decomposition then may be of non-optimal width. 
 
-    INPUT:
+    INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tuple (V, E, width)
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
@@ -244,9 +255,9 @@ def PP_MD(V, E):
 
     cdef int c_lb = -1
 
-    py_lb = gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
+    gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
 
-    return V_T, E_T, py_lb
+    return V_T, E_T, get_width(V_T, E_T)
 
 def PP_FI_TM(V, E):
     """
@@ -258,15 +269,19 @@ def PP_FI_TM(V, E):
     will be postprocessed by the minimalChordal algorithm, that may
     reduce the width of the tree decomposition.
 
-    INPUT:
+    INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tuple (V, E, width)
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
@@ -280,9 +295,9 @@ def PP_FI_TM(V, E):
 
     cdef int c_lb = -1
 
-    py_lb = gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
+    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
 
-    return V_T, E_T, py_lb
+    return V_T, E_T, get_width(V_T, E_T)
 
 
 def preprocessing_glue_bags(V, E, bags):
@@ -293,19 +308,25 @@ def preprocessing_glue_bags(V, E, bags):
 
     INPUTS:
 
-    - V : a list of bags
+    - V_T : a list of vertices of the input treedecomposition
 
-    - E : a list of edges
+    - E_T : a list of edges of the input treedecomposition
 
-    OUTPUT:
+    - bags : a list of bags, e.g. as returned by preprocessing
 
-    - A tree decomposition (V, E), containing the given bags
+    OUTPUTS:
 
-    EXAMPLES::
+    - V_T' : a list of vertices of the input treedecomposition
 
-        V_T, E_T, bags, lb = tdlib.preprocessing(V_G, E_G)
+    - E_T' : a list of edges of the input treedecomposition
+
+    EXAMPLES:
+
+        V_G2, E_G2, bags, lb = tdlib.preprocessing(V_G1, E_G1)
         ...
-        V_T, E_T = tdlib.preprocessing_glue_bags(V_T2, E_T2, bags)
+        V_T1, E_T1 = ...
+        ...
+        V_T2, E_T2 = tdlib.preprocessing_glue_bags(V_T1, E_T1, bags)
     """
 
     cdef vector[unsigned int] E_T
@@ -337,9 +358,9 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
     - algorithm -- (default: 'deltaC_least_c') specifies the algorithm to use 
                    for computing a lower bound on the treewidth of G. The 
@@ -347,7 +368,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     OUTPUT:
 
-    - A lower bound on the treewidth of G
+    - lb : a lower bound on the treewidth of (V_G, E_G)
 
     EXAMPLES:
         lb = tdlib.lower_bound(G, "deltaC_min_d")
@@ -381,9 +402,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
         print("Invalid lower bound algorithm")
         return -2
 
-    py_lb = c_lb
-
-    return py_lb
+    return c_lb
 
 
 ##############################################################
@@ -399,22 +418,24 @@ def exact_decomposition_cutset(V, E, lb=-1):
 
     INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    - lb : a lower bound to the treewidth of the given graph, 
+    - lb : a lower bound to the treewidth of (V_G, E_G),
            e.g. computed by lower_bound (default: '-1')
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tuple (V, E, width), where (V, E) is a treedecomposition G of tw(G), 
-      if the given lower bound was not greater than tw(G), otherwise a 
-      treedecomposition of width 'lb'. 
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
-        V, E, width = sage.graphs.tdlib.exact_decomposition_cutset(V, E)
+        V_T, E_T, width = tdlib.exact_decomposition_cutset(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
@@ -437,22 +458,24 @@ def exact_decomposition_dynamic(V, E, lb=-1):
 
     INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    - lb : a lower bound to the treewidth of the given graph, 
+    - lb : a lower bound to the treewidth of (V_G, E_G),
            e.g. computed by lower_bound (default: '-1')
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tuple (V, E, width), where (V, E) is a treedecomposition G of tw(G), 
-      if the given lower bound was not greater than tw(G), otherwise a 
-      treedecomposition of width 'lb'. 
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
-        V, E, width = sage.graphs.tdlib.exact_decomposition_dynamic(V, E)
+        V_T, E_T, width = tdlib.exact_decomposition_dynamic(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
@@ -474,17 +497,23 @@ def seperator_algorithm(V, E):
     Computes a tree decomposition of a given graph using nearly balanced 
     seperators. The returned width is at most 4*tw(G)+1.
 
-    - V : a list of vertices
+    INPUTS:
 
-    - E : a list of edges
+    - V_G : a list of vertices of the input graph
 
-    OUTPUT:
+    - E_G : a list of edges of the input graph
 
-    - A tuple (V, E, width)
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
-        V, E, width = tdlib.seperator_algorithm(V, E)
+        V_T, E_T, width = tdlib.seperator_algorithm(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
@@ -501,19 +530,19 @@ def minDegree_ordering(V, E):
     Computes an elimination ordering of a given graph based on the minDegree 
     heuristic.
 
-    INPUT:
+    INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    OUTPUTS:
 
-    - An elimination ordering on (V, E) according to the minDegree-heuristic.
+    - O : an elimination ordering on (V_G, E_G)
 
     EXAMPLES:
 
-        O = sage.graphs.tdlib.minDegree_ordering(V, E)
+        O = tdlib.minDegree_ordering(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, elim_ordering
@@ -534,19 +563,19 @@ def fillIn_ordering(V, E):
     Computes an elimination ordering of a given graph based on the fillIn 
     heuristic.
 
-    INPUT:
+    INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    OUTPUTS:
 
-    - An elimination ordering on (V, E) according to the fillIn-heuristic.
+    - O : an elimination ordering on (V_G, E_G)
 
     EXAMPLES:
 
-        O = sage.graphs.tdlib.fillIn_ordering(V, E)
+        O = tdlib.fillIn_ordering(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, elim_ordering
@@ -572,20 +601,24 @@ def ordering_to_treedec(V, E, O):
 
     INPUTS:
 
-    - V : a list of vertices
+    - V_G : a list of vertices of the input graph
 
-    - E : a list of edges
+    - E_G : a list of edges of the input graph
 
-    - O : an elimination ordering
+    - O : an elimination ordering on (V_G, E_G)
 
-    OUTPUT:
+    OUTPUTS:
 
-    - A tree decomposition, that has been made by applying O on G.
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
 
     EXAMPLES:
 
-        O = sage.graphs.tdlib.fillIn_ordering(V, E)
-        V, E = tdlib.ordering_to_treedec(V, E, O)
+        O = tdlib.fillIn_ordering(V_G, E_G)
+        V_T, E_T, width = tdlib.ordering_to_treedec(V_G, E_G, O)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, elim_ordering
@@ -625,20 +658,28 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
     INPUTS:
 
-        - G : a graph
+    - V_G : a list of vertices of the input graph
 
-        - T : a tree decomposition of G
+    - E_G : a list of edges of the input graph
 
-    OUTPUT:
+    - V_T : a list of vertices of the input treedecomposition
 
-        - A tree decomposition of G with possibly smaller width than T
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - V_T' : a list of vertices of a treedecomposition
+
+    - E_T' : a list of edges of a treedecomposition
+
+    - width : the width of (V_T', E_T')
 
     EXAMPLES:
 
-        T = tdlib.trivial_decomposition(G)
-        T_ = sage.graphs.tdlib.MSVS(G, T)
-        MSVS reduced the width by 12, new width: 2
+        V_T1, E_T1 = tdlib.trivial_decomposition(V_G, E_G)
+        V_T2, E_T2, width = tdlib.MSVS(V_G, E_G, V_T1, E_T1)
     """
+
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -662,26 +703,25 @@ def minimalChordal(V, E, O):
 
     INPUTS:
 
-    - ``G`` -- a generic graph
+    - V_G : a list of vertices of the input graph
 
-    - ``O`` -- an elimination ordering on ``G``
+    - E_G : a list of edges of the input graph
+
+    - O : an elimination ordering on (V_G, E_G)
 
     OUTPUT:
 
-    - An elimination ordering on ``G`` that may cause a lower width of the tree decomposition, that can be made out of
-      it, than the width, that ``O`` will cause.
+    - An elimination ordering on G that may cause a lower width of the 
+      treedecomposition, that can be made out of it, than the width, 
+      that O will cause.
 
-EXAMPLES::
+    EXAMPLES:
 
-        sage: g = graphs.HigmanSimsGraph()
-        sage: g.show()
-        sage: o1 = g.vertices()
-        sage: t1 = sage.graphs.tdlib.ordering_to_treedec(g, o1)
-        sage: t1.show(vertex_size=100)
-        sage: o2 = sage.graphs.tdlib.minimalChordal(g, o1)
-        sage: t2 = sage.graphs.tdlib.ordering_to_treedec(g, o2)
-        sage: t2.show(vertex_size=100)
+        V_T1, E_T1, w1 = tdlib.ordering_to_treedec(V_G, E_G, O1)
+        O2 = tdlib.minimalChordal(V_G, E_G, O1)
+        V_T2, E_T2, w2 = tdlib.ordering_to_treedec(V_G, E_G, O2)
     """
+
     cdef vector[unsigned int] V_G, E_G, old_elim_ordering, new_elim_ordering
     cython_make_tdlib_graph(V, E, V_G, E_G)
 
@@ -708,13 +748,29 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
 
     INPUTS:
 
-    - G : a generic graph
+    - V_G : a list of vertices of the input graph
 
-    - T : a tree decomposition
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    - message : outputs error message iff (V_T, E_T) is invalid with
+                respect to (V_G, E_G) (optional)
+
+    OUTPUT:
+
+    - error_code :     0, if (V_T, E_T) is valid with respect to (V_G, E_G)
+                   <= -1, if (V_T, E_T) is not a tree
+                   <= -2, if not all vertices of (V_G, E_G) are covered
+                   <= -3, if not all edges of (V_G, E_G) are covered
+                   == -4, if condition (T4) of a treedecomposition is 
+                             not satisfied
 
     EXAMPLES:
 
-        V_T, E_T, lb = sage.graphs.tdlib.seperator_algorithm(V_G, E_G)
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
         status = tdlib.is_valid_treedecomposition(V_G, E_G, V_T, E_T)
     """
 
@@ -749,21 +805,21 @@ def trivial_decomposition(V, E):
     """
     Returns a trivial tree decomposition of the given graph.
 
-    INPUT:
+    INPUTS:
 
-    - G : a graph
+    - V_G : a list of vertices of the input graph
 
-    OUTPUT:
+    - E_G : a list of edges of the input graph
 
-    - A trivial tree decomposition of ``G``
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
 
     EXAMPLES:
 
-        sage: g = graphs.RandomGNP(10, 0.05)
-        sage: t = sage.graphs.tdlib.trivial_decomposition(g)
-        sage: t
-        Treedecomposition of width 9 on 1 vertices
-        sage: t.show(vertex_size=5000)
+        V_T, E_T = tdlib.trivial_decomposition(V_G, E_G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
@@ -779,19 +835,21 @@ def get_width(V, E):
     """
     Returns the width of a given tree decomposition.
 
-    INPUT:
+    INPUTS:
 
-    - T -- a tree decomposition
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
 
     OUTPUT:
 
-    - The width of T
+    - width : the width of (V_T, E_T)
 
-EXAMPLES::
+    EXAMPLES:
 
-        sage: g = graphs.RandomGNP(10, 0.05)
-        sage: t = sage.graphs.tdlib.trivial_decomposition(g)
-        sage: sage.graphs.tdlib.get_width(t)
+        V_T, E_T = tdlib.trivial_decomposition(V_G, E_G)
+        width = tdlib.get_width(V_T, E_T)
     """
+
     return gc_get_width(V)
 
