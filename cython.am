@@ -1,0 +1,49 @@
+# some rules levitating the cython build
+
+AM_V_CYT = $(am__v_CYT_$(V))
+am__v_CYT_ = $(am__v_CYT_$(AM_DEFAULT_VERBOSITY))
+am__v_CYT_0 = @echo "  CYTH    " $@;
+
+AM_V_PYC = $(am__v_PYC_$(V))
+am__v_PYC_ = $(am__v_PYC_$(AM_DEFAULT_VERBOSITY))
+am__v_PYC_0 = @echo "  PYC     " $@;
+
+AM_V_PYO = $(am__v_PYO_$(V))
+am__v_PYO_ = $(am__v_PYO_$(AM_DEFAULT_VERBOSITY))
+am__v_PYO_0 = @echo "  PYO     " $@;
+
+define cython_call
+	$(AM_V_CYT)$(PYTHONPATHENV) $(CYTHON) $(CYTHONFLAGS) \
+		-w $(abs_top_builddir) \
+	    $(abspath $<) \
+	    -o $(abs_builddir)/$@
+endef
+
+%.cpp: CYTHONFLAGS+= --cplus
+
+.pyx.cpp:
+
+.SECONDEXPANSION:
+%.cpp: %.pyx $$(if $$(wildcard $$*.pxd),$$(wildcard $$*.pxd), \
+	                $$(if $$(wildcard @srcdir@/$$*.pxd), \
+                         $$(wildcard @srcdir@/$$*.pxd)))
+	$(cython_call)
+
+PYS = $(filter %.py,$(DIST_COMMON))
+PYCS = $(PYS:%.py=%.pyc)
+PYOS = $(PYS:%.py=%.pyo)
+
+$(LTLIBRARIES:%.la=%.so): %.so: | %.la
+	$(AM_V_at)[ -f $@ ] || $(LN_S) .libs/$@ .
+
+%.pyc: %.py
+	$(AM_V_PYC)$(PYTHON) -c 'import py_compile; py_compile.compile("$<","$@","$<")'
+%.pyo: %.py
+	$(AM_V_PYO)$(PYTHON) -O -c 'import py_compile; py_compile.compile("$<","$@","$<")'
+
+py-local: $(LTLIBRARIES:%.la=%.so) $(PYCS) $(PYOS)
+
+# create python module for checking
+check-local: py-local
+
+CLEANFILES = *.so *.pyc *.pyo

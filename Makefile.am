@@ -1,3 +1,6 @@
+ACLOCAL_AMFLAGS = -Im4
+SUBDIRS = pytdlib
+
 pkginclude_HEADERS = \
   src/TD_simple_graph_algos.hpp \
   src/TD_branch_decomposition.hpp \
@@ -12,3 +15,5 @@ pkginclude_HEADERS = \
   src/TD_preprocessing.hpp \
   src/TD_seperator_algorithm.hpp \
   src/TD_upper_bounds.hpp
+
+EXTRA_DIST = cython.am
