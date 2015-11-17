@@ -49,6 +49,7 @@
 // void FI_TM(G_t &G, T_t &T, int &low)
 // void exact_decomposition_cutset(G_t &G, T_t &T)
 // void exact_decomposition_cutset(G_t &G, T_t &T, int low)
+// void exact_decomposition_cutset_decision(G_t &G, T_t &T, int k)
 // void exact_decomposition_dynamic(G_t &G, T_t &T)
 // void exact_decomposition_dynamic(G_t &G, T_t &T, int low)
 // void seperator_algorithm_MSVS(G_t &G, T_t &T)
@@ -183,6 +184,65 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 }
 
 template <typename G_t, typename T_t>
+bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
+    //preprocessing
+    int low = -1;
+
+    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    treedec::preprocessing(G, bags, low);
+
+    if(boost::num_edges(G) == 0){
+        treedec::preprocessing_glue_bags(bags, T);
+        if(low <= k)
+            return true;
+        return false;
+    }
+
+    int lb_deltaC = treedec::lb::deltaC_least_c(G);
+
+    int lb = low;
+    lb = (lb_deltaC > lb)? lb_deltaC : lb;
+
+    if(lb > k)
+        return false;
+
+    //compute a treedecomposition for each connected component of G and glue the decompositions together
+    std::vector<std::set<unsigned int> > components;
+    get_components(G, components);
+
+    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
+
+    for(unsigned int i = 0; i < components.size(); i++){
+        //ignore isolated vertices
+        if(components[i].size() == 1)
+            continue;
+
+        G_t G_;
+        induced_subgraph(G_, G, components[i]);
+
+        //reorder ids
+        std::vector<unsigned int> id_map;
+        treedec::reorder_ids_graph(G_, id_map);
+
+        T_t T_;
+
+        while(!treedec::exact_cutset(G_, T_, lb)){
+            lb++;
+            if(lb > k)
+                return false;
+        }
+
+        treedec::reorder_ids_decomposition(T_, id_map);
+
+        treedec::glue_decompositions(T, T_);
+    }
+    
+    treedec::preprocessing_glue_bags(bags, T);
+
+    return true;
+}
+
+template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     //preprocessing
     int low = -1;
@@ -220,7 +280,8 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
 
         T_t T_;
 
-        treedec::exact_cutset(G_, T_, lb);
+        while(!treedec::exact_cutset(G_, T_, lb))
+            lb++;
 
         treedec::reorder_ids_decomposition(T_, id_map);
 

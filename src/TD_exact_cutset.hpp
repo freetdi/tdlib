@@ -168,9 +168,11 @@ void glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned int> &bag2
 
 
 template <typename G_t, typename T_t>
-void exact_cutset(G_t &G, T_t &T, int lb){
-    if(boost::num_vertices(G) == 0)
-        return;
+bool exact_cutset(G_t &G, T_t &T, int k){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return true;
+    }
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     boost::tie(vIt, vEnd) = boost::vertices(G);
@@ -180,7 +182,9 @@ void exact_cutset(G_t &G, T_t &T, int lb){
         bag.insert(G[*vIt].id);
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         T[t].bag = bag;
-        return;
+        if(k < 0)
+            return false;
+        return true;
     }
         
 
@@ -194,12 +198,12 @@ void exact_cutset(G_t &G, T_t &T, int lb){
     for(; vIt != vEnd; vIt++)
         component.insert(*vIt);
 
-    unsigned int k = (lb >= 0) ? (unsigned int)lb : 0;
+    unsigned int k_ = (k >= 0)? (unsigned int) k : 0;
 
     typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
     
-    while(!explore_cutsets(G, cut, component, results, k++))
-        results.clear();
+    if(!explore_cutsets(G, cut, component, results, k_))
+        return false;
 
     for(unsigned int i = 0; i < results.size()-1; i++){
         std::set<unsigned int> bag1;
@@ -213,12 +217,15 @@ void exact_cutset(G_t &G, T_t &T, int lb){
         glue_bags(T, bag1, bag2);
         i++;
     }
+
+    return true;
 }
 
 template <typename G_t, typename T_t>
 void exact_cutset(G_t &G, T_t &T){
     int lb = -1;
-    exact_cutset(G, T, lb);
+    while(!exact_cutset(G, T, lb))
+        lb++;
 }
 
 }

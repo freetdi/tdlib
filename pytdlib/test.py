@@ -257,35 +257,50 @@ errors = []
 def validate_width():
     c = 0
     for n in range(0, 13):
-        for i in range(0, 1000):
+        for i in range(0, 100):
             c += 1
+            print(str(c))
             V, E = randomGNP(n, 0.3)
             N, M, w1 = tdlib.exact_decomposition_cutset(V, E)    
+            Z, U, b = tdlib.exact_decomposition_cutset_decision(V, E, (w1-1))
+            if(b):
+                print("---width: " + str(w1))
+                errors.append([V, E])
+
             Q, R, w2 = tdlib.PP_FI_TM(V, E)
             if(w1 > w2):
                 print("error!!!!")
                 errors.append([V, E])
 
 
+
 print("####################")
 print("validate decompositions")
 validate_decompositions()
-
 
 print("####################")
 print("validate width")
 validate_width()
 
 """
-print(str(errors[0][0]))
-print(str(errors[0][1]))
 
 
-V = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-E = [(0, 1), (0, 3), (0, 4), (0, 6), (0, 7), (0, 9), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (2, 8), (2, 9), (3, 7), (3, 8), (3, 9), (4, 8), (4, 9), (5, 6), (5, 8), (6, 7), (7, 8), (8, 9)]
+#print(str(errors[0][0]))
+#print(str(errors[0][1]))
 
-N, M, w1 = tdlib.exact_decomposition_cutset(V, E)
-Q, R, w2 = tdlib.PP_FI_TM(V, E)
+V = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+E = [(0, 1), (0, 2), (0, 5), (0, 6), (1, 3), (1, 5), (1, 7), (2, 4), (2, 8), (3, 5), (3, 6), (3, 7), (5, 6), (5, 7), (5, 8), (6, 7)]
+
+N, M, w1 = tdlib.exact_decomposition_cutset(V, E)    
+
+for k in range(0, w1+1):
+    Z, U, b = tdlib.exact_decomposition_cutset_decision(V, E, k)
+    print(str(k) + " " + str(b))
+
+print(str(N))
+
+print("---width: " + str(w1))
+
 
 V_, E_, B, lb = tdlib.preprocessing(V, E)
 

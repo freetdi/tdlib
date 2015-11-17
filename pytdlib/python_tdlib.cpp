@@ -260,6 +260,24 @@ int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<un
     return treedec::get_width(T);
 }
 
+int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+
+    bool rtn = treedec::exact_decomposition_cutset_decision(G, T, k);
+
+    if(!rtn)
+        return -1;
+
+    treedec::make_small(T);
+
+    make_python_decomp(T, V_T, E_T);
+
+    return 0;
+}
+
 
 int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
     TD_graph_t G;
