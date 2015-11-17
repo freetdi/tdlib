@@ -13,6 +13,13 @@ LT_INIT()
 AC_PROG_CXX
 
 # python stuff
+AC_ARG_WITH([python],
+ [AS_HELP_STRING([--with-python],
+	[Enable python library])],
+ [python=$withval],
+ [python='no'])
+
+AS_IF([test "$python" != no], [
 python_version_required=2.7
 AM_PATH_PYTHON([$python_version_required])
 if ! test x$PYTHON_VERSION = x"$python_version_required"; then
@@ -40,6 +47,9 @@ AC_ARG_WITH(python-lib-dir,
             [  --with-python-lib-dir=DIR look in DIR for Python libraries],
             [PYTHON_LIB_DIR=$withval],)
 AC_SUBST(PYTHON_LIB_DIR)
+])
+
+AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 
 # Checks for libraries.
 

@@ -1,5 +1,10 @@
 ACLOCAL_AMFLAGS = -Im4
-SUBDIRS = pytdlib
+
+if USE_PYTHON
+pytdlib = pytdlib
+endif
+
+SUBDIRS = $(pytdlib)
 
 pkginclude_HEADERS = \
   src/TD_simple_graph_algos.hpp \
