@@ -57,7 +57,7 @@ namespace treedec{
 #define TD_SUBSETS
 
 //collects all subsets of X of size k in subs (todo: replacement by enumeration in hunt())
-void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx, std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
+static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx, std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
     if(k==0){
         std::set<unsigned int> subS;
         for(unsigned int i = 0; i < sub.size(); i++)
@@ -99,7 +99,7 @@ void get_robber_components(G_t G, std::set<unsigned int> &X, std::vector<std::se
 
 
 //computes the robber space with respect to X and y and saves it in R
-void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::vector<std::set<unsigned int> > &Rcomps){
+static void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::vector<std::set<unsigned int> > &Rcomps){
     for(unsigned int i = 0; i < Rcomps.size(); i++){
         std::set<unsigned int> intersection;  
         std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(), X_prime.begin(), X_prime.end(), std::inserter(intersection, intersection.begin()));
@@ -269,7 +269,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
           
 
 template <typename G_t, typename T_t>
-void CR_dynamic_decomp(G_t &G, T_t &T){
+static void CR_dynamic_decomp(G_t &G, T_t &T){
     int lb = -1;
     CR_dynamic_decomp(G, T, lb);
 }

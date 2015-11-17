@@ -85,7 +85,7 @@ digraph_t::vertex_descriptor make_digraph(G_t &G, std::vector<bool> &disabled, d
     return source;
 }
 
-void modify_digraph(digraph_t &H, std::set<unsigned int> &X, std::vector<std::vector<std::vector<unsigned int> > > &P, std::vector<digraph_t::vertex_descriptor> &idxMap, digraph_t::vertex_descriptor source){
+static void modify_digraph(digraph_t &H, std::set<unsigned int> &X, std::vector<std::vector<std::vector<unsigned int> > > &P, std::vector<digraph_t::vertex_descriptor> &idxMap, digraph_t::vertex_descriptor source){
     for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++)
         boost::add_edge(source, idxMap[*sIt], H);
     
@@ -101,7 +101,7 @@ void modify_digraph(digraph_t &H, std::set<unsigned int> &X, std::vector<std::ve
 }
 
 //follows the edge set of H beginning on the start_vertex (a vertex in Y), aborting, if a vertex in X is reached, saving the path in new_path
-void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, std::vector<std::vector<unsigned int> > &new_path, std::set<unsigned int> &X){
+static void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, std::vector<std::vector<unsigned int> > &new_path, std::set<unsigned int> &X){
     boost::graph_traits<H_t>::adjacency_iterator nIt, nEnd;
     while(true){
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, H);
@@ -122,7 +122,7 @@ void follow_path(H_t &H, boost::graph_traits<H_t>::vertex_descriptor v, std::vec
 //computes the symmetric difference between edges on the walk and on paths in P
 //inserts the edges in the symmetric difference into an empty graph and follows the paths starting in Y
 //function is called, if there exists a P-alternating walk
-void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y, 
+static void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y, 
                   std::vector<std::vector<unsigned int> > &walk, std::vector<std::vector<std::vector<unsigned int> > > &P, unsigned int source){
     //unfold the edges on P
     std::vector<std::vector<unsigned int> > edgesP;
@@ -221,7 +221,7 @@ void modify_paths(std::set<unsigned int> &X, std::set<unsigned int> Y,
 
 //takes the last vertex on each path, that could be reached by a P-alternating walk, that does not end in a vertex in Y
 //if no such one exists, the first vertex on a path is taken
-void calculate_seperator(std::vector<std::vector<std::vector<unsigned int> > > &P, std::set<unsigned int> &cS, std::set<unsigned int> &S){
+static void calculate_seperator(std::vector<std::vector<std::vector<unsigned int> > > &P, std::set<unsigned int> &cS, std::set<unsigned int> &S){
     for(unsigned int i = 0; i < P.size(); i++){
         for(unsigned int j = P[i].size(); j > 0; j--){
             if(cS.find(P[i][j-1][1]) != cS.end()){
@@ -235,7 +235,7 @@ void calculate_seperator(std::vector<std::vector<std::vector<unsigned int> > > &
 }
 
 //collects the neighbourhood of v and modifies the neighbourhood if v is on a path in P                
-bool t_search_disjoint_ways(digraph_t &diG, digraph_t::vertex_descriptor v, std::set<unsigned int> &Y, std::vector<boost::tuple<bool, int> > &visited, 
+static bool t_search_disjoint_ways(digraph_t &diG, digraph_t::vertex_descriptor v, std::set<unsigned int> &Y, std::vector<boost::tuple<bool, int> > &visited, 
    std::vector<std::vector<unsigned int> > &walk, std::vector<digraph_t::vertex_descriptor> &idxMap, bool edge_used, int source, std::set<unsigned int> &dangerous,
     std::set<unsigned int> &cS
 ){
