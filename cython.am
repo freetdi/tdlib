@@ -44,6 +44,6 @@ $(LTLIBRARIES:%.la=%.so): %.so: | %.la
 py-local: $(LTLIBRARIES:%.la=%.so) $(PYCS) $(PYOS)
 
 # create python module for checking
-check-local: py-local
+all-local: py-local
 
 CLEANFILES = *.so *.pyc *.pyo
