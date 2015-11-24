@@ -27,7 +27,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 namespace treedec{
-    
+
 namespace ub{
 
 template <typename G_t>
@@ -39,7 +39,7 @@ unsigned int _minDegree(G_t &G){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
         unsigned int min_degree = boost::num_vertices(G);
-    
+
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree != 0 && degree < min_degree){
@@ -50,11 +50,11 @@ unsigned int _minDegree(G_t &G){
 
         if(min_degree > upper_bound)
             upper_bound = min_degree;
-    
+
         //collect the neighbours
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
-        
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;    
+
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
             neighbours.push_back(*nIt);
@@ -62,7 +62,7 @@ unsigned int _minDegree(G_t &G){
 	//make the neighbours a clique
         for(unsigned int i = 0; i < neighbours.size(); i++){
             for(unsigned int j = i+1; j < neighbours.size(); j++)
-                boost::add_edge(neighbours[i], neighbours[j], G);	
+                boost::add_edge(neighbours[i], neighbours[j], G);
         }
 
         boost::clear_vertex(min_vertex, G);
@@ -81,7 +81,7 @@ unsigned int _minDegree_fast(G_t &G){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
         unsigned int min_degree = boost::num_vertices(G);
-    
+
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree != 0 && degree < min_degree){
@@ -92,11 +92,11 @@ unsigned int _minDegree_fast(G_t &G){
 
         if(min_degree > upper_bound)
             upper_bound = min_degree;
-    
+
         //collect the neighbours
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
-        
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;    
+
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
             neighbours.push_back(*nIt);
@@ -105,7 +105,7 @@ unsigned int _minDegree_fast(G_t &G){
         for(unsigned int i = 0; i < neighbours.size(); i++){
             for(unsigned int j = i+1; j < neighbours.size(); j++){
                 if(!boost::edge(neighbours[i], neighbours[j], G).second)
-                    boost::add_edge(neighbours[i], neighbours[j], G);	
+                    boost::add_edge(neighbours[i], neighbours[j], G);
             }
         }
 

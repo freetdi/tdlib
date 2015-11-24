@@ -35,14 +35,14 @@ void TD_copy_graph(const G_t &G, G_t &H){
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         max = (G[*vIt].id > max)? G[*vIt].id : max;
 
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1); 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        idxMap[G[*vIt].id] = boost::add_vertex(H); 
-        H[idxMap[G[*vIt].id]].id = G[*vIt].id; 
+        idxMap[G[*vIt].id] = boost::add_vertex(H);
+        H[idxMap[G[*vIt].id]].id = G[*vIt].id;
     }
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++)
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H); 
+        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
 }
 
 template <typename G_t>
@@ -53,30 +53,30 @@ void TD_copy_graph(const G_t &G, G_t &H, typename std::vector<typename boost::gr
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         max = (G[*vIt].id > max)? G[*vIt].id : max;
 
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1); 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
     map.resize(max+1);
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        idxMap[G[*vIt].id] = boost::add_vertex(H); 
+        idxMap[G[*vIt].id] = boost::add_vertex(H);
         H[idxMap[G[*vIt].id]].id = G[*vIt].id;
         map[G[*vIt].id] = *vIt;
     }
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++)
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H); 
+        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
 }
 
 
 template <typename G_t>
 void delete_vertices(G_t &G, std::set<unsigned int> &X){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    
+
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> to_delete;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
        if(X.find(G[*vIt].id) != X.end())
            to_delete.push_back(*vIt);
     }
-    
+
     for(unsigned int i = 0; i < to_delete.size(); i++){
         boost::clear_vertex(to_delete[i], G);
         boost::remove_vertex(to_delete[i], G);
@@ -90,14 +90,13 @@ void delete_edges(G_t &G, std::vector<std::vector<unsigned int> > &edges){
         for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
             if((G[boost::source(*eIt, G)].id == edges[i][0] && G[boost::target(*eIt, G)].id == edges[i][1])
              ||(G[boost::source(*eIt, G)].id == edges[i][1] && G[boost::target(*eIt, G)].id == edges[i][0])){
-                
                 boost::remove_edge(boost::source(*eIt, G), boost::target(*eIt, G), G);
                 break;
             }
         }
     }
 }
-                
+
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G, std::set<unsigned int> &X){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(boost::num_vertices(G));
@@ -170,7 +169,7 @@ void get_neighbourhood_new(G_t &G, std::vector<bool> &disabled, std::set<typenam
 }
 
 
-template <typename G_t> 
+template <typename G_t>
 void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor vertex, std::vector<bool> &visited, std::vector<std::set<unsigned int> > &components, int comp_idx){
     visited[G[vertex].id] = true;
     std::vector<unsigned int> N;
@@ -183,7 +182,7 @@ void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descr
     }
 }
 
-template <typename G_t> 
+template <typename G_t>
 void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor vertex, std::vector<bool> &visited, std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components, int comp_idx){
     visited[G[vertex].id] = true;
     std::vector<unsigned int> N;
@@ -196,24 +195,24 @@ void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descr
     }
 }
 
-template <typename G_t> 
+template <typename G_t>
 void get_components(G_t &G, std::vector<std::set<unsigned int> > &components){
     unsigned int max = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         max = (G[*vIt].id > max)? G[*vIt].id : max;
-    
+
     std::vector<bool> visited(max+1);
-    
+
     for(unsigned int i = 0; i < max+1; i++)
         visited[i] = false;
-    
+
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(!visited[G[*vIt].id]){
             components.resize(components.size()+1);
             comp_idx++;
-            
+
             components[comp_idx].insert(G[*vIt].id);
             t_search_components(G, *vIt, visited, components, comp_idx);
         }
@@ -221,7 +220,7 @@ void get_components(G_t &G, std::vector<std::set<unsigned int> > &components){
 }
 
 
-template <typename G_t> 
+template <typename G_t>
 void get_components_provided_map(G_t &G, std::vector<std::set<unsigned int> > &components, std::vector<bool> &visited){  
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
@@ -229,14 +228,14 @@ void get_components_provided_map(G_t &G, std::vector<std::set<unsigned int> > &c
         if(!visited[G[*vIt].id]){
             components.resize(components.size()+1);
             comp_idx++;
-            
+
             components[comp_idx].insert(G[*vIt].id);
             t_search_components(G, *vIt, visited, components, comp_idx);
         }
     }
 }
 
-template <typename G_t> 
+template <typename G_t>
 void get_components_provided_map(G_t &G, std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components, std::vector<bool> &visited){  
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
@@ -244,7 +243,7 @@ void get_components_provided_map(G_t &G, std::vector<std::set<typename boost::gr
         if(!visited[G[*vIt].id]){
             components.resize(components.size()+1);
             comp_idx++;
-            
+
             components[comp_idx].insert(*vIt);
             t_search_components(G, *vIt, visited, components, comp_idx);
         }
@@ -257,11 +256,11 @@ void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::verte
     unsigned int max = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         max = (G[*vIt].id > max)? G[*vIt].id : max;
-    
+
     idxMap.resize(max+1);
-    
+
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        idxMap[G[*vIt].id] = *vIt; 
+        idxMap[G[*vIt].id] = *vIt;
 }
 
 #endif

@@ -104,17 +104,17 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
 
         G_t H;
-        treedec::remove_isolated_vertices(H, G);  
+        treedec::remove_isolated_vertices(H, G);
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(H, id_map);
 
         treedec::fillIn_ordering(H, old_elim_ordering);
         treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
         treedec::ordering_to_treedec(H, new_elim_ordering, T);
-        
+
         treedec::reorder_ids_decomposition(T, id_map);
     }
-    treedec::preprocessing_glue_bags(bags, T); 
+    treedec::preprocessing_glue_bags(bags, T);
 }
 
 //this version applies the fillIn-heuristic followed by triangulation minimization
@@ -166,7 +166,7 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 
         G_t G_;
         induced_subgraph(G_, G, components[i]);
-        
+
         //reorder ids
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(G_, id_map);
@@ -179,7 +179,7 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 
         treedec::glue_decompositions(T, T_);
     }
-    
+
     treedec::preprocessing_glue_bags(bags, T);
 }
 
@@ -236,7 +236,7 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
 
         treedec::glue_decompositions(T, T_);
     }
-    
+
     treedec::preprocessing_glue_bags(bags, T);
 
     return true;
@@ -287,7 +287,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
 
         treedec::glue_decompositions(T, T_);
     }
-    
+
     treedec::preprocessing_glue_bags(bags, T);
 }
 

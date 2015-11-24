@@ -17,7 +17,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width. 
+// Offers functionality to compute a tree decomposition of exact width.
 //
 // A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
 //
@@ -135,7 +135,7 @@ void glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned int> &bag2
 
     typename boost::graph_traits<T_t>::vertex_iterator vIt1, vIt2, vEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor b1,b2;
-    bool bag1_found = false; 
+    bool bag1_found = false;
     bool bag2_found = false;
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
         if(T[*vIt1].bag == bag1){
@@ -182,26 +182,26 @@ bool exact_cutset(G_t &G, T_t &T, int k){
         bag.insert(G[*vIt].id);
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         T[t].bag = bag;
-        if(k < 0)
-            return false;
-        return true;
+        if(k <= 0)
+            return true;
+        return false;
     }
-        
+
 
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut;
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
-    
+
 
     cut.insert(*vIt);
-    
+
     vIt++;
     for(; vIt != vEnd; vIt++)
         component.insert(*vIt);
 
-    unsigned int k_ = (k >= 0)? (unsigned int) k : 0;
+    unsigned int k_ = (unsigned int)k;
 
     typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
-    
+
     if(!explore_cutsets(G, cut, component, results, k_))
         return false;
 
@@ -212,7 +212,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
         std::set<unsigned int> bag2;
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = results[i+1].begin(); sIt != results[i+1].end(); sIt++)
-            bag2.insert(G[*sIt].id);           
+            bag2.insert(G[*sIt].id);
 
         glue_bags(T, bag1, bag2);
         i++;

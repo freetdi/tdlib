@@ -17,7 +17,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width. 
+// Offers functionality to compute a tree decomposition of exact width.
 //
 // A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
 //
@@ -52,7 +52,7 @@
 #include "TD_simple_graph_algos.hpp"
 
 namespace treedec{
-    
+
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 
@@ -65,7 +65,7 @@ static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx
         subs.push_back(subS);
         return;
     }
-    
+
     unsigned int i = idx;
     std::set<unsigned int>::iterator sIt = X.begin();
     std::advance(sIt, i);
@@ -75,7 +75,7 @@ static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx
         sub.pop_back();
         sIt++;
     }
-} 
+}
 
 #endif
 
@@ -93,15 +93,15 @@ void get_robber_components(G_t G, std::set<unsigned int> &X, std::vector<std::se
             }
         }
     }
- 
-    get_components(G, Rcomps);   
+
+    get_components(G, Rcomps);
 }
 
 
 //computes the robber space with respect to X and y and saves it in R
 static void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::vector<std::set<unsigned int> > &Rcomps){
     for(unsigned int i = 0; i < Rcomps.size(); i++){
-        std::set<unsigned int> intersection;  
+        std::set<unsigned int> intersection;
         std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(), X_prime.begin(), X_prime.end(), std::inserter(intersection, intersection.begin()));
         if(!intersection.empty()){
             R.insert(Rcomps[i].begin(), Rcomps[i].end());
@@ -114,44 +114,44 @@ template <typename G_t>
 bool is_monotone_dynamicCR(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &X_prime, std::set<unsigned int> &oldR, std::set<unsigned int> &newR, std::vector<std::set<unsigned int> > &Rcomps){ 
     if(X == X_prime)
         return false;
-    
-    //robber_space(G\X) 
+
+    //robber_space(G\X)
     std::set<unsigned int> R1;
     get_robber_component(X_prime, R1, Rcomps);
 
     //robber_space(G\(X ^ X'))
-    std::set<unsigned int> is_X_X_prime;  
+    std::set<unsigned int> is_X_X_prime;
     std::set_intersection(X.begin(), X.end(), X_prime.begin(), X_prime.end(), std::inserter(is_X_X_prime, is_X_X_prime.begin()));
     std::set<unsigned int> R2;
     std::vector<std::set<unsigned int> > Rcomps2;
     get_robber_components(G, is_X_X_prime, Rcomps2);
     get_robber_component(X_prime, R2, Rcomps2);
-    
-            if(R1 == R2 && ((oldR.size() == 0 && std::includes(X_prime.begin(), X_prime.end(), R1.begin(), R1.end())) || std::includes(oldR.begin(), oldR.end(), R1.begin(), R1.end()))){
-                std::set_union(R1.begin(), R1.end(), X_prime.begin(), X_prime.end(), std::inserter(newR, newR.begin()));
-                return true;
-            }
-        
+
+    if(R1 == R2 && ((oldR.size() == 0 && std::includes(X_prime.begin(), X_prime.end(), R1.begin(), R1.end())) || std::includes(oldR.begin(), oldR.end(), R1.begin(), R1.end()))){
+        std::set_union(R1.begin(), R1.end(), X_prime.begin(), X_prime.end(), std::inserter(newR, newR.begin()));
+        return true;
+    }
+
     return false;
 }
 
 template <typename G_t>
 bool make_layer(G_t &G, std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > > &W, std::set<unsigned int> &vertices, unsigned int k, unsigned int idx){
-    W.resize(idx+1);   
+    W.resize(idx+1);
 
     std::vector<unsigned int> sub;
     std::vector<std::set<unsigned int> > subs; //all possible X
-    subsets(vertices, vertices.size(), k, 0, sub, subs);  
-    
+    subsets(vertices, vertices.size(), k, 0, sub, subs);
+
     //in the last layer (idx == 0), we just insert all subsets, without computing anything (the robber is catched)
     if(idx != 0){
         for(unsigned int i = 0; i <  subs.size(); i++){
             std::vector<unsigned int> indices;
-            
+
             std::vector<std::set<unsigned int> > Rcomps;
-            get_robber_components(G, subs[i], Rcomps); 
+            get_robber_components(G, subs[i], Rcomps);
             std::set<unsigned int> newR;
-            
+
             //search for all X', such that a turn is strict monotone
             for(unsigned int j = 0; j < W[idx-1].size(); j++){
                 //if a turn X -> X' is monotone, save the index of the entry in the layer below for computing a tree decomposition
@@ -162,55 +162,55 @@ bool make_layer(G_t &G, std::vector<std::vector<boost::tuple<std::set<unsigned i
             //if there is a at least one monotone turn, including X, we have to add X to W
             if(indices.size() != 0){
                 W[idx].push_back(boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> >(subs[i], newR, indices));
-                
+
                 std::set<unsigned int> union_R_X;
                 std::set_union(newR.begin(), newR.end(), subs[i].begin(), subs[i].end(), std::inserter(union_R_X, union_R_X.begin()));
-                    
+
                 //test if a tree decomposition has been found
                 if(union_R_X.size() == vertices.size())
                     return true;
             }
         }
     }
-    
+
     //We catched the robber(y in X). To cut down memory usage, we save the empty robber space instead of all possible y in X (or just X).
     //With this modification, we additionally have to check "if(|R|== 0 && X' includes newR)" for monotonicity in is_monotone_dynamicCR
-    
+
     //todo: copy the whole "graph" in W displaced by one layer, such we would not compute monotone turns several times
     for(unsigned int i = 0; i < subs.size(); i++)
         W[idx].push_back(boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> >(subs[i], std::set<unsigned int>(), std::vector<unsigned int>()));
-    
+
     return false;
 }
 
-        
+
 template <typename T_t>
 void dynamicCR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned int> &bag2){
     typename boost::graph_traits<T_t>::vertex_iterator vIt1, vIt2, vEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor b1, b2;
-    
+
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
         if(T[*vIt1].bag == bag1){
             b1 = *vIt1;
             break;
         }
     }
-    
+
     for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
         if(T[*vIt2].bag == bag2){
             b2 = *vIt2;
             break;
         }
     }
-    
+
     if(vIt1 != vEnd && vIt2 != vEnd)
         return;
-    
+
     if(vIt1 == vEnd){
         b1 = boost::add_vertex(T);
         T[b1].bag = bag1;
     }
-    
+
     if(vIt2 == vEnd){
         b2 = boost::add_vertex(T);
         T[b2].bag = bag2;
@@ -219,7 +219,7 @@ void dynamicCR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned 
     boost::add_edge(b1, b2, T);
 }
 
-//follows the "pointers" stores in the third entry of W[layer][i] recursively 
+//follows the "pointers" stored in the third entry of W[layer][i] recursively
 template <typename T_t>
 void make_tree_decomposition(T_t &T, std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > > &W, unsigned int layer, unsigned int idx){
     std::set<unsigned int> R;
@@ -241,7 +241,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
 
     if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-    	for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
             T[t].bag.insert(G[*vIt].id);
 
         return;
@@ -252,7 +252,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
 
     std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > > W(1);
     unsigned int k = (unsigned int)lb;
-    
+
     while(true){
         k++;
         for(unsigned int i = 0; i < vertices.size(); i++){
@@ -261,12 +261,12 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
                 return;
             }
         }
-    
+
         W.clear();
         W.resize(1);
-    }   
+    }
 }
-          
+
 
 template <typename G_t, typename T_t>
 static void CR_dynamic_decomp(G_t &G, T_t &T){

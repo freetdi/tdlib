@@ -57,7 +57,7 @@ namespace treedec{
 template <typename G_t, typename T_t>
 bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T){
     induced_subgraph(H, G, T[t_desc].bag);
-    
+
     //adding additional edge, if a non-edge "occures" in another bag of the current tree decomposition (neighbour-bags of the refinement bag are sufficient)    
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
@@ -76,7 +76,7 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
         }
     }
 
-    //find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y 
+    //find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y
 
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
@@ -87,20 +87,20 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
                     X.insert(H[*nIt].id);
-                    
+
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++)
                     Y.insert(H[*nIt].id);
-                    
+
                 disabled[H[*vIt1].id] = true;
                 disabled[H[*vIt2].id] = true;
-                    
+
                 goto BREAK_LOOP;
             }
         }
     }
 
     BREAK_LOOP:
-        
+
     //test for completeness
     if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
         H.clear();
@@ -108,20 +108,20 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
         Y.clear();
         return false;
     }
-    
+
     return true;
-}  
+}
 
 /* MinimalSeperatingVertexSet(MSVS)-algorithm
- * 
- * Tries to find a seperator in the modified induced subgraph by a maximum-sized bag 
+ *
+ * Tries to find a seperator in the modified induced subgraph by a maximum-sized bag
  * and refines the tree decomposition if possible.
  */
 template <typename G_t, typename T_t>
 void MSVS(G_t &G, T_t &T){
     while(true){
         unsigned int width = treedec::get_width(T);
-        
+
         //check all maximum sized bags, whether they can be improved or not. take the first improvable
         G_t H;
         std::set<unsigned int> X, Y;
@@ -139,11 +139,11 @@ void MSVS(G_t &G, T_t &T){
                 }
             }
         }
-        
+
         //no improvement possible
         if(boost::num_vertices(H) == 0)
             return;
-        
+
         //compute a seperating set S
         std::set<unsigned int> S;
         seperate_vertices(H, disabled, X, Y, S);
@@ -159,28 +159,28 @@ void MSVS(G_t &G, T_t &T){
 
         std::vector<std::set<unsigned int> > components;
         get_components_provided_map(H, components, visited);
-        
+
         typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN;
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> newN(components.size());
-        
+
         for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_bag, T); t_nIt != t_nEnd; t_nIt++)
             oldN.push_back(*t_nIt);
-        
+
         boost::clear_vertex(refinement_bag, T);
-        
+
         std::set<unsigned int> old_bag = T[refinement_bag].bag;
         T[refinement_bag].bag = S;
-        
+
         std::vector<std::set<unsigned int> > union_S_W_i(components.size());
-        
+
         for(unsigned int i = 0; i < components.size(); i++){
             std::set_union(S.begin(), S.end(), components[i].begin(), components[i].end(), std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
             newN[i] = boost::add_vertex(T);
             T[newN[i]].bag = union_S_W_i[i];
             boost::add_edge(refinement_bag, newN[i], T);
         }
-            
+
         for(unsigned int i = 0; i <  oldN.size(); i++){
             std::set<unsigned int> intersection;
             std::set_intersection(old_bag.begin(), old_bag.end(), T[oldN[i]].bag.begin(), T[oldN[i]].bag.end(), std::inserter(intersection, intersection.begin()));
@@ -213,19 +213,19 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
 
 
 
-/* minimalChordal-algorithm 
- * 
+/* minimalChordal-algorithm
+ *
  * Computes possibly redundant fill-in-edges and runs LEX-M to check,
  * if the graph after removal of a fill-in-edge is chordal.
  * Finally, the algorithm computes a new perfect elimination ordering, that
- * possibly causes lower tree width. 
+ * possibly causes lower tree width.
  */
 template <typename G_t>
 void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering){
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap; 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
     make_index_map(G, idxMap);
-    
-    std::vector<std::set<unsigned int> > C; 
+
+    std::vector<std::set<unsigned int> > C;
     std::vector<std::vector<std::vector<unsigned int> > > F;
     make_filled_graph(G, old_elimination_ordering, C, F);
 
@@ -240,13 +240,13 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
             }
         }
         if(candidate.size() != 0){
-            G_t W_i; 
+            G_t W_i;
             induced_subgraph(W_i, G, incident);
             delete_edges(W_i, candidate);
-            
+
             std::vector<std::vector<unsigned int> > keep_fill;
             LEX_M_fill_in(W_i, keep_fill);
-            
+
             for(unsigned int j = 0; j < candidate.size(); j++){
                 for(unsigned int k = 0; k < keep_fill.size(); k++){
                     if((candidate[j][0] == keep_fill[k][0] && candidate[j][1] == keep_fill[k][1])
@@ -256,7 +256,7 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
                      }
                 }
             }
-            
+
             delete_edges(G, candidate);
         }
     }
