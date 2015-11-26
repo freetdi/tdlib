@@ -16,7 +16,7 @@ AM_LDFLAGS = -module -omit-version
 
 TESTS = test.py
 TEST_EXTENSIONS = .py
-PY_LOG_COMPILER = python
+PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
     export PYTHONPATH='.';
 
