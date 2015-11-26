@@ -20,12 +20,10 @@ AC_ARG_WITH([python],
  [python='no'])
 
 AS_IF([test "$python" != no], [
-python_version_required=2.7
-AM_PATH_PYTHON([$python_version_required])
-if ! test x$PYTHON_VERSION = x"$python_version_required"; then
+python_version_required="${python##python}"
+AM_PATH_PYTHON([$python_version_required],,
    AC_MSG_ERROR([python $PYTHON_VERSION is not $python_version_required])
-fi
-AM_PATH_PYTHON([2.7])
+	)
 
 AC_PATH_PROGS([CYTHON],
               [cython2.7 cython],
