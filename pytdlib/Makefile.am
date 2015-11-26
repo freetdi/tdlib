@@ -11,7 +11,7 @@ AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
               -fno-strict-aliasing -g -fwrapv -O2 -Wall \
               -Wformat -Werror=format-security
 
-AM_CPPFLAGS = -DNDEBUG @my_CPPFLAGS@ -I$(top_srcdir)/src
+AM_CPPFLAGS = -DNDEBUG @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -omit-version
 
 TESTS = test.py

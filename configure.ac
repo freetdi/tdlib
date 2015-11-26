@@ -30,7 +30,6 @@ AC_PATH_PROGS([CYTHON],
               [no])
 AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
 
-AM_CHECK_PYTHON_HEADERS()
 PYTHON_INCLUDE_DIR=$PYTHON_PREFIX/include
 PYTHON_LIB_DIR=$PYTHON_PREFIX/lib
 
@@ -38,8 +37,6 @@ AC_ARG_WITH(python-include-dir,
             [  --with-python-include-dir=DIR look in DIR for Python headers],
             [PYTHON_INCLUDE_DIR=$withval],)
 AC_SUBST(PYTHON_INCLUDE_DIR)
-my_CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
-AC_SUBST([my_CPPFLAGS])
 
 AC_ARG_WITH(python-lib-dir,
             [  --with-python-lib-dir=DIR look in DIR for Python libraries],
@@ -52,6 +49,10 @@ AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 # Checks for libraries.
 
 # Checks for header files.
+AS_IF([test x"$PYTHON" != x], [
+  AM_CHECK_PYTHON_HEADERS([:],
+	[AC_MSG_ERROR(please install python headers matching $PYTHON)])
+])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
