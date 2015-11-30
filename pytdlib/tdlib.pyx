@@ -143,19 +143,19 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
 
     if len(pyE) > 0:
         #tuple representation
-        if str(type(pyE[0])) == "<type 'tuple'>" or str(type(pyE[0])) == "<class 'tuple'>":
+        if isinstance(pyE[0], tuple):
             for u,v in pyE:
                 E.push_back(u)
                 E.push_back(v)
 
         #list representation
-        elif str(type(pyE[0])) == "<type 'list'>" or str(type(pyE[0])) == "<class 'list'>":
+        elif isinstance(pyE[0], list):
             for e in pyE:
                 E.push_back(e[0])
                 E.push_back(e[1])
 
         #internal representation (unfolded tuple/list representation)
-        elif str(type(pyE[0])) == "<type 'int'>" or str(type(pyE[0])) == "<class 'int'>":
+        elif isinstance(pyE[0], int):
             for e in pyE:
                 E.push_back(e)
 
