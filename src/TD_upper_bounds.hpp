@@ -52,14 +52,15 @@ unsigned int _minDegree(G_t &G){
             upper_bound = min_degree;
 
         //collect the neighbours
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours(boost::out_degree(min_vertex, G));
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
+        unsigned int i = 0;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
-            neighbours.push_back(*nIt);
+            neighbours[i++] = *nIt;
 
-	//make the neighbours a clique
+        //make the neighbours a clique
         for(unsigned int i = 0; i < neighbours.size(); i++){
             for(unsigned int j = i+1; j < neighbours.size(); j++)
                 boost::add_edge(neighbours[i], neighbours[j], G);
@@ -94,14 +95,15 @@ unsigned int _minDegree_fast(G_t &G){
             upper_bound = min_degree;
 
         //collect the neighbours
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours(boost::out_degree(min_vertex, G));
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
+        unsigned int i = 0;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
-            neighbours.push_back(*nIt);
+            neighbours[i++] = *nIt;
 
-	//make the neighbours a clique
+        //make the neighbours a clique
         for(unsigned int i = 0; i < neighbours.size(); i++){
             for(unsigned int j = i+1; j < neighbours.size(); j++){
                 if(!boost::edge(neighbours[i], neighbours[j], G).second)

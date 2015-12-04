@@ -164,19 +164,19 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
         V.push_back(t)
 
     #tuple representation
-    if len(pyE) > 0 and str(type(pyE[0])) == "<type 'tuple'>":
+    if isinstance(pyE[0], tuple):
         for u,v in pyE:
             E.push_back(u)
             E.push_back(v)
 
     #list representation
-    elif len(pyE) > 0 and str(type(pyE[0])) == "<type 'list'>":
+    elif isinstance(pyE[0], list):
         for e in pyE:
             E.push_back(e[0])
             E.push_back(e[1])
 
     #internal representation (unfolded tuple/list representation)
-    elif len(pyE) > 0 and str(type(pyE[0])) == "<type 'int'>":
+    elif isinstance(pyE[0], int):
         for e in pyE:
             E.push_back(e)
 
