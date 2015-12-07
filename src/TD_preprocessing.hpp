@@ -377,7 +377,7 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned
 
             boost::clear_vertex(*vIt, G);
 
-            low = (low > (int)bag.size())? low : (int)bag.size()-1;
+            low = (low > (int)bag.size())? low : (int)bag.size();
             return true;
         }
     }
@@ -461,7 +461,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
 
             boost::clear_vertex(*vIt, G);
 
-            low = (low > (int)bag.size())? low : (int)bag.size()-1;
+            low = (low > (int)bag.size())? low : (int)bag.size();
             return true;
         }
     }

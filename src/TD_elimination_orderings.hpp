@@ -481,7 +481,7 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && T[leaf].bag.size() > 0){
+        if(boost::out_degree(*tIt, T) <= 1 && !T[*tIt].bag.empty()){
             leaf = *tIt;
             leaf_found = true;
             break;

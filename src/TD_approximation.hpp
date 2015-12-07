@@ -75,7 +75,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor logApproximation(G_t &G, T_
 
     //find a 2/3-vertex seperator S_ of (Z v W) in G[Z v W]
     std::vector<bool> disabled2(disabled);
-    approximate_vertex_seperator(G, disabled, union_Z_W, S_); 
+    approximate_vertex_seperator(G, disabled, union_Z_W, S_);
 
 
     //compute the connected components of G[Z v W - (S v S_)]
@@ -105,7 +105,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor logApproximation(G_t &G, T_
     for(unsigned int i = 0; i < C.size(); i++){
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> Zi, Wi, union_Wi_S_S_;
 
-        //Zi = (V(Gi) ^ Z) 
+        //Zi = (V(Gi) ^ Z)
         std::set_intersection(C[i].begin(), C[i].end(), Z.begin(), Z.end(), std::inserter(Zi, Zi.begin()));
 
         //Wi = (V(Gi) ^ W)

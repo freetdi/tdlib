@@ -342,8 +342,6 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V, E);
 
-    return;
-
     treedec::treedec_to_ordering(T, elim_ordering);
 }
 
