@@ -496,20 +496,19 @@ int _deltaC_least_c(G_t &G){
 
         lb = (lb>min_degree)? lb : min_degree;
 
-        //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+        //least-c heuristic: search a neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
 
-        unsigned int min_common = boost::out_degree(min_vertex, G);
-        min_common++;
+        unsigned int min_common = UINT_MAX;
 
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
+        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; nIt1++){
             unsigned int cnt_common = 0;
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
+            for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(min_vertex, G); nIt2 != nEnd2; nIt2++){
                 if(boost::edge(*nIt1, *nIt2, G).second)
                     cnt_common++;
+                if(cnt_common >= min_common)
+                    break;
             }
             if(cnt_common < min_common){
                 w = *nIt1;
@@ -518,7 +517,7 @@ int _deltaC_least_c(G_t &G){
         }
 
         //contract the edge between min_vertex and w
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(w, G); nIt1 != nEnd; nIt1++){
+        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(w, G); nIt1 != nEnd1; nIt1++){
             if(*nIt1 != min_vertex)
                 boost::add_edge(min_vertex, *nIt1, G);
         }
