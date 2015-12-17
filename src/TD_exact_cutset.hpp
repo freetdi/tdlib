@@ -75,7 +75,7 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
 
     std::set_difference(component.begin(), component.end(), N.begin(), N.end(), std::inserter(rest, rest.begin()));
 
-    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> candidates(N.size());
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> candidates(component.size());
 
     unsigned int i = 0;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++)

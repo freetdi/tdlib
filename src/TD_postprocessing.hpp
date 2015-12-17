@@ -82,8 +82,7 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*vIt1, *vIt2, H);
-            if(!existsEdge.second){
+            if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
                     X.insert(H[*nIt].id);

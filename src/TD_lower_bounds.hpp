@@ -167,7 +167,7 @@ int _deltaD(G_t &G){
 
     while(true){
         unsigned int min_degree = boost::num_vertices(G);
-        for(boost::tie(vIt, vEnd) = vertices(G); vIt != vEnd; vIt++){
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree < min_degree && degree > 0){
                 min_degree = degree;
@@ -204,7 +204,7 @@ int delta2D(const G_t &G){
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> assumed_minimal;
 
     typename boost::graph_traits<G_t>::vertex_iterator hIt, hEnd;
-    for(boost::tie(hIt, hEnd) = vertices(H); hIt != hEnd; hIt++)
+    for(boost::tie(hIt, hEnd) = boost::vertices(H); hIt != hEnd; hIt++)
         assumed_minimal.push_back(*hIt);
 
     unsigned int min_degree, maxmin = 0;
@@ -214,7 +214,7 @@ int delta2D(const G_t &G){
         while(boost::num_edges(H) > 0){
             min_degree = boost::num_vertices(H);
 
-            for(boost::tie(hIt, hEnd) = vertices(H); hIt != hEnd; hIt++){
+            for(boost::tie(hIt, hEnd) = boost::vertices(H); hIt != hEnd; hIt++){
                 if(*hIt == assumed_minimal[i])
                     continue;
                 unsigned int degree = boost::out_degree(*hIt, H);
@@ -389,11 +389,11 @@ template <typename G_t>
 inline void _contract_edge(G_t &G, const typename boost::graph_traits<G_t>::vertex_descriptor &v, const typename boost::graph_traits<G_t>::vertex_descriptor &w){
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-        if(*nIt != v)
-            boost::add_edge(v, *nIt, G);
+        if(*nIt != w)
+            boost::add_edge(w, *nIt, G);
     }
 
-    boost::clear_vertex(w, G);
+    boost::clear_vertex(v, G);
 }
 
 
@@ -517,65 +517,12 @@ int _deltaC_least_c(G_t &G){
         }
 
         //contract the edge between min_vertex and w
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(w, G); nIt1 != nEnd1; nIt1++){
-            if(*nIt1 != min_vertex)
-                boost::add_edge(min_vertex, *nIt1, G);
+        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; nIt1++){
+            if(*nIt1 != w)
+                boost::add_edge(w, *nIt1, G);
         }
 
-        boost::clear_vertex(w, G);
-    }
-    return (int)lb;
-}
-
-//quite faster as the above version if vecS is the container for the edges
-template <typename G_t>
-int _deltaC_least_c_fast(G_t &G){
-    unsigned int lb = 0;
-
-    while(boost::num_edges(G) > 0){
-        //search a minimum-degree-vertex
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
-        unsigned int min_degree = boost::num_vertices(G);
-
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree <= min_degree && degree > 0){
-                min_degree = degree;
-                min_vertex = *vIt;
-            }
-        }
-
-        lb = (lb>min_degree)? lb : min_degree;
-
-        //least-c heuristic: search the neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        typename boost::graph_traits<G_t>::vertex_descriptor w;
-
-        unsigned int min_common = boost::out_degree(min_vertex, G);
-        min_common++;
-
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            unsigned int cnt_common = 0;
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                if(boost::edge(*nIt1, *nIt2, G).second)
-                    cnt_common++;
-            }
-            if(cnt_common < min_common){
-                w = *nIt1;
-                min_common = cnt_common;
-            }
-        }
-
-        //contract the edge between min_vertex and w
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(w, G); nIt1 != nEnd; nIt1++){
-            if(*nIt1 != min_vertex && !boost::edge(min_vertex, *nIt1, G).second)
-                boost::add_edge(min_vertex, *nIt1, G);
-        }
-
-        boost::clear_vertex(w, G);
+        boost::clear_vertex(min_vertex, G);
     }
     return (int)lb;
 }
@@ -792,8 +739,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*vIt1, *vIt2, H);
-            if(!existsEdge.second){
+            if(!boost::edge(*vIt1, *vIt2, H).second){
                 std::set<unsigned int> X, Y, S;
 
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -1092,8 +1038,7 @@ void MCSC_min_deg(G_t H, int &lb){
             sIt2 = sIt1;
             sIt2++;
             for(; sIt2 != N2.end(); sIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                if(existsEdge.second)
+                if(boost::edge(*sIt1, *sIt2, H).second)
                     cnt_common += 1;
             }
             if(cnt_common < min_common){
@@ -1158,8 +1103,7 @@ void MCSC_last_mcs(G_t H, int &lb){
             sIt2 = sIt1;
             sIt2++;
             for(; sIt2 != N2.end(); sIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                if(existsEdge.second)
+                if(boost::edge(*sIt1, *sIt2, H).second)
                     cnt_common += 1;
             }
             if(cnt_common < min_common){
@@ -1218,8 +1162,7 @@ void MCSC_max_mcs(G_t H, int &lb){
             sIt2 = sIt1;
             sIt2++;
             for(; sIt2 != N2.end(); sIt2++){
-                std::pair<typename G_t::edge_descriptor, bool> existsEdge = boost::edge(*sIt1, *sIt2, H);
-                if(existsEdge.second)
+                if(boost::edge(*sIt1, *sIt2, H).second)
                     cnt_common += 1;
             }
             if(cnt_common < min_common){

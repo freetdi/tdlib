@@ -110,7 +110,7 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 3)
 
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "deltaC_min_d")
-        self.assertEqual(lb, 3)
+        self.assertEqual(lb, 4)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "deltaC_max_d")
         self.assertEqual(lb, 3)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "deltaC_least_c")

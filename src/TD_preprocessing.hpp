@@ -156,11 +156,7 @@ bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned i
                 N.push_back(neighbourIt);
             }
 
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge1 = boost::edge(*N.at(0), *N.at(1), G);
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge2 = boost::edge(*N.at(0), *N.at(2), G);
-            std::pair<typename G_t::edge_descriptor, bool> existsEdge3 = boost::edge(*N.at(1), *N.at(2), G);
-
-            if(existsEdge1.second || existsEdge2.second || existsEdge3.second){
+            if(boost::edge(*N.at(0), *N.at(1), G).second || boost::edge(*N.at(0), *N.at(2), G).second || boost::edge(*N.at(1), *N.at(2), G).second){
                 boost::add_edge(*N.at(0), *N.at(1), G);
                 boost::add_edge(*N.at(0), *N.at(2), G);
                 boost::add_edge(*N.at(1), *N.at(2), G);
