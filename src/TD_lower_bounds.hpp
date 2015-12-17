@@ -61,6 +61,7 @@
 #include <vector>
 #include <set>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/copy.hpp>
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
 #include "TD_simple_graph_algos.hpp"
@@ -199,7 +200,7 @@ int delta2D(const G_t &G){
         return -1;
 
     G_t H;
-    TD_copy_graph(G, H);
+    boost::copy_graph(G, H);
 
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> assumed_minimal;
 
@@ -230,7 +231,7 @@ int delta2D(const G_t &G){
             boost::clear_vertex(min_vertex, H);
         }
         H.clear();
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
     }
     return (int)maxmin;
 }
@@ -545,11 +546,11 @@ int deltaC_least_c(G_t G){
 template <typename G_t>
 void k_neighbour_improved_graph(G_t &G, unsigned int k){
     G_t H;
+    boost::copy_graph(G, H);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    TD_copy_graph(G, H, map);
+    make_map(G, map);
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
@@ -587,7 +588,7 @@ int LBN_deltaD(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
 
         if(_deltaD(H) > lb)
@@ -611,7 +612,7 @@ int LBN_deltaC(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
 
         if(_deltaC_least_c(H) > lb)
@@ -662,7 +663,7 @@ int LBNC_deltaD(G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
 
         int new_lb;
@@ -701,7 +702,7 @@ int LBNC_deltaC(G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         k_neighbour_improved_graph(H, lb+1);
 
         int new_lb;
@@ -731,8 +732,9 @@ int LBNC_deltaC(G_t &G){
 template <typename G_t>
 void k_path_improved_graph(G_t &G, unsigned int k){
     G_t H;
+    boost::copy_graph(G, H);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    TD_copy_graph(G, H, map);
+    make_map(G, map);
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
@@ -775,7 +777,7 @@ int LBP_deltaD(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(H, id_map);
 
@@ -802,7 +804,7 @@ int LBP_deltaC(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(H, id_map);
 
@@ -829,7 +831,7 @@ int LBPC_deltaD(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(H, id_map);
 
@@ -872,7 +874,7 @@ int LBPC_deltaC(const G_t &G){
 
     while(true){
         G_t H;
-        TD_copy_graph(G, H);
+        boost::copy_graph(G, H);
         std::vector<unsigned int> id_map;
         treedec::reorder_ids_graph(H, id_map);
 

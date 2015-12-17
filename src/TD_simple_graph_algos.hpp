@@ -28,42 +28,17 @@
 #include <set>
 
 template <typename G_t>
-void TD_copy_graph(const G_t &G, G_t &H){
+void make_map(const G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &map){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     unsigned int max = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         max = (G[*vIt].id > max)? G[*vIt].id : max;
 
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        idxMap[G[*vIt].id] = boost::add_vertex(H);
-        H[idxMap[G[*vIt].id]].id = G[*vIt].id;
-    }
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++)
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
-}
-
-template <typename G_t>
-void TD_copy_graph(const G_t &G, G_t &H, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &map){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-
-    unsigned int max = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        max = (G[*vIt].id > max)? G[*vIt].id : max;
-
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
     map.resize(max+1);
 
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        idxMap[G[*vIt].id] = boost::add_vertex(H);
-        H[idxMap[G[*vIt].id]].id = G[*vIt].id;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
         map[G[*vIt].id] = *vIt;
-    }
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++)
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
 }
 
 
