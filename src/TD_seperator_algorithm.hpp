@@ -127,8 +127,8 @@ bool nearly_balanced_seperator(G_t &G, typename std::set<typename boost::graph_t
             std::set_difference(W_.begin(), W_.end(), X_Y.begin(), X_Y.end(), std::inserter(Z, Z.begin()));
 
             //do the extended deepth-first-search on the neighbours of vertices in X and Y
-            get_neighbourhood_new(G, disabled_, subsX[i], sX);
-            get_neighbourhood_new(G, disabled_, subsY[i][j], sY);
+            get_neighbourhood(G, disabled_, subsX[i], sX);
+            get_neighbourhood(G, disabled_, subsY[i][j], sY);
 
             for(std::set<unsigned int>::iterator sIt = X_Y.begin(); sIt != X_Y.end(); sIt++)
                 disabled_[*sIt] = true;

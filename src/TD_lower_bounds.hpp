@@ -548,7 +548,7 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
     G_t H;
     boost::copy_graph(G, H);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    make_map(G, map);
+    make_index_map(G, map);
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
@@ -734,7 +734,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){
     G_t H;
     boost::copy_graph(G, H);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    make_map(G, map);
+    make_index_map(G, map);
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){

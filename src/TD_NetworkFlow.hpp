@@ -369,7 +369,6 @@ bool seperate_vertices(G_t &G, std::vector<bool> &disabled, std::set<unsigned in
     if(X.size() == 0 || Y.size() == 0)
         return true;
 
-    //delete_vertices(G, S);
     for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
         disabled[*sIt] = true;
 
