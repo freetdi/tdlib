@@ -48,17 +48,17 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_elimination_orderings.hpp"
 #include "TD_NetworkFlow.hpp"
-#include "TD_misc.hpp"
 #include "TD_simple_graph_algos.hpp"
+#include "TD_misc.hpp"
 
 namespace treedec{
 
-//creates a modified induced subgraph of the bag "T[t_desc].bag"
+//Creates a modified induced subgraph of the bag 'T[t_desc].bag'.
 template <typename G_t, typename T_t>
 bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T){
     induced_subgraph(H, G, T[t_desc].bag);
 
-    //adding additional edge, if a non-edge "occures" in another bag of the current tree decomposition (neighbour-bags of the refinement bag are sufficient)    
+    //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent vertex t_desc' of t_desc in T.
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
@@ -76,8 +76,7 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
         }
     }
 
-    //find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y
-
+    //Find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y.
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
@@ -100,7 +99,7 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
 
     BREAK_LOOP:
 
-    //test for completeness
+    //Test for completeness.
     if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
         H.clear();
         X.clear();
@@ -113,15 +112,18 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
 
 /* MinimalSeperatingVertexSet(MSVS)-algorithm
  *
- * Tries to find a seperator in the modified induced subgraph by a maximum-sized bag
- * and refines the tree decomposition if possible.
+ * Tries to find a minimal seperator S in the graph H, that
+ *    (1) containes the induced subgraph of a maximum-sized bag B(t) of T,
+ *    (2) has an edge {x,y}, if {x,y} is a subset of B(t') for some neighbour t' of t in T.
+ * If no seperator can be found for none of the maximum-sized bags, the algorithm stops. Otherwise,
+ * the tree decomposition T is refined according to S.
  */
 template <typename G_t, typename T_t>
 void MSVS(G_t &G, T_t &T){
     while(true){
         unsigned int width = treedec::get_width(T);
 
-        //check all maximum sized bags, whether they can be improved or not. take the first improvable
+        //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
         std::set<unsigned int> X, Y;
         std::vector<bool> disabled(boost::num_vertices(G), false);
@@ -139,15 +141,22 @@ void MSVS(G_t &G, T_t &T){
             }
         }
 
-        //no improvement possible
-        if(boost::num_vertices(H) == 0)
+        //No improvement possible.
+        if(boost::num_vertices(H) == 0){
             return;
+        }
 
-        //compute a seperating set S
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X_, Y_, S_;
+        treedec::id_bag_to_descriptor_bag(H, X_, X);
+        treedec::id_bag_to_descriptor_bag(H, Y_, Y);
+
+        //Compute a seperating set S.
         std::set<unsigned int> S;
-        seperate_vertices(H, disabled, X, Y, S);
+        treedec::seperate_vertices(H, disabled, X_, Y_, S_);
 
-        //do the refinement
+        treedec::descriptor_bag_to_id_bag(H, S, S_);
+
+        //Do the refinement.
         std::vector<bool> visited(boost::num_vertices(G), true);
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++)
@@ -195,7 +204,7 @@ void MSVS(G_t &G, T_t &T){
 
 template <typename G_t>
 bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vector<unsigned int> &elimination_ordering, G_t &M, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    //pos i in elimination_ordering_ will store the "elimination date" of vertex i
+    //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
     std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
     for(unsigned int t = 0; t < elimination_ordering.size(); t++)
         elimination_ordering_[elimination_ordering[t]] = t;
@@ -210,14 +219,12 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
 
 
 
-
-
 /* minimalChordal-algorithm
  *
  * Computes possibly redundant fill-in-edges and runs LEX-M to check,
  * if the graph after removal of a fill-in-edge is chordal.
  * Finally, the algorithm computes a new perfect elimination ordering, that
- * possibly causes lower tree width.
+ * possibly causes lower width than 'old_elimination_ordering'.
  */
 template <typename G_t>
 void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering){
@@ -261,7 +268,6 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
     }
     LEX_M_minimal_ordering(G, new_elimination_ordering);
 }
-
 
 }
 

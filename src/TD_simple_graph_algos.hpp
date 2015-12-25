@@ -72,16 +72,15 @@ bool is_edge_between_sets(G_t &G, typename std::set<typename boost::graph_traits
 }
 
 template <typename G_t>
-void get_neighbourhood(G_t &G, std::vector<bool> &disabled, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, std::set<unsigned int> &S_X){
+void get_neighbourhood(G_t &G, std::vector<bool> &disabled, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X){
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
            if(!disabled[G[*nIt].id] && X.find(*nIt) == X.end())
-               S_X.insert(G[*nIt].id);
+               S_X.insert(*nIt);
         }
     }
 }
-
 
 template <typename G_t>
 void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor vertex, std::vector<bool> &visited, std::vector<std::set<unsigned int> > &components, int comp_idx){
@@ -135,7 +134,7 @@ void get_components(G_t &G, std::vector<std::set<unsigned int> > &components){
 
 
 template <typename G_t>
-void get_components_provided_map(G_t &G, std::vector<std::set<unsigned int> > &components, std::vector<bool> &visited){  
+void get_components_provided_map(G_t &G, std::vector<std::set<unsigned int> > &components, std::vector<bool> &visited){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){

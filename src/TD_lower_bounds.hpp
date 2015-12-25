@@ -17,11 +17,11 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute lower bounds on tree width
-//
 
 /*
- * provides following functions (namespace treedec::lb):
+ * Offers functionality to compute lower bounds on the tree width of a graph.
+ *
+ * Provides following functions (namespace treedec::lb):
  *
  * - int delta(G_t &G)
  * - int delta2(G_t &G)
@@ -53,6 +53,27 @@
  * - void MCSC_max_mcs(G_t G, int &lb)
  *
  * - int relation_edges_vertices(G_t &G)
+ *
+ * The main idea of all algorithms included in this file is this one:
+ *
+ *    For any tree decomposition T of width k, there is a 'small tree decomposition' T' (no bag is subset of another bag) of width k.
+ *    If a graph G is a complete graph, than all trees of tree decompositions of G consists of an isolated vertex t with B(t) = V(G).
+ *    In this case, the minimal degree of a vertex in G matches the treewidth of G. If G is not a complete graph, than all trees of
+ *    tree decompositions of G of minimal width have at least two vertices and hence at least two leafs. Let t be a leaf of a small tree
+ *    decomposition T' of G of minimal width and let t' be adjacent with t in T'. Then B(t) \ B(t') is not empty and all neighbours
+ *    of a vertex v in (B(t) \ B(t')) are contained in B(t). Let d be the degree of v in G. The minimal degree d_min of a vertex in G is
+ *    a lower bound of the treewidth of G, since d_min <= d <= tw(G) (algorithm delta). The same argument holds for the second minimal
+ *    degree of vertices in in G (algorithm delta2) and some variation, which is introduced in gamma. The minimal degree-method also
+ *    holds for subgraphs and minors of G. The degeneracy of G is the maximum over all smallest degrees of vertices in the graphs
+ *    obtained by successivly removing a vertex of minimal degree. The algorithms ...D apply the algorithms delta, delta2 and gamma
+ *    on all (degeneracy-)subgraphs of G. The algorithms ...C apply the algorithms delta, delta2 and gamma on some heuristically choosen
+ *    minors of G.
+ *
+ * For more information, see e.g.:
+ *
+ *     Hans L. Bodlaender, Arie M.C.A. Koster, Treewidth computations II. Lower bounds, Information and Computation,
+ *     Volume 209, Issue 7, July 2011, Pages 1103-1119
+ *
  */
 
 #ifndef TD_LOWER_BOUNDS
@@ -63,18 +84,17 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
 #include "TD_NetworkFlow.hpp"
-#include "TD_misc.hpp"
 #include "TD_simple_graph_algos.hpp"
+#include "TD_misc.hpp"
 
 namespace treedec{
 
 namespace lb{
 
 
-
 /* DEGREE BASED */
 
-//smallest vertex-degree in G
+//Smallest vertex-degree in G.
 template <typename G_t>
 int delta(const G_t &G){
     if(boost::num_vertices(G) == 0)
@@ -89,7 +109,7 @@ int delta(const G_t &G){
     return (int)min;
 }
 
-//second smallest vertex-degree in G
+//Second smallest vertex-degree in G.
 template <typename G_t>
 int delta2(const G_t &G){
     if(boost::num_vertices(G) == 0)
@@ -144,11 +164,11 @@ int gamma(const G_t &G){
     else if(boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1))
         return boost::num_vertices(G)-1;
 
-    //sort the vertices of G according to rising degree -> degree_sequence
+    //Sort the vertices of G according to rising degree -> degree_sequence.
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
     _make_degree_sequence(G, degree_sequence);
 
-    //take the degree of the right vertex in the first not-edge
+    //Take the degree of the right vertex in the first not-edge.
     for(unsigned int i = 0; i < boost::num_vertices(G); i++){
         for(unsigned int j = 0; j < i; j++){
             if(!boost::edge(degree_sequence[i], degree_sequence[j], G).second){
@@ -159,7 +179,6 @@ int gamma(const G_t &G){
     }
 }
 
-//successivly remove a smallest-degree-vertex in G and return the smallest degree seen
 template <typename G_t>
 int _deltaD(G_t &G){
     unsigned int maxmin = 0;
@@ -193,7 +212,7 @@ int deltaD(G_t G){
     return _deltaD(G);
 }
 
-//assume each vertex as the minimal one and do deltaD
+//Assume each vertex as the minimal one and apply deltaD.
 template <typename G_t>
 int delta2D(const G_t &G){
     if(boost::num_vertices(G) == 0)
@@ -241,7 +260,7 @@ void _gammaD_left(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0)
         return;
 
-    //sort the vertices of G according to rising degree -> degree_sequence
+    //Sort the vertices of G according to rising degree -> degree_sequence.
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
     _make_degree_sequence(G, degree_sequence);
 
@@ -283,7 +302,7 @@ void _gammaD_right(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0)
         return;
 
-    //sort the vertices of G according to rising degree -> degree_sequence
+    //Sort the vertices of G according to rising degree -> degree_sequence.
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
     _make_degree_sequence(G, degree_sequence);
 
@@ -324,7 +343,7 @@ void _gammaD_min_e(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0)
         return;
 
-    //sort the vertices of G according to rising degree -> degree_sequence
+    //Sort the vertices of G according to rising degree -> degree_sequence.
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> degree_sequence;
     _make_degree_sequence(G, degree_sequence);
 
@@ -369,7 +388,6 @@ int gammaD_min_e(G_t G){
     return lb;
 }
 
-//assumes that some edge exists
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor _min_degree_vertex(const G_t &G){
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
@@ -403,11 +421,11 @@ int _deltaC_min_d(G_t &G){
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
-        //search a minimum-degree-vertex
+        //Search a minimum-degree-vertex.
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(G);
         lb = (lb>boost::out_degree(min_vertex, G))? lb : boost::out_degree(min_vertex, G);
 
-        //min_d heuristic: search a neighbour of min_vertex with minimal degree
+        //min_d heuristic: Search a neighbour of min_vertex with minimal degree.
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         unsigned int min_degree_w = boost::num_vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor w;
@@ -443,11 +461,11 @@ int _deltaC_max_d(G_t &G){
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
-        //search a minimum-degree-vertex
+        //Search a minimum-degree-vertex.
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = _min_degree_vertex(G);
         lb = (lb>boost::out_degree(min_vertex, G))? lb : boost::out_degree(min_vertex, G);
 
-        //max_d heuristic: search the neighbour of min_vertex with maximal degree
+        //max_d heuristic: Search the neighbour of min_vertex with maximal degree.
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         unsigned int max_degree = 0;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
@@ -482,7 +500,7 @@ int _deltaC_least_c(G_t &G){
     unsigned int lb = 0;
 
     while(boost::num_edges(G) > 0){
-        //search a minimum-degree-vertex
+        //Search a minimum-degree-vertex.
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
         unsigned int min_degree = boost::num_vertices(G);
 
@@ -497,7 +515,7 @@ int _deltaC_least_c(G_t &G){
 
         lb = (lb>min_degree)? lb : min_degree;
 
-        //least-c heuristic: search a neighbour of min_vertex such that contracting {min_vertex, w} removes least edges
+        //least-c heuristic: Search a neighbour of min_vertex such that contracting {min_vertex, w} removes least edges.
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
         typename boost::graph_traits<G_t>::vertex_descriptor w;
 
@@ -517,7 +535,7 @@ int _deltaC_least_c(G_t &G){
             }
         }
 
-        //contract the edge between min_vertex and w
+        //Contract the edge between min_vertex and w.
         for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; nIt1++){
             if(*nIt1 != w)
                 boost::add_edge(w, *nIt1, G);
@@ -624,7 +642,7 @@ int LBN_deltaC(const G_t &G){
 }
 
 
-//assumes that some edge exists
+//Assumes that some edge exists.
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor _least_c(const G_t &G, const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex){
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
@@ -742,20 +760,20 @@ void k_path_improved_graph(G_t &G, unsigned int k){
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
             if(!boost::edge(*vIt1, *vIt2, H).second){
-                std::set<unsigned int> X, Y, S;
+                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y, S;
 
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
-                    X.insert(G[*nIt].id);
+                    X.insert(*nIt);
 
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++)
-                    Y.insert(G[*nIt].id);
+                    Y.insert(*nIt);
 
                 std::vector<bool> disabled(boost::num_vertices(H), false);
                 disabled[H[*vIt1].id] = true;
                 disabled[H[*vIt2].id] = true;
 
-                seperate_vertices(H, disabled, X, Y, S);
+                treedec::seperate_vertices(H, disabled, X, Y, S);
 
                 if(S.size() >= k)
                     boost::add_edge(map[H[*vIt1].id], map[H[*vIt2].id], G);
@@ -909,7 +927,7 @@ int LBPC_deltaC(const G_t &G){
 
 /* Maximum Cardinality Search-based */
 
-//does a maximum cardinality search and returns the vertex descriptors of the maximum visited degree-vertex and the last visited vertex
+//Does a maximum cardinality search and returns the vertex descriptors of the maximum visited degree-vertex and the last visited vertex.
 template <typename G_t>
 std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_single(G_t &G, int &lb, typename boost::graph_traits<G_t>::vertex_descriptor start_vertex){
     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N, visited;
@@ -1024,7 +1042,7 @@ void MCSC_min_deg(G_t H, int &lb){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
     v = data[0];
-    
+
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     while(boost::num_edges(H) > 0){
