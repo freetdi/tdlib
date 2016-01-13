@@ -54,6 +54,9 @@ AS_IF([test x"$PYTHON" != x], [
 	[AC_MSG_ERROR(please install python headers matching $PYTHON)])
 ])
 
+AC_CHECK_HEADER([cliquer/cliquer.h],
+                [CPPFLAGS="$CPPFLAGS -DHAVE_CLIQUER"],)
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
