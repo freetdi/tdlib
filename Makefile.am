@@ -7,6 +7,7 @@ endif
 SUBDIRS = $(pytdlib)
 
 pkginclude_HEADERS = \
+  src/TD_noboost.hpp \
   src/TD_simple_graph_algos.hpp \
   src/TD_branch_decomposition.hpp \
   src/TD_combinations.hpp \
