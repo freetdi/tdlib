@@ -27,7 +27,7 @@
 
 #ifdef HAVE_CLIQUER
 #define new new_foo
-//you have to use -fpermissive in compilation 
+//you have to use -fpermissive in compilation
 extern "C"{
 #include <cliquer/cliquer.h>
 #undef new
@@ -121,6 +121,13 @@ class max_clique_cliquer : public max_clique_base<G_t>{
 
 };
 
+/*
+ * Solves max_independent_set with max_clique.
+ *
+ * Reduction: Search a maximal clique in the complement graph of the
+ *            input graph and output this clique.
+ */
+
 template <typename G_t>
 class max_independent_set_cliquer : public max_independent_set_base<G_t>{
     public:
@@ -131,7 +138,39 @@ class max_independent_set_cliquer : public max_independent_set_base<G_t>{
             treedec::np::max_clique_cliquer<G_t> A;
             A.max_clique(cG, result);
         }
+};
 
+/*
+ * Solves min_vertex_cover with max_clique.
+ *
+ * Reduction: Search a maximal clique C in the complement graph of the
+ *            input graph and return (V \ C).
+ */
+
+template <typename G_t>
+class min_vertex_cover_cliquer : public min_vertex_cover_base<G_t>{
+    public:
+        void min_vertex_cover(G_t &G, std::vector<unsigned int> &result){
+            G_t cG;
+            complement_graph(cG, G);
+
+            std::vector<unsigned int> tmp_result1;
+            treedec::np::max_clique_cliquer<G_t> A;
+            A.max_clique(cG, tmp_result1);
+
+            std::set<unsigned int> tmp_result2, tmp_result3;
+            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+            for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+                tmp_result2.insert(G[*vIt].id);
+
+            for(unsigned int i = 0; i < tmp_result1.size(); i++)
+                tmp_result3.insert(tmp_result1[i]);
+
+            result.resize(tmp_result2.size());
+            std::vector<unsigned int>::iterator it;
+            it = std::set_difference(tmp_result2.begin(), tmp_result2.end(), tmp_result3.begin(), tmp_result3.end(), result.begin());
+            result.resize(it-result.begin());
+        }
 };
 
 #endif //HAVE_CLIQUER
