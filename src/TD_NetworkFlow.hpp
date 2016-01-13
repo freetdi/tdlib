@@ -137,7 +137,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
     diG[j].predecessor = -1;
     idxMap.push_back(j);
 
-    return std::make_pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>(source, sink);
+    return std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>(source, sink);
 }
 
 //Builds the computed disjoint paths by following the edge set of the disjoint paths stored in the edge properties of diG, starting
