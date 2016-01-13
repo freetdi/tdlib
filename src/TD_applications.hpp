@@ -27,101 +27,15 @@
 
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
-
-#ifdef HAVE_CLIQUER
-#define new new_foo
-//you have to use -fpermissive in compilation 
-extern "C"{
-#include "cliquer.h"
-#undef new
-}
-#endif
+#include "TD_hard_problems.hpp"
 
 
 namespace treedec{
 
 namespace app{
 
-template <typename G_t>
-class max_clique_base{
-    public:
-        virtual void max_clique(G_t &G, std::vector<unsigned int> &result) = 0;
-};
-
-template <typename G_t>
-class min_vertex_cover_base{
-    public:
-        virtual void min_vertex_cover(G_t &G, std::vector<unsigned int> &result) = 0;
-};
-
-template <typename G_t>
-class max_independent_set_base{
-    public:
-        virtual void max_independent_set(G_t &G, std::vector<unsigned int> &result) = 0;
-};
-
-template <typename G_t>
-class min_coloring_base{
-    public:
-        virtual void min_coloring(G_t &G, std::vector<std::vector<unsigned int> > &result) = 0;
-};
-
-#ifdef HAVE_CLIQUER
-
-template <typename G_t>
-class max_clique_cliquer : public max_clique_base<G_t>{
-    public:
-        void max_clique(G_t &G, std::vector<unsigned int> &result){
-            graph_t *h;
-            set_t s;
-            clique_options *opts;
-
-            std::vector<unsigned int> id_map;
-            treedec::reorder_ids_graph(G, id_map);
-
-            h = graph_new(boost::num_vertices(G));
-
-            typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-                    if(G[*nIt].id > G[*vIt].id)
-                        GRAPH_ADD_EDGE(h, G[*vIt].id, G[*nIt].id);
-                }
-            }
-
-            /* Initialize out clique_options */
-            opts=(clique_options*)malloc(sizeof(clique_options));
-            opts->time_function=NULL;
-            opts->output=stderr;
-            opts->reorder_function=NULL;
-            opts->reorder_map=NULL;
-            opts->user_function=NULL;
-            opts->user_data=NULL;
-            opts->clique_list=NULL;
-            opts->clique_list_length=0;
-
-            /* max-clique call */
-            s=clique_unweighted_find_single(h, 0, 0, TRUE, opts);
-
-            int size=set_size(s);
-            for(unsigned int i = 0; i < SET_MAX_SIZE(s); i++){
-                if(SET_CONTAINS(s,i))
-                    result.push_back(id_map[i]);
-            }
-
-            /* free all stuff */
-            free(opts);
-            graph_free(h);
-        }
-
-};
-
-#endif
-
-
 template <typename G_t, typename T_t>
-void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, max_clique_base<G_t> &mclb){
+void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::max_clique_base<G_t> &mclb){
     for(unsigned int i = 0; i < boost::num_vertices(T); i++){
         G_t H;
         induced_subgraph(H, G, T[i].bag);
@@ -133,24 +47,24 @@ void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int>
 }
 
 template <typename G_t, typename T_t>
-void min_vertex_cover(G_t &G, T_t &T, std::vector<unsigned int> &global_result, min_vertex_cover_base<G_t> &mvcb){
+void max_independent_set_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::max_independent_set_base<G_t> &misb){
 }
 
 template <typename G_t, typename T_t>
-void max_independent_set(G_t &G, T_t &T, std::vector<unsigned int> &global_result, max_independent_set_base<G_t> &misb){
+void min_vertex_cover_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::min_vertex_cover_base<G_t> &mvcb){
 }
 
 template <typename G_t, typename T_t>
-void min_coloring(G_t &G, T_t &T, std::vector<std::vector<unsigned int> > &global_result, min_coloring_base<G_t> &mcob){
+void min_coloring_with_treedecomposition(G_t &G, T_t &T, std::vector<std::vector<unsigned int> > &global_result, treedec::np::min_coloring_base<G_t> &mcob){
 }
 
 template <typename G_t, typename T_t>
-void hamiltonian_cycle(G_t &G, T_t &T){
+void min_dominating_set_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::min_dominating_set_base<G_t> &mvcb){
 }
 
-}
+} //namespace app
 
-}
+} //namespace treedec
 
 #endif
 
