@@ -22,7 +22,7 @@
  * faster for particular graph classes.
  */
 
-namespace noboost{ //
+namespace noboost{
     template<typename G>
     using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
     template<typename G>
@@ -36,7 +36,6 @@ namespace noboost{ //
         remove_vertex(*u, g);
     }
 
-    // FIXME: misleading name.
     // vertex v will remain as isolated node
     template<typename G>
     void contract_edge(vertex_descriptor<G> v,
@@ -53,7 +52,6 @@ namespace noboost{ //
         boost::clear_vertex(v, g);
     }
 
-    // FIXME: misleading name.
     // vertex v will remain as isolated node, unless erase.
     // if erase, v will be deleted (not collapsed).
     template<typename G>
@@ -68,4 +66,3 @@ namespace noboost{ //
     }
 } // namespace noboost
 
-// vim:ts=4:sw=4:et
