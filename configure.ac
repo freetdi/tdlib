@@ -65,4 +65,6 @@ AC_C_INLINE
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
+AC_CONFIG_FILES([src/Makefile])
+
 AC_OUTPUT
