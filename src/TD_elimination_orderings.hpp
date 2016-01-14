@@ -350,8 +350,9 @@ void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_orderin
         return;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    boost::tie(vIt, vEnd) = boost::vertices(G);
+    typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = *vIt++;
+    for(; vIt != vEnd; vIt++){
         if(G[*vIt].id == elimination_ordering[idx]){
             elim_vertex = *vIt;
             break;
