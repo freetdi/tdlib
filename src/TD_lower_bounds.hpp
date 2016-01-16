@@ -1140,6 +1140,7 @@ void MCSC_min_deg(G_t H, int &lb){
     }
 
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
+    w = *boost::vertices(H).first;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
     v = data[0];
@@ -1205,6 +1206,7 @@ void MCSC_last_mcs(G_t H, int &lb){
     }
 
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
+    w = *boost::vertices(H).first;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
     v = data[0];
@@ -1264,6 +1266,7 @@ void MCSC_max_mcs(G_t H, int &lb){
     }
 
     typename boost::graph_traits<G_t>::vertex_descriptor v, w;
+    w = *boost::vertices(H).first;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
     data = MCS_all_start_vertices(H, lb);
     v = data[0];
