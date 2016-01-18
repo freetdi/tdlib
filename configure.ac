@@ -13,22 +13,26 @@ LT_INIT()
 AC_PROG_CXX
 
 # python stuff
+default_python_version=2.7
 AC_ARG_WITH([python],
  [AS_HELP_STRING([--with-python],
 	[Enable python library])],
  [python=$withval],
- [python='no'])
+ [python="auto"])
 
+AS_IF([test "$python" = auto], [
+  AM_PATH_PYTHON([$default_python_version],
+					  [python="$default_python_version"], [python="no"]
+					 )
+],[
 AS_IF([test "$python" != no], [
 python_version_required="${python##python}"
 AM_PATH_PYTHON([$python_version_required],,
    AC_MSG_ERROR([python $PYTHON_VERSION is not $python_version_required])
 	)
+])])
 
-AC_PATH_PROGS([CYTHON],
-              [cython2.7 cython],
-              [no])
-AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
+AS_IF([test "$python" != no], [
 
 PYTHON_INCLUDE_DIR=$PYTHON_PREFIX/include
 PYTHON_LIB_DIR=$PYTHON_PREFIX/lib
@@ -46,12 +50,23 @@ AC_SUBST(PYTHON_LIB_DIR)
 
 AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 
+AS_IF([test "$python" != no], [
+AC_PATH_PROGS([CYTHON],
+              [cython2.7 cython],
+              [no])
+AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
+])
+
 # Checks for libraries.
 
 # Checks for header files.
+
+# BUG: in auto mode disable python if there are no headers...
+AS_IF([test "$python" != no], [
 AS_IF([test x"$PYTHON" != x], [
   AM_CHECK_PYTHON_HEADERS([:],
 	[AC_MSG_ERROR(please install python headers matching $PYTHON)])
+])
 ])
 
 AC_CHECK_HEADER([cliquer/cliquer.h],
