@@ -22,6 +22,10 @@
  * faster for particular graph classes.
  */
 
+#ifndef TD_NOBOOST_H
+#define TD_NOBOOST_H
+#include <boost/graph/graph_traits.hpp>
+
 namespace noboost{
     template<typename G>
     using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
@@ -43,13 +47,13 @@ namespace noboost{
                        G &g, bool erase=true)
     {
         adjacency_iterator<G> I, E;
-        for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
+        for(boost::tie(I, E)=boost::graph_traits<G>::adjacent_vertices(v, g); I!=E; ++I){
             if(*I != w){
-                boost::add_edge(w, *I, g);
+                boost::graph_traits<G>::add_edge(w, *I, g);
             }
         }
 
-        boost::clear_vertex(v, g);
+        boost::graph_traits<G>::clear_vertex(v, g);
     }
 
     // vertex v will remain as isolated node, unless erase.
@@ -66,3 +70,5 @@ namespace noboost{
     }
 } // namespace noboost
 
+#endif
+// vim:ts=8:sw=4:noet
