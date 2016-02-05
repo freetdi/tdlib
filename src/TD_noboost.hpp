@@ -41,23 +41,41 @@ namespace noboost{
         remove_vertex(*u, g);
     }
 
+    template<typename G>
+    struct vertex_callback{
+	virtual ~vertex_callback(){};
+//	virtual void operator()(const vertex_descriptor<G>&)=0;
+	virtual void operator()(vertex_descriptor<G>)=0;
+    };
+
     // vertex v will remain as isolated node
+    // calls cb on neighbors if degree drops by one,
+    //          before dg will drop.
     template<typename G>
     void contract_edge(vertex_descriptor<G> v,
-                       vertex_descriptor<G> w,
-                       G &g, bool erase=true)
-    {
+                       vertex_descriptor<G> target,
+                       G &g,
+                       bool erase=true,
+                       vertex_callback<G>* cb=NULL)
+    { untested();
         adjacency_iterator<G> I, E;
-//        for(boost::tie(I, E)=boost::graph_traits<G>::adjacent_vertices(v, g); I!=E; ++I)
         for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
-            if(*I != w){
-                //boost::graph_traits<G>::add_edge(w, *I, g);
-                boost::add_edge(w, *I, g);
-            }
+            assert(boost::edge(v, *I, g).second);
+            if(*I != target){
+                bool added=boost::add_edge(target, *I, g).second;
+		if(added){ untested();
+		    // rebasing edge from I-v to I-target.
+		}else if(cb){ untested();
+		    // did not add, degree will drop by one.
+		    (*cb)(*I);
+		}
+            }else{ untested();
+	    }
         }
 
         //boost::graph_traits<G>::clear_vertex(v, g);
         boost::clear_vertex(v, g);
+	assert(!boost::edge(v, target, g).second);
     }
 
     // vertex v will remain as isolated node, unless erase.
@@ -65,9 +83,11 @@ namespace noboost{
     template<typename G>
     void contract_edge(vertex_iterator<G> v,
                        vertex_descriptor<G> into,
-                       G &g, bool erase=true)
-    {
-        contract_edge(*v, into, g);
+                       G &g,
+                       bool erase=true,
+                       vertex_callback<G>* cb=NULL)
+    { untested();
+        contract_edge(*v, into, g, erase, cb);
         if(erase){
             noboost::remove_vertex(v, g);
         }

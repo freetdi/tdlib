@@ -565,6 +565,32 @@ int deltaC_least_c_small(G_t G){
     return _deltaC_least_c_small(G);
 }
 
+template<typename G_t>
+struct degree_decrease : public noboost::vertex_callback<G_t>{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    degree_decrease(std::vector<std::set<vertex_descriptor> >*d, G_t*g) :
+	degs(d), G(g){}
+    void operator()(vertex_descriptor v){
+	size_t degree = boost::out_degree(v, *G);
+	if(degree==0){
+	    // unreachable
+	    // unconnected nodes are unreachable throught adj iterator
+	    assert(false);
+	}else if(degree==1){
+	    // unreachable
+	    // a degree one node does not change its degree during collapse
+	    assert(false);
+	}else{ untested();
+            size_t found=(*degs)[degree].erase(v);
+	    assert(found); // sanity check on degs.
+	    bool done=(*degs)[degree-1].insert(v).second;
+	    assert(done);
+	}
+    }
+    private:
+    std::vector<std::set<vertex_descriptor> >*degs;
+    G_t* G;
+};
 
 template <typename G_t>
 int _deltaC_least_c(G_t &G) // , bool erase=false)
@@ -574,6 +600,7 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
 
     unsigned int lb = 0;
     std::vector<std::set<vertex_descriptor> > degs(boost::num_vertices(G));
+    degree_decrease<G_t> cb(&degs,&G);
 
     vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; ++vIt){
@@ -600,13 +627,13 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
         }
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
         min_vertex = *degs[min_degree].begin();
-        assert(degs[min_degree].begin() != degs[min_degree].end());
+        assert(!degs[min_degree].empty());
 
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
-        typename boost::graph_traits<G_t>::vertex_descriptor w;
+        typename boost::graph_traits<G_t>::vertex_descriptor w=*vertices(G).second;
 
         unsigned int min_common = boost::num_vertices(G);
 
@@ -615,9 +642,9 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
             unsigned int cnt_common = 0;
             for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(min_vertex, G);
                     nIt2 != nEnd2; ++nIt2){
-                if(boost::edge(*nIt1, *nIt2, G).second) {
+                if(boost::edge(*nIt1, *nIt2, G).second) { untested();
                     cnt_common++;
-                }else{
+                }else{ untested();
                 }
                 if(cnt_common >= min_common){ itested();
                     break;
@@ -627,50 +654,31 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
             if(cnt_common < min_common){ itested();
                 w = *nIt1;
                 min_common = cnt_common;
-            }else{
+            }else{ untested();
             }
         }
         assert(w!=min_vertex);
+        assert(w!=*vertices(G).second);
+        assert(min_vertex!=*vertices(G).second);
 
-
-        unsigned outdegw = boost::out_degree(w, G);
+        size_t outdegw = boost::out_degree(w, G);
+        size_t outdegmin = boost::out_degree(min_vertex, G);
         assert(degs[outdegw].find(w) != degs[outdegw].end());
+        assert(degs[outdegmin].find(min_vertex) != degs[outdegmin].end());
 
         degs[outdegw].erase(w);
-        degs[boost::out_degree(min_vertex, G)].erase(min_vertex);
+        degs[outdegmin].erase(min_vertex);
 
         //contract the edge between min_vertex into w
 	// clear min_vertex
-	// and rearrange degs:
-# if 0
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; ++nIt1){
-            degs[boost::out_degree(*nIt1, G)].erase(*nIt1);
-            if(*nIt1 != w){
-                boost::add_edge(w, *nIt1, G);
-            }else{
-            }
-        }
-#endif
-
-
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; ++nIt1){
-            size_t degree = boost::out_degree(*nIt1, G);
-            if(degree==0){
-            }else if(degree==1){
-            }else if(*nIt1 != w){ itested();
-                degs[degree-1].insert(*nIt1);
-            }else{
-            }
-        }
-
-//	boost::clear_vertex(min_vertex, G);
-        noboost::contract_edge(min_vertex, w, G);
+	// and rearrange degs through callback
+        noboost::contract_edge(min_vertex, w, G, false, &cb);
 
         assert(0==boost::out_degree(min_vertex, G));
-
         assert(boost::out_degree(min_vertex, G)==0);
-        degs[boost::out_degree(w, G)].insert(w);
 
+        outdegw = boost::out_degree(w, G);
+        degs[outdegw].insert(w);
     }
     return (int)lb;
 }
