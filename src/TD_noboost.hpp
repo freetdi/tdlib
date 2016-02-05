@@ -25,6 +25,7 @@
 #ifndef TD_NOBOOST_H
 #define TD_NOBOOST_H
 #include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 namespace noboost{
     template<typename G>
@@ -47,13 +48,16 @@ namespace noboost{
                        G &g, bool erase=true)
     {
         adjacency_iterator<G> I, E;
-        for(boost::tie(I, E)=boost::graph_traits<G>::adjacent_vertices(v, g); I!=E; ++I){
+//        for(boost::tie(I, E)=boost::graph_traits<G>::adjacent_vertices(v, g); I!=E; ++I)
+        for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
             if(*I != w){
-                boost::graph_traits<G>::add_edge(w, *I, g);
+                //boost::graph_traits<G>::add_edge(w, *I, g);
+                boost::add_edge(w, *I, g);
             }
         }
 
-        boost::graph_traits<G>::clear_vertex(v, g);
+        //boost::graph_traits<G>::clear_vertex(v, g);
+        boost::clear_vertex(v, g);
     }
 
     // vertex v will remain as isolated node, unless erase.

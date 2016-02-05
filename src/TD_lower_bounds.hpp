@@ -87,6 +87,7 @@
 #include <tdlib/TD_NetworkFlow.hpp>
 #include <tdlib/TD_simple_graph_algos.hpp>
 #include <tdlib/TD_misc.hpp>
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -568,12 +569,13 @@ int deltaC_least_c_small(G_t G){
 template <typename G_t>
 int _deltaC_least_c(G_t &G) // , bool erase=false)
 {
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
+
     unsigned int lb = 0;
+    std::vector<std::set<vertex_descriptor> > degs(boost::num_vertices(G));
 
-    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> >
-        degs(boost::num_vertices(G));
-
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; ++vIt){
         degs[boost::out_degree(*vIt, G)].insert(*vIt);
     }
@@ -637,8 +639,10 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
         degs[outdegw].erase(w);
         degs[boost::out_degree(min_vertex, G)].erase(min_vertex);
 
-        //contract the edge between min_vertex and w
-        // and rearrange degs:
+        //contract the edge between min_vertex into w
+	// clear min_vertex
+	// and rearrange degs:
+# if 0
         for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; ++nIt1){
             degs[boost::out_degree(*nIt1, G)].erase(*nIt1);
             if(*nIt1 != w){
@@ -646,6 +650,8 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
             }else{
             }
         }
+#endif
+
 
         for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd1; ++nIt1){
             size_t degree = boost::out_degree(*nIt1, G);
@@ -657,8 +663,8 @@ int _deltaC_least_c(G_t &G) // , bool erase=false)
             }
         }
 
-        boost::clear_vertex(min_vertex, G);
-
+//	boost::clear_vertex(min_vertex, G);
+        noboost::contract_edge(min_vertex, w, G);
 
         assert(0==boost::out_degree(min_vertex, G));
 
@@ -1345,3 +1351,4 @@ int relation_edges_vertices(G_t &G){
 }
 
 #endif
+// vim:ts=8:sw=4:noet
