@@ -10,6 +10,7 @@ pkginclude_HEADERS = \
   TD_lower_bounds.hpp \
   TD_misc.hpp \
   TD_NetworkFlow.hpp \
+  TD_nice_decomposition.hpp \
   TD_postprocessing.hpp \
   TD_preprocessing.hpp \
   TD_seperator_algorithm.hpp \
