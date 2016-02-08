@@ -24,6 +24,7 @@
 
 #ifndef TD_NOBOOST_H
 #define TD_NOBOOST_H
+
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
@@ -95,4 +96,3 @@ namespace noboost{
 } // namespace noboost
 
 #endif
-// vim:ts=8:sw=4:noet
