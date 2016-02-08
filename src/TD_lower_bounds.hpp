@@ -584,8 +584,10 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
         }else{
             size_t found=(*degs)[degree].erase(v);
             assert(found); // sanity check on degs.
+            (void) found;
             bool done=(*degs)[degree-1].insert(v).second;
             assert(done);
+            (void) done;
         }
     }
     private:

@@ -29,15 +29,24 @@
 #include <boost/graph/adjacency_list.hpp>
 
 namespace noboost{
+#if 0 // later, need c++11
     template<typename G>
     using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
     template<typename G>
     using vertex_descriptor = typename boost::graph_traits<G>::vertex_descriptor;
     template<typename G>
     using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
+#define vertex_iterator_G vertex_iterator<G>
+#define vertex_descriptor_G typename vertex_descriptor<G>
+#define adjacency_iterator_G typename adjacency_iterator<G>
+#else
+#define vertex_iterator_G typename boost::graph_traits<G>::vertex_iterator
+#define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
+#define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
+#endif
 
     template<typename G>
-    void remove_vertex(vertex_iterator<G> u, G &g)
+    void remove_vertex(vertex_iterator_G u, G &g)
     {
         remove_vertex(*u, g);
     }
@@ -45,20 +54,20 @@ namespace noboost{
     template<typename G>
     struct vertex_callback{
     virtual ~vertex_callback(){};
-    virtual void operator()(vertex_descriptor<G>)=0;
+    virtual void operator()(vertex_descriptor_G)=0;
     };
 
     // vertex v will remain as isolated node
     // calls cb on neighbors if degree drops by one,
     //          before dg will drop.
     template<typename G>
-    void contract_edge(vertex_descriptor<G> v,
-                       vertex_descriptor<G> target,
+    void contract_edge(vertex_descriptor_G v,
+                       vertex_descriptor_G target,
                        G &g,
                        bool erase=true,
                        vertex_callback<G>* cb=NULL)
     {
-        adjacency_iterator<G> I, E;
+        adjacency_iterator_G I, E;
         for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
             assert(boost::edge(v, *I, g).second);
             if(*I != target){
@@ -81,8 +90,8 @@ namespace noboost{
     // vertex v will remain as isolated node, unless erase.
     // if erase, v will be deleted (not collapsed).
     template<typename G>
-    void contract_edge(vertex_iterator<G> v,
-                       vertex_descriptor<G> into,
+    void contract_edge(vertex_iterator_G v,
+                       vertex_descriptor_G into,
                        G &g,
                        bool erase=true,
                        vertex_callback<G>* cb=NULL)
