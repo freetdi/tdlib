@@ -44,9 +44,8 @@ namespace noboost{
 
     template<typename G>
     struct vertex_callback{
-	virtual ~vertex_callback(){};
-//	virtual void operator()(const vertex_descriptor<G>&)=0;
-	virtual void operator()(vertex_descriptor<G>)=0;
+    virtual ~vertex_callback(){};
+    virtual void operator()(vertex_descriptor<G>)=0;
     };
 
     // vertex v will remain as isolated node
@@ -58,25 +57,25 @@ namespace noboost{
                        G &g,
                        bool erase=true,
                        vertex_callback<G>* cb=NULL)
-    { untested();
+    {
         adjacency_iterator<G> I, E;
         for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
             assert(boost::edge(v, *I, g).second);
             if(*I != target){
                 bool added=boost::add_edge(target, *I, g).second;
-		if(added){ untested();
-		    // rebasing edge from I-v to I-target.
-		}else if(cb){ untested();
-		    // did not add, degree will drop by one.
-		    (*cb)(*I);
-		}
-            }else{ untested();
-	    }
+        if(added){
+            // rebasing edge from I-v to I-target.
+        }else if(cb){
+            // did not add, degree will drop by one.
+            (*cb)(*I);
+        }
+            }else{
+        }
         }
 
         //boost::graph_traits<G>::clear_vertex(v, g);
         boost::clear_vertex(v, g);
-	assert(!boost::edge(v, target, g).second);
+    assert(!boost::edge(v, target, g).second);
     }
 
     // vertex v will remain as isolated node, unless erase.
@@ -87,7 +86,7 @@ namespace noboost{
                        G &g,
                        bool erase=true,
                        vertex_callback<G>* cb=NULL)
-    { untested();
+    {
         contract_edge(*v, into, g, erase, cb);
         if(erase){
             noboost::remove_vertex(v, g);
