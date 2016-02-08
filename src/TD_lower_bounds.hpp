@@ -94,7 +94,6 @@ namespace treedec{
 namespace lb{
 
 
-
 /* DEGREE BASED */
 
 //Smallest vertex-degree in G.

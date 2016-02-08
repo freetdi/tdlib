@@ -34,7 +34,7 @@ extern "C"{
 }
 #endif
 
-#include <tdlib/TD_misc.hpp>
+#include "TD_misc.hpp"
 
 namespace treedec{
 
