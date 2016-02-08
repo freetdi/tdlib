@@ -24,8 +24,8 @@
 #ifndef TD_SIMPLE_GRAPH_ALGOS
 #define TD_SIMPLE_GRAPH_ALGOS
 
-#include <boost/graph/adjacency_list.hpp>
 #include <set>
+#include <boost/graph/adjacency_list.hpp>
 
 template <typename G_t>
 void delete_edges(G_t &G, std::vector<std::vector<unsigned int> > &edges){

@@ -53,8 +53,8 @@
 // void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, T_t &T)
 //
 
-#ifndef TD_PREPROCESSING_NEW
-#define TD_PREPROCESSING_NEW
+#ifndef TD_PREPROCESSING
+#define TD_PREPROCESSING
 
 #include <vector>
 #include <set>

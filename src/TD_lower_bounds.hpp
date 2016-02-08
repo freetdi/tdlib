@@ -84,9 +84,9 @@
 #include <set>
 #include <climits>
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/TD_NetworkFlow.hpp>
-#include <tdlib/TD_simple_graph_algos.hpp>
-#include <tdlib/TD_misc.hpp>
+#include "TD_simple_graph_algos.hpp"
+#include "TD_NetworkFlow.hpp"
+#include "TD_misc.hpp"
 
 namespace treedec{
 
