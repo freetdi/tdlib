@@ -95,7 +95,6 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
     //G may be a graph with ids not in range [0, |V(G)|). The maximum id of a vertex in G is disabled.size().
     std::vector<digraph_t::vertex_descriptor> internal_idxMap(disabled.size()+3); //needed for linear copy of the edge set of G
 
-    unsigned int i = 0;
     unsigned int j = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(!disabled[G[*vIt].id]){
