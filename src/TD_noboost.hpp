@@ -22,6 +22,9 @@
  * faster for particular graph classes.
  */
 
+#ifndef TD_NOBOOST_H
+#else
+
 namespace noboost{
     template<typename G>
     using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
@@ -66,3 +69,4 @@ namespace noboost{
     }
 } // namespace noboost
 
+#endif

@@ -75,10 +75,11 @@ void _minDegree_decomp(G_t &G, T_t &T){
     while(boost::num_edges(G) > 0){
         //Search a minimum degree vertex.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+        boost::tie(vIt, vEnd) = boost::vertices(G);
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
         unsigned int min_degree = boost::num_vertices(G);
 
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        for(; vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree < min_degree && degree > 0){
                 min_degree = degree;
