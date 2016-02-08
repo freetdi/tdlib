@@ -212,7 +212,7 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, diG); nIt != nEnd; nIt++){
         if(!diG[*nIt].visited && !diG[boost::edge(v, *nIt, diG).first].path){
 
-            bool edge_used_ = diG[v].predecessor == *nIt;
+            bool edge_used_ = diG[v].predecessor == (int)*nIt;
 
             //Recursivly build the walk
             if(t_search_disjoint_ways(diG, *nIt, sink, edge_used_, source, dangerous, idxMap, G)){
