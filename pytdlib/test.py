@@ -249,6 +249,19 @@ class TestTdLib(unittest.TestCase):
 
         self.assertEqual(status, True)
 
+    def test_independent_set_with_treedecomposition(self):
+        V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
+        IS1 = tdlib.max_independent_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
+        self.assertEqual(len(IS1), 4)
+
+        V_T2, E_T2, lb = tdlib.PP_MD(V_Wagner, E_Wagner)
+        IS2 = tdlib.max_independent_set_with_treedecomposition(V_Wagner, E_Wagner, V_T2, E_T2)
+        self.assertEqual(len(IS2), 3)
+
+        V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
+        IS3 = tdlib.max_independent_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
+        self.assertEqual(len(IS3), 9)
+
 if __name__ == '__main__':
     unittest.main()
 

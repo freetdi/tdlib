@@ -641,6 +641,25 @@ def fillIn_ordering(V, E):
 
     return py_elim_ordering
 
+##############################################################
+############ APPLICATIONS ####################################
+
+def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    cdef vector[unsigned int] V_G, E_G, E_T, IS
+    cdef vector[vector[int]] V_T
+
+    cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T)
+
+    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS)
+
+    py_IS = []
+    cdef i;
+    for i in range(0, len(IS)):
+        py_IS.append(IS[i])
+
+    return py_IS
+
 
 ##############################################################
 ############ MISC ############################################

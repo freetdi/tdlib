@@ -29,6 +29,7 @@
 
 #include "TD_nice_decomposition.hpp"
 #include "TD_simple_graph_algos.hpp"
+#include "TD_hard_problems.hpp"
 #include "TD_misc.hpp"
 
 namespace treedec{
@@ -156,7 +157,7 @@ void top_down_computation_independent_set(T_t &T, typename boost::graph_traits<T
 
     if(node_type == treedec::nice::LEAF){
         for(std::map<std::set<unsigned int>, int>::iterator it = results[cur].begin(); it != results[cur].end(); it++){
-            if(it->second == val){
+            if(it->second == (int)val){
                 IS.insert(it->first.begin(), it->first.end());
                 return;
             }
@@ -169,8 +170,8 @@ void top_down_computation_independent_set(T_t &T, typename boost::graph_traits<T
 
         for(std::map<std::set<unsigned int>, int>::iterator it = results[cur].begin(); it != results[cur].end(); it++){
             if((take_flag == 1 && it->first == have_to_take)
-            || (take_flag == 2 && it->second == val && std::includes(it->first.begin(), it->first.end(), have_to_take.begin(), have_to_take.end()))
-            || (take_flag == 0 && it->second == val)){
+            || (take_flag == 2 && it->second == (int)val && std::includes(it->first.begin(), it->first.end(), have_to_take.begin(), have_to_take.end()))
+            || (take_flag == 0 && it->second == (int)val)){
                 std::set<unsigned int> intersection;
                 std::set_intersection(it->first.begin(), it->first.end(), IS_comp.begin(), IS_comp.end(), 
                                                                            std::inserter(intersection, intersection.begin()));
@@ -204,8 +205,8 @@ void top_down_computation_independent_set(T_t &T, typename boost::graph_traits<T
     else if(node_type == treedec::nice::JOIN){
         for(std::map<std::set<unsigned int>, int>::iterator it = results[cur].begin(); it != results[cur].end(); it++){
             if((take_flag == 1 && it->first == have_to_take)
-            || (take_flag == 2 && it->second == val && std::includes(it->first.begin(), it->first.end(), have_to_take.begin(), have_to_take.end()))
-            || (take_flag == 0 && it->second == val)){
+            || (take_flag == 2 && it->second == (int)val && std::includes(it->first.begin(), it->first.end(), have_to_take.begin(), have_to_take.end()))
+            || (take_flag == 0 && it->second == (int)val)){
                 std::set<unsigned int> intersection;
                 std::set_intersection(it->first.begin(), it->first.end(), IS_comp.begin(), IS_comp.end(), 
                                                                            std::inserter(intersection, intersection.begin()));

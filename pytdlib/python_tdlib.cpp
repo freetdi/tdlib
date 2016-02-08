@@ -6,6 +6,8 @@
 #include "TD_combinations.hpp"
 #include "TD_lower_bounds.hpp"
 #include "TD_elimination_orderings.hpp"
+#include "TD_nice_decomposition.hpp"
+#include "TD_applications.hpp"
 #include "TD_misc.hpp"
 
 
@@ -25,6 +27,8 @@ struct bag{
 };
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> TD_tree_dec_t;
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, bag> TD_tree_dec_directed_t;
 
 #include "python_tdlib.hpp"
 
@@ -49,8 +53,9 @@ void make_tdlib_graph(TD_graph_t &G, std::vector<unsigned int> &V, std::vector<u
     }
 }
 
-void make_tdlib_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V, std::vector<unsigned int> &E){
-    std::vector<TD_tree_dec_t::vertex_descriptor> idxMap(V.size()+1);
+template <typename T_t>
+void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<unsigned int> &E){
+    std::vector<typename T_t::vertex_descriptor> idxMap(V.size()+1);
 
     for(unsigned int i = 0; i < V.size(); i++){
         idxMap[i] = boost::add_vertex(T);
@@ -352,7 +357,7 @@ int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std:
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    TD_tree_dec_t T;	
+    TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
     treedec::MSVS(G, T);
@@ -376,6 +381,27 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
     TD_graph_t::vertex_iterator vIt, vEnd;
     for(unsigned int i = 0; i < new_elimination_ordering_tmp.size(); i++)
         new_elimination_ordering.push_back(G[new_elimination_ordering_tmp[i]].id);
+}
+
+/* APPLICATIONS */
+
+void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &IS){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_directed_t T;
+    make_tdlib_decomp(T, V_T, E_T);
+
+    treedec::nice::nicify(T);
+
+    std::set<unsigned int> result;
+    treedec::app::max_independent_set_with_treedecomposition(G, T, result);
+
+    IS.resize(result.size());
+    unsigned int i = 0;
+    for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
+        IS[i++] = *sIt;
+    }
 }
 
 

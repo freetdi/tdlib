@@ -1,5 +1,6 @@
 
 pkginclude_HEADERS = \
+  TD_applications.hpp \
   TD_noboost.hpp \
   TD_simple_graph_algos.hpp \
   TD_branch_decomposition.hpp \
@@ -10,6 +11,7 @@ pkginclude_HEADERS = \
   TD_lower_bounds.hpp \
   TD_misc.hpp \
   TD_NetworkFlow.hpp \
+  TD_hard_problems.hpp \
   TD_nice_decomposition.hpp \
   TD_postprocessing.hpp \
   TD_preprocessing.hpp \

@@ -120,7 +120,7 @@ typename boost::graph_traits<G_t>::vertex_descriptor get_forgotten_vertex(typena
 }
 
 
-enum enum_node_type { LEAF, INTRODUCE, FORGET, JOIN };
+enum enum_node_type { LEAF, INTRODUCE, FORGET, JOIN, INVALID };
 
 //Returns the type of a node in a nice tree decomposition.
 template <typename T_t>
@@ -138,12 +138,14 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
             return FORGET;
         }
         else{
+            return INVALID;
         }
     }
     else if(boost::out_degree(v, T) == 0){
         return LEAF;
     }
     else{
+        return INVALID;
     }
 }
 

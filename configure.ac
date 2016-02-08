@@ -70,7 +70,7 @@ AS_IF([test x"$PYTHON" != x], [
 ])
 
 AC_CHECK_HEADER([cliquer/cliquer.h],
-                [CPPFLAGS="$CPPFLAGS -DHAVE_CLIQUER"],)
+                [CPPFLAGS="$CPPFLAGS -DHAVE_CLIQUER -fpermissive"],)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
