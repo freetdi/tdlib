@@ -645,6 +645,24 @@ def fillIn_ordering(V, E):
 ############ APPLICATIONS ####################################
 
 def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a maximal independent set based on a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - IS : a list of vertices of a maximal independent set
+    """
+
     cdef vector[unsigned int] V_G, E_G, E_T, IS
     cdef vector[vector[int]] V_T
 
@@ -659,6 +677,40 @@ def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
         py_IS.append(IS[i])
 
     return py_IS
+
+def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a minimal vertex cover based on a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - IS : a list of vertices of a minimal vertex cover
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, VC
+    cdef vector[vector[int]] V_T
+
+    cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T)
+
+    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC)
+
+    py_VC = []
+    cdef i;
+    for i in range(0, len(VC)):
+        py_VC.append(VC[i])
+
+    return py_VC
 
 
 ##############################################################

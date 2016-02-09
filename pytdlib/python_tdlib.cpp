@@ -404,6 +404,25 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     }
 }
 
+void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &VC){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_directed_t T;
+    make_tdlib_decomp(T, V_T, E_T);
+
+    treedec::nice::nicify(T);
+
+    std::set<unsigned int> result;
+    treedec::app::max_independent_set_with_treedecomposition(G, T, result);
+
+    VC.resize(result.size());
+    unsigned int i = 0;
+    for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
+        VC[i++] = *sIt;
+    }
+}
+
 
 /* MISC */
 
