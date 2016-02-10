@@ -694,7 +694,7 @@ def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
 
     OUTPUTS:
 
-    - IS : a list of vertices of a minimal vertex cover
+    - VC : a list of vertices of a minimal vertex cover
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, VC
@@ -711,6 +711,40 @@ def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
         py_VC.append(VC[i])
 
     return py_VC
+
+def min_dominating_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a minimal dominating set based on a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - DS : a list of vertices of a minimal dominating set
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, DS
+    cdef vector[vector[int]] V_T
+
+    cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T)
+
+    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS)
+
+    py_DS = []
+    cdef i;
+    for i in range(0, len(DS)):
+        py_DS.append(DS[i])
+
+    return py_DS
 
 
 ##############################################################
