@@ -391,7 +391,7 @@ static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx
 #ifndef TD_POWERSET
 #define TD_POWERSET
 
-void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned int> > &subs){
+inline void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned int> > &subs){
     std::vector<unsigned int> sub;
     for(unsigned int i = 0; i <=X.size(); i++){
         subsets(X, X.size(), i, 0, sub, subs);
