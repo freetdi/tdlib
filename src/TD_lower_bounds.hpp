@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -185,7 +186,8 @@ template <typename G_t>
 int _deltaD(G_t &G){
     unsigned int maxmin = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex =
+       *boost::vertices(G).second;
 
     while(true){
         unsigned int min_degree = boost::num_vertices(G);
