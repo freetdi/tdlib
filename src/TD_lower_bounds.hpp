@@ -232,7 +232,7 @@ int delta2D(const G_t &G){
         assumed_minimal.push_back(*hIt);
 
     unsigned int min_degree, maxmin = 0;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *(boost::vertices(H).first);
 
     for(unsigned int i = 0; i < assumed_minimal.size(); i++){
         while(boost::num_edges(H) > 0){
