@@ -633,7 +633,7 @@ int _deltaC_least_c(G_t &G){
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
-        typename boost::graph_traits<G_t>::vertex_descriptor w = *(boost::vertices(G).second);
+        typename boost::graph_traits<G_t>::vertex_descriptor w=*boost::vertices(G).second;
 
         unsigned int min_common = boost::num_vertices(G);
 
@@ -653,8 +653,8 @@ int _deltaC_least_c(G_t &G){
             }
         }
         assert(w!=min_vertex);
-        assert(w!=*(boost::vertices(G).second));
-        assert(min_vertex!=*(boost::vertices(G).second));
+        assert(w!=*boost::vertices(G).second);
+        assert(min_vertex!=*boost::vertices(G).second);
 
         size_t outdegw = boost::out_degree(w, G);
         size_t outdegmin = boost::out_degree(min_vertex, G);
