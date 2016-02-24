@@ -153,7 +153,8 @@ void get_components_provided_map(G_t &G, std::vector<std::set<typename boost::gr
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(!visited[G[*vIt].id]){
+        unsigned id=noboost::get_id(G, *vIt);
+        if(!visited[id]){
             components.resize(components.size()+1);
             comp_idx++;
 
@@ -177,3 +178,4 @@ void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::verte
 }
 
 #endif
+// vim:ts=8:sw=4:et
