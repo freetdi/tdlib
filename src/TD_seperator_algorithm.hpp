@@ -180,7 +180,12 @@ void sep_glue_bag(std::set<unsigned int> &bag, std::set<unsigned int> &glueBag, 
 
 //The main procedure of the seperator algorithm.
 template <typename G_t, typename T_t>
-bool sep_decomp(G_t &G, T_t &T, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &parent, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &vertices, std::vector<bool> &disabled, unsigned int k){    
+bool sep_decomp(G_t &G, T_t &T,
+                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
+                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &parent,
+                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &vertices,
+                std::vector<bool> &disabled, unsigned int k)
+{
     //tw(G) > k - one could replace this with a better lower bound (see TD_lower_bounds.hpp).
     if(boost::num_edges(G) > k*boost::num_vertices(G))
         return false;
@@ -204,14 +209,19 @@ bool sep_decomp(G_t &G, T_t &T, typename std::set<typename boost::graph_traits<G
 
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
 
-    //If a nearly balanced seperator S of W' exists, proceed with the graphs induced by the resulting
-    //components and the seperator recursively, add a bag containing the union of W and S to the decomposition,
+    //If a nearly balanced seperator S of W' exists, proceed with the graphs
+    //induced by the resulting components and the seperator recursively, add a
+    //bag containing the union of W and S to the decomposition,
     //connected with the bag, created in the 'parent-call' of the procedure.
     if(nearly_balanced_seperator(G, W, S, disabled, k)){
         std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
-            disabled[G[*sIt].id] = true;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+                = S.begin(); sIt != S.end(); sIt++) {
+            // disabled[G[*sIt].id] = true;
+            unsigned id = noboost::get_id(G,*sIt);
+            disabled[id] = true;
+        }
 
         get_components_provided_map(G, C, disabled);
 
@@ -271,4 +281,4 @@ unsigned seperator_algorithm(G_t &G, T_t &T){
 }
 
 #endif
-
+// vim:ts=8:sw=4:et:

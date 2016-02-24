@@ -101,6 +101,14 @@ void contract_edge(vertex_iterator_G v,
     }
 }
 
+
+template<typename G>
+unsigned get_id(const G& g, const vertex_descriptor_G& v )
+{
+	// works with "TD_graph_t" (augmented adj_list)
+	return g[v].id;
+}
+
 } // namespace noboost
 
 #endif
