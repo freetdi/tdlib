@@ -66,8 +66,10 @@ int is_valid_treedecomposition(G_t G, T_t T){
 
     std::set<unsigned int> vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        vertices.insert(G[*vIt].id);
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned id=noboost::get_id(G, *vIt);
+        vertices.insert(id);
+    }
 
     if(coded_vertices != vertices)
         return -2;
@@ -79,8 +81,10 @@ int is_valid_treedecomposition(G_t G, T_t T){
         std::set<unsigned int> edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            edge.insert(G[*vIt].id);
-            edge.insert(G[*nIt].id);
+            unsigned id=noboost::get_id(G, *vIt);
+            edge.insert(id);
+            id = noboost::get_id(G, *nIt);
+            edge.insert(id);
             edges.push_back(edge);
             edge.clear();
         }
@@ -317,9 +321,14 @@ void undo_reorder_ids_graph(G_t &G, std::vector<unsigned int> &id_map){
 }
 
 template <typename G_t>
-void descriptor_bag_to_id_bag(G_t &G, std::set<unsigned int> &id_bag, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag){
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = desc_bag.begin(); sIt != desc_bag.end(); sIt++)
-        id_bag.insert(G[*sIt].id);
+void descriptor_bag_to_id_bag(G_t &G, std::set<unsigned int> &id_bag,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag)
+{
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+            desc_bag.begin(); sIt != desc_bag.end(); sIt++){
+        unsigned id = noboost::get_id(G,*sIt);
+        id_bag.insert(id);
+    }
 }
 
 template <typename G_t>
@@ -403,3 +412,4 @@ inline void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
 }
 
 #endif
+// vim:ts=8:sw=4:et

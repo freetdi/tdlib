@@ -97,8 +97,9 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
 
     unsigned int j = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(!disabled[G[*vIt].id]){
-            internal_idxMap[G[*vIt].id] = boost::add_vertex(diG);
+        unsigned id=noboost::get_id(G, *vIt);
+        if(!disabled[id]){
+            internal_idxMap[id] = boost::add_vertex(diG);
             diG[j].visited = false;
             diG[j++].predecessor = -1;
             idxMap.push_back(*vIt);
@@ -107,23 +108,34 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        if(!disabled[G[boost::source(*eIt, G)].id] && !disabled[G[boost::target(*eIt, G)].id]){
-            digraph_t::edge_descriptor e1 = boost::add_edge(internal_idxMap[G[boost::source(*eIt, G)].id], internal_idxMap[G[boost::target(*eIt, G)].id], diG).first;
+        unsigned sid=noboost::get_id(G, boost::source(*eIt, G));
+        unsigned tid=noboost::get_id(G, boost::target(*eIt, G));
+        if(!disabled[sid] && !disabled[tid]){
+
+            digraph_t::edge_descriptor e1 =
+                boost::add_edge(internal_idxMap[sid], internal_idxMap[tid], diG).first;
             diG[e1].path = false;
-            digraph_t::edge_descriptor e2 = boost::add_edge(internal_idxMap[G[boost::target(*eIt, G)].id], internal_idxMap[G[boost::source(*eIt, G)].id], diG).first;
+            digraph_t::edge_descriptor e2 =
+                boost::add_edge(internal_idxMap[tid], internal_idxMap[sid], diG).first;
             diG[e2].path = false;
         }
     }
 
     digraph_t::vertex_descriptor source = boost::add_vertex(diG);
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
-        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[G[*sIt].id], diG).first;
+    for(typename std::set<typename
+            boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+            X.begin(); sIt != X.end(); sIt++){
+        unsigned id=noboost::get_id(G, *sIt);
+        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[id], diG).first;
         diG[e].path = false;
     }
 
     digraph_t::vertex_descriptor sink = boost::add_vertex(diG);
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = Y.begin(); sIt != Y.end(); sIt++){
-        digraph_t::edge_descriptor e =  boost::add_edge(internal_idxMap[G[*sIt].id], sink, diG).first;
+    for(typename std::set<typename
+            boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+            Y.begin(); sIt != Y.end(); sIt++){
+        unsigned id=noboost::get_id(G, *sIt);
+        digraph_t::edge_descriptor e =  boost::add_edge(internal_idxMap[id], sink, diG).first;
         diG[e].path = false;
     }
 
@@ -300,8 +312,12 @@ bool seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
         return true;
 
     //disables/deletes the vertices in the intersection of X and Y.
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
-        disabled[G[*sIt].id] = true;
+	 for(typename std::set<typename
+			 boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+			 S.begin(); sIt != S.end(); sIt++){
+        unsigned id=noboost::get_id(G, *sIt);
+        disabled[id] = true;
+	 }
 
     return _disjoint_ways(G, disabled, X_, Y_, S, k);
 }
@@ -315,3 +331,4 @@ void seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
 }
 
 #endif
+// vim:ts=8:sw=4:et

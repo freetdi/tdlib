@@ -26,6 +26,7 @@
 
 #include <set>
 #include <boost/graph/adjacency_list.hpp>
+#include "TD_noboost.hpp"
 
 template <typename G_t>
 void delete_edges(G_t &G, std::vector<std::vector<unsigned int> > &edges){
@@ -76,7 +77,8 @@ void get_neighbourhood(G_t &G, std::vector<bool> &disabled, std::set<typename bo
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-           if(!disabled[G[*nIt].id] && X.find(*nIt) == X.end())
+           unsigned id = noboost::get_id(G, *nIt);
+           if(!disabled[id] && X.find(*nIt) == X.end())
                S_X.insert(*nIt);
         }
     }
@@ -96,12 +98,19 @@ void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descr
 }
 
 template <typename G_t>
-void t_search_components(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor vertex, std::vector<bool> &visited, std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components, int comp_idx){
-    visited[G[vertex].id] = true;
+void t_search_components(G_t &G,
+        typename boost::graph_traits<G_t>::vertex_descriptor vertex,
+        std::vector<bool> &visited,
+        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
+        int comp_idx)
+{
+    unsigned id=noboost::get_id(G, vertex);
+    visited[id] = true;
     std::vector<unsigned int> N;
     typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vertex, G); nIt != nEnd; nIt++){
-        if(!visited[G[*nIt].id]){
+        unsigned id=noboost::get_id(G, *nIt);
+        if(!visited[id]){
             components[comp_idx].insert(*nIt);
             t_search_components(G, *nIt, visited, components, comp_idx);
         }
@@ -153,7 +162,8 @@ void get_components_provided_map(G_t &G, std::vector<std::set<typename boost::gr
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(!visited[G[*vIt].id]){
+        unsigned id=noboost::get_id(G, *vIt);
+        if(!visited[id]){
             components.resize(components.size()+1);
             comp_idx++;
 
@@ -177,3 +187,4 @@ void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::verte
 }
 
 #endif
+// vim:ts=8:sw=4:et
