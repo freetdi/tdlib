@@ -138,8 +138,12 @@ bool nearly_balanced_seperator(G_t &G, typename std::set<typename boost::graph_t
             get_neighbourhood(G, disabled_, subsX[i], sX);
             get_neighbourhood(G, disabled_, subsY[i][j], sY);
 
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X_Y.begin(); sIt != X_Y.end(); sIt++)
-                disabled_[G[*sIt].id] = true;
+            for(typename std::set<typename
+                    boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+                    = X_Y.begin(); sIt != X_Y.end(); sIt++){
+                unsigned id=noboost::get_id(G, *sIt);
+                disabled_[id] = true;
+            }
 
             //Z must be a subset of S.
             sX.insert(Z.begin(), Z.end());
@@ -243,8 +247,12 @@ bool sep_decomp(G_t &G, T_t &T,
             treedec::descriptor_bag_to_id_bag(G, union_C_i_S_, union_C_i_S);
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++)
-                disabled_[G[*sIt].id] = false;
+            for(typename std::set<typename
+                    boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
+                unsigned id=noboost::get_id(G, *sIt);
+                disabled_[id] = false;
+            }
 
             //Reject if no seperator can be found in one of the ongoing recursive calls.
             if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, k))
