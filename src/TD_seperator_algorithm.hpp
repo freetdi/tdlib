@@ -247,7 +247,7 @@ bool sep_decomp(G_t &G, T_t &T, typename std::set<typename boost::graph_traits<G
 
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole graph could be decomposed.
 template <typename G_t, typename T_t>
-void seperator_algorithm(G_t &G, T_t &T){
+unsigned seperator_algorithm(G_t &G, T_t &T){
     unsigned int k = 0;
     bool finished = false;
 
@@ -265,6 +265,7 @@ void seperator_algorithm(G_t &G, T_t &T){
         if(!finished)
             T.clear();
     }
+	 return k;
 }
 
 }
