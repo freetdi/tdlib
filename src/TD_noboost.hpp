@@ -27,6 +27,7 @@
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/type_traits.hpp>
 
 #ifndef TD_STRUCT_VERTEX
 #define TD_STRUCT_VERTEX
@@ -111,14 +112,6 @@ void contract_edge(vertex_iterator_G v,
     }
 }
 
-template<typename G>
-inline unsigned& get_id(G& g, vertex_descriptor_G v )
-{
-	// works with "TD_graph_t" (augmented adj_list)
-	Vertex& V = g[v]; // boost::get(v,g);
-	return V.id;
-}
-
 // WIP
 // http://stackoverflow.com/questions/671714/modifying-vertex-properties-in-a-boostgraph ?
 template<typename G>
@@ -126,26 +119,19 @@ inline unsigned get_id(const G& g, vertex_descriptor_G v )
 {
 	// works with "TD_graph_t" (augmented adj_list)
 	Vertex V = g[v];
-// 	boost::get(V, v, g);
 	return V.id;
 }
 
-/// baluvoid: use position as .id
-// better: always do this for propertyless graphs...
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> baluvoid;
-#if 0
-template<>
-unsigned& get_id(baluvoid& g, vertex_descriptor_(baluvoid)& v )
+template<typename G>
+inline typename boost::mpl::if_< typename
+		std::is_same<typename G::vertex_property_type, boost::no_property>::type,
+		 size_t&, unsigned& >::type
+get_id(G& g, vertex_descriptor_G &v )
 {
-	return v;
+	// works with "TD_graph_t" (augmented adj_list)
+	Vertex& V = g[v]; // boost::get(v,g);
+	return V.id;
 }
-#endif
-
-// template<>
-// inline unsigned get_id(const baluvoid& g, vertex_descriptor_(baluvoid) v )
-// {
-// 	return v;
-// }
 
 
 } // namespace noboost
