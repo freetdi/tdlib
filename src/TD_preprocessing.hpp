@@ -60,6 +60,7 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 #include "TD_misc.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -70,7 +71,9 @@ void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int>
 
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
         if(boost::out_degree(*vertexIt, G) == 0){
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, std::set<unsigned int>()));
+            unsigned id=noboost::get_id(G, *vertexIt);
+            std::set<unsigned int> emptyset=std::set<unsigned int>();
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, emptyset));
 
             low = (low > 0)? low : 0;
         }
@@ -532,3 +535,4 @@ void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<uns
 }
 
 #endif
+// vim:ts=8:sw=4:et

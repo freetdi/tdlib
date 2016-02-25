@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -93,7 +94,8 @@ void _minDegree_decomp(G_t &G, T_t &T){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
 
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            bag.insert(G[*nIt1].id);
+            unsigned id=noboost::get_id(G, *nIt1);
+            bag.insert(id);
             nIt2 = nIt1;
             nIt2++;
             for(; nIt2 != nEnd; nIt2++)
@@ -101,7 +103,8 @@ void _minDegree_decomp(G_t &G, T_t &T){
         }
 
         bags[i] = bag;
-        elim_vertices[i++] = G[min_vertex].id;
+        unsigned id=noboost::get_id(G, min_vertex);
+        elim_vertices[i++] = id;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -721,4 +724,5 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
 
 }
 
-#endif
+# endif
+// vim:ts=8:sw=4:et
