@@ -642,20 +642,15 @@ int _deltaC_least_c(G_t &G){
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
 
     unsigned int lb = 0;
-    std::vector<std::set<vertex_descriptor> > degs(boost::num_vertices(G));
-    degree_decrease<G_t> cb(&degs, &G);
-
-    vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; ++vIt){
-        degs[boost::out_degree(*vIt, G)].insert(*vIt);
-    }
+    misc::DEGS<G_t> degs(G);
+    degree_decrease<G_t> cb(&degs._degs, &G);
 
     unsigned int min_degree = 1;
 
     while(boost::num_edges(G) > 0){
         //Search a minimum-degree-vertex.
         if(degs[min_degree].empty()){
-            for(min_degree = 1; min_degree < degs.size(); min_degree++){
+            for(min_degree = 1/*why?*/; min_degree < degs.size(); min_degree++){
                 if(!degs[min_degree].empty()){
                     break;
                 }

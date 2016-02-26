@@ -65,49 +65,105 @@
 
 namespace treedec{
 
+namespace detail{
+
+    // DRAFT. no useful interface
+template<typename G>
+struct degree_mod : public noboost::vertex_callback<G>{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    degree_mod(misc::DEGS<G>* d, G* g) : _degs(d), _g(g){}
+
+    // reinsert with degree-1
+    void operator()(vertex_descriptor v){ untested();
+        unsigned deg=boost::degree(v,*_g);
+        assert(deg);
+        bool done=(*_degs)[deg-1].insert(v).second;
+        assert(done);
+    }
+    //private: not yet.
+//    BUG:: hardcoded type
+        misc::DEGS<G>* _degs;
+    private:
+        degree_mod(const degree_mod&){}
+        G* _g;
+};
+
+}
+
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic. Ignores isolated vertices.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
     std::vector<std::set<unsigned int> > bags(boost::num_vertices(G));
     std::vector<unsigned int> elim_vertices(boost::num_vertices(G));
+    misc::DEGS<G_t> degs(G);
+    detail::degree_mod<G_t> cb(&degs, &G);
 
     unsigned int i = 0;
+    unsigned min_ntd = 1; // minimum nontrivial vertex degree
     while(boost::num_edges(G) > 0){
         //Search a minimum degree vertex.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         boost::tie(vIt, vEnd) = boost::vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-        unsigned int min_degree = boost::num_vertices(G);
+        unsigned min_degree = boost::num_vertices(G);
+        unsigned num_vert = boost::num_vertices(G);
+        auto mdvi = degs[0].begin();
 
-        for(; vIt != vEnd; vIt++){
+        // recompute ntd can only increase from here
+        while(degs[min_ntd].empty()){
+            ++min_ntd;
+            // min_ntd==num_vert contradicts the outer loop condition
+            // (this loop should be safe)
+            assert(min_ntd != num_vert);
+        }
+        assert(!degs[min_ntd].empty());
+        assert(min_ntd);
+        assert(min_ntd==1 || degs[min_ntd-1].empty());
+
+#ifndef NDEBUG // remove later.
+        for(vIt=boost::vertices(G).first; vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree < min_degree && degree > 0){
                 min_degree = degree;
-                min_vertex = *vIt;
             }
         }
+        assert(min_degree == min_ntd);
+#endif
+        mdvi = degs[min_ntd].begin(); // min degree vertex iterator
 
-        //Make the neighbourhood of 'min_vertex' a clique.
         std::set<unsigned int> bag;
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
+        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*mdvi, G);
+                nIt1 != nEnd; nIt1++){ untested();
             unsigned id=noboost::get_id(G, *nIt1);
-            bag.insert(id);
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                boost::add_edge(*nIt1, *nIt2, G);
-            }
+            bag.insert(id); // collect neighborhood, inefficient.
         }
+        degs.check();
+        misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
+//         degs.check(); not here.
+//         degrees of neighbors are wrong
 
-        bags[i] = bag;
-        unsigned id=noboost::get_id(G, min_vertex);
+        bags[i] = bag; // std::move?!
+        unsigned id=noboost::get_id(G, *mdvi);
         elim_vertices[i++] = id;
 
-        boost::clear_vertex(min_vertex, G);
+        unsigned n=degs[min_ntd].erase(*mdvi);
+//        degs[min_ntd].erase(mdvi);
+        boost::clear_vertex(*mdvi, G);
+        if(min_ntd>1){
+            --min_ntd;
+        }
+        assert(boost::degree(*mdvi, G)==0);
+        
+        assert(n==1);
+
+#ifndef NDEBUG //redundant, for checking only
+        bool done=degs[0].insert(*mdvi).second;
+        assert(done);
+#endif
+        degs.check(); // g has a node of deg 445 that degs doesn't know about.
     }
 
     for(; i > 0; i--){

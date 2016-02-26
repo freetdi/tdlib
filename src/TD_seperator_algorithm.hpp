@@ -270,8 +270,9 @@ bool sep_decomp(G_t &G, T_t &T,
 }
 
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole graph could be decomposed.
+//returns an upper bound for the treewidth
 template <typename G_t, typename T_t>
-void seperator_algorithm(G_t &G, T_t &T){
+unsigned seperator_algorithm(G_t &G, T_t &T){
     unsigned int k = 0;
     bool finished = false;
 
@@ -291,6 +292,7 @@ void seperator_algorithm(G_t &G, T_t &T){
             T.clear();
         }
     }
+    return 4*k;
 }
 
 }
