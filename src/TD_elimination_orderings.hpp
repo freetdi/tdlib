@@ -783,8 +783,8 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
     }
 }
 
-}
+} //namespace treedec
 
-# endif
+#endif //ifdef TD_ELIMINATION_ORDERING
 
 // vim:ts=8:sw=4:et

@@ -33,7 +33,7 @@
 // {
 //  unsigned int id;
 // };
-// typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Vertex> TD_graph_t;
+// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
 //
 //
 //
@@ -357,7 +357,8 @@ void exact_decomposition_cutset(G_t &G, T_t &T){
     exact_decomposition_cutset(G, T, lb);
 }
 
-}
+} //namespace treedec
 
-#endif
+#endif //ifdef TD_COMBINATIONS
 
+// vim:ts=8:sw=4:et

@@ -126,6 +126,8 @@ void logApproximation(G_t &G, T_t &T){
     logApproximation(G, T, V, emptyset);
 }
 
-}
+} //namespace treedec
 
-#endif
+#endif //ifdef TD_APPROXIMATIOM
+
+// vim:ts=8:sw=4:et

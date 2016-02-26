@@ -22,7 +22,7 @@
  *
  * Provides following functions (namespace treedec::app):
  *
- * - void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, 
+ * - void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result,
  *                                                          treedec::np::max_clique_base<G_t> &mclb)
  * - void max_independent_set_with_treedecomposition(G_t &G, T_t &T, std::set<unsigned int> &global_result)
  * - void min_vertex_cover_with_treedecomposition(G_t &G, T_t &T, std::set<unsigned int> &global_result)
@@ -578,4 +578,4 @@ void min_coloring_with_treedecomposition(G_t &G, T_t &T, std::vector<std::set<un
 
 #endif
 
-
+// vim:ts=8:sw=4:et

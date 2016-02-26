@@ -29,4 +29,6 @@ template <typename G_t>
 void approximate_vertex_seperator(G_t &G, std::vector<bool> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S){
 }
 
-#endif
+#endif //ifdef TD_APPROXIMATE_SEPERATOR
+
+// vim:ts=8:sw=4:et

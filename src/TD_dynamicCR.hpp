@@ -33,7 +33,7 @@
 // {
 //  unsigned int id;
 // };
-// typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Vertex> TD_graph_t;
+// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
 //
 //
 //
@@ -50,6 +50,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "TD_simple_graph_algos.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -86,7 +87,8 @@ void get_robber_components(G_t G, std::set<unsigned int> &X, std::vector<std::se
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if (G[*vIt].id == *sIt){
+            unsigned id=noboost::get_id(G, *vIt);
+            if (id == *sIt){
                 boost::clear_vertex(*vIt, G);
                 boost::remove_vertex(*vIt, G);
                 break;
@@ -102,7 +104,8 @@ void get_robber_components(G_t G, std::set<unsigned int> &X, std::vector<std::se
 static void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsigned int> &R, std::vector<std::set<unsigned int> > &Rcomps){
     for(unsigned int i = 0; i < Rcomps.size(); i++){
         std::set<unsigned int> intersection;
-        std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(), X_prime.begin(), X_prime.end(), std::inserter(intersection, intersection.begin()));
+        std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(), X_prime.begin(), X_prime.end(),
+                              std::inserter(intersection, intersection.begin()));
         if(!intersection.empty()){
             R.insert(Rcomps[i].begin(), Rcomps[i].end());
         }
@@ -112,8 +115,9 @@ static void get_robber_component(std::set<unsigned int> &X_prime, std::set<unsig
 //checks if comp(G\X, y) = comp(G\ (X ^ X'), y) := R and X' ^ R != emptyset
 template <typename G_t>
 bool is_monotone_dynamicCR(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &X_prime, std::set<unsigned int> &oldR, std::set<unsigned int> &newR, std::vector<std::set<unsigned int> > &Rcomps){ 
-    if(X == X_prime)
+    if(X == X_prime){
         return false;
+    }
 
     //robber_space(G\X)
     std::set<unsigned int> R1;
@@ -127,7 +131,8 @@ bool is_monotone_dynamicCR(G_t &G, std::set<unsigned int> &X, std::set<unsigned 
     get_robber_components(G, is_X_X_prime, Rcomps2);
     get_robber_component(X_prime, R2, Rcomps2);
 
-    if(R1 == R2 && ((oldR.size() == 0 && std::includes(X_prime.begin(), X_prime.end(), R1.begin(), R1.end())) || std::includes(oldR.begin(), oldR.end(), R1.begin(), R1.end()))){
+    if(R1 == R2 && ((oldR.size() == 0 && std::includes(X_prime.begin(), X_prime.end(), R1.begin(), R1.end()))
+    || std::includes(oldR.begin(), oldR.end(), R1.begin(), R1.end()))){
         std::set_union(R1.begin(), R1.end(), X_prime.begin(), X_prime.end(), std::inserter(newR, newR.begin()));
         return true;
     }
@@ -156,8 +161,9 @@ bool make_layer(G_t &G, std::vector<std::vector<boost::tuple<std::set<unsigned i
             for(unsigned int j = 0; j < W[idx-1].size(); j++){
                 //if a turn X -> X' is monotone, save the index of the entry in the layer below for computing a tree decomposition
                 //at the end
-                if(is_monotone_dynamicCR(G, subs[i], W[idx-1][j].get<0>(), W[idx-1][j].get<1>(), newR, Rcomps))
+                if(is_monotone_dynamicCR(G, subs[i], W[idx-1][j].get<0>(), W[idx-1][j].get<1>(), newR, Rcomps)){
                     indices.push_back(j);
+                }
             }
             //if there is a at least one monotone turn, including X, we have to add X to W
             if(indices.size() != 0){
@@ -167,8 +173,9 @@ bool make_layer(G_t &G, std::vector<std::vector<boost::tuple<std::set<unsigned i
                 std::set_union(newR.begin(), newR.end(), subs[i].begin(), subs[i].end(), std::inserter(union_R_X, union_R_X.begin()));
 
                 //test if a tree decomposition has been found
-                if(union_R_X.size() == vertices.size())
+                if(union_R_X.size() == vertices.size()){
                     return true;
+                }
             }
         }
     }
@@ -177,9 +184,11 @@ bool make_layer(G_t &G, std::vector<std::vector<boost::tuple<std::set<unsigned i
     //With this modification, we additionally have to check "if(|R|== 0 && X' includes newR)" for monotonicity in is_monotone_dynamicCR
 
     //todo: copy the whole "graph" in W displaced by one layer, such we would not compute monotone turns several times
-    for(unsigned int i = 0; i < subs.size(); i++)
-        W[idx].push_back(boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> >(subs[i], std::set<unsigned int>(), std::vector<unsigned int>()));
-
+    for(unsigned int i = 0; i < subs.size(); i++){
+        W[idx].push_back(boost::tuple<std::set<unsigned int>, std::set<unsigned int>,
+                         std::vector<unsigned int> >(subs[i], std::set<unsigned int>(),
+                         std::vector<unsigned int>()));
+    }
     return false;
 }
 
@@ -203,8 +212,9 @@ void dynamicCR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned 
         }
     }
 
-    if(vIt1 != vEnd && vIt2 != vEnd)
+    if(vIt1 != vEnd && vIt2 != vEnd){
         return;
+    }
 
     if(vIt1 == vEnd){
         b1 = boost::add_vertex(T);
@@ -241,14 +251,18 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
 
     if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-            T[t].bag.insert(G[*vIt].id);
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            unsigned id=noboost::get_id(G, *vIt);
+            T[t].bag.insert(id);
+        }
 
         return;
     }
 
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        vertices.insert(G[*vIt].id);
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned id=noboost::get_id(G, *vIt);
+        vertices.insert(id);
+    }
 
     std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > > W(1);
     unsigned int k = (unsigned int)lb;
@@ -274,7 +288,8 @@ static void CR_dynamic_decomp(G_t &G, T_t &T){
     CR_dynamic_decomp(G, T, lb);
 }
 
-}
+} //namespace treedec
 
-#endif
+#endif //ifdef TD_DYNAMICCR
 
+// vim:ts=8:sw=4:et

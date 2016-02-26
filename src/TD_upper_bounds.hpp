@@ -49,8 +49,9 @@ unsigned int _minDegree(G_t &G){
             }
         }
 
-        if(min_degree > upper_bound)
+        if(min_degree > upper_bound){
             upper_bound = min_degree;
+        }
 
         //Collect the neighbours of min_vertex.
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours(boost::out_degree(min_vertex, G));
@@ -58,13 +59,15 @@ unsigned int _minDegree(G_t &G){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
         unsigned int i = 0;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++)
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
             neighbours[i++] = *nIt;
+        }
 
         //Make the neighbours of min_vertex a clique.
         for(unsigned int i = 0; i < neighbours.size(); i++){
-            for(unsigned int j = i+1; j < neighbours.size(); j++)
+            for(unsigned int j = i+1; j < neighbours.size(); j++){
                 boost::add_edge(neighbours[i], neighbours[j], G);
+            }
         }
 
         boost::clear_vertex(min_vertex, G);
@@ -78,8 +81,10 @@ unsigned int minDegree(G_t G){
     return _minDegree(G);
 }
 
-}
-}
+} //namespace ub
 
-#endif
+} //namespace treedec
 
+#endif //ifdef TD_UPPER_BOUNDS
+
+// vim:ts=8:sw=4:et

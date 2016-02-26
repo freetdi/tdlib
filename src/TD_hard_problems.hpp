@@ -101,8 +101,11 @@ class max_clique_cliquer : public max_clique_base<G_t>{
             for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-                    if(G[*nIt].id > G[*vIt].id)
-                        GRAPH_ADD_EDGE(h, G[*vIt].id, G[*nIt].id);
+                    unsigned vid=noboost::get_id(G, *vIt);
+                    unsigned nid=noboost::get_id(G, *nIt);
+                    if(nid > vid){
+                        GRAPH_ADD_EDGE(h, vid, nid);
+                    }
                 }
             }
 
@@ -122,8 +125,9 @@ class max_clique_cliquer : public max_clique_base<G_t>{
 
             int size=set_size(s);
             for(unsigned int i = 0; i < SET_MAX_SIZE(s); i++){
-                if(SET_CONTAINS(s,i))
+                if(SET_CONTAINS(s,i)){
                     result.push_back(id_map[i]);
+                }
             }
 
             /* free all stuff */
@@ -172,8 +176,11 @@ class all_cliques_cliquer : public all_cliques_base<G_t>{
             for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-                    if(G[*nIt].id > G[*vIt].id)
-                        GRAPH_ADD_EDGE(h, G[*vIt].id, G[*nIt].id);
+                    unsigned vid=noboost::get_id(G, *vIt);
+                    unsigned nid=noboost::get_id(G, *nIt);
+                    if(nid > vid){
+                        GRAPH_ADD_EDGE(h, vid, nid);
+                    }
                 }
             }
 
@@ -194,8 +201,9 @@ class all_cliques_cliquer : public all_cliques_base<G_t>{
             results.resize(clique_count);
             for(unsigned i = 0; i < clique_count; i++){
                 for(unsigned int j = 0; j < SET_MAX_SIZE(clique_list[i]); j++){
-                    if(SET_CONTAINS(clique_list[i],j))
+                    if(SET_CONTAINS(clique_list[i],j)){
                         results[i].push_back(id_map[j]);
+                    }
                 }
             }
 
@@ -246,11 +254,14 @@ class min_vertex_cover_cliquer : public min_vertex_cover_base<G_t>{
 
             std::set<unsigned int> tmp_result2, tmp_result3;
             typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-            for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-                tmp_result2.insert(G[*vIt].id);
+            for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+                unsigned id=noboost::get_id(G, *vIt);
+                tmp_result2.insert(id);
+            }
 
-            for(unsigned int i = 0; i < tmp_result1.size(); i++)
+            for(unsigned int i = 0; i < tmp_result1.size(); i++){
                 tmp_result3.insert(tmp_result1[i]);
+            }
 
             result.resize(tmp_result2.size());
             std::vector<unsigned int>::iterator it;
@@ -259,11 +270,13 @@ class min_vertex_cover_cliquer : public min_vertex_cover_base<G_t>{
         }
 };
 
-#endif //HAVE_CLIQUER
+#endif //ifdef HAVE_CLIQUER
 
 } //namespace np
 
 } //namespace treedec
 
 
-#endif
+#endif //ifdef TD_HARD_PROBLEMS
+
+// vim:ts=8:sw=4:et

@@ -445,10 +445,10 @@ static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
     }
 }
 
-#endif //TD_POWERSET
+#endif //ifdef TD_POWERSET
 
-}
+} //namespace treedec
 
-#endif //namespace treedec
+#endif //ifdef TD_MISC
 
 // vim:ts=8:sw=4:et

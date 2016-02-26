@@ -50,6 +50,7 @@
 #include "TD_NetworkFlow.hpp"
 #include "TD_simple_graph_algos.hpp"
 #include "TD_misc.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -67,7 +68,9 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
-                    if(T[*nIt].bag.find(H[*vIt1].id) != T[*nIt].bag.end() && T[*nIt].bag.find(H[*vIt2].id) != T[*nIt].bag.end()){
+                    unsigned int id1=noboost::get_id(H, *vIt1);
+                    unsigned int id2=noboost::get_id(H, *vIt2);
+                    if(T[*nIt].bag.find(id1) != T[*nIt].bag.end() && T[*nIt].bag.find(id2) != T[*nIt].bag.end()){
                         boost::add_edge(*vIt1, *vIt2, H);
                         break;
                     }
@@ -83,14 +86,20 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
         for(; vIt2 != vEnd; vIt2++){
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++)
-                    X.insert(H[*nIt].id);
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
+                    unsigned id=noboost::get_id(H, *nIt);
+                    X.insert(id);
+                }
 
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++)
-                    Y.insert(H[*nIt].id);
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++){
+                    unsigned id=noboost::get_id(H, *nIt);
+                    Y.insert(id);
+                }
 
-                disabled[H[*vIt1].id] = true;
-                disabled[H[*vIt2].id] = true;
+                unsigned id1=noboost::get_id(H, *vIt1);
+                unsigned id2=noboost::get_id(H, *vIt2);
+                disabled[id1] = true;
+                disabled[id2] = true;
 
                 goto BREAK_LOOP;
             }
@@ -159,11 +168,14 @@ void MSVS(G_t &G, T_t &T){
         //Do the refinement.
         std::vector<bool> visited(boost::num_vertices(G), true);
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++)
-            visited[H[*vIt].id] = false;
+        for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++){
+            unsigned id=noboost::get_id(H, *vIt);
+            visited[id] = false;
+        }
 
-        for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
+        for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
             visited[*sIt] = true;
+        }
 
         std::vector<std::set<unsigned int> > components;
         get_components_provided_map(H, components, visited);
@@ -172,8 +184,9 @@ void MSVS(G_t &G, T_t &T){
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN;
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> newN(components.size());
 
-        for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_bag, T); t_nIt != t_nEnd; t_nIt++)
+        for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_bag, T); t_nIt != t_nEnd; t_nIt++){
             oldN.push_back(*t_nIt);
+        }
 
         boost::clear_vertex(refinement_bag, T);
 
@@ -191,7 +204,9 @@ void MSVS(G_t &G, T_t &T){
 
         for(unsigned int i = 0; i <  oldN.size(); i++){
             std::set<unsigned int> intersection;
-            std::set_intersection(old_bag.begin(), old_bag.end(), T[oldN[i]].bag.begin(), T[oldN[i]].bag.end(), std::inserter(intersection, intersection.begin()));
+            std::set_intersection(old_bag.begin(), old_bag.end(),
+                T[oldN[i]].bag.begin(), T[oldN[i]].bag.end(),
+                std::inserter(intersection, intersection.begin()));
             for(unsigned int j = 0; j < union_S_W_i.size(); j++){
                 if(std::includes(union_S_W_i[j].begin(), union_S_W_i[j].end(), intersection.begin(), intersection.end())){
                     boost::add_edge(newN[j], oldN[i], T);
@@ -211,8 +226,10 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[edge[0]], M); nIt != nEnd; nIt++){
-        if(elimination_ordering_[M[*nIt].id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second)
+        unsigned id=noboost::get_id(M, *nIt);
+        if(elimination_ordering_[id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second){
             return false;
+        }
     }
     return true;
 }
@@ -269,6 +286,8 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
     LEX_M_minimal_ordering(G, new_elimination_ordering);
 }
 
-}
+} //namespace treedec
 
-#endif
+#endif //ifdef TD_POSTPROCESSING
+
+// vim:ts=8:sw=4:et:

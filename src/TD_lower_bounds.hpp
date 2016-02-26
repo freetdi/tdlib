@@ -1462,4 +1462,6 @@ int relation_edges_vertices(G_t &G){
 
 } //namespace treedec
 
-#endif
+#endif //TD_LOWER_BOUNDS
+
+// vim:ts=8:sw=4:et
