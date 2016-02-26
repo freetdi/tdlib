@@ -534,7 +534,7 @@ void LEX_M_fill_in(G_t &G, std::vector<std::vector<unsigned int> > &fill_in_edge
     unsigned int k = 1;
 
     for(int i = boost::num_vertices(G)-1; i >= 0; i--){
-        typename boost::graph_traits<G_t>::vertex_descriptor v;
+        typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned id=noboost::get_id(G, *vIt);
@@ -718,7 +718,7 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
     unsigned int k = 1;
 
     for(int i = boost::num_vertices(G)-1; i >= 0; i--){
-        typename boost::graph_traits<G_t>::vertex_descriptor v;
+        typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned id=noboost::get_id(G, *vIt);
