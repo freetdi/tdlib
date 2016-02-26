@@ -42,7 +42,7 @@
 // {
 //  unsigned int id;
 // };
-// typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Vertex> TD_graph_t;
+// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
 //
 //
 //
@@ -60,17 +60,20 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 #include "TD_misc.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
 //checks if there exists a degree-0-vertex
 template <typename G_t>
 void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 0){
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, std::set<unsigned int>()));
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 0){
+            unsigned id=noboost::get_id(G, *vIt);
+            std::set<unsigned int> emptyset=std::set<unsigned int>();
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, emptyset));
 
             low = (low > 0)? low : 0;
         }
@@ -80,30 +83,35 @@ void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int>
 //checks if there exists a degree-0-vertex
 template <typename G_t>
 void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 0)
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, std::set<unsigned int>()));
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 0){
+            unsigned id=noboost::get_id(G, *vIt);
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, std::set<unsigned int>()));
+        }
     }
 }
 
 //checks if there exists a degree-1-vertex
 template <typename G_t>
 bool Twig(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 1){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 1){
             std::set<unsigned int> bag;
 
-            typename boost::graph_traits<G_t>::adjacency_iterator neighbourIt, neighbourEnd;
-            for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++)
-                bag.insert(G[*neighbourIt].id);
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
+            }
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
+            unsigned id=noboost::get_id(G, *vIt);
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, bag));
 
-            boost::clear_vertex(*vertexIt, G);
+            boost::clear_vertex(*vIt, G);
 
             low = (low > 1)? low : 1;
             return true;
@@ -115,22 +123,24 @@ bool Twig(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
 //checks if there exists a degree-2-vertex
 template <typename G_t>
 bool Series(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 2){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 2){
             std::set<unsigned int> bag;
             std::vector<typename boost::graph_traits<G_t>::vertex_descriptor > N;
 
-            typename boost::graph_traits<G_t>::adjacency_iterator  neighbourIt, neighbourEnd;
-            for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++){
-                bag.insert(G[*neighbourIt].id);
-                N.push_back(*neighbourIt);
+            typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
+                N.push_back(*nIt);
             }
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
+            unsigned id=noboost::get_id(G, *vIt);
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, bag));
 
-            boost::clear_vertex(*vertexIt, G);
+            boost::clear_vertex(*vIt, G);
             boost::add_edge(N.at(0), N.at(1), G);
 
             low = (low > 2)? low : 2;
@@ -143,17 +153,18 @@ bool Series(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int
 //checks if there exists a degree-3-vertex, such that at least one edge exists in its neighbourhood (Triangle)
 template <typename G_t>
 bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(G); vertexIt != vertexEnd; vertexIt++){
-        if(boost::out_degree(*vertexIt, G) == 3){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::out_degree(*vIt, G) == 3){
             std::set<unsigned int> bag;
             std::vector<typename boost::graph_traits<G_t>::adjacency_iterator> N;
 
-            typename boost::graph_traits<G_t>::adjacency_iterator neighbourIt, neighbourEnd;
-            for(boost::tie(neighbourIt, neighbourEnd) = boost::adjacent_vertices(*vertexIt, G); neighbourIt != neighbourEnd; neighbourIt++){
-                bag.insert(G[*neighbourIt].id);
-                N.push_back(neighbourIt);
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
+                N.push_back(nIt);
             }
 
             if(boost::edge(*N.at(0), *N.at(1), G).second || boost::edge(*N.at(0), *N.at(2), G).second || boost::edge(*N.at(1), *N.at(2), G).second){
@@ -161,9 +172,10 @@ bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned i
                 boost::add_edge(*N.at(0), *N.at(2), G);
                 boost::add_edge(*N.at(1), *N.at(2), G);
 
-                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt].id, bag));
+                unsigned id=noboost::get_id(G, *vIt);
+                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, bag));
 
-                boost::clear_vertex(*vertexIt, G);
+                boost::clear_vertex(*vIt, G);
 
                 low = (low > 3)? low : 3;
                 return true;
@@ -176,43 +188,49 @@ bool Triangle(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned i
 //checks if there exists two degree-3-vertices, such that they share their neighbours (Buddies)
 template <typename G_t>
 bool Buddy(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
-    typename boost::graph_traits<G_t>::vertex_iterator  vertexIt1, vertexEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator  vIt1, vEnd;
 
-    for(boost::tie(vertexIt1, vertexEnd) = boost::vertices(G); vertexIt1 != vertexEnd; vertexIt1++){
-        if(boost::out_degree(*vertexIt1, G) != 3)
+    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
+        if(boost::out_degree(*vIt1, G) != 3){
             continue;
+        }
 
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> dN;
         std::set<unsigned int> N1;
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd1;
-        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(*vertexIt1, G); nIt1 != nEnd1; nIt1++){
+        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(*vIt1, G); nIt1 != nEnd1; nIt1++){
             dN.push_back(*nIt1);
-            N1.insert(G[*nIt1].id);
+            unsigned id=noboost::get_id(G, *nIt1);
+            N1.insert(id);
         }
 
-        typename boost::graph_traits<G_t>::vertex_iterator vertexIt2;
-        vertexIt2 = vertexIt1;
-        vertexIt2++;
-        for(; vertexIt2 != vertexEnd; vertexIt2++){
-            if(boost::out_degree(*vertexIt2, G) != 3)
+        typename boost::graph_traits<G_t>::vertex_iterator vIt2;
+        vIt2 = vIt1;
+        vIt2++;
+        for(; vIt2 != vEnd; vIt2++){
+            if(boost::out_degree(*vIt2, G) != 3){
                 continue;
+            }
 
             std::set<unsigned int> N2;
             typename boost::graph_traits<G_t>::adjacency_iterator nIt2, nEnd2;
-            for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*vertexIt2, G); nIt2 != nEnd2; nIt2++){
-                N2.insert(G[*nIt2].id);
+            for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*vIt2, G); nIt2 != nEnd2; nIt2++){
+                unsigned id=noboost::get_id(G, *nIt2);
+                N2.insert(id);
             }
             if(N1 == N2){
                 boost::add_edge(dN.at(0), dN.at(1), G);
                 boost::add_edge(dN.at(0), dN.at(2), G);
                 boost::add_edge(dN.at(1), dN.at(2), G);
 
-                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt1].id, N1));
-                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vertexIt2].id, N2));
+                unsigned id1=noboost::get_id(G, *vIt1);
+                unsigned id2=noboost::get_id(G, *vIt2);
+                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id1, N1));
+                bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id2, N2));
 
-                boost::clear_vertex(*vertexIt1, G);
-                boost::clear_vertex(*vertexIt2, G);
+                boost::clear_vertex(*vIt1, G);
+                boost::clear_vertex(*vIt2, G);
 
                 low = (low > 3)? low : 3;
                 return true;
@@ -228,44 +246,50 @@ bool Cube(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::out_degree(*vIt, G) != 3)
+        if(boost::out_degree(*vIt, G) != 3){
             continue;
+        }
 
         typename boost::graph_traits<G_t>::vertex_descriptor x,a,b,c;
         x = *vIt;
 
         typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> Nx, Na, Nb, Nc;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(x, G); nIt != nEnd; nIt++)
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(x, G); nIt != nEnd; nIt++){
             Nx.push_back(*nIt);
+        }
 
         a = Nx[0];
         b = Nx[1];
         c = Nx[2];
 
-        if(boost::out_degree(a, G) != 3 || boost::out_degree(b, G) != 3 || boost::out_degree(c, G) != 3)
+        if(boost::out_degree(a, G) != 3 || boost::out_degree(b, G) != 3 || boost::out_degree(c, G) != 3){
             continue;
+        }
 
         std::set<unsigned int> bag;
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(a, G); nIt != nEnd; nIt++){
             if(*nIt != x){
                 Na.push_back(*nIt);
-                bag.insert(G[*nIt].id);
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
             }
         }
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(b, G); nIt != nEnd; nIt++){
             if(*nIt != x){
                 Nb.push_back(*nIt);
-                bag.insert(G[*nIt].id);
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
             }
         }
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(c, G); nIt != nEnd; nIt++){
             if(*nIt != x){
                 Nc.push_back(*nIt);
-                bag.insert(G[*nIt].id);
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
             }
         }
 
@@ -301,25 +325,33 @@ bool Cube(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> 
 
         if((Nc[0] == v && Nc[1] == w) || (Nc[1] == v && Nc[0] == w)){
             bag.clear();
-            bag.insert(G[u].id);
-            bag.insert(G[v].id);
-            bag.insert(G[x].id);
+            unsigned idu=noboost::get_id(G, u);
+            unsigned idv=noboost::get_id(G, v);
+            unsigned idw=noboost::get_id(G, w);
+            unsigned idx=noboost::get_id(G, x);
+            unsigned ida=noboost::get_id(G, a);
+            unsigned idb=noboost::get_id(G, b);
+            unsigned idc=noboost::get_id(G, c);
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[a].id, bag));
+            bag.insert(idu);
+            bag.insert(idv);
+            bag.insert(idx);
+
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(ida, bag));
 
             bag.clear();
-            bag.insert(G[w].id);
-            bag.insert(G[v].id);
-            bag.insert(G[x].id);
+            bag.insert(idw);
+            bag.insert(idv);
+            bag.insert(idx);
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[c].id, bag));
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(idc, bag));
 
             bag.clear();
-            bag.insert(G[w].id);
-            bag.insert(G[u].id);
-            bag.insert(G[x].id);
+            bag.insert(idw);
+            bag.insert(idu);
+            bag.insert(idx);
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[b].id, bag));
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(idb, bag));
 
             boost::clear_vertex(a, G);
             boost::clear_vertex(b, G);
@@ -344,8 +376,9 @@ template <typename G_t>
 bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::out_degree(*vIt, G) == 0)
+        if(boost::out_degree(*vIt, G) == 0){
             continue;
+        }
 
         //N is a clique, if no "edge miss" occures
         bool isClique = true;
@@ -366,10 +399,13 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned
 
         if(isClique){
             std::set<unsigned int> bag;
-            for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++)
-                bag.insert(G[*nIt1].id);
+            for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++){
+                unsigned id=noboost::get_id(G, *nIt1);
+                bag.insert(id);
+            }
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vIt].id, bag));
+            unsigned id=noboost::get_id(G, *vIt);
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, bag));
 
             boost::clear_vertex(*vIt, G);
 
@@ -387,15 +423,17 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::out_degree(*vIt, G) == 0)
+        if(boost::out_degree(*vIt, G) == 0){
             continue;
+        }
 
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N;
         N.push_back(*vIt);
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++)
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
             N.push_back(*nIt);
+        }
 
         //N except one vertex now potentially is a clique
         bool isAlmostSimplicial = true;
@@ -409,8 +447,9 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
             nIt2++;
             missingEdgesCount = 0;
             for(; nIt2 != N.end(); nIt2++){
-                if(specialNeighbourFound && (*nIt1 == specialNeighbour || *nIt2 == specialNeighbour))
+                if(specialNeighbourFound && (*nIt1 == specialNeighbour || *nIt2 == specialNeighbour)){
                     continue;
+                }
 
                 if(!boost::edge(*nIt1, *nIt2, G).second){
                     if(specialNeighbourFound){
@@ -444,16 +483,20 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
             //adding the edges, if specialNeighbourFound is true, N is a clique and vertexIt is a simplicial vertex
             if(specialNeighbourFound){
                 for(unsigned int i = 0; i < N.size(); i++){
-                    if(N.at(i) != specialNeighbour)
+                    if(N.at(i) != specialNeighbour){
                         boost::add_edge(specialNeighbour, N.at(i), G);
+                    }
                 }
             }
 
             std::set<unsigned int> bag;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++)
-                bag.insert(G[*nIt].id);
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+                unsigned id=noboost::get_id(G, *nIt);
+                bag.insert(id);
+            }
 
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(G[*vIt].id, bag));
+            unsigned id=noboost::get_id(G, *vIt);
+            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, bag));
 
             boost::clear_vertex(*vIt, G);
 
@@ -475,15 +518,15 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
         return;
     }
 
-    typename boost::graph_traits<T_t>::vertex_iterator vertexIt, vertexEnd;
+    typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
-        if(std::includes(T[*vertexIt].bag.begin(), T[*vertexIt].bag.end(), bag.begin(), bag.end())){
+    for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
+        if(std::includes(T[*vIt].bag.begin(), T[*vIt].bag.end(), bag.begin(), bag.end())){
             bag.insert(preprocessed_node);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
             T[t_dec_node].bag = bag;
 
-            boost::add_edge(*vertexIt, t_dec_node, T);
+            boost::add_edge(*vIt, t_dec_node, T);
             return;
         }
     }
@@ -492,8 +535,8 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     bag.insert(preprocessed_node);
     T[t_dec_node].bag = bag;
-    boost::tie(vertexIt, vertexEnd) = boost::vertices(T);
-    boost::add_edge(*vertexIt, t_dec_node, T);
+    boost::tie(vIt, vEnd) = boost::vertices(T);
+    boost::add_edge(*vIt, t_dec_node, T);
 
 }
 
@@ -506,8 +549,9 @@ void _preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsi
 
         _preprocessing(G, bags, low);
     }
-    else if (boost::num_edges(G) != 0)
+    else if (boost::num_edges(G) != 0){
         low = (low > 4)? low : 4;
+    }
 }
 
 template <typename G_t>
@@ -525,10 +569,13 @@ void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsig
 //glues bags with the current tree decomposition
 template<typename T_t>
 void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, T_t &T){
-    for(unsigned int i = bags.size(); i > 0; i--)
+    for(unsigned int i = bags.size(); i > 0; i--){
         glue_bag_preprocessing(bags[i-1].get<1>(), bags[i-1].get<0>(), T);
+    }
 }
 
 }
 
-#endif
+#endif //namespace treedec
+
+// vim:ts=8:sw=4:et

@@ -56,8 +56,10 @@
 #ifndef TD_NETWORK_FLOW
 #define TD_NETWORK_FLOW
 
+#include <vector>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -97,8 +99,9 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
 
     unsigned int j = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(!disabled[G[*vIt].id]){
-            internal_idxMap[G[*vIt].id] = boost::add_vertex(diG);
+        unsigned id=noboost::get_id(G, *vIt);
+        if(!disabled[id]){
+            internal_idxMap[id] = boost::add_vertex(diG);
             diG[j].visited = false;
             diG[j++].predecessor = -1;
             idxMap.push_back(*vIt);
@@ -107,23 +110,32 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digra
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        if(!disabled[G[boost::source(*eIt, G)].id] && !disabled[G[boost::target(*eIt, G)].id]){
-            digraph_t::edge_descriptor e1 = boost::add_edge(internal_idxMap[G[boost::source(*eIt, G)].id], internal_idxMap[G[boost::target(*eIt, G)].id], diG).first;
+        unsigned sid=noboost::get_id(G, boost::source(*eIt, G));
+        unsigned tid=noboost::get_id(G, boost::target(*eIt, G));
+        if(!disabled[sid] && !disabled[tid]){
+
+            digraph_t::edge_descriptor e1 =
+                boost::add_edge(internal_idxMap[sid], internal_idxMap[tid], diG).first;
             diG[e1].path = false;
-            digraph_t::edge_descriptor e2 = boost::add_edge(internal_idxMap[G[boost::target(*eIt, G)].id], internal_idxMap[G[boost::source(*eIt, G)].id], diG).first;
+            digraph_t::edge_descriptor e2 =
+                boost::add_edge(internal_idxMap[tid], internal_idxMap[sid], diG).first;
             diG[e2].path = false;
         }
     }
 
     digraph_t::vertex_descriptor source = boost::add_vertex(diG);
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
-        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[G[*sIt].id], diG).first;
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+            X.begin(); sIt != X.end(); sIt++){
+        unsigned id=noboost::get_id(G, *sIt);
+        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[id], diG).first;
         diG[e].path = false;
     }
 
     digraph_t::vertex_descriptor sink = boost::add_vertex(diG);
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = Y.begin(); sIt != Y.end(); sIt++){
-        digraph_t::edge_descriptor e =  boost::add_edge(internal_idxMap[G[*sIt].id], sink, diG).first;
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+            Y.begin(); sIt != Y.end(); sIt++){
+        unsigned id = noboost::get_id(G, *sIt);
+        digraph_t::edge_descriptor e =  boost::add_edge(internal_idxMap[id], sink, diG).first;
         diG[e].path = false;
     }
 
@@ -179,8 +191,9 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
     bool on_a_path = diG[v].predecessor != -1;
 
     //The walk has reached the sink. We can extend the set of disjoint paths by another path.
-    if(v == sink)
+    if(v == sink){
         return true;
+    }
 
     //Case, that v is on a path in P and the last visited vertex was not the predecessor of v on this path in P.
     //This vertex could be possibly reached by the predecessor of v on the path at a later time.
@@ -191,8 +204,9 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
             dangerous.insert(v);
         }
 
-        if(diG[diG[v].predecessor].visited)
+        if(diG[diG[v].predecessor].visited){
             return false;
+        }
         else{
             //If a P-alternating walk can be computed by taking this 'reverse edge', P' will not
             //contain {v, w}, where w is the predecessor of v on the path in P that containes v.
@@ -243,22 +257,26 @@ bool _disjoint_ways(G_t &G, std::vector<bool> &disabled, typename std::set<typen
     //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one for the unavailing try).
     unsigned int iter = 0;
     for(; iter < X.size()+1; iter++){
-        if(S.size()+iter > k)
+        if(S.size()+iter > k){
             return false;
+        }
 
         //start extended DFS at source
         std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> dangerous;
         if(!t_search_disjoint_ways(diG, source, sink, false, source, dangerous, idxMap, G)){
-            for(std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor>::iterator sIt = dangerous.begin(); sIt != dangerous.end(); sIt++)
+            for(std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor>::iterator sIt =
+                  dangerous.begin(); sIt != dangerous.end(); sIt++){
                 diG[*sIt].visited = true;
+            }
 
             break;
         }
 
         //undo visited
         digraph_t::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(diG); vIt != vEnd; vIt++)
+        for(boost::tie(vIt, vEnd) = boost::vertices(diG); vIt != vEnd; vIt++){
             diG[*vIt].visited = false;
+        }
     }
 
     std::vector<std::vector<unsigned int> > P(iter);
@@ -293,15 +311,20 @@ bool seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
     std::set_difference(X.begin(), X.end(), S.begin(), S.end(), std::inserter(X_, X_.begin()));
     std::set_difference(Y.begin(), Y.end(), S.begin(), S.end(), std::inserter(Y_, Y_.begin()));
 
-    if(S.size() > k)
+    if(S.size() > k){
         return false;
+    }
 
-    if(X_.size() == 0 || Y_.size() == 0)
+    if(X_.size() == 0 || Y_.size() == 0){
         return true;
+    }
 
     //disables/deletes the vertices in the intersection of X and Y.
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
-        disabled[G[*sIt].id] = true;
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+          S.begin(); sIt != S.end(); sIt++){
+        unsigned id=noboost::get_id(G, *sIt);
+        disabled[id] = true;
+    }
 
     return _disjoint_ways(G, disabled, X_, Y_, S, k);
 }
@@ -315,3 +338,5 @@ void seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
 }
 
 #endif
+
+// vim:ts=8:sw=4:et

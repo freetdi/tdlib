@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -93,21 +94,25 @@ void _minDegree_decomp(G_t &G, T_t &T){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
 
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            bag.insert(G[*nIt1].id);
+            unsigned id=noboost::get_id(G, *nIt1);
+            bag.insert(id);
             nIt2 = nIt1;
             nIt2++;
-            for(; nIt2 != nEnd; nIt2++)
+            for(; nIt2 != nEnd; nIt2++){
                 boost::add_edge(*nIt1, *nIt2, G);
+            }
         }
 
         bags[i] = bag;
-        elim_vertices[i++] = G[min_vertex].id;
+        unsigned id=noboost::get_id(G, min_vertex);
+        elim_vertices[i++] = id;
 
         boost::clear_vertex(min_vertex, G);
     }
 
-    for(; i > 0; i--)
+    for(; i > 0; i--){
         glue_bag(bags[i-1], elim_vertices[i-1], T);
+    }
 }
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
@@ -140,8 +145,9 @@ void _fillIn_decomp(G_t &G, T_t &T){
 
         unsigned int min_fill = UINT_MAX;
         for(; vIt != vEnd; vIt++){
-            if(boost::out_degree(*vIt, G) == 0)
+            if(boost::out_degree(*vIt, G) == 0){
                 continue;
+            }
 
             unsigned int current_fill = 0;
 
@@ -149,16 +155,18 @@ void _fillIn_decomp(G_t &G, T_t &T){
                 nIt2 = nIt1;
                 nIt2++;
                 for(; nIt2 != nEnd; nIt2++){
-                    if(!boost::edge(*nIt1, *nIt2, G).second)
+                    if(!boost::edge(*nIt1, *nIt2, G).second){
                         current_fill++;
+                    }
                 }
             }
 
             if(current_fill < min_fill){
                 min_fill = current_fill;
                 min_vertex = *vIt;
-                if(current_fill == 0)
+                if(current_fill == 0){
                     break;
+                }
             }
         }
 
@@ -166,21 +174,25 @@ void _fillIn_decomp(G_t &G, T_t &T){
         std::set<unsigned int> bag;
 
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            bag.insert(G[*nIt1].id);
+            unsigned id=noboost::get_id(G, *nIt1);
+            bag.insert(id);
             nIt2 = nIt1;
             nIt2++;
-            for(; nIt2 != nEnd; nIt2++)
+            for(; nIt2 != nEnd; nIt2++){
                 boost::add_edge(*nIt1, *nIt2, G);
+            }
         }
 
         bags[i] = bag;
-        elim_vertices[i++] = G[min_vertex].id;
+        unsigned id=noboost::get_id(G, min_vertex);
+        elim_vertices[i++] = id;
 
         boost::clear_vertex(min_vertex, G);
     }
 
-    for(; i > 0; i--)
+    for(; i > 0; i--){
         glue_bag(bags[i-1], elim_vertices[i-1], T);
+    }
 }
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
@@ -205,8 +217,10 @@ void _minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::v
 
         unsigned int min_degree = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(visited[G[*vIt].id])
+            unsigned id=noboost::get_id(G,*vIt);
+            if(visited[id]){
                 continue;
+            }
 
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree < min_degree){
@@ -215,20 +229,23 @@ void _minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::v
             }
         }
 
-        if(min_degree == UINT_MAX)
+        if(min_degree == UINT_MAX){
             return;
+        }
 
         //Make the neighbourhood of 'min_vertex' a clique.
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
             nIt2 = nIt1;
             nIt2++;
-            for(; nIt2 != nEnd; nIt2++)
+            for(; nIt2 != nEnd; nIt2++){
                 boost::add_edge(*nIt1, *nIt2, G);
+            }
         }
 
-        elim_ordering.push_back(G[min_vertex].id);
-        visited[G[min_vertex].id] = true;
+        unsigned id=noboost::get_id(G, min_vertex);
+        elim_ordering.push_back(id);
+        visited[id] = true;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -253,8 +270,10 @@ void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vect
 
         unsigned int min_fill = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(visited[G[*vIt].id])
+            unsigned id=noboost::get_id(G, *vIt);
+            if(visited[id]){
                 continue;
+            }
 
             if(boost::out_degree(*vIt, G) == 0){
                 min_vertex = *vIt;
@@ -268,32 +287,37 @@ void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vect
                 nIt2 = nIt1;
                 nIt2++;
                 for(; nIt2 != nEnd; nIt2++){
-                    if(!boost::edge(*nIt1, *nIt2, G).second)
+                    if(!boost::edge(*nIt1, *nIt2, G).second){
                         current_fill++;
+                    }
                 }
             }
 
             if(current_fill < min_fill){
                 min_fill = current_fill;
                 min_vertex = *vIt;
-                if(current_fill == 0)
+                if(current_fill == 0){
                     break;
+                }
             }
         }
 
-        if(min_fill == UINT_MAX)
+        if(min_fill == UINT_MAX){
             return;
+        }
 
         //Make the neighbourhood of 'min_vertex' a clique.
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
             nIt2 = nIt1;
             nIt2++;
-            for(; nIt2 != nEnd; nIt2++)
+            for(; nIt2 != nEnd; nIt2++){
                 boost::add_edge(*nIt1, *nIt2, G);
+            }
         }
 
-        elim_ordering.push_back(G[min_vertex].id);
-        visited[G[min_vertex].id] = true;
+        unsigned id=noboost::get_id(G, min_vertex);
+        elim_ordering.push_back(id);
+        visited[id] = true;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -324,8 +348,10 @@ void make_filled_graph(G_t &G, std::vector<unsigned int> &elim_ordering, std::ve
         std::set<unsigned int> N_i, E_i;
         C[i].insert(elim_ordering[i]);
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[elim_ordering[i]], G); nIt != nEnd; nIt++){
-            if(!visited[G[*nIt].id])
-                C[i].insert(G[*nIt].id);
+            unsigned id=noboost::get_id(G, *nIt);
+            if(!visited[id]){
+                C[i].insert(id);
+            }
         }
 
         for(std::set<unsigned int>::iterator sIt1 = C[i].begin(); sIt1 != C[i].end(); sIt1++){
@@ -354,7 +380,8 @@ void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_orderin
     boost::tie(vIt, vEnd) = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = *vIt++;
     for(; vIt != vEnd; vIt++){
-        if(G[*vIt].id == elimination_ordering[idx]){
+        unsigned id=noboost::get_id(G, *vIt);
+        if(id == elimination_ordering[idx]){
             elim_vertex = *vIt;
             break;
         }
@@ -365,17 +392,20 @@ void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_orderin
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_vertex, G); nIt != nEnd; nIt++){
-        bag.insert(G[*nIt].id);
+        unsigned id=noboost::get_id(G, *nIt);
+        bag.insert(id);
         neighbours.push_back(*nIt);
     }
 
     //Make the neighbourhood of 'min_vertex' a clique.
     for(unsigned int i = 0; i < neighbours.size(); i++){
-        for(unsigned int j = i+1; j < neighbours.size(); j++)
+        for(unsigned int j = i+1; j < neighbours.size(); j++){
             boost::add_edge(neighbours[i], neighbours[j], G);
+        }
     }
 
-    unsigned int elim_vertex_id = G[elim_vertex].id;
+    unsigned id=noboost::get_id(G, elim_vertex);
+    unsigned int elim_vertex_id = id;
 
     boost::clear_vertex(elim_vertex, G);
 
@@ -399,25 +429,29 @@ void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_tra
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elimination_ordering[i], G); nIt != nEnd; nIt++){
-            bag.insert(G[*nIt].id);
+            unsigned id=noboost::get_id(G, *nIt);
+            bag.insert(id);
             neighbours.push_back(*nIt);
         }
 
         //Make the neighbourhood of elimination vertex i a clique.
         for(unsigned int j = 0; j < neighbours.size(); j++){
-            for(unsigned int k = j+1; k < neighbours.size(); k++)
+            for(unsigned int k = j+1; k < neighbours.size(); k++){
                 boost::add_edge(neighbours[j], neighbours[k], G);
+            }
         }
 
         boost::clear_vertex(elimination_ordering[i], G);
 
         bags.push_back(bag);
-        elim_vertices.push_back(G[elimination_ordering[i]].id);
+        unsigned id=noboost::get_id(G, elimination_ordering[i]);
+        elim_vertices.push_back(id);
 
     }
 
-    for(unsigned int i = bags.size(); i > 0; i--)
+    for(unsigned int i = bags.size(); i > 0; i--){
         glue_bag(bags[i-1], elim_vertices[i-1], T);
+    }
 }
 
 template <typename G_t, typename T_t>
@@ -447,15 +481,20 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
         std::set<unsigned int> difference;
 
         if(boost::out_degree(leaf, T) == 1){
-            if(!std::includes(T[parent].bag.begin(), T[parent].bag.end(), T[leaf].bag.begin(), T[leaf].bag.end()))
-                std::set_difference(T[leaf].bag.begin(), T[leaf].bag.end(), T[parent].bag.begin(), T[parent].bag.end(), std::inserter(difference, difference.begin()));
+            if(!std::includes(T[parent].bag.begin(), T[parent].bag.end(),
+                              T[leaf].bag.begin(), T[leaf].bag.end())){
+                std::set_difference(T[leaf].bag.begin(), T[leaf].bag.end(), T[parent].bag.begin(),
+                                    T[parent].bag.end(), std::inserter(difference, difference.begin()));
+            }
             boost::clear_vertex(leaf, T);
         }
-        else
+        else{
             difference = T[leaf].bag;
+        }
 
-        for(std::set<unsigned int>::iterator sIt = difference.begin(); sIt != difference.end(); sIt++)
+        for(std::set<unsigned int>::iterator sIt = difference.begin(); sIt != difference.end(); sIt++){
             elimination_ordering.push_back(*sIt);
+        }
 
         T[leaf].bag.clear();
 
@@ -465,8 +504,9 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
 
 template <typename T_t>
 void treedec_to_ordering(T_t T, std::vector<unsigned int> &elimination_ordering){
-    if(boost::num_vertices(T) == 0)
+    if(boost::num_vertices(T) == 0){
         return;
+    }
 
     _treedec_to_ordering(T, elimination_ordering);
 }
@@ -485,9 +525,10 @@ void LEX_M_fill_in(G_t &G, std::vector<std::vector<unsigned int> > &fill_in_edge
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        label[G[*vIt].id] = 1.0;
+        unsigned id=noboost::get_id(G, *vIt);
+        label[id] = 1.0;
         alpha_inv[i++] = 0;
-        visited[G[*vIt].id] = false;
+        visited[id] = false;
     }
 
     unsigned int k = 1;
@@ -496,30 +537,35 @@ void LEX_M_fill_in(G_t &G, std::vector<std::vector<unsigned int> > &fill_in_edge
         typename boost::graph_traits<G_t>::vertex_descriptor v;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(alpha_inv[G[*vIt].id] == 0){
-                if(label[G[*vIt].id] > max){
-                    max = (unsigned int) label[G[*vIt].id];
+            unsigned id=noboost::get_id(G, *vIt);
+            if(alpha_inv[id] == 0){
+                if(label[id] > max){
+                    max = (unsigned int) label[id];
                     v = *vIt;
                 }
             }
         }
-        visited[G[v].id] = true;
-        alpha_inv[G[v].id] = i+1;
+        unsigned id=noboost::get_id(G, v);
+        visited[id] = true;
+        alpha_inv[id] = i+1;
 
-        for(unsigned int j = 0; j < k; j++)
+        for(unsigned int j = 0; j < k; j++){
             reached_i[j].clear();
+        }
 
         for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(alpha_inv[j] == 0)
+            if(alpha_inv[j] == 0){
                 visited[j] = false;
+            }
         }
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-            if(alpha_inv[G[*nIt].id] == 0){
-                reached_i[(int)label[G[*nIt].id]-1].push_back(G[*nIt].id);
-                visited[G[*nIt].id] = true;
-                label[G[*nIt].id] += 0.5;
+            unsigned idn=noboost::get_id(G, *nIt);
+            if(alpha_inv[idn] == 0){
+                reached_i[(int)label[idn]-1].push_back(idn);
+                visited[idn] = true;
+                label[idn] += 0.5;
             }
         }
 
@@ -529,20 +575,23 @@ void LEX_M_fill_in(G_t &G, std::vector<std::vector<unsigned int> > &fill_in_edge
 
                 reached_i[j].pop_back();
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[w], G); nIt != nEnd; nIt++){
-                    if(visited[G[*nIt].id])
+                    unsigned idn=noboost::get_id(G, *nIt);
+                    if(visited[idn]){
                         continue;
+                    }
 
-                    visited[G[*nIt].id] = true;
-                    if((unsigned int)label[G[*nIt].id]-1 > j){
-                        reached_i[(int)label[G[*nIt].id]].push_back(G[*nIt].id);
-                        label[G[*nIt].id] += 0.5;
+                    visited[idn] = true;
+                    if((unsigned int)label[idn]-1 > j){
+                        reached_i[(int)label[idn]].push_back(idn);
+                        label[idn] += 0.5;
                         std::vector<unsigned int> edge;
-                        edge.push_back(G[v].id);
-                        edge.push_back(G[*nIt].id);
+                        unsigned idv=noboost::get_id(G, v);
+                        edge.push_back(idv);
+                        edge.push_back(idn);
                         fill_in_edges.push_back(edge);
                     }
                     else{
-                        reached_i[j].push_back(G[*nIt].id);
+                        reached_i[j].push_back(idn);
                     }
                 }
             }
@@ -570,9 +619,10 @@ void LEX_M_minimal_ordering(G_t &G, std::vector<unsigned int> &alpha){
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        label[G[*vIt].id] = 1.0;
+        unsigned id=noboost::get_id(G, *vIt);
+        label[id] = 1.0;
         alpha_inv[i++] = 0;
-        visited[G[*vIt].id] = false;
+        visited[id] = false;
     }
 
     unsigned int k = 1;
@@ -581,31 +631,36 @@ void LEX_M_minimal_ordering(G_t &G, std::vector<unsigned int> &alpha){
         typename boost::graph_traits<G_t>::vertex_descriptor v;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(alpha_inv[G[*vIt].id] == 0){
-                if((unsigned int)label[G[*vIt].id] > max){
-                    max = (unsigned int) label[G[*vIt].id];
+            unsigned id=noboost::get_id(G, *vIt);
+            if(alpha_inv[id] == 0){
+                if((unsigned int)label[id] > max){
+                    max = (unsigned int) label[id];
                     v = *vIt;
                 }
             }
         }
-        visited[G[v].id] = true;
-        alpha[i] = G[v].id;
-        alpha_inv[G[v].id] = i+1;
+        unsigned idv=noboost::get_id(G, v);
+        visited[idv] = true;
+        alpha[i] = idv;
+        alpha_inv[idv] = i+1;
 
-        for(unsigned int j = 0; j < k; j++)
+        for(unsigned int j = 0; j < k; j++){
             reached_i[j].clear();
+        }
 
         for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(alpha_inv[j] == 0)
+            if(alpha_inv[j] == 0){
                 visited[j] = false;
+            }
         }
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-            if(alpha_inv[G[*nIt].id] == 0){
-                reached_i[(int)label[G[*nIt].id]-1].push_back(G[*nIt].id);
-                visited[G[*nIt].id] = true;
-                label[G[*nIt].id] += 0.5;
+            unsigned idn=noboost::get_id(G, *nIt);
+            if(alpha_inv[idn] == 0){
+                reached_i[(int)label[idn]-1].push_back(idn);
+                visited[idn] = true;
+                label[idn] += 0.5;
             }
         }
 
@@ -615,16 +670,18 @@ void LEX_M_minimal_ordering(G_t &G, std::vector<unsigned int> &alpha){
 
                 reached_i[j].pop_back();
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[w], G); nIt != nEnd; nIt++){
-                    if(visited[G[*nIt].id])
+                    unsigned idn=noboost::get_id(G, *nIt);
+                    if(visited[idn]){
                         continue;
+                    }
 
-                    visited[G[*nIt].id] = true;
-                    if((unsigned int)label[G[*nIt].id]-1 > j){
-                        reached_i[(int)label[G[*nIt].id]].push_back(G[*nIt].id);
-                        label[G[*nIt].id] += 0.5;
+                    visited[idn] = true;
+                    if((unsigned int)label[idn]-1 > j){
+                        reached_i[(int)label[idn]].push_back(idn);
+                        label[idn] += 0.5;
                     }
                     else{
-                        reached_i[j].push_back(G[*nIt].id);
+                        reached_i[j].push_back(idn);
                     }
                 }
             }
@@ -652,9 +709,10 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        label[G[*vIt].id] = 1.0;
+        unsigned id=noboost::get_id(G, *vIt);
+        label[id] = 1.0;
         alpha_inv[i++] = 0;
-        visited[G[*vIt].id] = false;
+        visited[id] = false;
     }
 
     unsigned int k = 1;
@@ -663,31 +721,36 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
         typename boost::graph_traits<G_t>::vertex_descriptor v;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(alpha_inv[G[*vIt].id] == 0){
-                if((unsigned int)label[G[*vIt].id] > max){
-                    max = (unsigned int) label[G[*vIt].id];
+            unsigned id=noboost::get_id(G, *vIt);
+            if(alpha_inv[id] == 0){
+                if((unsigned int)label[id] > max){
+                    max = (unsigned int) label[id];
                     v = *vIt;
                 }
             }
         }
-        visited[G[v].id] = true;
+        unsigned idv=noboost::get_id(G, v);
+        visited[idv] = true;
         alpha[i] = v;
-        alpha_inv[G[v].id] = i+1;
+        alpha_inv[idv] = i+1;
 
-        for(unsigned int j = 0; j < k; j++)
+        for(unsigned int j = 0; j < k; j++){
             reached_i[j].clear();
+        }
 
         for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(alpha_inv[j] == 0)
+            if(alpha_inv[j] == 0){
                 visited[j] = false;
+            }
         }
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-            if(alpha_inv[G[*nIt].id] == 0){
-                reached_i[(int)label[G[*nIt].id]-1].push_back(G[*nIt].id);
-                visited[G[*nIt].id] = true;
-                label[G[*nIt].id] += 0.5;
+            unsigned idn=noboost::get_id(G, *nIt);
+            if(alpha_inv[idn] == 0){
+                reached_i[(int)label[idn]-1].push_back(idn);
+                visited[idn] = true;
+                label[idn] += 0.5;
             }
         }
 
@@ -697,16 +760,17 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
 
                 reached_i[j].pop_back();
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[w], G); nIt != nEnd; nIt++){
-                    if(visited[G[*nIt].id])
+                    unsigned idn=noboost::get_id(G, *nIt);
+                    if(visited[idn])
                         continue;
 
-                    visited[G[*nIt].id] = true;
-                    if((unsigned int)label[G[*nIt].id]-1 > j){
-                        reached_i[(int)label[G[*nIt].id]].push_back(G[*nIt].id);
-                        label[G[*nIt].id] += 0.5;
+                    visited[idn] = true;
+                    if((unsigned int)label[idn]-1 > j){
+                        reached_i[(int)label[idn]].push_back(idn);
+                        label[idn] += 0.5;
                     }
                     else{
-                        reached_i[j].push_back(G[*nIt].id);
+                        reached_i[j].push_back(idn);
                     }
                 }
             }
@@ -721,4 +785,6 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
 
 }
 
-#endif
+# endif
+
+// vim:ts=8:sw=4:et

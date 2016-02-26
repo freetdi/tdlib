@@ -37,6 +37,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 #include "TD_simple_graph_algos.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -55,32 +56,39 @@ int is_valid_treedecomposition(G_t G, T_t T){
     //checks if T is a tree
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
-    if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1)
+    if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
         return -1;
+    }
 
     //checks if exactly the vertices of G are covered
     std::set<unsigned int> coded_vertices;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++)
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         coded_vertices.insert(T[*tIt].bag.begin(), T[*tIt].bag.end());
+    }
 
     std::set<unsigned int> vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        vertices.insert(G[*vIt].id);
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned id=noboost::get_id(G, *vIt);
+        vertices.insert(id);
+    }
 
-    if(coded_vertices != vertices)
+    if(coded_vertices != vertices){
         return -2;
+    }
 
     //checks if all edges are covered
     std::vector<std::set<unsigned int> > edges;
 
-    for (boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         std::set<unsigned int> edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            edge.insert(G[*vIt].id);
-            edge.insert(G[*nIt].id);
+            unsigned id=noboost::get_id(G, *vIt);
+            edge.insert(id);
+            id = noboost::get_id(G, *nIt);
+            edge.insert(id);
             edges.push_back(edge);
             edge.clear();
         }
@@ -93,9 +101,10 @@ int is_valid_treedecomposition(G_t G, T_t T){
                 break;
             }
         }
-        if(!isSubset)
+        if(!isSubset){
             //not all edges covered
             return -3;
+        }
     }
     std::set<unsigned int> forgotten;
 
@@ -104,7 +113,9 @@ int is_valid_treedecomposition(G_t G, T_t T){
             unsigned int degree = boost::out_degree(*tIt, T);
             if(degree < 2){
                 std::set<unsigned int> intersection;
-                std::set_intersection(forgotten.begin(), forgotten.end(), T[*tIt].bag.begin(), T[*tIt].bag.end(), std::inserter(intersection, intersection.begin()));
+                std::set_intersection(forgotten.begin(), forgotten.end(),
+                               T[*tIt].bag.begin(), T[*tIt].bag.end(),
+                               std::inserter(intersection, intersection.begin()));
                 if(!intersection.empty()){
                     //there are coded vertices, that are not connected in T
                     return -4;
@@ -113,10 +124,13 @@ int is_valid_treedecomposition(G_t G, T_t T){
                 if(degree == 1){
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                     typename boost::graph_traits<T_t>::vertex_descriptor parent;
-                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++)
+                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
                         parent = *nIt;
+                    }
 
-                    std::set_difference(T[*tIt].bag.begin(), T[*tIt].bag.end(), T[parent].bag.begin(), T[parent].bag.end(), std::inserter(forgotten, forgotten.begin()));
+                    std::set_difference(T[*tIt].bag.begin(), T[*tIt].bag.end(),
+                                 T[parent].bag.begin(), T[parent].bag.end(),
+                                 std::inserter(forgotten, forgotten.begin()));
                 }
 
                 boost::clear_vertex(*tIt, T);
@@ -125,8 +139,9 @@ int is_valid_treedecomposition(G_t G, T_t T){
             }
         }
 
-        if(boost::num_vertices(T) == 0)
+        if(boost::num_vertices(T) == 0){
             return 0;
+        }
     }
 }
 
@@ -134,8 +149,10 @@ template <typename G_t, typename T_t>
 void trivial_decomposition(G_t &G, T_t &T){
     std::set<unsigned int> bag;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        bag.insert(G[*vIt].id);
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned id=noboost::get_id(G,*vIt);
+        bag.insert(id);
+    }
 
     typename boost::graph_traits<T_t>::vertex_descriptor t;
     t = boost::add_vertex(T);
@@ -146,8 +163,9 @@ template <typename T_t>
 int get_width(T_t &T){
     int max = -1;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++)
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         max = ((int)T[*tIt].bag.size() > max)? (int)T[*tIt].bag.size() : max;
+    }
 
     return (max-1);
 }
@@ -156,8 +174,9 @@ template <typename T_t>
 float get_average_bag_size(T_t &T){
     float avg = 0.0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++)
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         avg += T[*tIt].bag.size();
+    }
 
     return avg/boost::num_vertices(T);
 }
@@ -176,11 +195,14 @@ unsigned int get_adhesion(T_t T){
             if(boost::out_degree(*tIt, T) == 1){
                 typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                 typename boost::graph_traits<T_t>::vertex_descriptor parent;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++)
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
                     parent = *nIt;
+                }
 
                 std::set<unsigned int> intersection;
-                std::set_intersection(T[*tIt].bag.begin(), T[*tIt].bag.end(), T[parent].bag.begin(), T[parent].bag.end(), std::inserter(intersection, intersection.begin()));
+                std::set_intersection(T[*tIt].bag.begin(), T[*tIt].bag.end(),
+                               T[parent].bag.begin(), T[parent].bag.end(),
+                               std::inserter(intersection, intersection.begin()));
 
                 max = (intersection.size() > max)? intersection.size() : max;
 
@@ -204,16 +226,18 @@ void make_small(T_t &T){
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
             for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
-                if(*tIt == *nIt)
+                if(*tIt == *nIt){
                     continue;
+                }
                 if(std::includes(T[*nIt].bag.begin(), T[*nIt].bag.end(), T[*tIt].bag.begin(), T[*tIt].bag.end())){
                     child = *tIt;
                     parent = *nIt;
 
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
                     for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){
-                        if(*nIt2 != parent)
+                        if(*nIt2 != parent){
                             N.push_back(*nIt2);
+                        }
                     }
 
                     modified = true;
@@ -221,16 +245,18 @@ void make_small(T_t &T){
                 }
             }
             if(modified){
-                for(unsigned int i = 0; i < N.size(); i++)
+                for(unsigned int i = 0; i < N.size(); i++){
                     boost::add_edge(parent, N[i], T);
+                }
 
                 boost::clear_vertex(child, T);
                 boost::remove_vertex(child, T);
                 break;
             }
         }
-        if(!modified)
+        if(!modified){
             return;
+        }
     }
 }
 
@@ -242,8 +268,9 @@ void glue_bag(std::set<unsigned int> &bag, unsigned int elim_vertex, T_t &T){
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         if(std::includes(T[*vIt].bag.begin(), T[*vIt].bag.end(), bag.begin(), bag.end())){
-            if(T[*vIt].bag.find(elim_vertex) != T[*vIt].bag.end())
+            if(T[*vIt].bag.find(elim_vertex) != T[*vIt].bag.end()){
                 return;
+            }
 
             t_dec_node = boost::add_vertex(T);
             bag.insert(elim_vertex);
@@ -254,16 +281,18 @@ void glue_bag(std::set<unsigned int> &bag, unsigned int elim_vertex, T_t &T){
         }
     }
 
-    if(boost::num_vertices(T) > 0)
+    if(boost::num_vertices(T) > 0){
         boost::tie(vIt, vEnd) = boost::vertices(T);
+    }
 
     t_dec_node = boost::add_vertex(T);
     bag.insert(elim_vertex);
     T[t_dec_node].bag = bag;
     bag.clear();
 
-    if(boost::num_vertices(T) > 1)
+    if(boost::num_vertices(T) > 1){
         boost::add_edge(*vIt, t_dec_node, T);
+    }
 }
 
 //glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
@@ -312,8 +341,9 @@ template <typename G_t>
 void undo_reorder_ids_graph(G_t &G, std::vector<unsigned int> &id_map){
     unsigned int k = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         G[*vIt].id = id_map[k++];
+    }
 }
 
 template <typename G_t>
@@ -328,11 +358,14 @@ void descriptor_bag_to_id_bag(G_t &G, std::set<unsigned int> &id_bag,
 }
 
 template <typename G_t>
-void id_bag_to_descriptor_bag(G_t &G, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag, std::set<unsigned int> &id_bag){
+void id_bag_to_descriptor_bag(G_t &G, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag,
+        std::set<unsigned int> &id_bag){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(id_bag.find(G[*vIt].id) != id_bag.end())
+        unsigned id=noboost::get_id(G,*vIt);
+        if(id_bag.find(id) != id_bag.end()){
             desc_bag.insert(*vIt);
+        }
     }
 }
 
@@ -341,8 +374,9 @@ void reorder_ids_decomposition(T_t &T, std::vector<unsigned int> &id_map){
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         std::set<unsigned int> new_bag;
-        for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++)
+        for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++){
             new_bag.insert(id_map[*sIt]);
+        }
 
         T[*tIt].bag = new_bag;
     }
@@ -352,30 +386,38 @@ template <typename G_t>
 void remove_isolated_vertices(G_t &H, G_t &G){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     unsigned int max = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
-        max = (G[*vIt].id > max)? G[*vIt].id : max;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned id=noboost::get_id(G,*vIt);
+        max = (id > max)? id : max;
+    }
 
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(boost::out_degree(*vIt, G) > 0){
-            idxMap[G[*vIt].id] = boost::add_vertex(H);
-            H[idxMap[G[*vIt].id]].id = G[*vIt].id;
+            unsigned id=noboost::get_id(G,*vIt);
+            idxMap[id] = boost::add_vertex(H);
+            H[idxMap[id]].id = id;
         }
     }
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++)
-        boost::add_edge(idxMap[G[boost::source(*eIt, G)].id], idxMap[G[boost::target(*eIt, G)].id], H);
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+        unsigned sid=noboost::get_id(G, boost::source(*eIt, G));
+        unsigned tid=noboost::get_id(G, boost::target(*eIt, G));
+        boost::add_edge(idxMap[sid], idxMap[tid], H);
+    }
 }
 
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 
 //collects all subsets of X of size k in subs (todo: replacement by enumeration in hunt())
-static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx, std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
+static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx,
+        std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
     if(k==0){
         std::set<unsigned int> subS;
-        for(unsigned int i = 0; i < sub.size(); i++)
+        for(unsigned int i = 0; i < sub.size(); i++){
             subS.insert(sub[i]);
+        }
         subs.push_back(subS);
         return;
     }
@@ -391,21 +433,22 @@ static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx
     }
 }
 
-#endif
+#endif //TD_SUBSETS
 
 #ifndef TD_POWERSET
 #define TD_POWERSET
 
-inline void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned int> > &subs){
+static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned int> > &subs){
     std::vector<unsigned int> sub;
     for(unsigned int i = 0; i <=X.size(); i++){
         subsets(X, X.size(), i, 0, sub, subs);
     }
 }
 
-#endif
+#endif //TD_POWERSET
 
 }
 
-#endif
+#endif //namespace treedec
+
 // vim:ts=8:sw=4:et
