@@ -64,7 +64,7 @@ template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
-                   bool erase=true,
+                   bool /*erase*/=true,
                    vertex_callback<G>* cb=NULL)
 {
     adjacency_iterator_G I, E;

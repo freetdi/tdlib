@@ -62,6 +62,7 @@
 #include "TD_preprocessing.hpp"
 #include "TD_simple_graph_algos.hpp"
 #include "TD_misc.hpp"
+#include "TD_std.hpp"
 
 namespace treedec{
 
@@ -76,8 +77,10 @@ struct degree_mod : public noboost::vertex_callback<G>{
     // reinsert with degree-1
     void operator()(vertex_descriptor v){ untested();
         unsigned deg=boost::degree(v,*_g);
+        (void)deg;
         assert(deg);
         bool done=(*_degs)[deg-1].insert(v).second;
+        (void)done;
         assert(done);
     }
     //private: not yet.
@@ -106,15 +109,15 @@ void _minDegree_decomp(G_t &G, T_t &T){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         boost::tie(vIt, vEnd) = boost::vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-        unsigned min_degree = boost::num_vertices(G);
         unsigned num_vert = boost::num_vertices(G);
-        auto mdvi = degs[0].begin();
+        typename misc::DEGS<G_t>::bag_iterator mdvi;
 
         // recompute ntd can only increase from here
         while(degs[min_ntd].empty()){
             ++min_ntd;
             // min_ntd==num_vert contradicts the outer loop condition
             // (this loop should be safe)
+            (void)(num_vert);
             assert(min_ntd != num_vert);
         }
         assert(!degs[min_ntd].empty());
@@ -122,6 +125,7 @@ void _minDegree_decomp(G_t &G, T_t &T){
         assert(min_ntd==1 || degs[min_ntd-1].empty());
 
 #ifndef NDEBUG // remove later.
+        unsigned min_degree = boost::num_vertices(G);
         for(vIt=boost::vertices(G).first; vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree < min_degree && degree > 0){
@@ -150,14 +154,15 @@ void _minDegree_decomp(G_t &G, T_t &T){
         elim_vertices[i++] = id;
 
         unsigned n=degs[min_ntd].erase(*mdvi);
-//        degs[min_ntd].erase(mdvi);
+        (void)n;
+        assert(n==1);
+
         boost::clear_vertex(*mdvi, G);
         if(min_ntd>1){
             --min_ntd;
         }
         assert(boost::degree(*mdvi, G)==0);
         
-        assert(n==1);
 
 #ifndef NDEBUG //redundant, for checking only
         bool done=degs[0].insert(*mdvi).second;

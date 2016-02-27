@@ -119,7 +119,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
 //this version applies the fillIn-heuristic followed by triangulation minimization
 template <typename G_t, typename T_t>
-void FI_TM(G_t &G, T_t &T, int &low){
+void FI_TM(G_t &G, T_t &T, int &/*low*/){
     std::vector<unsigned int> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
     treedec::fillIn_ordering(G, old_elim_ordering);

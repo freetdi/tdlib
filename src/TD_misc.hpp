@@ -39,6 +39,18 @@
 // #include <boost/graph/graph_traits.hpp>
 #include "TD_simple_graph_algos.hpp"
 #include "TD_noboost.hpp"
+#include "TD_std.hpp"
+
+// temporary.
+#ifndef untested
+#define untested()
+#endif
+#ifndef itested
+#define itested()
+#endif
+#ifndef incomplete
+#define incomplete()
+#endif
 
 namespace treedec{
 
@@ -412,7 +424,7 @@ void remove_isolated_vertices(G_t &H, G_t &G){
 #define TD_SUBSETS
 
 //collects all subsets of X of size k in subs (todo: replacement by enumeration in hunt())
-static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx,
+static void subsets(std::set<unsigned int> &X, int /*size*/, int k, unsigned int idx,
         std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
     if(k==0){
         std::set<unsigned int> subS;
@@ -458,6 +470,8 @@ namespace misc {
         public:
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
         typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
+        typedef std::set<vertex_descriptor> bag_type;
+        typedef typename bag_type::iterator bag_iterator;
         typedef std::vector<std::set<vertex_descriptor> > container_type;
         typedef typename container_type::iterator iterator;
         typedef typename container_type::const_iterator const_iterator;
@@ -521,13 +535,14 @@ namespace misc {
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
         typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-        auto &degs=*cb->_degs;
+        typename misc::DEGS<G> &degs=*cb->_degs;
 
         std::set<vertex_descriptor> redeg;
         for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
             if(cb){
                 unsigned deg = boost::degree(*nIt1,g);
                 size_t n=degs[deg].erase(*nIt1);
+                (void)n;
                 assert(n==1);
             }
         }
@@ -545,8 +560,9 @@ namespace misc {
                     // need to redegree *nIt1...
                     if(redeg.insert(*nIt1).second){ untested();
                         unsigned deg = boost::degree(*nIt1,g);
-                        std::cerr << "queued 4 redeg " << *nIt1 << " deg" << deg-1 << "\n";
+                        // std::cerr << "queued 4 redeg " << *nIt1 << " deg" << deg-1 << "\n";
                         size_t n=degs[deg-1].erase(*nIt1);
+                        (void)n;
                         assert(n==1);
                     }else{ untested();
                         // already queued for redegree
@@ -555,8 +571,9 @@ namespace misc {
                     // need to redegree *nIt2...
                     if(redeg.insert(*nIt2).second){ untested();
                         unsigned deg = boost::degree(*nIt2,g);
-                        std::cerr << "queued 4 redeg " << *nIt2 << " deg" << deg-1 << "\n";
+                        // std::cerr << "queued 4 redeg " << *nIt2 << " deg" << deg-1 << "\n";
                         size_t n=degs[deg-1].erase(*nIt2);
+                        (void)n;
                         assert(n==1);
                     }else{ untested();
                         // already queued for redegree
@@ -574,13 +591,14 @@ namespace misc {
 
             for(typename std::set<vertex_descriptor>::iterator i=redeg.begin();
                     i!=redeg.end(); ++i){
-                std::cerr << "redegging " << *i << "\n";
+                // std::cerr << "redegging " << *i << "\n";
                 if(cb){ untested();
                 }else{ incomplete();
                     // just reinsert
                     size_t deg=boost::degree(*i,g);
                     assert(deg>0);
                     bool done=degs[deg].insert(*i).second;
+                    (void)done;
                     assert(done);
                 }
             }

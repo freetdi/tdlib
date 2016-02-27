@@ -22,9 +22,12 @@ struct Vertex{
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
 
+#ifndef TD_STRUCT_BAG
+#define TD_STRUCT_BAG
 struct bag{
     std::set<unsigned int> bag;
 };
+#endif
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> TD_tree_dec_t;
 

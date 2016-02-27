@@ -639,7 +639,7 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
 template <typename G_t>
 int _deltaC_least_c(G_t &G){
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
+//    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
 
     unsigned int lb = 0;
     misc::DEGS<G_t> degs(G);
@@ -661,14 +661,14 @@ int _deltaC_least_c(G_t &G){
             lb = min_degree;
         }
 
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
+        vertex_descriptor min_vertex;
         min_vertex = *degs[min_degree].begin();
         assert(!degs[min_degree].empty());
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
-        typename boost::graph_traits<G_t>::vertex_descriptor w=*(boost::vertices(G).second);
+        vertex_descriptor w=*(boost::vertices(G).second);
 
         unsigned int min_common = boost::num_vertices(G);
 
