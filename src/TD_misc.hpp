@@ -101,9 +101,10 @@ int is_valid_treedecomposition(G_t G, T_t T){
         bag_type edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            unsigned id=noboost::get_id(G, *vIt);
+            vd_type id;
+            id = noboost::get_vd(G, *vIt);
             edge.insert(id);
-            id = noboost::get_id(G, *nIt);
+            id = noboost::get_vd(G, *nIt);
             edge.insert(id);
             edges.push_back(edge);
             edge.clear();
