@@ -212,22 +212,24 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
         typename boost::graph_traits<T_t>::vertex_descriptor t_node;
         unsigned int covered_count = 0;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(std::includes(T[*tIt].bag.begin(), T[*tIt].bag.end(), it->begin(), it->end())){
+            if(std::includes(noboost::bag(T,*tIt).begin(),
+                             noboost::bag(T,*tIt).end(),
+                             it->begin(), it->end())){
                 t_node = *tIt;
-                if(boost::out_degree(*tIt, T) <= 1 && *it == T[*tIt].bag){
+                if(boost::out_degree(*tIt, T) <= 1 && *it == noboost::bag(T,*tIt)){
                     covered_count++;
                 }
             }
         }
         if(covered_count == 0){
             typename boost::graph_traits<T_t>::vertex_descriptor new_t_node = boost::add_vertex(T);
-            T[new_t_node].bag = *it;
+            noboost::bag(T,new_t_node) = *it;
             boost::add_edge(t_node, new_t_node, T);
         }
         else{
             for(unsigned int j = 0; j < covered_count-1; j++){
                 for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-                    if(*it == T[*tIt].bag){
+                    if(*it == noboost::bag(T,*tIt)){
                         boost::clear_vertex(*tIt, T);
                         boost::remove_vertex(*tIt, T);
                     }

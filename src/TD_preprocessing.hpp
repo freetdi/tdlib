@@ -513,7 +513,7 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
     if(boost::num_vertices(T) == 0){
         bag.insert(preprocessed_node);
         typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-        T[t_dec_node].bag = bag;
+        noboost::bag(T,t_dec_node) = bag;
 
         return;
     }
@@ -521,10 +521,12 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(std::includes(T[*vIt].bag.begin(), T[*vIt].bag.end(), bag.begin(), bag.end())){
+        if(std::includes(noboost::bag(T,*vIt).begin(),
+                         noboost::bag(T,*vIt).end(),
+                         bag.begin(), bag.end())){
             bag.insert(preprocessed_node);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            T[t_dec_node].bag = bag;
+            noboost::bag(T,t_dec_node) = bag;
 
             boost::add_edge(*vIt, t_dec_node, T);
             return;
@@ -534,7 +536,7 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
     //case for a disconnected graph
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     bag.insert(preprocessed_node);
-    T[t_dec_node].bag = bag;
+    noboost::bag(T,t_dec_node) = bag;
     boost::tie(vIt, vEnd) = boost::vertices(T);
     boost::add_edge(*vIt, t_dec_node, T);
 

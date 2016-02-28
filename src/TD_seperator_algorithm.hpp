@@ -178,7 +178,7 @@ void sep_glue_bag(std::set<unsigned int> &bag, std::set<unsigned int> &glueBag, 
 
     typename boost::graph_traits<T_t>::vertex_iterator vertexIt, vertexEnd;
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
-        if(T[*vertexIt].bag == glueBag){
+        if(noboost::bag(T,*vertexIt) == glueBag){
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
             T[t_dec_node].bag = bag;
             boost::add_edge(t_dec_node, *vertexIt, T);

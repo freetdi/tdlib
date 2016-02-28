@@ -77,7 +77,8 @@ int is_valid_treedecomposition(G_t G, T_t T){
     std::set<unsigned int> coded_vertices;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        coded_vertices.insert(T[*tIt].bag.begin(), T[*tIt].bag.end());
+        coded_vertices.insert(noboost::bag(T, *tIt).begin(),
+                              noboost::bag(T, *tIt).end());
     }
 
     std::set<unsigned int> vertices;
@@ -109,7 +110,8 @@ int is_valid_treedecomposition(G_t G, T_t T){
     for(std::vector<std::set<unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++){
         bool isSubset = false;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(std::includes(T[*tIt].bag.begin(), T[*tIt].bag.end(), it->begin(), it->end())){
+            if(std::includes(noboost::bag(T,*tIt).begin(),
+                             noboost::bag(T,*tIt).end(), it->begin(), it->end())){
                 isSubset = true;
                 break;
             }
@@ -127,7 +129,8 @@ int is_valid_treedecomposition(G_t G, T_t T){
             if(degree < 2){
                 std::set<unsigned int> intersection;
                 std::set_intersection(forgotten.begin(), forgotten.end(),
-                               T[*tIt].bag.begin(), T[*tIt].bag.end(),
+                               noboost::bag(T, *tIt).begin(),
+                               noboost::bag(T, *tIt).end(),
                                std::inserter(intersection, intersection.begin()));
                 if(!intersection.empty()){
                     //there are coded vertices, that are not connected in T
@@ -141,8 +144,10 @@ int is_valid_treedecomposition(G_t G, T_t T){
                         parent = *nIt;
                     }
 
-                    std::set_difference(T[*tIt].bag.begin(), T[*tIt].bag.end(),
-                                 T[parent].bag.begin(), T[parent].bag.end(),
+                    std::set_difference(noboost::bag(T, *tIt).begin(),
+                                        noboost::bag(T, *tIt).end(),
+                                 noboost::bag(T, parent).begin(),
+                                 noboost::bag(T, parent).end(),
                                  std::inserter(forgotten, forgotten.begin()));
                 }
 
@@ -177,7 +182,12 @@ int get_width(T_t &T){
     int max = -1;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        max = ((int)T[*tIt].bag.size() > max)? (int)T[*tIt].bag.size() : max;
+        size_t bag_size=noboost::bag(T, *tIt).size();
+        assert(bag_size<INT_MAX);
+        if ((int)bag_size > max){ untested();
+            max = (int)bag_size;
+        }else{untested();
+        }
     }
 
     return (max-1);
@@ -280,14 +290,16 @@ void glue_bag(std::set<unsigned int> &bag, unsigned int elim_vertex, T_t &T){
 
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(std::includes(T[*vIt].bag.begin(), T[*vIt].bag.end(), bag.begin(), bag.end())){
-            if(T[*vIt].bag.find(elim_vertex) != T[*vIt].bag.end()){
+        if(std::includes(noboost::bag(T, *vIt).begin(),
+                         noboost::bag(T, *vIt).end(),
+                         bag.begin(), bag.end())) {
+            if(noboost::bag(T, *vIt).find(elim_vertex) != noboost::bag(T, *vIt).end()){
                 return;
             }
 
             t_dec_node = boost::add_vertex(T);
-            bag.insert(elim_vertex);
-            T[t_dec_node].bag = bag;
+            noboost::bag(T,t_dec_node) = MOVE(bag);
+            noboost::bag(T,t_dec_node).insert(elim_vertex);
             boost::add_edge(*vIt, t_dec_node, T);
             bag.clear();
             return;
@@ -299,8 +311,8 @@ void glue_bag(std::set<unsigned int> &bag, unsigned int elim_vertex, T_t &T){
     }
 
     t_dec_node = boost::add_vertex(T);
-    bag.insert(elim_vertex);
-    T[t_dec_node].bag = bag;
+    noboost::bag(T,t_dec_node) = MOVE(bag);
+    noboost::bag(T,t_dec_node).insert(elim_vertex);
     bag.clear();
 
     if(boost::num_vertices(T) > 1){
