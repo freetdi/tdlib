@@ -67,6 +67,7 @@ namespace treedec{
 template <typename G_t, typename T_t>
 int is_valid_treedecomposition(G_t G, T_t T){
     //checks if T is a tree
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
     if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
@@ -74,18 +75,18 @@ int is_valid_treedecomposition(G_t G, T_t T){
     }
 
     //checks if exactly the vertices of G are covered
-    std::set<unsigned int> coded_vertices;
+    typename noboost::treedec_traits<T_t>::bag_type coded_vertices;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         coded_vertices.insert(noboost::bag(T, *tIt).begin(),
                               noboost::bag(T, *tIt).end());
     }
 
-    std::set<unsigned int> vertices;
+    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned id=noboost::get_id(G, *vIt);
-        vertices.insert(id);
+        vertices.insert(noboost::get_vd(G, *vIt));
     }
 
     if(coded_vertices != vertices){
@@ -93,10 +94,11 @@ int is_valid_treedecomposition(G_t G, T_t T){
     }
 
     //checks if all edges are covered
-    std::vector<std::set<unsigned int> > edges;
+    typedef typename std::vector<bag_type> edges_vt;
+    edges_vt edges;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        std::set<unsigned int> edge;
+        bag_type edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
             unsigned id=noboost::get_id(G, *vIt);
@@ -107,7 +109,7 @@ int is_valid_treedecomposition(G_t G, T_t T){
             edge.clear();
         }
     }
-    for(std::vector<std::set<unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++){
+    for(typename edges_vt::iterator it = edges.begin(); it != edges.end(); it++){
         bool isSubset = false;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             if(std::includes(noboost::bag(T,*tIt).begin(),
@@ -121,13 +123,13 @@ int is_valid_treedecomposition(G_t G, T_t T){
             return -3;
         }
     }
-    std::set<unsigned int> forgotten;
+    typename noboost::outedge_set<G_t>::type forgotten;
 
     while(true){
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             unsigned int degree = boost::out_degree(*tIt, T);
             if(degree < 2){
-                std::set<unsigned int> intersection;
+                typename noboost::treedec_traits<T_t>::bag_type intersection;
                 std::set_intersection(forgotten.begin(), forgotten.end(),
                                noboost::bag(T, *tIt).begin(),
                                noboost::bag(T, *tIt).end(),
@@ -284,8 +286,8 @@ void make_small(T_t &T){
 }
 
 //glues a single bag with the current tree decomposition
-template <typename T_t>
-void glue_bag(std::set<unsigned int> &bag, unsigned int elim_vertex, T_t &T){
+template <class bagtype, typename T_t>
+void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node;
 
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;

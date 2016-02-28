@@ -66,14 +66,23 @@ namespace treedec{
 
 //checks if there exists a degree-0-vertex
 template <typename G_t>
-void Islet(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
+void Islet(G_t &G, std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > &bags, int &low){
+    typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(boost::out_degree(*vIt, G) == 0){
-            unsigned id=noboost::get_id(G, *vIt);
-            std::set<unsigned int> emptyset=std::set<unsigned int>();
-            bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(id, emptyset));
+            typename noboost::treedec_traits<T_t>::vd_type id=noboost::get_vd(G, *vIt);
+            typename noboost::treedec_traits<T_t>::bag_type emptybag;
+//            auto x = boost::make_tuple(id,emptybag);
+            bags.push_back(
+                    boost::tuple<
+                    typename noboost::treedec_traits<T_t>::vd_type,
+                    typename noboost::treedec_traits<T_t>::bag_type
+                    >(id, emptybag));
 
             low = (low > 0)? low : 0;
         }
@@ -509,7 +518,11 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<unsigned int, std::set<un
 
 //glues a single bag with the current tree decomposition
 template<typename T_t>
-void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocessed_node, T_t &T){
+void glue_bag_preprocessing(
+        typename noboost::treedec_traits<T_t>::bag_type &bag,
+        typename noboost::treedec_traits<T_t>::vd_type preprocessed_node,
+        T_t &T)
+{
     if(boost::num_vertices(T) == 0){
         bag.insert(preprocessed_node);
         typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
@@ -545,7 +558,10 @@ void glue_bag_preprocessing(std::set<unsigned int> &bag, unsigned int preprocess
 //recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
 //this version stores the resulting bags in a vector and does not call further algorithms
 template <typename G_t>
-void _preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
+void _preprocessing(G_t &G, std::vector< boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > &bags, int &low){
     if(Twig(G, bags, low) || Series(G, bags, low) || Triangle(G, bags, low) || Buddy(G, bags, low) || Cube(G, bags, low) ||
        Simplicial(G, bags, low) || AlmostSimplicial(G, bags, low)){
 
@@ -557,13 +573,19 @@ void _preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsi
 }
 
 template <typename G_t>
-void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &low){
+void preprocessing(G_t &G, std::vector< boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+              > > &bags, int &low){
     Islet(G, bags, low);
     _preprocessing(G, bags, low);
 }
 
 template <typename G_t>
-void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags){
+void preprocessing(G_t &G, std::vector< boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+             > > &bags){
     int low = -1;
     preprocessing(G, bags, low);
 }

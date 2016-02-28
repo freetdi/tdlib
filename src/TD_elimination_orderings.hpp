@@ -97,8 +97,10 @@ struct degree_mod : public noboost::vertex_callback<G>{
 //minimum-degree heuristic. Ignores isolated vertices.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
-    std::vector<std::set<unsigned int> > bags(boost::num_vertices(G));
-    std::vector<unsigned int> elim_vertices(boost::num_vertices(G));
+    std::vector<typename noboost::outedge_set<G_t>::type > bags(boost::num_vertices(G));
+    // TODO: what if outedge_set == treedec bag type?
+    typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
+    std::vector<my_vd> elim_vertices(boost::num_vertices(G));
     misc::DEGS<G_t> degs(G);
     detail::degree_mod<G_t> cb(&degs, &G);
 
@@ -135,14 +137,13 @@ void _minDegree_decomp(G_t &G, T_t &T){
         assert(min_degree == min_ntd);
 #endif
         mdvi = degs[min_ntd].begin(); // min degree vertex iterator
-
-        std::set<unsigned int> bag;
+        typename noboost::outedge_set<G_t>::type bag;
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
         for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*mdvi, G);
                 nIt1 != nEnd; nIt1++){ untested();
-            unsigned id=noboost::get_id(G, *nIt1);
-            bag.insert(id); // collect neighborhood, inefficient.
+            // inefficient.
+            bag.insert(noboost::get_vd(G, *nIt1));
         }
         degs.check();
         misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
@@ -172,7 +173,8 @@ void _minDegree_decomp(G_t &G, T_t &T){
     }
 
     for(; i > 0; i--){
-        glue_bag(bags[i-1], elim_vertices[i-1], T);
+        typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
+        glue_bag(bags[i-1], e, T);
     }
 }
 
@@ -180,7 +182,11 @@ void _minDegree_decomp(G_t &G, T_t &T){
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
 void minDegree_decomp(G_t &G, T_t &T){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector< boost::tuple<
+        typename noboost::treedec_traits<T_t>::vd_type,
+        typename noboost::treedec_traits<T_t>::bag_type
+            > > bags;
+
     int low = 0;
     treedec::Islet(G, bags, low);
     treedec::_minDegree_decomp(G, T);
@@ -260,7 +266,11 @@ void _fillIn_decomp(G_t &G, T_t &T){
 //fill-in heuristic.
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t &T){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    //std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector< boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+            > > bags;
     int low = 0;
     treedec::Islet(G, bags, low);
     treedec::_fillIn_decomp(G, T);
