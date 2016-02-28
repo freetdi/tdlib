@@ -28,6 +28,14 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
+#ifndef TD_STRUCT_BAG
+#define TD_STRUCT_BAG
+struct bag{
+    std::set<unsigned int> bag;
+	 typedef std::set<unsigned int> bagtype;
+};
+#endif
+
 namespace noboost{
 #if 0 // later, need c++11
     template<typename G>
@@ -89,7 +97,7 @@ void contract_edge(vertex_descriptor_G v,
 //Vertex v will remain as isolated node, unless erase.
 //If erase, v will be deleted (not collapsed).
 template<typename G>
-void contract_edge(vertex_iterator_G v,
+inline void contract_edge(vertex_iterator_G v,
                    vertex_descriptor_G into,
                    G &g,
                    bool erase=true,
@@ -101,14 +109,62 @@ void contract_edge(vertex_iterator_G v,
     }
 }
 
-
 template<typename G>
-unsigned get_id(const G& g, const vertex_descriptor_G& v )
+inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
 {
     // works with "TD_graph_t" (augmented adj_list)
     return g[v].id;
 }
 
+// return the internal vertex position.
+// to be used as a narrower alternative to vertex_descriptor.
+// positions are in {0, 1, ..., num_vertices-1}, where applicable
+template<typename G>
+inline unsigned get_pos(const G& /*g*/, const vertex_descriptor_G& /*v*/ )
+{
+    assert(false); // incomplete.
+    return 0;
+}
+
+// return "id" where the vertex_descriptor might make more sense.
+// (transitional interface)
+template<typename G>
+inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
+{
+    // works with "TD_graph_t" (augmented adj_list)
+    return g[v].id;
+}
+
+
+template<class G>
+struct outedge_set{
+    typedef std::set<unsigned> type;
+//	typedef std::set type;
+};
+
+// kludge for balu
+template<class G>
+struct treedec_chooser{
+    typedef unsigned value_type;
+    typedef std::set<unsigned> bag_type;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
+};
+
+// is this really part of noboost?
+template<class T>
+struct treedec_traits{
+    typedef unsigned vd_type;
+    typedef std::set<vd_type> bag_type;
+};
+
+template<typename T>
+inline typename treedec_traits<T>::bag_type& bag(T& t,
+	const typename boost::graph_traits<T>::vertex_descriptor& v)
+{
+    return t[v].bag;
+}
+
 } // namespace noboost
 
 #endif
+// vim:ts=8:sw=4:et
