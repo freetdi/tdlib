@@ -490,7 +490,7 @@ void ordering_to_treedec(G_t G, std::vector<unsigned int> &elimination_ordering,
 }
 
 template <typename G_t, typename T_t>
-void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T, unsigned int idx){
+void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T, unsigned int /*idx*/){
     std::vector<std::set<unsigned int> > bags;
     std::vector<unsigned int> elim_vertices;
 
