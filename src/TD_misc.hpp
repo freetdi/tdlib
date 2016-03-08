@@ -40,17 +40,6 @@
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
 
-// temporary.
-#ifndef untested
-#define untested()
-#endif
-#ifndef itested
-#define itested()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
-
 namespace treedec{
 
 
@@ -81,8 +70,7 @@ int is_valid_treedecomposition(G_t G, T_t T){
                               noboost::bag(T, *tIt).end());
     }
 
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
-    bag_type vertices;
+    typename noboost::treedec_traits<T_t>::bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         vertices.insert(noboost::get_vd(G, *vIt));
@@ -93,11 +81,11 @@ int is_valid_treedecomposition(G_t G, T_t T){
     }
 
     //Checks if all edges are covered.
-    typedef typename std::vector<bag_type> edges_vt;
+    typedef typename std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges_vt;
     edges_vt edges;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        bag_type edge;
+        typename noboost::treedec_traits<T_t>::bag_type edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
             vd_type id;
@@ -169,16 +157,13 @@ int is_valid_treedecomposition(G_t G, T_t T){
 
 template <typename G_t, typename T_t>
 void trivial_decomposition(G_t &G, T_t &T){
-    std::set<unsigned int> bag;
+    typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
+
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned id=noboost::get_id(G,*vIt);
-        bag.insert(id);
+        noboost::bag(T, t).insert(id);
     }
-
-    typename boost::graph_traits<T_t>::vertex_descriptor t;
-    t = boost::add_vertex(T);
-    noboost::bag(T, t) = bag;
 }
 
 template <typename T_t>
@@ -186,11 +171,9 @@ int get_width(T_t &T){
     int max = -1;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        size_t bag_size=noboost::bag(T, *tIt).size();
-        assert(bag_size<INT_MAX);
-        if ((int)bag_size > max){ untested();
+        size_t bag_size = noboost::bag(T, *tIt).size();
+        if((int)bag_size > max){
             max = (int)bag_size;
-        }else{untested();
         }
     }
 
@@ -205,7 +188,7 @@ float get_average_bag_size(T_t &T){
         avg += noboost::bag(T, *tIt).size();
     }
 
-    return avg/boost::num_vertices(T);
+    return (boost::num_vertices(T) > 0)? avg/boost::num_vertices(T) : 0.0;
 }
 
 template <typename T_t>
@@ -263,10 +246,12 @@ void make_small(T_t &T){
                     child = *tIt;
                     parent = *nIt;
 
+                    N.resize(boost::degree(*tIt, T)-1);
+                    unsigned int c = 0;
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
                     for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){
                         if(*nIt2 != parent){
-                            N.push_back(*nIt2);
+                            N[c++] = *nIt2;
                         }
                     }
 
@@ -290,7 +275,7 @@ void make_small(T_t &T){
     }
 }
 
-//glues a single bag with the current tree decomposition
+//Glues a single bag with the current tree decomposition.
 template <class bagtype, typename T_t>
 void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node;
@@ -307,9 +292,9 @@ void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
 
             t_dec_node = boost::add_vertex(T);
             noboost::bag(T,t_dec_node) = MOVE(bag);
+            bag.clear();
             noboost::bag(T,t_dec_node).insert(elim_vertex);
             boost::add_edge(*vIt, t_dec_node, T);
-            bag.clear();
             return;
         }
     }
@@ -320,8 +305,8 @@ void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
 
     t_dec_node = boost::add_vertex(T);
     noboost::bag(T,t_dec_node) = MOVE(bag);
-    noboost::bag(T,t_dec_node).insert(elim_vertex);
     bag.clear();
+    noboost::bag(T,t_dec_node).insert(elim_vertex);
 
     if(boost::num_vertices(T) > 1){
         boost::add_edge(*vIt, t_dec_node, T);
@@ -333,7 +318,7 @@ template <typename T_t>
 void glue_decompositions(T_t &T1, T_t &T2){
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
 
-    //copy T2 to T1 and add an edge from root to an arbitrary vertex of T2
+    //Copy T2 to T1 and add an edge from root to an arbitrary vertex of T2.
     std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> idxMap(boost::num_vertices(T2));
     std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
     unsigned int id = 0;
@@ -384,15 +369,18 @@ void descriptor_bag_to_id_bag(G_t &G, std::set<unsigned int> &id_bag,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag)
 {
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
-            desc_bag.begin(); sIt != desc_bag.end(); sIt++){
+         desc_bag.begin(); sIt != desc_bag.end(); sIt++)
+    {
         unsigned id = noboost::get_id(G,*sIt);
         id_bag.insert(id);
     }
 }
 
 template <typename G_t>
-void id_bag_to_descriptor_bag(G_t &G, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag,
-        std::set<unsigned int> &id_bag){
+void id_bag_to_descriptor_bag(G_t &G,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &desc_bag,
+        std::set<unsigned int> &id_bag)
+{
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned id=noboost::get_id(G,*vIt);
@@ -411,7 +399,7 @@ void reorder_ids_decomposition(T_t &T, std::vector<unsigned int> &id_map){
             new_bag.insert(id_map[*sIt]);
         }
 
-        noboost::bag(T, *tIt) = new_bag;
+        noboost::bag(T, *tIt) = MOVE(new_bag);
     }
 }
 
@@ -482,157 +470,6 @@ static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
 
 } // namespace treedec
 
-namespace misc {
-
-    template<class G>
-    class DEGS{
-        DEGS(const DEGS&){}
-        public:
-        typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-        typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
-        typedef std::set<vertex_descriptor> bag_type;
-        typedef typename bag_type::iterator bag_iterator;
-        typedef std::vector<std::set<vertex_descriptor> > container_type;
-        typedef typename container_type::iterator iterator;
-        typedef typename container_type::const_iterator const_iterator;
-
-        DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
-        {
-            vertex_iterator vIt, vEnd;
-            for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
-                _degs[boost::degree(*vIt, g)].insert(*vIt);
-            }
-        }
-        size_t num_nodes() const{ untested();
-            unsigned N=0;
-            for(const_iterator i=_degs.begin(); i!=_degs.end(); ++i) { itested();
-                N+=i->size();
-            }
-            return N;
-        }
-        void check()
-        { // sometimes required when debugging fancy callbacks :/
-#ifdef EXCESSIVE_DEG_DEBUG
-            DEGS degs(_g);
-            assert(_degs.size()==degs.size());
-            assert(size()==boost::num_vertices(_g));
-            assert(num_nodes()==degs.num_nodes());
-
-            iterator j=degs._degs.begin();
-            unsigned N=0;
-            for(iterator i=_degs.begin(); i!=_degs.end();) {
-                assert(N<boost::num_vertices(_g));
-                unsigned I=i->size();
-                unsigned J=j->size(); //actual _g
-
-                if(I>J){
-                    std::cerr<<"mismatch " << I << " " << J << "\n";
-                    std::cerr<<"extra node " << *i->begin() << " of deg " << N << " in degs\n";
-                }else if(I<J){
-                    std::cerr<<"mismatch " << I << " " << J << " in " << N << "\n";
-                    std::cerr<<"extra node " << *j->begin() << " of deg " << N << " in g\n";
-                }
-                assert(I==J);
-                ++i;
-                ++j;
-                ++N;
-            }
-            assert(N==boost::num_vertices(_g));
-#endif
-        }
-        std::set<vertex_descriptor>& operator[](size_t x){return _degs[x];}
-        size_t size()const{return _degs.size();}
-        //private: // later.
-        container_type _degs;
-        private:
-        const G& _g;
-    };
-
-    template<class VC, class G, class CB>
-    void make_clique(VC V, G& g, CB* cb)
-    {
-        // FIXME: permit any container...
-        typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-
-        typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-        typename misc::DEGS<G> &degs=*cb->_degs;
-
-        std::set<vertex_descriptor> redeg;
-        for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-            if(cb){
-                unsigned deg = boost::degree(*nIt1,g);
-                size_t n=degs[deg].erase(*nIt1);
-                (void)n;
-                assert(n==1);
-            }
-        }
-        for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                bool newedge = boost::add_edge(*nIt1, *nIt2, g).second;
-                assert(boost::degree(*nIt1,g));
-                assert(boost::degree(*nIt2,g));
-
-                if(cb){ untested();
-                    // need to redegree all vertices.
-                } else if(newedge){ untested();
-                    // need to redegree *nIt1...
-                    if(redeg.insert(*nIt1).second){ untested();
-                        unsigned deg = boost::degree(*nIt1,g);
-                        // std::cerr << "queued 4 redeg " << *nIt1 << " deg" << deg-1 << "\n";
-                        size_t n=degs[deg-1].erase(*nIt1);
-                        (void)n;
-                        assert(n==1);
-                    }else{ untested();
-                        // already queued for redegree
-                    }
-
-                    // need to redegree *nIt2...
-                    if(redeg.insert(*nIt2).second){ untested();
-                        unsigned deg = boost::degree(*nIt2,g);
-                        // std::cerr << "queued 4 redeg " << *nIt2 << " deg" << deg-1 << "\n";
-                        size_t n=degs[deg-1].erase(*nIt2);
-                        (void)n;
-                        assert(n==1);
-                    }else{ untested();
-                        // already queued for redegree
-                    }
-                }else{ untested();
-                    // nothing to do.
-                }
-            }
-        }
-        if(cb){
-            for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-                (*cb)(*nIt1);
-            }
-        }else{ incomplete();
-
-            for(typename std::set<vertex_descriptor>::iterator i=redeg.begin();
-                    i!=redeg.end(); ++i){
-                // std::cerr << "redegging " << *i << "\n";
-                if(cb){ untested();
-                }else{ incomplete();
-                    // just reinsert
-                    size_t deg=boost::degree(*i,g);
-                    assert(deg>0);
-                    bool done=degs[deg].insert(*i).second;
-                    (void)done;
-                    assert(done);
-                }
-            }
-        }
-
-        if (cb) {
-            // degs might be in an inconsistent state, depending on what cb is
-        }else{ untested();
-            degs.check();
-        }
-
-    }
-}
-
-#endif //ifdef TD_MISC
+#endif //TD_MISC
 
 // vim:ts=8:sw=4:et

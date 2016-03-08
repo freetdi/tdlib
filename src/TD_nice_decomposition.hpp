@@ -261,7 +261,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
         case 0:
 /*
             //ensures that leafs have empty bags
-            if(T[t].bag.size())
+            if(noboost::bag(T, t).size())
                 boost::add_edge(t, boost::add_vertex(T), T);
 */
                 return;
@@ -298,7 +298,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 
     std::set_intersection(noboost::bag(T, t).begin(), noboost::bag(T, t).end(),
                           noboost::bag(T, c0).begin(), noboost::bag(T, c0).end(),
-                          std::inserter(noboost::bag(T, d).bag, noboost::bag(T, d).begin()));
+                          std::inserter(noboost::bag(T, d), noboost::bag(T, d).begin()));
 }
 
 // // Ensure that all bag sizes of adjacent bags differ by at most one.
@@ -350,7 +350,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     boost::add_edge(t, d, T);
     boost::remove_edge(t, c0, T);
 
-    noboost::bag(T, d) = noboost::bag(T, t_size > c0_size ? t : c0]);
+    noboost::bag(T, d) = noboost::bag(T, t_size > c0_size ? t : c0);
     std::set<unsigned int>::iterator i;
 
     for(i = noboost::bag(T, d).begin();
