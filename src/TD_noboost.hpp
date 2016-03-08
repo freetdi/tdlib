@@ -18,7 +18,8 @@
 //
 //
 
-/* implements functions on generic BGL graphs that can be implemented (much)
+/*
+ * Implements functions on generic BGL graphs that can be implemented (much)
  * faster for particular graph classes.
  */
 
@@ -32,7 +33,7 @@
 #define TD_STRUCT_BAG
 struct bag{
     std::set<unsigned int> bag;
-	 typedef std::set<unsigned int> bagtype;
+    typedef std::set<unsigned int> bagtype;
 };
 #endif
 
@@ -167,4 +168,5 @@ inline typename treedec_traits<T>::bag_type& bag(T& t,
 } // namespace noboost
 
 #endif
+
 // vim:ts=8:sw=4:et

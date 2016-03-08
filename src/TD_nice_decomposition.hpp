@@ -31,6 +31,7 @@
 #include <set>
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -39,16 +40,16 @@ namespace nice{
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertex_descriptor get_introduced_vertex(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T,
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    if(T[v].bag.size() == 1){
-        return idxMap[*(T[v].bag.begin())];
+    if(noboost::bag(T, v).size() == 1){
+        return idxMap[*(noboost::bag(T, v).begin())];
     }
     else{
         typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
         std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
-        sIt1 = T[v].bag.begin();
-        sIt2 = T[child].bag.begin();
-        sEnd1 = T[v].bag.end();
-        sEnd2 = T[child].bag.end();
+        sIt1 = noboost::bag(T, v).begin();
+        sIt2 = noboost::bag(T, child).begin();
+        sEnd1 = noboost::bag(T, v).end();
+        sEnd2 = noboost::bag(T, child).end();
 
         //If *sIt1 != *sIt2, then *sIt1 must be the introduced vertex.
         for(; sIt1 != sEnd1 && sIt2 != sEnd2; ){
@@ -60,22 +61,22 @@ typename boost::graph_traits<G_t>::vertex_descriptor get_introduced_vertex(typen
                 return idxMap[*sIt1];
             }
         }
-        return idxMap[*(T[v].bag.rbegin())];
+        return idxMap[*(noboost::bag(T, v).rbegin())];
     }
 }
 
 template <typename T_t>
 unsigned int get_introduced_vertex_id(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T){
-    if(T[v].bag.size() == 1){
-        return *(T[v].bag.begin());
+    if(noboost::bag(T, v).size() == 1){
+        return *(noboost::bag(T, v).begin());
     }
     else{
         typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
         std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
-        sIt1 = T[v].bag.begin();
-        sIt2 = T[child].bag.begin();
-        sEnd1 = T[v].bag.end();
-        sEnd2 = T[child].bag.end();
+        sIt1 = noboost::bag(T, v).begin();
+        sIt2 = noboost::bag(T, child).begin();
+        sEnd1 = noboost::bag(T, v).end();
+        sEnd2 = noboost::bag(T, child).end();
 
         //If *sIt1 != *sIt2, then *sIt1 must be the introduced vertex.
         for(; sIt1 != sEnd1 && sIt2 != sEnd2; ){
@@ -87,7 +88,7 @@ unsigned int get_introduced_vertex_id(typename boost::graph_traits<T_t>::vertex_
                 return *sIt1;
             }
         }
-        return *(T[v].bag.rbegin());
+        return *(noboost::bag(T, v).rbegin());
     }
 }
 
@@ -96,15 +97,15 @@ typename boost::graph_traits<G_t>::vertex_descriptor get_forgotten_vertex(typena
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
     typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
 
-    if(T[child].bag.size() == 1){
-        return idxMap[*(T[child].bag.begin())];
+    if(noboost::bag(T, child).size() == 1){
+        return idxMap[*(noboost::bag(T, child).begin())];
     }
 
     std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
-    sIt1 = T[v].bag.begin();
-    sIt2 = T[child].bag.begin();
-    sEnd1 = T[v].bag.end();
-    sEnd2 = T[child].bag.end();
+    sIt1 = noboost::bag(T, v).begin();
+    sIt2 = noboost::bag(T, child).begin();
+    sEnd1 = noboost::bag(T, v).end();
+    sEnd2 = noboost::bag(T, child).end();
 
     //if *sIt1 != *sIt2, then *sIt2 must be the forgotten vertex.
     for(; sIt1 != sEnd1 && sIt2 != sEnd2; ){
@@ -116,7 +117,7 @@ typename boost::graph_traits<G_t>::vertex_descriptor get_forgotten_vertex(typena
             return idxMap[*sIt2];
         }
     }
-    return idxMap[*(T[child].bag.rbegin())];
+    return idxMap[*(noboost::bag(T, child).rbegin())];
 }
 
 
@@ -131,10 +132,10 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
     else if(boost::out_degree(v, T) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
 
-        if(T[v].bag.size() > T[child].bag.size()){
+        if(noboost::bag(T, v).size() > noboost::bag(T, child).size()){
             return INTRODUCE;
         }
-        else if(T[v].bag.size() < T[child].bag.size()){
+        else if(noboost::bag(T, v).size() < noboost::bag(T, child).size()){
             return FORGET;
         }
         else{
@@ -216,7 +217,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             boost::remove_edge(t, c0, T);
             boost::remove_edge(t, c1, T);
 
-            T[d].bag = T[t].bag;
+            noboost::bag(T, d) = noboost::bag(T, t);
             boost::add_edge(t, d, T);
 
             nicify_joins(T, t);
@@ -228,22 +229,22 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 
     nicify_joins(T, c0);
 
-    if(T[t].bag != T[c0].bag){
+    if(noboost::bag(T, t) != noboost::bag(T, c0)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
         boost::add_edge(d, c0, T);
         boost::add_edge(t, d, T);
         boost::remove_edge(t, c0, T);
-        T[d].bag = T[t].bag;
+        noboost::bag(T, d) = noboost::bag(T, t);
     }
 
     nicify_joins(T, c1);
 
-    if(T[t].bag != T[c1].bag){
+    if(noboost::bag(T, t) != noboost::bag(T, c1)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
         boost::add_edge(d, c1, T);
         boost::add_edge(t, d, T);
         boost::remove_edge(t, c1, T);
-        T[d].bag = T[t].bag;
+        noboost::bag(T, d) = noboost::bag(T, t);
     }
 }
 
@@ -281,9 +282,13 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     c0 = *c;
     nicify_diffs(T, c0);
 
-    if(std::includes(T[t].bag.begin(), T[t].bag.end(), T[c0].bag.begin(), T[c0].bag.end())
-    || std::includes(T[c0].bag.begin(), T[c0].bag.end(), T[t].bag.begin(), T[t].bag.end()))
+    if(std::includes(noboost::bag(T, t).begin(), noboost::bag(T, t).end(),
+                     noboost::bag(T, c0).begin(), noboost::bag(T, c0).end())
+    || std::includes(noboost::bag(T, c0).begin(), noboost::bag(T, c0).end(),
+                     noboost::bag(T, t).begin(), noboost::bag(T, t).end()))
+    {
         return;
+    }
 
     typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
 
@@ -291,7 +296,9 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     boost::add_edge(t, d, T);
     boost::remove_edge(t, c0, T);
 
-    std::set_intersection(T[t].bag.begin(), T[t].bag.end(), T[c0].bag.begin(), T[c0].bag.end(), std::inserter(T[d].bag, T[d].bag.begin()));
+    std::set_intersection(noboost::bag(T, t).begin(), noboost::bag(T, t).end(),
+                          noboost::bag(T, c0).begin(), noboost::bag(T, c0).end(),
+                          std::inserter(noboost::bag(T, d).bag, noboost::bag(T, d).begin()));
 }
 
 // // Ensure that all bag sizes of adjacent bags differ by at most one.
@@ -304,10 +311,10 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 
     switch(boost::out_degree(t, T)){
         case 0:
-            if(T[t].bag.size() > 1){
+            if(noboost::bag(T, t).size() > 1){
                 typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
-                T[d].bag = T[t].bag;
-                T[d].bag.erase(T[d].bag.begin());
+                noboost::bag(T, d) = noboost::bag(T, t);
+                noboost::bag(T, d).erase(noboost::bag(T, d).begin());
                 boost::add_edge(t, d, T);
 
                 nicify_diffs_more(T, t);
@@ -330,8 +337,8 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     c0 = *c;
 
     size_t c0_size, t_size;
-    t_size = T[t].bag.size();
-    c0_size = T[c0].bag.size();
+    t_size = noboost::bag(T, t).size();
+    c0_size = noboost::bag(T, c0).size();
 
     if(t_size <= c0_size + 1 && t_size + 1 >= c0_size){
         nicify_diffs_more(T, c0);
@@ -343,12 +350,14 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     boost::add_edge(t, d, T);
     boost::remove_edge(t, c0, T);
 
-    T[d].bag = T[t_size > c0_size ? t : c0].bag;
+    noboost::bag(T, d) = noboost::bag(T, t_size > c0_size ? t : c0]);
     std::set<unsigned int>::iterator i;
 
-    for(i = T[d].bag.begin(); T[t_size < c0_size ? t : c0].bag.find(*i) != T[t_size < c0_size ? t : c0].bag.end(); ++i);
+    for(i = noboost::bag(T, d).begin();
+        noboost::bag(T, t_size < c0_size ? t : c0).find(*i)
+     != noboost::bag(T, t_size < c0_size ? t : c0).end(); ++i);
 
-    T[d].bag.erase(i);
+    noboost::bag(T, d).erase(i);
 
     nicify_diffs_more(T, t);
 }
@@ -373,7 +382,7 @@ void nicify(T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t = find_root(T);
 
     // Ensure we have an empty bag at the root.
-    if(T[t].bag.size() > 0){
+    if(noboost::bag(T, t).size() > 0){
         typename boost::graph_traits<T_t>::vertex_descriptor d = t;
         t = boost::add_vertex(T);
         boost::add_edge(t, d, T);

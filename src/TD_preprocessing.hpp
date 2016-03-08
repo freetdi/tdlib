@@ -536,7 +536,8 @@ void glue_bag_preprocessing(
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         if(std::includes(noboost::bag(T,*vIt).begin(),
                          noboost::bag(T,*vIt).end(),
-                         bag.begin(), bag.end())){
+                         bag.begin(), bag.end()))
+        {
             bag.insert(preprocessed_node);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
             noboost::bag(T,t_dec_node) = bag;

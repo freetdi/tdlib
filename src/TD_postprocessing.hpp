@@ -54,10 +54,12 @@
 
 namespace treedec{
 
-//Creates a modified induced subgraph of the bag 'T[t_desc].bag'.
+//Creates a modified induced subgraph of the bag 'noboost::bag(T, t_desc)'.
 template <typename G_t, typename T_t>
-bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y, typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T){
-    induced_subgraph(H, G, T[t_desc].bag);
+bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y,
+                        typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T)
+{
+    induced_subgraph(H, G, noboost::bag(T, t_desc));
 
     //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent vertex t_desc' of t_desc in T.
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
@@ -70,7 +72,9 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
                     unsigned int id1=noboost::get_id(H, *vIt1);
                     unsigned int id2=noboost::get_id(H, *vIt2);
-                    if(T[*nIt].bag.find(id1) != T[*nIt].bag.end() && T[*nIt].bag.find(id2) != T[*nIt].bag.end()){
+                    if(noboost::bag(T, *nIt).find(id1) != noboost::bag(T, *nIt).end()
+                    && noboost::bag(T, *nIt).find(id2) != noboost::bag(T, *nIt).end())
+                    {
                         boost::add_edge(*vIt1, *vIt2, H);
                         break;
                     }
@@ -140,7 +144,7 @@ void MSVS(G_t &G, T_t &T){
         typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor refinement_bag;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(T[*tIt].bag.size() == width+1){
+            if(noboost::bag(T, *tIt).size() == width+1){
                 std::vector<bool> disabled_(disabled);
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, G, T)){
                     refinement_bag = *tIt;
@@ -190,25 +194,30 @@ void MSVS(G_t &G, T_t &T){
 
         boost::clear_vertex(refinement_bag, T);
 
-        std::set<unsigned int> old_bag = T[refinement_bag].bag;
-        T[refinement_bag].bag = S;
+        std::set<unsigned int> old_bag = noboost::bag(T, refinement_bag);
+        noboost::bag(T, refinement_bag) = S;
 
         std::vector<std::set<unsigned int> > union_S_W_i(components.size());
 
         for(unsigned int i = 0; i < components.size(); i++){
-            std::set_union(S.begin(), S.end(), components[i].begin(), components[i].end(), std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
+            std::set_union(S.begin(), S.end(),
+                           components[i].begin(), components[i].end(),
+                           std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
             newN[i] = boost::add_vertex(T);
-            T[newN[i]].bag = union_S_W_i[i];
+            noboost::bag(T, newN[i]) = union_S_W_i[i];
             boost::add_edge(refinement_bag, newN[i], T);
         }
 
         for(unsigned int i = 0; i <  oldN.size(); i++){
             std::set<unsigned int> intersection;
             std::set_intersection(old_bag.begin(), old_bag.end(),
-                T[oldN[i]].bag.begin(), T[oldN[i]].bag.end(),
-                std::inserter(intersection, intersection.begin()));
+                                  noboost::bag(T, oldN[i]).begin(),
+                                  noboost::bag(T, oldN[i]).end(),
+                                  std::inserter(intersection, intersection.begin()));
+
             for(unsigned int j = 0; j < union_S_W_i.size(); j++){
-                if(std::includes(union_S_W_i[j].begin(), union_S_W_i[j].end(), intersection.begin(), intersection.end())){
+                if(std::includes(union_S_W_i[j].begin(), union_S_W_i[j].end(),
+                                 intersection.begin(), intersection.end())){
                     boost::add_edge(newN[j], oldN[i], T);
                     break;
                 }
@@ -221,13 +230,16 @@ template <typename G_t>
 bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vector<unsigned int> &elimination_ordering, G_t &M, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
     //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
     std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
-    for(unsigned int t = 0; t < elimination_ordering.size(); t++)
+    for(unsigned int t = 0; t < elimination_ordering.size(); t++){
         elimination_ordering_[elimination_ordering[t]] = t;
+    }
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[edge[0]], M); nIt != nEnd; nIt++){
         unsigned id=noboost::get_id(M, *nIt);
-        if(elimination_ordering_[id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second){
+        if(elimination_ordering_[id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second
+       && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second)
+        {
             return false;
         }
     }
@@ -244,7 +256,9 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
  * possibly causes lower width than 'old_elimination_ordering'.
  */
 template <typename G_t>
-void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering){
+void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
+                    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
+{
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
     make_index_map(G, idxMap);
 
@@ -273,10 +287,11 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
             for(unsigned int j = 0; j < candidate.size(); j++){
                 for(unsigned int k = 0; k < keep_fill.size(); k++){
                     if((candidate[j][0] == keep_fill[k][0] && candidate[j][1] == keep_fill[k][1])
-                     ||(candidate[j][0] == keep_fill[k][1] && candidate[j][1] == keep_fill[k][0])){
-                         candidate.erase(candidate.begin()+j);
-                         break;
-                     }
+                     ||(candidate[j][0] == keep_fill[k][1] && candidate[j][1] == keep_fill[k][0]))
+                    {
+                        candidate.erase(candidate.begin()+j);
+                        break;
+                    }
                 }
             }
 

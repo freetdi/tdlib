@@ -180,7 +180,7 @@ void sep_glue_bag(std::set<unsigned int> &bag, std::set<unsigned int> &glueBag, 
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
         if(noboost::bag(T,*vertexIt) == glueBag){
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            T[t_dec_node].bag = bag;
+            noboost::bag(T, t_dec_node) = bag;
             boost::add_edge(t_dec_node, *vertexIt, T);
             return;
         }

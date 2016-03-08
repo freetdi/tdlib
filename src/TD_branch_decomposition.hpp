@@ -82,9 +82,9 @@ int is_valid_branchdecomposition(G_t &G, T_t T){
         typename boost::graph_traits<T_t>::vertex_descriptor t_node;
         unsigned int covered_count = 0;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(std::includes(T[*tIt].bag.begin(), T[*tIt].bag.end(), it->begin(), it->end())){
+            if(std::includes(noboost::bag(T, *tIt).begin(), noboost::bag(T, *tIt).end(), it->begin(), it->end())){
                 t_node = *tIt;
-                if(*it == T[*tIt].bag){
+                if(*it == noboost::bag(T, *tIt)){
                     covered_count++;
                 }
             }
@@ -96,7 +96,7 @@ int is_valid_branchdecomposition(G_t &G, T_t T){
 
     //exist bags of size 1?
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(T[*tIt].bag.size() == 1){
+        if(noboost::bag(T, *tIt).size() == 1){
             return -4;
         }
     }
@@ -115,7 +115,7 @@ void explore_component(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
         }
     }
 
-    for(std::set<unsigned int>::iterator sIt = T[t].bag.begin(); sIt != T[t].bag.end(); sIt++){
+    for(std::set<unsigned int>::iterator sIt = noboost::bag(T, t).begin(); sIt != noboost::bag(T, t).end(); sIt++){
         V.insert(*sIt);
     }
     for(unsigned int i = 0; i < N.size(); i++){
@@ -159,7 +159,7 @@ void branch_to_tree_decomposition(G_t &G, T_t &T){
         if(boost::out_degree(*tIt, T) == 3){
             std::set<unsigned int> V;
             compute_cutset(T, *tIt, V);
-            T[*tIt].bag = V;
+            noboost::bag(T, *tIt) = V;
         }
     }
 
@@ -171,7 +171,7 @@ void branch_to_tree_decomposition(G_t &G, T_t &T){
             std::set<unsigned int> bag;
             unsigned id=noboost::get_id(G, *vIt);
             bag.insert(id);
-            T[new_t_node].bag = bag;
+            noboost::bag(T, new_t_node) = bag;
 
             if(boost::num_vertices(T) > 1){
                 boost::tie(tIt, tEnd) = boost::vertices(T);
@@ -243,7 +243,7 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
     while(exists_singleton){
         exists_singleton = false;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(T[*tIt].bag.size() == 1){
+            if(noboost::bag(T, *tIt).size() == 1){
                 boost::clear_vertex(*tIt, T);
                 boost::remove_vertex(*tIt, T);
                 exists_singleton = true;
@@ -284,7 +284,7 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
 
             //degree > 3
             typename boost::graph_traits<T_t>::vertex_descriptor new_t_node = boost::add_vertex(T);
-            T[new_t_node].bag = T[*tIt].bag;
+            nooboost::bag(new_t_node) = noboost::bag(T, *tIt);
             boost::add_edge(*tIt, new_t_node, T);
             boost::remove_edge(*tIt, N[0], T);
             boost::remove_edge(*tIt, N[1], T);
@@ -298,7 +298,7 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
     //remove "interior" bags
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         if(boost::out_degree(*tIt, T) != 1){
-            T[*tIt].bag.clear();
+            noboost::bag(T, *tIt).clear();
         }
     }
 }

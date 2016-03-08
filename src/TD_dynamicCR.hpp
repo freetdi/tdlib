@@ -199,14 +199,14 @@ void dynamicCR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned 
     typename boost::graph_traits<T_t>::vertex_descriptor b1, b2;
 
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
-        if(T[*vIt1].bag == bag1){
+        if(noboost::bag(T, *vIt1) == bag1){
             b1 = *vIt1;
             break;
         }
     }
 
     for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
-        if(T[*vIt2].bag == bag2){
+        if(noboost::bag(T, *vIt2) == bag2){
             b2 = *vIt2;
             break;
         }
@@ -218,12 +218,12 @@ void dynamicCR_glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned 
 
     if(vIt1 == vEnd){
         b1 = boost::add_vertex(T);
-        T[b1].bag = bag1;
+        noboost::bag(T, b1) = bag1;
     }
 
     if(vIt2 == vEnd){
         b2 = boost::add_vertex(T);
-        T[b2].bag = bag2;
+        noboost::bag(T, b2) = bag2;
     }
 
     boost::add_edge(b1, b2, T);
@@ -253,7 +253,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned id=noboost::get_id(G, *vIt);
-            T[t].bag.insert(id);
+            noboost::bag(T, t).insert(id);
         }
 
         return;

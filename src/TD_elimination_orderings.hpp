@@ -62,6 +62,7 @@
 #include "TD_preprocessing.hpp"
 #include "TD_simple_graph_algos.hpp"
 #include "TD_misc.hpp"
+#include "TD_noboost.hpp"
 #include "TD_std.hpp"
 
 namespace treedec{
@@ -537,7 +538,7 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && !T[*tIt].bag.empty()){
+        if(boost::out_degree(*tIt, T) <= 1 && !noboost::bag(T, *tIt).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -552,22 +553,28 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
         std::set<unsigned int> difference;
 
         if(boost::out_degree(leaf, T) == 1){
-            if(!std::includes(T[parent].bag.begin(), T[parent].bag.end(),
-                              T[leaf].bag.begin(), T[leaf].bag.end())){
-                std::set_difference(T[leaf].bag.begin(), T[leaf].bag.end(), T[parent].bag.begin(),
-                                    T[parent].bag.end(), std::inserter(difference, difference.begin()));
+            if(!std::includes(noboost::bag(T, parent).begin(),
+                              noboost::bag(T, parent).end(),
+                              noboost::bag(T, leaf).begin(),
+                              noboost::bag(T, leaf).end()))
+            {
+                std::set_difference(noboost::bag(T, leaf).begin(),
+                                    noboost::bag(T, leaf).end(),
+                                    noboost::bag(T, parent).begin(),
+                                    noboost::bag(T, parent).end(),
+                                    std::inserter(difference, difference.begin()));
             }
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = T[leaf].bag;
+            difference = noboost::bag(T, leaf);
         }
 
         for(std::set<unsigned int>::iterator sIt = difference.begin(); sIt != difference.end(); sIt++){
             elimination_ordering.push_back(*sIt);
         }
 
-        T[leaf].bag.clear();
+        noboost::bag(T, leaf).clear();
 
         _treedec_to_ordering(T, elimination_ordering);
     }

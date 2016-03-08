@@ -43,6 +43,7 @@
 #include "TD_simple_graph_algos.hpp"
 #include "TD_hard_problems.hpp"
 #include "TD_misc.hpp"
+#include "TD_noboost.hpp"
 
 namespace treedec{
 
@@ -88,12 +89,15 @@ void top_down_computation(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
             || (take_flag == 2 && it->second == (int)val && std::includes(it->first.begin(), it->first.end(), subset.begin(), subset.end()))
             || (take_flag == 0 && it->second == (int)val)){
                 std::set<unsigned int> intersection;
-                std::set_intersection(it->first.begin(), it->first.end(), S_comp.begin(), S_comp.end(),
-                                                                           std::inserter(intersection, intersection.begin()));
+                std::set_intersection(it->first.begin(), it->first.end(),
+                                      S_comp.begin(), S_comp.end(),
+                                      std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() == 0){
-                    std::set_difference(T[cur].bag.begin(), T[cur].bag.end(), it->first.begin(), it->first.end(),
-                                                                           std::inserter(S_comp, S_comp.begin()));
+                    std::set_difference(noboost::bag(T, cur).begin(),
+                                        noboost::bag(T, cur).end(),
+                                        it->first.begin(), it->first.end(),
+                                        std::inserter(S_comp, S_comp.begin()));
                     S.insert(it->first.begin(), it->first.end());
                     subset = it->first;
                     break;
@@ -130,8 +134,10 @@ void top_down_computation(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
                     std::set<unsigned int> must_take = it->first;
                     S.insert(it->first.begin(), it->first.end());
 
-                    std::set_difference(T[cur].bag.begin(), T[cur].bag.end(), it->first.begin(), it->first.end(),
-                                                                               std::inserter(S_comp, S_comp.begin()));
+                    std::set_difference(noboost::bag(T, cur).begin(),
+                                        noboost::bag(T, cur).end(),
+                                        it->first.begin(), it->first.end(),
+                                        std::inserter(S_comp, S_comp.begin()));
 
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
@@ -151,7 +157,7 @@ template <typename G_t, typename T_t>
 void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::max_clique_base<G_t> &mclb){
     for(unsigned int i = 0; i < boost::num_vertices(T); i++){
         G_t H;
-        induced_subgraph(H, G, T[i].bag);
+        induced_subgraph(H, G, noboost::bag(T, i));
         std::vector<unsigned int> result;
         mclb.max_clique(H, result);
         if(result.size() > global_result.size())
@@ -182,7 +188,7 @@ int bottom_up_computation_independent_set(G_t &G, T_t &T, std::vector<std::map<s
 
         if(node_type == treedec::nice::LEAF){
             results[cur][std::set<unsigned int>()] = 0;
-            results[cur][T[cur].bag] = 1;
+            results[cur][noboost::bag(T, cur)] = 1;
         }
         else{
             typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(cur, T).first);
@@ -191,7 +197,7 @@ int bottom_up_computation_independent_set(G_t &G, T_t &T, std::vector<std::map<s
                 typename boost::graph_traits<T_t>::vertex_descriptor child2 = *(++boost::adjacent_vertices(cur, T).first);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     if(results[child][subs[i]] < 0 || results[child2][subs[i]] < 0){
@@ -234,7 +240,7 @@ int bottom_up_computation_independent_set(G_t &G, T_t &T, std::vector<std::map<s
                 typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex = treedec::nice::get_forgotten_vertex<G_t, T_t>(cur, T, idxMap);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     std::set<unsigned int> tmp = subs[i];
@@ -328,7 +334,7 @@ int bottom_up_computation_vertex_cover(G_t &G, T_t &T, std::vector<std::map<std:
 
         if(node_type == treedec::nice::LEAF){
             results[cur][std::set<unsigned int>()] = 0;
-            results[cur][T[cur].bag] = 1;
+            results[cur][noboost::bag(T, cur)] = 1;
         }
         else{
             typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(cur, T).first);
@@ -337,7 +343,7 @@ int bottom_up_computation_vertex_cover(G_t &G, T_t &T, std::vector<std::map<std:
                 typename boost::graph_traits<T_t>::vertex_descriptor child2 = *(++boost::adjacent_vertices(cur, T).first);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     if(results[child][subs[i]] < 0 || results[child2][subs[i]] < 0){
@@ -353,7 +359,7 @@ int bottom_up_computation_vertex_cover(G_t &G, T_t &T, std::vector<std::map<std:
                 typename boost::graph_traits<G_t>::vertex_descriptor new_vertex = treedec::nice::get_introduced_vertex<G_t, T_t>(cur, T, idxMap);
 
                 for(std::map<std::set<unsigned int>, int>::iterator it = results[child].begin(); it != results[child].end(); it++){
-                    if(is_vertex_cover(G, T[cur].bag, it->first, idxMap)){
+                    if(is_vertex_cover(G, noboost::bag(T, cur), it->first, idxMap)){
                         results[cur][it->first] = results[child][it->first];
                     }
                     else{
@@ -369,7 +375,7 @@ int bottom_up_computation_vertex_cover(G_t &G, T_t &T, std::vector<std::map<std:
                         results[cur][tmp] = results[child][it->first] + 1;
                     }
                     else{
-                        if(is_vertex_cover(G, T[cur].bag, tmp, idxMap)){
+                        if(is_vertex_cover(G, noboost::bag(T, cur), tmp, idxMap)){
                             results[cur][tmp] = tmp.size();
                         }
                         else{
@@ -383,7 +389,7 @@ int bottom_up_computation_vertex_cover(G_t &G, T_t &T, std::vector<std::map<std:
                 typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex = treedec::nice::get_forgotten_vertex<G_t, T_t>(cur, T, idxMap);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     std::set<unsigned int> tmp = subs[i];
@@ -471,7 +477,7 @@ int bottom_up_computation_dominating_set(G_t &G, T_t &T, std::vector<std::map<st
 
         if(node_type == treedec::nice::LEAF){
             results[cur][std::set<unsigned int>()] = -1;
-            results[cur][T[cur].bag] = 1;
+            results[cur][noboost::bag(T, cur)] = 1;
         }
         else{
             typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(cur, T).first);
@@ -480,7 +486,7 @@ int bottom_up_computation_dominating_set(G_t &G, T_t &T, std::vector<std::map<st
                 typename boost::graph_traits<T_t>::vertex_descriptor child2 = *(++boost::adjacent_vertices(cur, T).first);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     if(results[child][subs[i]] < 0 || results[child2][subs[i]] < 0){
@@ -496,7 +502,7 @@ int bottom_up_computation_dominating_set(G_t &G, T_t &T, std::vector<std::map<st
                 typename boost::graph_traits<G_t>::vertex_descriptor new_vertex = treedec::nice::get_introduced_vertex<G_t, T_t>(cur, T, idxMap);
 
                 for(std::map<std::set<unsigned int>, int>::iterator it = results[child].begin(); it != results[child].end(); it++){
-                    if(is_dominating_set(G, T[cur].bag, it->first, idxMap)){
+                    if(is_dominating_set(G, noboost::bag(T, cur), it->first, idxMap)){
                         results[cur][it->first] = results[child][it->first];
                     }
                     else{
@@ -521,7 +527,7 @@ int bottom_up_computation_dominating_set(G_t &G, T_t &T, std::vector<std::map<st
                 typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex = treedec::nice::get_forgotten_vertex<G_t, T_t>(cur, T, idxMap);
 
                 std::vector<std::set<unsigned int> > subs;
-                powerset(T[cur].bag, subs);
+                powerset(noboost::bag(T, cur), subs);
 
                 for(unsigned int i = 0; i < subs.size(); i++){
                     std::set<unsigned int> tmp = subs[i];
