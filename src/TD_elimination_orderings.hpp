@@ -480,7 +480,7 @@ int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimina
 
 template <typename G_t>
 int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
-    std::vector<std::vector<unsigned int> > elimination_ordering(count, std::vector<unsigned int>(boost::num_vertices(G)));
+    std::vector<std::vector<unsigned int> > elimination_orderings(count, std::vector<unsigned int>(boost::num_vertices(G)));
 
     int min_width = INT_MAX;
 
