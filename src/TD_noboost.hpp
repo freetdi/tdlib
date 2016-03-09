@@ -112,6 +112,18 @@ inline void contract_edge(vertex_iterator_G v,
     }
 }
 
+template<typename nIter_t, typename G_t>
+void make_clique(nIter_t nIter, G_t &G){
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    for(boost::tie(nIt1, nEnd) = nIter; nIt1 != nEnd; nIt1++){
+        nIt2 = nIt1;
+        nIt2++;
+        for(; nIt2 != nEnd; nIt2++){
+            boost::add_edge(*nIt1, *nIt2, G);
+        }
+    }
+}
+
 template<typename G>
 inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
 {

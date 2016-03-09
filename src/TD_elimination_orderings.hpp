@@ -118,10 +118,13 @@ void _minDegree_decomp(G_t &G, T_t &T){
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
 void minDegree_decomp(G_t &G, T_t &T){
-    std::vector< boost::tuple<
-        typename noboost::treedec_traits<T_t>::vd_type,
-        typename noboost::treedec_traits<T_t>::bag_type
-            > > bags;
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
+    std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
+                              typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     int low = 0;
     treedec::Islet(G, bags, low);
@@ -134,17 +137,15 @@ void minDegree_decomp(G_t &G, T_t &T){
 //fill-in heuristic. Ignores isolated vertices.
 template <typename G_t, typename T_t>
 void _fillIn_decomp(G_t &G, T_t &T){
-    std::vector<std::set<unsigned int> > bags(boost::num_vertices(G));
-    std::vector<unsigned int> elim_vertices(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
 
     unsigned int i = 0;
     while(boost::num_edges(G) > 0){
         //Search a vertex v such that least edges are missing for making the neighbourhood of v a clique.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-
         boost::tie(vIt, vEnd) = boost::vertices(G);
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
 
         unsigned int min_fill = UINT_MAX;
         for(; vIt != vEnd; vIt++){
@@ -154,6 +155,7 @@ void _fillIn_decomp(G_t &G, T_t &T){
 
             unsigned int current_fill = 0;
 
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
             for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++){
                 nIt2 = nIt1;
                 nIt2++;
@@ -173,22 +175,14 @@ void _fillIn_decomp(G_t &G, T_t &T){
             }
         }
 
-        //Make the neighbourhood of 'min_vertex' a clique.
-        std::set<unsigned int> bag;
-
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            unsigned id=noboost::get_id(G, *nIt1);
-            bag.insert(id);
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                boost::add_edge(*nIt1, *nIt2, G);
-            }
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
+            bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
         }
 
-        bags[i] = bag;
-        unsigned id=noboost::get_id(G, min_vertex);
-        elim_vertices[i++] = id;
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G); //replace this with make_clique_and_hijack?!
+
+        elim_vertices[i++] = min_vertex;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -202,11 +196,14 @@ void _fillIn_decomp(G_t &G, T_t &T){
 //fill-in heuristic.
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t &T){
-    //std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
-    std::vector< boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
-            > > bags;
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
+    std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
+                              typename noboost::treedec_traits<T_t>::bag_type> > bags;
+
     int low = 0;
     treedec::Islet(G, bags, low);
     treedec::_fillIn_decomp(G, T);
@@ -217,6 +214,7 @@ void fillIn_decomp(G_t &G, T_t &T){
 //Computes an elimination ordering according to the minDegree heuristic (version used for postprocessing algorithms).
 template<typename G_t>
 void _minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vector<bool> &visited){
+    unsigned int i = 0;
     while(true){
         //Search a minimum degree vertex.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -240,18 +238,10 @@ void _minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::v
             return;
         }
 
-        //Make the neighbourhood of 'min_vertex' a clique.
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                boost::add_edge(*nIt1, *nIt2, G);
-            }
-        }
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
 
         unsigned id=noboost::get_id(G, min_vertex);
-        elim_ordering.push_back(id);
+        elim_ordering[i++] = id;
         visited[id] = true;
 
         boost::clear_vertex(min_vertex, G);
@@ -261,7 +251,9 @@ void _minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::v
 //Computes an elimination ordering according to minDegree heuristic (version used for postprocessing algorithms).
 template<typename G_t>
 void minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering){
+    elim_ordering.resize(boost::num_vertices(G));
     std::vector<bool> visited(boost::num_vertices(G), false);
+
     _minDegree_ordering(G, elim_ordering, visited);
 }
 
@@ -313,14 +305,7 @@ void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vect
             return;
         }
 
-        //Make the neighbourhood of 'min_vertex' a clique.
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt1 != nEnd; nIt1++){
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                boost::add_edge(*nIt1, *nIt2, G);
-            }
-        }
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
 
         unsigned id=noboost::get_id(G, min_vertex);
         elim_ordering.push_back(id);
@@ -389,15 +374,7 @@ int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimina
 
         width = (width > (int)boost::out_degree(elim_vertex, G))? width : (int)boost::out_degree(elim_vertex, G);
 
-        //todo: replace with misc::make_clique
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(elim_vertex, G); nIt1 != nEnd; nIt1++){
-            nIt2 = nIt1;
-            nIt2++;
-            for(; nIt2 != nEnd; nIt2++){
-                boost::add_edge(*nIt1, *nIt2, G);
-            }
-        }
+        noboost::make_clique(boost::adjacent_vertices(elim_vertex, G));
  
         boost::clear_vertex(elim_vertex, G);
     }
@@ -453,20 +430,13 @@ void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_orderin
 
     //Collect the neighbours of 'elim_vertex'.
     std::set<unsigned int> bag;
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_vertex, G); nIt != nEnd; nIt++){
         unsigned id=noboost::get_id(G, *nIt);
         bag.insert(id);
-        neighbours.push_back(*nIt);
     }
 
-    //Make the neighbourhood of 'min_vertex' a clique.
-    for(unsigned int i = 0; i < neighbours.size(); i++){
-        for(unsigned int j = i+1; j < neighbours.size(); j++){
-            boost::add_edge(neighbours[i], neighbours[j], G);
-        }
-    }
+    noboost::make_clique(boost::adjacent_vertices(elim_vertex, G), G);
 
     unsigned id=noboost::get_id(G, elim_vertex);
     unsigned int elim_vertex_id = id;
@@ -479,13 +449,18 @@ void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_orderin
 
 template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t G, std::vector<unsigned int> &elimination_ordering, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     _ordering_to_treedec(G, elimination_ordering, T, 0);
 }
 
 template <typename G_t, typename T_t>
 void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T, unsigned int /*idx*/){
-    std::vector<std::set<unsigned int> > bags;
-    std::vector<unsigned int> elim_vertices;
+    std::vector<std::set<unsigned int> > bags(boost::num_vertices(G));
+    std::vector<unsigned int> elim_vertices(boost::num_vertices(G));
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
         //Collect the neighbours of elimination vertex i.
@@ -494,22 +469,15 @@ void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_tra
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elimination_ordering[i], G); nIt != nEnd; nIt++){
             unsigned id=noboost::get_id(G, *nIt);
-            bag.insert(id);
-            neighbours.push_back(*nIt);
+            bags[i].insert(id);
         }
 
-        //Make the neighbourhood of elimination vertex i a clique.
-        for(unsigned int j = 0; j < neighbours.size(); j++){
-            for(unsigned int k = j+1; k < neighbours.size(); k++){
-                boost::add_edge(neighbours[j], neighbours[k], G);
-            }
-        }
+        noboost::make_clique(boost::adjacent_vertices(elimination_ordering[i], G), G);
 
         boost::clear_vertex(elimination_ordering[i], G);
 
-        bags.push_back(bag);
         unsigned id=noboost::get_id(G, elimination_ordering[i]);
-        elim_vertices.push_back(id);
+        elim_vertices[i] = id;
 
     }
 
@@ -559,7 +527,7 @@ void _treedec_to_ordering(T_t &T, std::vector<unsigned int> &elimination_orderin
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = noboost::bag(T, leaf);
+            difference = MOVE(noboost::bag(T, leaf));
         }
 
         for(std::set<unsigned int>::iterator sIt = difference.begin(); sIt != difference.end(); sIt++){
@@ -855,6 +823,6 @@ void LEX_M_minimal_ordering(G_t &G, typename std::vector<typename boost::graph_t
 
 } //namespace treedec
 
-#endif //ifdef TD_ELIMINATION_ORDERING
+#endif //TD_ELIMINATION_ORDERING
 
 // vim:ts=8:sw=4:et
