@@ -165,6 +165,5 @@ void make_clique(VC V, G& g, CB* cb)
     }
 }
 
-
 } //namespace MISC
 

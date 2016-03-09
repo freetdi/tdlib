@@ -16,4 +16,6 @@ pkginclude_HEADERS = \
   TD_postprocessing.hpp \
   TD_preprocessing.hpp \
   TD_seperator_algorithm.hpp \
-  TD_upper_bounds.hpp
+  TD_upper_bounds.hpp \
+  TD_std.hpp \
+  TD_degree.hpp

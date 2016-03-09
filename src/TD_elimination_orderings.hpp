@@ -56,6 +56,11 @@
 
 #include <cmath>
 #include <climits>
+#include <algorithm>    // std::random_shuffle
+#include <cstdlib>
+
+#include <iostream> //remove later
+
 #include <boost/tuple/tuple.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
@@ -66,33 +71,6 @@
 #include "TD_std.hpp"
 
 namespace treedec{
-
-namespace detail{
-
-    // DRAFT. no useful interface
-template<typename G>
-struct degree_mod : public noboost::vertex_callback<G>{
-    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-    degree_mod(misc::DEGS<G>* d, G* g) : _degs(d), _g(g){}
-
-    // reinsert with degree-1
-    void operator()(vertex_descriptor v){ untested();
-        unsigned deg=boost::degree(v,*_g);
-        (void)deg;
-        assert(deg);
-        bool done=(*_degs)[deg-1].insert(v).second;
-        (void)done;
-        assert(done);
-    }
-    //private: not yet.
-//    BUG:: hardcoded type
-        misc::DEGS<G>* _degs;
-    private:
-        degree_mod(const degree_mod&){}
-        G* _g;
-};
-
-}
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic. Ignores isolated vertices.
@@ -480,17 +458,25 @@ int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimina
 
 template <typename G_t>
 int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
-    std::vector<std::vector<unsigned int> > elimination_orderings(count, std::vector<unsigned int>(boost::num_vertices(G)));
+    std::vector<unsigned int> elim_ordering(boost::num_vertices(G));
+    for(unsigned int i=0; i<elim_ordering.size(); ++i){
+        elim_ordering[i] = i;
+    }
+
+    std::vector<std::vector<unsigned int> > elimination_orderings(count);
+    for(unsigned int i=0; i<elimination_orderings.size(); ++i){
+        std::random_shuffle(elim_ordering.begin(), elim_ordering.end()); // using built-in random generator
+        elimination_orderings[i] = elim_ordering;
+    }
 
     int min_width = INT_MAX;
-
-    //.. generate some random elimination orderings...
 
     //parallel
     for(unsigned int i = 0; i < count; i++){
         G_t H;
         boost::copy_graph(G, H); // ..(H, G)..?! "unavoidable"?
         int width_i = get_width_of_elimination_ordering(H, elimination_orderings[i]);
+        std::cout << "width_" << i << ": " << width_i << std::endl;
         //compute minimum over all widths
     }
 
