@@ -1,6 +1,7 @@
 
 pkginclude_HEADERS = \
   TD_applications.hpp \
+  TD_degree.hpp \
   TD_noboost.hpp \
   TD_simple_graph_algos.hpp \
   TD_branch_decomposition.hpp \
@@ -18,4 +19,5 @@ pkginclude_HEADERS = \
   TD_seperator_algorithm.hpp \
   TD_upper_bounds.hpp \
   TD_std.hpp \
-  TD_degree.hpp
+  TD_std.hpp \
+  TD_upper_bounds.hpp
