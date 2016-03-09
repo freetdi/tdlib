@@ -117,7 +117,8 @@ unsigned int _minFill(G_t &G){
 }
 
 template <typename G_t>
-unsigned int minFill(G_t G){
+unsigned int minFill(G_t& G)
+{
     return _minFill(G);
 }
 

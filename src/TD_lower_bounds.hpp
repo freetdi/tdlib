@@ -48,7 +48,7 @@
  * - int LBPC_deltaC(G_t &G)
  *
  * - int MCS(G_t &G)
- * - int MCSC(G_t G)
+ * - int MCSC(G_t &G)
  *
  * - int relation_edges_vertices(G_t &G)
  *
@@ -199,7 +199,8 @@ int deltaD(G_t &G){
 } //namespace detail (for deltaD)
 
 template <typename G_t>
-int deltaD(G_t G){
+int deltaD(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -339,7 +340,8 @@ void gammaD_right(G_t &G, unsigned int &lb){
 
 
 template <typename G_t>
-int gammaD_right(G_t G){
+int gammaD_right(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -400,7 +402,8 @@ void gammaD_min_e(G_t &G, unsigned int &lb){
 } //namespace detail (for gammaD_min_e)
 
 template <typename G_t>
-int gammaD_min_e(G_t G){
+int gammaD_min_e(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -452,7 +455,8 @@ int deltaC_min_d(G_t &G){
 
 
 template <typename G_t>
-int deltaC_min_d(G_t G){
+int deltaC_min_d(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -500,9 +504,9 @@ int deltaC_max_d(G_t &G){
 
 } //namespace detail (for deltaC_max_d)
 
-
 template <typename G_t>
-int deltaC_max_d(G_t G){
+int deltaC_max_d(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -549,7 +553,8 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
 namespace detail{
 
 template <typename G_t>
-int deltaC_least_c(G_t &G){
+int deltaC_least_c(G_t &G)
+{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
 
     unsigned int lb = 0;
@@ -604,7 +609,8 @@ int deltaC_least_c(G_t &G){
 
 
 template <typename G_t>
-int deltaC_least_c(G_t G){
+int deltaC_least_c(G_t& G)
+{
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -688,7 +694,7 @@ int LBN_deltaD(const G_t &G){
 }
 
 template <typename G_t>
-int LBN_deltaC(const G_t &G){
+int LBN_deltaC(G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -762,7 +768,7 @@ int LBNC_deltaD(const G_t &G){
 }
 
 template <typename G_t>
-int LBNC_deltaC(const G_t &G){
+int LBNC_deltaC(G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -881,7 +887,7 @@ int LBP_deltaD(const G_t &G){
 }
 
 template <typename G_t>
-int LBP_deltaC(const G_t &G){
+int LBP_deltaC(G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -959,7 +965,7 @@ int LBPC_deltaD(const G_t &G){
 }
 
 template <typename G_t>
-int LBPC_deltaC(const G_t &G){
+int LBPC_deltaC(G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -1066,7 +1072,8 @@ int MCS(G_t &G){
 //This is the contraction version of the maximal cardinality search lower bound algorithm.
 //Heuristic: max_mcs.
 template <typename G_t>
-int MCSC(G_t G){
+int MCSC(G_t& G)
+{
     int max = -1;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
