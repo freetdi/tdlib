@@ -425,18 +425,11 @@ template <typename G_t>
 int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimination_ordering){
     int width = -1;
 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
+    make_index_map(G, idxMap);
+
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
-        //todo: work with idxMap (O(n) -> O(1))
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        boost::tie(vIt, vEnd) = boost::vertices(G);
-        typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = *vIt++;
-        for(; vIt != vEnd; vIt++){
-            unsigned id=noboost::get_id(G, *vIt);
-            if(id == elimination_ordering[i]){
-                elim_vertex = *vIt;
-                break;
-            }
-        }
+        typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = idxMap[elimination_ordering[i]];
 
         width = (width > (int)boost::out_degree(elim_vertex, G))? width : (int)boost::out_degree(elim_vertex, G);
 
@@ -471,12 +464,12 @@ int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
 
     int min_width = INT_MAX;
 
-    //parallel
+    #pragma omp parallel for
     for(unsigned int i = 0; i < count; i++){
         G_t H;
         boost::copy_graph(G, H); // ..(H, G)..?! "unavoidable"?
         int width_i = get_width_of_elimination_ordering(H, elimination_orderings[i]);
-        std::cout << "width_" << i << ": " << width_i << std::endl;
+        //std::cout << "width_" << i << ": " << width_i << std::endl;
         //compute minimum over all widths
     }
 
