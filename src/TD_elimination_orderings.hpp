@@ -57,7 +57,7 @@
 #include <cmath>
 #include <climits>
 #include <algorithm>    // std::random_shuffle
-#include <cstdlib>
+#include <cstdlib>      // rand()
 
 #include <iostream> //remove later
 
@@ -77,78 +77,37 @@ namespace treedec{
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
     std::vector<typename noboost::outedge_set<G_t>::type > bags(boost::num_vertices(G));
-    // TODO: what if outedge_set == treedec bag type?
-    typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
-    std::vector<my_vd> elim_vertices(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_chooser<G_t>::value_type> elim_vertices(boost::num_vertices(G));
+
     misc::DEGS<G_t> degs(G);
     detail::degree_mod<G_t> cb(&degs, &G);
 
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
     while(boost::num_edges(G) > 0){
-        //Search a minimum degree vertex.
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        boost::tie(vIt, vEnd) = boost::vertices(G);
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-        unsigned num_vert = boost::num_vertices(G);
-        typename misc::DEGS<G_t>::bag_iterator mdvi;
+        //Search a minimum degree vertex by recomputing min_ntd.
+        //(min_ntd==num_vert contradicts the outer loop condition (-> safe)).
+        for(; degs[min_ntd].empty(); min_ntd++);
 
-        // recompute ntd can only increase from here
-        while(degs[min_ntd].empty()){
-            ++min_ntd;
-            // min_ntd==num_vert contradicts the outer loop condition
-            // (this loop should be safe)
-            (void)(num_vert);
-            assert(min_ntd != num_vert);
-        }
-        assert(!degs[min_ntd].empty());
-        assert(min_ntd);
-        assert(min_ntd==1 || degs[min_ntd-1].empty());
+        typename misc::DEGS<G_t>::bag_iterator mdvi = degs[min_ntd].begin(); // min degree vertex iterator
 
-#ifndef NDEBUG // remove later.
-        unsigned min_degree = boost::num_vertices(G);
-        for(vIt=boost::vertices(G).first; vIt != vEnd; vIt++){
-            unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree < min_degree && degree > 0){
-                min_degree = degree;
-            }
-        }
-        assert(min_degree == min_ntd);
-#endif
-        mdvi = degs[min_ntd].begin(); // min degree vertex iterator
-        typename noboost::outedge_set<G_t>::type bag;
-
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*mdvi, G);
-                nIt1 != nEnd; nIt1++){ untested();
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*mdvi, G); nIt != nEnd; nIt++){
             // inefficient.
-            bag.insert(noboost::get_vd(G, *nIt1));
+            bags[i].insert(noboost::get_vd(G, *nIt));
         }
-        degs.check();
-        misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
-//         degs.check(); not here.
-//         degrees of neighbors are wrong
 
-        bags[i] = bag; // std::move?!
+        misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
+
         unsigned id=noboost::get_id(G, *mdvi);
         elim_vertices[i++] = id;
 
-        unsigned n=degs[min_ntd].erase(*mdvi);
-        (void)n;
-        assert(n==1);
+        degs[min_ntd].erase(*mdvi);
 
         boost::clear_vertex(*mdvi, G);
         if(min_ntd>1){
             --min_ntd;
         }
-        assert(boost::degree(*mdvi, G)==0);
-        
-
-#ifndef NDEBUG //redundant, for checking only
-        bool done=degs[0].insert(*mdvi).second;
-        assert(done);
-#endif
-        degs.check(); // g has a node of deg 445 that degs doesn't know about.
     }
 
     for(; i > 0; i--){
@@ -422,11 +381,10 @@ void make_filled_graph(G_t &G, std::vector<unsigned int> &elim_ordering, std::ve
 }
 
 template <typename G_t>
-int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimination_ordering){
+int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimination_ordering,
+                                      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap)
+{
     int width = -1;
-
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
-    make_index_map(G, idxMap);
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
         typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = idxMap[elimination_ordering[i]];
@@ -462,13 +420,16 @@ int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
         elimination_orderings[i] = elim_ordering;
     }
 
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
+    make_index_map(G, idxMap);
+
     int min_width = INT_MAX;
 
     #pragma omp parallel for
     for(unsigned int i = 0; i < count; i++){
         G_t H;
         boost::copy_graph(G, H); // ..(H, G)..?! "unavoidable"?
-        int width_i = get_width_of_elimination_ordering(H, elimination_orderings[i]);
+        int width_i = get_width_of_elimination_ordering(H, elimination_orderings[i], idxMap);
         //std::cout << "width_" << i << ": " << width_i << std::endl;
         //compute minimum over all widths
     }
