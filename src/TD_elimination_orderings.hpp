@@ -76,8 +76,8 @@ namespace treedec{
 //minimum-degree heuristic. Ignores isolated vertices.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
-    std::vector<typename noboost::outedge_set<G_t>::type > bags(boost::num_vertices(G));
-    std::vector<typename noboost::treedec_chooser<G_t>::value_type> elim_vertices(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
 
     misc::DEGS<G_t> degs(G);
     detail::degree_mod<G_t> cb(&degs, &G);
@@ -93,14 +93,13 @@ void _minDegree_decomp(G_t &G, T_t &T){
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*mdvi, G); nIt != nEnd; nIt++){
-            // inefficient.
-            bags[i].insert(noboost::get_vd(G, *nIt));
+            // inefficient. //if this cast failes to compile, the bag_type::value_type is a bad choice
+            bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
         }
 
         misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
 
-        unsigned id=noboost::get_id(G, *mdvi);
-        elim_vertices[i++] = id;
+        elim_vertices[i++] =  *mdvi;
 
         degs[min_ntd].erase(*mdvi);
 
@@ -111,8 +110,7 @@ void _minDegree_decomp(G_t &G, T_t &T){
     }
 
     for(; i > 0; i--){
-        typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
-        glue_bag(bags[i-1], e, T);
+        glue_bag(bags[i-1], elim_vertices[i-1], T);
     }
 }
 

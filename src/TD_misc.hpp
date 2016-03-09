@@ -55,7 +55,6 @@ namespace treedec{
 template <typename G_t, typename T_t>
 int is_valid_treedecomposition(G_t G, T_t T){
     //Checks if T is a tree.
-    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
     if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
@@ -73,7 +72,7 @@ int is_valid_treedecomposition(G_t G, T_t T){
     typename noboost::treedec_traits<T_t>::bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        vertices.insert(noboost::get_vd(G, *vIt));
+        vertices.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt);
     }
 
     if(coded_vertices != vertices){
@@ -81,23 +80,21 @@ int is_valid_treedecomposition(G_t G, T_t T){
     }
 
     //Checks if all edges are covered.
-    typedef typename std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges_vt;
-    edges_vt edges;
-
+    typename std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges(boost::num_edges(G));
+    unsigned int i = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        typename noboost::treedec_traits<T_t>::bag_type edge;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            vd_type id;
-            id = noboost::get_vd(G, *vIt);
-            edge.insert(id);
-            id = noboost::get_vd(G, *nIt);
-            edge.insert(id);
-            edges.push_back(edge);
-            edge.clear();
+            if(*vIt >= *nIt){
+                continue;
+            }
+            typename noboost::treedec_traits<T_t>::bag_type edge;
+            edge.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt);
+            edge.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
+            edges[i++] = MOVE(edge);
         }
     }
-    for(typename edges_vt::iterator it = edges.begin(); it != edges.end(); it++){
+    for(typename std::vector<typename noboost::treedec_traits<T_t>::bag_type>::iterator it = edges.begin(); it != edges.end(); it++){
         bool isSubset = false;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             if(std::includes(noboost::bag(T,*tIt).begin(),
@@ -113,20 +110,27 @@ int is_valid_treedecomposition(G_t G, T_t T){
             return -3;
         }
     }
-    typename noboost::outedge_set<G_t>::type forgotten;
+    typename noboost::treedec_traits<T_t>::bag_type forgotten;
 
     while(true){
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             unsigned int degree = boost::out_degree(*tIt, T);
             if(degree < 2){
-                typename noboost::treedec_traits<T_t>::bag_type intersection;
-                std::set_intersection(forgotten.begin(), forgotten.end(),
-                               noboost::bag(T, *tIt).begin(),
-                               noboost::bag(T, *tIt).end(),
-                               std::inserter(intersection, intersection.begin()));
-                if(!intersection.empty()){
-                    //There are coded vertices, that are not connected in T.
-                    return -4;
+                typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
+                typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(T, *tIt).begin();
+
+                //Test if forgotten and noboost::bag(T, *tIt) have an entry in common.
+                for(; it1 != forgotten.end() && it2 != noboost::bag(T, *tIt).end(); ){
+                    if(*it1 == *it2){
+                        //There are coded vertices, that are not connected in T.
+                        return -4;
+                    }
+                    else if(*it1 < *it2){
+                        it1++;
+                    }
+                    else{
+                        it2++;
+                    }
                 }
 
                 if(degree == 1){
