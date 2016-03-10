@@ -78,8 +78,9 @@ template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    if(boost::num_edges(G) > 0)
+    if(boost::num_edges(G) > 0){
         treedec::_minDegree_decomp(G, T);
+    }
     treedec::preprocessing_glue_bags(bags, T);
 }
 
@@ -89,7 +90,9 @@ template <typename G_t, typename T_t>
 void PP_FI(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
     treedec::preprocessing(G, bags, low);
-    treedec::_fillIn_decomp(G, T);
+    if(boost::num_edges(G) > 0){
+        treedec::_fillIn_decomp(G, T);
+    }
     treedec::preprocessing_glue_bags(bags, T);
 }
 

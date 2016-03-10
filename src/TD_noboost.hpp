@@ -124,6 +124,15 @@ void make_clique(nIter_t nIter, G_t &G){
     }
 }
 
+template<typename B_t, typename nIter_t, typename G_t>
+void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G){
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){
+        B.insert(*nIt);
+    }
+}
+
+
 template<typename G>
 inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
 {
@@ -141,14 +150,17 @@ inline unsigned get_pos(const G& /*g*/, const vertex_descriptor_G& /*v*/ )
     return 0;
 }
 
+
 // return "id" where the vertex_descriptor might make more sense.
 // (transitional interface)
 template<typename G>
 inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
 {
     // works with "TD_graph_t" (augmented adj_list)
-    return g[v].id;
+    //return g[v].id;
+    return v;
 }
+
 
 
 template<class G>
