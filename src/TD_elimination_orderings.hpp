@@ -153,8 +153,8 @@ void minDegree_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     int low = 0;
-    treedec::Islet(G, bags, low);
-    treedec::_minDegree_decomp(G, T);
+    Islet(G, bags);
+    _minDegree_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
