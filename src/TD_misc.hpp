@@ -91,8 +91,32 @@ void postOrderIterative(struct Node* root)
 }
 */
 
+// Find a root of an acyclic graph T
+// Complexity: Linear in the number of vertices of T.
+template <class T_t>
+typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
+    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
+    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
+    std::vector<bool> visited(boost::num_vertices(T), false);
+
+    visited[t] = true;
+
+    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
+        if(!visited[t]){
+            t = boost::source(*e, T);
+            visited[t] = true;
+        }
+        else{ //T is undirected
+            return t;
+        }
+    }
+
+    return t;
+}
+
+
 template <typename T_t>
-bool validate_connectivity(T_t &T, typename noboost::treedec_traits<T_t>::bag_type &forgotten){
+bool validate_connectivity(T_t &T){
     //Compute a postorder traversal.
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s1;
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s2;
@@ -100,9 +124,9 @@ bool validate_connectivity(T_t &T, typename noboost::treedec_traits<T_t>::bag_ty
     std::vector<bool> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
-    typename boost::graph_traits<T_t>::vertex_descriptor root = *(boost::vertices(T).first);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     s1.push(root);
-    visited[noboost::pos(root, T)] = true;
+    visited[root] = true;
 
     while(!s1.empty()){
         typename boost::graph_traits<T_t>::vertex_descriptor v = s1.top();
@@ -111,23 +135,34 @@ bool validate_connectivity(T_t &T, typename noboost::treedec_traits<T_t>::bag_ty
 
         typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
-            if(!visited[noboost::get_pos(*nIt, T)]){
+            if(!visited[*nIt]){
                 s1.push(*nIt);
-                visited[noboost::pos(*nIt, T)] = true;
+                visited[*nIt] = true;
             }
         }
     }
 
-    while(!s2.empty()){
+    visited.assign(boost::num_vertices(T), false);
+    typename noboost::treedec_traits<T_t>::bag_type forgotten;
+
+    while(true){
         typename boost::graph_traits<T_t>::vertex_descriptor cur = s2.top();
         s2.pop();
-        typename boost::graph_traits<T_t>::vertex_descriptor parent;
-        if(!s2.empty()){ parent = s2.top(); }
+        visited[cur] = true;
 
+        //Get the parent of cur.
+        typename boost::graph_traits<T_t>::vertex_descriptor parent;
+        if(!s2.empty()){
+            typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
+                if(!visited[*nIt]){ parent = *nIt; break; }
+            }
+        }
+
+        //Test if forgotten and noboost::bag(T, cur) have an entry in common.
         typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
         typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(T, cur).begin();
 
-        //Test if forgotten and noboost::bag(T, cur) have an entry in common.
         for(; it1 != forgotten.end() && it2 != noboost::bag(T, cur).end(); ){
             if(*it1 == *it2){
                 //There are coded vertices, that are not connected in T.
@@ -146,7 +181,6 @@ bool validate_connectivity(T_t &T, typename noboost::treedec_traits<T_t>::bag_ty
                             noboost::bag(T, parent).begin(),
                             noboost::bag(T, parent).end(),
                             std::inserter(forgotten, forgotten.begin()));
-
     }
 }
 
@@ -209,8 +243,7 @@ int is_valid_treedecomposition(G_t G, T_t T){
         }
     }
 
-    typename noboost::treedec_traits<T_t>::bag_type forgotten;
-    if(!validate_connectivity(T, forgotten)){
+    if(!validate_connectivity(T)){
         return -4;
     }
 
