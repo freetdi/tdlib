@@ -376,7 +376,7 @@ int get_width_of_elimination_ordering(G_t &G, std::vector<unsigned int> &elimina
 
         width = (width > (int)boost::out_degree(elim_vertex, G))? width : (int)boost::out_degree(elim_vertex, G);
 
-        noboost::make_clique(boost::adjacent_vertices(elim_vertex, G));
+        noboost::make_clique(boost::adjacent_vertices(elim_vertex, G), G);
  
         boost::clear_vertex(elim_vertex, G);
     }

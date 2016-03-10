@@ -1,3 +1,8 @@
+
+#ifndef TD_RANDOM
+
+namespace treedec{
+
 #include "TD_elimination_orderings.hpp"
 
 #ifdef _OPENMP
@@ -33,3 +38,7 @@ int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
 
     return min_width; //also return the elimination ordering causing minimal width?
 }
+
+} //namespace treedec
+
+#endif //TD_RANDOM
