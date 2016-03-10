@@ -231,7 +231,7 @@ void fillIn_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     int low = 0;
-    treedec::Islet(G, bags, low);
+    treedec::Islet(G, bags);
     treedec::_fillIn_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }
