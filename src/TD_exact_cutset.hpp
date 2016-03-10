@@ -43,10 +43,17 @@
 // void exact_cutset(G_t &G, T_t &T)
 //
 
+#ifndef TD_EXACT_CUTSET
+#define TD_EXACT_CUTSET
+
 namespace treedec{
 
 template <typename G_t>
-bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component, std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &results, unsigned int k){
+bool explore_cutsets(G_t &G,
+         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut,
+         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component,
+         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &results, unsigned int k)
+{
     if(cut.size() > k){
         return false;
     }
@@ -58,13 +65,14 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
         return true;
     }
 
-
     unsigned int idx = results.size();
 
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N;
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> rest;
+    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N, rest;
 
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = cut.begin(); sIt != cut.end(); sIt++){
+    //Collect the neighbours of 'cut'.
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+          = cut.begin(); sIt != cut.end(); sIt++)
+    {
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
             if(component.find(*nIt) != component.end()){
@@ -73,31 +81,37 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
         }
     }
 
+    //'Enqueue' the neighbours of 'cut' first.
     std::set_difference(component.begin(), component.end(), N.begin(), N.end(), std::inserter(rest, rest.begin()));
 
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> candidates(component.size());
 
     unsigned int i = 0;
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++){
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+            = N.begin(); sIt != N.end(); sIt++)
+    {
         candidates[i++] = *sIt;
     }
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = rest.begin(); sIt != rest.end(); sIt++){
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+            = rest.begin(); sIt != rest.end(); sIt++)
+    {
         candidates[i++] = *sIt;
     }
 
     for(unsigned int i = 0; i < candidates.size(); i++){
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
         cut_ext.insert(candidates[i]);
 
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = component;
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = MOVE(component);
         component_red.erase(candidates[i]);
 
         std::vector<bool> visited(boost::num_vertices(G), true);
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
-           component_red.begin(); sIt != component_red.end(); sIt++){
-            unsigned id=noboost::get_id(G, *sIt);
-            visited[id] = false;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+              = component_red.begin(); sIt != component_red.end(); sIt++)
+        {
+            unsigned pos=noboost::get_id(G, *sIt); //use pos later
+            visited[pos] = false;
         }
 
         typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > new_components;
@@ -108,8 +122,9 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
         for(unsigned int t = 0; t < new_components.size(); t++){
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_red;
 
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
-               cut_ext.begin(); sIt != cut_ext.end(); sIt++){
+            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+                 = cut_ext.begin(); sIt != cut_ext.end(); sIt++)
+            {
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
                     if(new_components[t].find(*nIt) != new_components[t].end()){
@@ -139,7 +154,10 @@ bool explore_cutsets(G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_
 }
 
 template <typename T_t>
-void glue_bags(T_t &T, std::set<unsigned int> bag1, std::set<unsigned int> &bag2){
+void glue_bags(T_t &T,
+          typename noboost::treedec_traits<T_t>::bag_type &bag1,
+          typename noboost::treedec_traits<T_t>::bag_type &bag2)
+{
     if(bag1 == bag2){
         return;
     }
@@ -190,11 +208,8 @@ bool exact_cutset(G_t &G, T_t &T, int k){
     boost::tie(vIt, vEnd) = boost::vertices(G);
 
     if(boost::num_vertices(G) == 1){
-        std::set<unsigned int> bag;
-        unsigned id=noboost::get_id(G, *vIt);
-        bag.insert(id);
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        noboost::bag(T, t) = bag;
+        noboost::bag(T, t).insert(*vIt);
         if(k <= 0){
             return true;
         }
@@ -202,9 +217,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
     }
 
 
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut;
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
-
+    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut, component;
     cut.insert(*vIt);
 
     vIt++;
@@ -212,27 +225,25 @@ bool exact_cutset(G_t &G, T_t &T, int k){
         component.insert(*vIt);
     }
 
-    unsigned int k_ = (unsigned int)k;
+    unsigned int k_ = (unsigned int)(k+1);
 
-    typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
 
     if(!explore_cutsets(G, cut, component, results, k_)){
         return false;
     }
 
     for(unsigned int i = 0; i < results.size()-1; i++){
-        std::set<unsigned int> bag1;
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
-           results[i].begin(); sIt != results[i].end(); sIt++){
-            unsigned id=noboost::get_id(G, *sIt);
-            bag1.insert(id);
+        typename noboost::treedec_traits<T_t>::bag_type bag1, bag2;
+
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+              = results[i].begin(); sIt != results[i].end(); sIt++){
+            bag1.insert(*sIt);
         }
 
-        std::set<unsigned int> bag2;
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt=
-           results[i+1].begin(); sIt != results[i+1].end(); sIt++){
-            unsigned id=noboost::get_id(G, *sIt);
-            bag2.insert(id);
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+              = results[i+1].begin(); sIt != results[i+1].end(); sIt++){
+            bag2.insert(*sIt);
         }
 
         glue_bags(T, bag1, bag2);
@@ -244,12 +255,14 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
 template <typename G_t, typename T_t>
 void exact_cutset(G_t &G, T_t &T){
-    int lb = -1;
+    int lb = 0;
     while(!exact_cutset(G, T, lb)){
         lb++;
     }
 }
 
 } //namespace treedec
+
+#endif //TD_EXACT_CUTSET
 
 // vim:ts=8:sw=4:et

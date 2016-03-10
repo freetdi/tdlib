@@ -17,7 +17,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers some recommended combinations of the algorithms
+// Offers some recommended combinations of the algorithms.
 //
 // A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
 //
@@ -76,7 +76,11 @@ namespace treedec{
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T, int &low){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
+
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
         treedec::_minDegree_decomp(G, T);
@@ -88,7 +92,11 @@ void PP_MD(G_t &G, T_t &T, int &low){
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
 void PP_FI(G_t &G, T_t &T, int &low){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
+
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
         treedec::_fillIn_decomp(G, T);
@@ -100,7 +108,11 @@ void PP_FI(G_t &G, T_t &T, int &low){
 //this version applies the fillIn-heuristic followed by triangulation minimization on not fully preprocessable graph instances
 template <typename G_t, typename T_t>
 void PP_FI_TM(G_t &G, T_t &T, int &low){
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
+
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
         std::vector<unsigned int> old_elim_ordering;
@@ -120,7 +132,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     treedec::preprocessing_glue_bags(bags, T);
 }
 
-//this version applies the fillIn-heuristic followed by triangulation minimization
+//This version applies the fillIn-heuristic followed by triangulation minimization.
 template <typename G_t, typename T_t>
 void FI_TM(G_t &G, T_t &T, int &/*low*/){
     std::vector<unsigned int> old_elim_ordering;
@@ -134,16 +146,20 @@ template <typename G_t, typename T_t>
 void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     //preprocessing
     int low = -1;
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
+
     treedec::preprocessing(G, bags, low);
-    if(boost::num_vertices(G) == 0){
+    if(boost::num_edges(G) == 0){
         treedec::preprocessing_glue_bags(bags, T);
         return;
     }
 
     lb = (low > lb)? low : lb;
 
-    //compute a treedecomposition for each connected component of G and glue the decompositions together
+    //Compute a treedecomposition for each connected component of G and glue the decompositions together.
     std::vector<std::set<unsigned int> > components;
     get_components(G, components);
 
@@ -191,13 +207,17 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     //preprocessing
     int low = -1;
 
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
     treedec::preprocessing(G, bags, low);
 
     if(boost::num_edges(G) == 0){
         treedec::preprocessing_glue_bags(bags, T);
-        if(low <= k)
+        if(low <= k){
             return true;
+        }
         return false;
     }
 
@@ -206,10 +226,11 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     int lb = low;
     lb = (lb_deltaC > lb)? lb_deltaC : lb;
 
-    if(lb > k)
+    if(lb > k){
         return false;
+    }
 
-    //compute a treedecomposition for each connected component of G and glue the decompositions together
+    //Compute a treedecomposition for each connected component of G and glue the decompositions together.
     std::vector<std::set<unsigned int> > components;
     get_components(G, components);
 
@@ -250,7 +271,10 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     //preprocessing
     int low = -1;
 
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > bags;
+    std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > bags;
     treedec::preprocessing(G, bags, low);
 
     if(boost::num_edges(G) == 0){
@@ -263,7 +287,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     lb = (low > lb)? low : lb;
     lb = (lb_deltaC > lb)? lb_deltaC : lb;
 
-    //compute a treedecomposition for each connected component of G and glue the decompositions together
+    //Compute a treedecomposition for each connected component of G and glue the decompositions together.
     std::vector<std::set<unsigned int> > components;
     get_components(G, components);
 
@@ -362,6 +386,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T){
 
 } //namespace treedec
 
-#endif //ifdef TD_COMBINATIONS
+#endif //TD_COMBINATIONS
 
 // vim:ts=8:sw=4:et

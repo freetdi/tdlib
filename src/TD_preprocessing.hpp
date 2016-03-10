@@ -346,29 +346,11 @@ bool Cube(G_t &G, std::vector<boost::tuple<
 
         typename boost::graph_traits<G_t>::vertex_descriptor u,v,w;
 
-        if(Na[0] == Nb[0]){
-            u = Na[0];
-            v = Na[1];
-            w = Nb[1];
-        }
-        else if(Na[0] == Nb[1]){
-            u = Na[0];
-            v = Na[1];
-            w = Nb[0];
-        }
-        else if(Na[1] == Nb[0]){
-            u = Na[1];
-            v = Na[0];
-            w = Nb[1];
-        }
-        else if(Na[1] == Nb[1]){
-            u = Na[1];
-            v = Na[0];
-            w = Nb[0];
-        }
-        else{
-            continue;
-        }
+        if(Na[0] == Nb[0]){      u = Na[0]; v = Na[1]; w = Nb[1]; }
+        else if(Na[0] == Nb[1]){ u = Na[0]; v = Na[1]; w = Nb[0]; }
+        else if(Na[1] == Nb[0]){ u = Na[1]; v = Na[0]; w = Nb[1]; }
+        else if(Na[1] == Nb[1]){ u = Na[1]; v = Na[0]; w = Nb[0]; }
+        else{ continue; }
 
         if((Nc[0] == v && Nc[1] == w) || (Nc[1] == v && Nc[0] == w)){
             bag.clear();
@@ -518,11 +500,11 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
 
                 if(!boost::edge(*nIt1, *nIt2, G).second){
                     if(specialNeighbourFound){
-                        //#special neighbours > 1
+                        //#special neighbours > 1.
                         isAlmostSimplicial = false;
                         goto DOUBLE_BREAK;
                     }
-                    //*nIt1 or *nIt2 is a special neighbour
+                    //*nIt1 or *nIt2 is a special neighbour.
                     cand1 = *nIt1;
                     cand2 = *nIt2;
                     missingEdgesCount++;
@@ -531,11 +513,11 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
 
             if(missingEdgesCount > 0){
                 if(missingEdgesCount == 1){
-                    //cand2 has to be the special neighbour
+                    //cand2 has to be the special neighbour.
                     specialNeighbour = cand2;
                 }
                 else{
-                    //cand1 has to be the special neighbour
+                    //cand1 has to be the special neighbour.
                     specialNeighbour = cand1;
                 }
                 specialNeighbourFound = true;
@@ -604,7 +586,7 @@ void glue_bag_preprocessing(
         }
     }
 
-    //case for a disconnected graph
+    //Case for a disconnected graph.
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     bag.insert(preprocessed_node);
     noboost::bag(T,t_dec_node) = MOVE(bag);
@@ -613,8 +595,8 @@ void glue_bag_preprocessing(
 
 }
 
-//recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
-//this version stores the resulting bags in a vector and does not call further algorithms
+//Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
+//this version stores the resulting bags in a vector and does not call further algorithms.
 template <typename G_t>
 void _preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
@@ -652,7 +634,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     preprocessing(G, bags, low);
 }
 
-//glues bags with the current tree decomposition
+//Glues bags with the current tree decomposition.
 template<typename T_t>
 void preprocessing_glue_bags(std::vector< boost::tuple<
         typename noboost::treedec_traits<T_t>::vd_type,
