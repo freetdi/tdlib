@@ -18,4 +18,5 @@ pkginclude_HEADERS = \
   TD_seperator_algorithm.hpp \
   TD_upper_bounds.hpp \
   TD_std.hpp \
-  TD_degree.hpp
+  TD_degree.hpp \
+  TD_random.hpp
