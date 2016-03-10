@@ -34,11 +34,14 @@
 #ifndef TD_MISC
 #define TD_MISC
 
+#include <stack>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 #include "TD_simple_graph_algos.hpp"
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
+
+#include <iostream>
 
 namespace treedec{
 
@@ -52,8 +55,108 @@ namespace treedec{
  * -4 = there exist vertices, coded in the bags of T, that are not connected in T
  *                           (but T is a tree and all edges/vertices are covered)
  */
+
+/*
+/ An iterative function to do post order traversal of a given binary tree
+void postOrderIterative(struct Node* root)
+{
+    // Create two stacks
+    struct Stack* s1 = createStack(MAX_SIZE);
+    struct Stack* s2 = createStack(MAX_SIZE);
+ 
+    // push root to first stack
+    push(s1, root);
+    struct Node* node;
+ 
+    // Run while first stack is not empty
+    while (!isEmpty(s1))
+    {
+        // Pop an item from s1 and push it to s2
+        node = pop(s1);
+        push(s2, node);
+ 
+        // Push left and right children of removed item to s1
+        if (node->left)
+            push(s1, node->left);
+        if (node->right)
+            push(s1, node->right);
+    }
+ 
+    // Print all elements of second stack
+    while (!isEmpty(s2))
+    {
+        node = pop(s2);
+        printf("%d ", node->data);
+    }
+}
+*/
+
+template <typename T_t>
+bool validate_connectivity(T_t &T, typename noboost::treedec_traits<T_t>::bag_type &forgotten){
+    //Compute a postorder traversal.
+    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s1;
+    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s2;
+
+    std::vector<bool> visited(boost::num_vertices(T), false);
+
+    //The root can be chosen freely.
+    typename boost::graph_traits<T_t>::vertex_descriptor root = *(boost::vertices(T).first);
+    s1.push(root);
+    visited[noboost::pos(root, T)] = true;
+
+    while(!s1.empty()){
+        typename boost::graph_traits<T_t>::vertex_descriptor v = s1.top();
+        s1.pop();
+        s2.push(v);
+
+        typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
+            if(!visited[noboost::get_pos(*nIt, T)]){
+                s1.push(*nIt);
+                visited[noboost::pos(*nIt, T)] = true;
+            }
+        }
+    }
+
+    while(!s2.empty()){
+        typename boost::graph_traits<T_t>::vertex_descriptor cur = s2.top();
+        s2.pop();
+        typename boost::graph_traits<T_t>::vertex_descriptor parent;
+        if(!s2.empty()){ parent = s2.top(); }
+
+        typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
+        typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(T, cur).begin();
+
+        //Test if forgotten and noboost::bag(T, cur) have an entry in common.
+        for(; it1 != forgotten.end() && it2 != noboost::bag(T, cur).end(); ){
+            if(*it1 == *it2){
+                //There are coded vertices, that are not connected in T.
+                return false;
+            }
+            else if(*it1 < *it2){ it1++; }
+            else{ it2++; }
+        }
+
+        if(s2.empty()){
+            return true;
+        }
+
+        std::set_difference(noboost::bag(T, cur).begin(),
+                            noboost::bag(T, cur).end(),
+                            noboost::bag(T, parent).begin(),
+                            noboost::bag(T, parent).end(),
+                            std::inserter(forgotten, forgotten.begin()));
+
+    }
+}
+
 template <typename G_t, typename T_t>
 int is_valid_treedecomposition(G_t G, T_t T){
+    if(boost::num_vertices(T) == 0){
+        //The empty graph has a treedecomposition with 1 vertex and an empty bag.
+        return -5;
+    }
+
     //Checks if T is a tree.
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
@@ -88,75 +191,30 @@ int is_valid_treedecomposition(G_t G, T_t T){
             if(*vIt >= *nIt){
                 continue;
             }
-            typename noboost::treedec_traits<T_t>::bag_type edge;
-            edge.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt);
-            edge.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
-            edges[i++] = MOVE(edge);
-        }
-    }
-    for(typename std::vector<typename noboost::treedec_traits<T_t>::bag_type>::iterator it = edges.begin(); it != edges.end(); it++){
-        bool isSubset = false;
-        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(std::includes(noboost::bag(T,*tIt).begin(),
-                             noboost::bag(T,*tIt).end(),
-                             it->begin(), it->end()))
-            {
-                isSubset = true;
-                break;
+
+            bool is_contained = false;
+            for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+                if(noboost::bag(T,*tIt).find((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt)
+                != noboost::bag(T,*tIt).end() &&
+                   noboost::bag(T,*tIt).find((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt)
+                != noboost::bag(T,*tIt).end()){
+                    is_contained = true;
+                    break;
+                }
+            }
+
+            if(!is_contained){
+                return -3; //Not all edges are covered.
             }
         }
-        if(!isSubset){
-            //Not all edges are covered.
-            return -3;
-        }
     }
+
     typename noboost::treedec_traits<T_t>::bag_type forgotten;
-
-    while(true){
-        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            unsigned int degree = boost::out_degree(*tIt, T);
-            if(degree < 2){
-                typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
-                typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(T, *tIt).begin();
-
-                //Test if forgotten and noboost::bag(T, *tIt) have an entry in common.
-                for(; it1 != forgotten.end() && it2 != noboost::bag(T, *tIt).end(); ){
-                    if(*it1 == *it2){
-                        //There are coded vertices, that are not connected in T.
-                        return -4;
-                    }
-                    else if(*it1 < *it2){
-                        it1++;
-                    }
-                    else{
-                        it2++;
-                    }
-                }
-
-                if(degree == 1){
-                    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-                    typename boost::graph_traits<T_t>::vertex_descriptor parent;
-                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
-                        parent = *nIt;
-                    }
-
-                    std::set_difference(noboost::bag(T, *tIt).begin(),
-                                        noboost::bag(T, *tIt).end(),
-                                        noboost::bag(T, parent).begin(),
-                                        noboost::bag(T, parent).end(),
-                                        std::inserter(forgotten, forgotten.begin()));
-                }
-
-                boost::clear_vertex(*tIt, T);
-                boost::remove_vertex(*tIt, T);
-                break;
-            }
-        }
-
-        if(boost::num_vertices(T) == 0){
-            return 0;
-        }
+    if(!validate_connectivity(T, forgotten)){
+        return -4;
     }
+
+    return 0;
 }
 
 template <typename G_t, typename T_t>

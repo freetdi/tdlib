@@ -261,6 +261,7 @@ void minDegree_ordering(G_t G, std::vector<unsigned int> &elim_ordering){
 //Computes an elimination ordering according to fillIn heuristic (version used for postprocessing algorithms).
 template<typename G_t>
 void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vector<bool> &visited){
+    unsigned int i = 0;
     while(true){
         //Search a vertex v such that least edges are missing for making the neighbourhood of v a clique.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -308,7 +309,7 @@ void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vect
         noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
 
         unsigned id=noboost::get_id(G, min_vertex);
-        elim_ordering.push_back(id);
+        elim_ordering[i++] = id;
         visited[id] = true;
 
         boost::clear_vertex(min_vertex, G);
@@ -318,7 +319,8 @@ void _fillIn_ordering(G_t G, std::vector<unsigned int> &elim_ordering, std::vect
 //Computes an elimination ordering according to fillIn heuristic (version used for postprocessing algorithms).
 template<typename G_t>
 void fillIn_ordering(G_t &G, std::vector<unsigned int> &elim_ordering){
-    std::vector<bool> visited(boost::num_vertices(G)+1, false);
+    elim_ordering.resize(boost::num_vertices(G));
+    std::vector<bool> visited(boost::num_vertices(G), false);
     _fillIn_ordering(G, elim_ordering, visited);
 }
 
@@ -406,7 +408,7 @@ int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
         boost::copy_graph(G, H); // ..(H, G)..?! "unavoidable"?
         int width_i = get_width_of_elimination_ordering(H, elimination_orderings[i], idxMap);
         //std::cout << "width_" << i << ": " << width_i << std::endl;
-        //compute minimum over all widths
+        //compute minimum over all widths (shared min_width?!)
     }
 
     return min_width; //also return the elimination ordering causing minimal width?
@@ -414,8 +416,9 @@ int randomly_try_some_elimination_orderings(G_t &G, unsigned int count = 5){
 
 template <typename G_t, typename T_t>
 void _ordering_to_treedec(G_t &G, std::vector<unsigned int> &elimination_ordering, T_t &T, unsigned int idx){
-    if(idx == elimination_ordering.size())
+    if(idx == elimination_ordering.size()){
         return;
+    }
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     boost::tie(vIt, vEnd) = boost::vertices(G);
@@ -464,7 +467,6 @@ void _ordering_to_treedec(G_t &G, typename std::vector<typename boost::graph_tra
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
         //Collect the neighbours of elimination vertex i.
-        std::set<unsigned int> bag;
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elimination_ordering[i], G); nIt != nEnd; nIt++){
