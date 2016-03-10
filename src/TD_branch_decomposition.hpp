@@ -284,7 +284,7 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
 
             //degree > 3
             typename boost::graph_traits<T_t>::vertex_descriptor new_t_node = boost::add_vertex(T);
-            nooboost::bag(new_t_node) = noboost::bag(T, *tIt);
+            noboost::bag(new_t_node) = noboost::bag(T, *tIt);
             boost::add_edge(*tIt, new_t_node, T);
             boost::remove_edge(*tIt, N[0], T);
             boost::remove_edge(*tIt, N[1], T);
