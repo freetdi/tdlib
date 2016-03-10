@@ -56,41 +56,6 @@ namespace treedec{
  *                           (but T is a tree and all edges/vertices are covered)
  */
 
-/*
-/ An iterative function to do post order traversal of a given binary tree
-void postOrderIterative(struct Node* root)
-{
-    // Create two stacks
-    struct Stack* s1 = createStack(MAX_SIZE);
-    struct Stack* s2 = createStack(MAX_SIZE);
- 
-    // push root to first stack
-    push(s1, root);
-    struct Node* node;
- 
-    // Run while first stack is not empty
-    while (!isEmpty(s1))
-    {
-        // Pop an item from s1 and push it to s2
-        node = pop(s1);
-        push(s2, node);
- 
-        // Push left and right children of removed item to s1
-        if (node->left)
-            push(s1, node->left);
-        if (node->right)
-            push(s1, node->right);
-    }
- 
-    // Print all elements of second stack
-    while (!isEmpty(s2))
-    {
-        node = pop(s2);
-        printf("%d ", node->data);
-    }
-}
-*/
-
 // Find a root of an acyclic graph T
 // Complexity: Linear in the number of vertices of T.
 template <class T_t>
@@ -113,7 +78,6 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
 
     return t;
 }
-
 
 template <typename T_t>
 bool validate_connectivity(T_t &T){
