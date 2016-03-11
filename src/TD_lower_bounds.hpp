@@ -888,10 +888,11 @@ int LBNC_deltaD(G_t &G){
 
             k_neighbour_improved_graph(H, lb+1);
         }
-        if(new_lb > lb)
+        if(new_lb > lb){
             lb++;
-        else
+        }else{
             break;
+        }
     }
     return lb;
 }

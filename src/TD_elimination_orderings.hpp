@@ -71,6 +71,32 @@
 #include "TD_std.hpp"
 
 namespace treedec{
+namespace detail{
+
+    // DRAFT. no useful interface
+template<typename G>
+struct degree_mod : public noboost::vertex_callback<G>{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    degree_mod(misc::DEGS<G>* d, G* g) : _degs(d), _g(g){}
+
+    // reinsert with degree-1
+    void operator()(vertex_descriptor v){ untested();
+        unsigned deg=boost::degree(v,*_g);
+        (void)deg;
+        assert(deg);
+        bool done=(*_degs)[deg-1].insert(v).second;
+        (void)done;
+        assert(done);
+    }
+    //private: not yet.
+//    BUG:: hardcoded type
+        misc::DEGS<G>* _degs;
+    private:
+        degree_mod(const degree_mod&){}
+        G* _g;
+};
+
+} //namespace detail
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic. Ignores isolated vertices.
@@ -205,7 +231,7 @@ void fillIn_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     int low = 0;
-    treedec::Islet(G, bags, low);
+    treedec::Islet(G, bags);
     treedec::_fillIn_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }

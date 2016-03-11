@@ -620,7 +620,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
               > > &bags, int &low)
 {
-    Islet(G, bags, low);
+    Islet(G, bags);
     _preprocessing(G, bags, low);
 }
 
