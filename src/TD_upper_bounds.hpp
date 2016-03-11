@@ -39,8 +39,8 @@ unsigned int _minDegree(G_t &G){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         boost::tie(vIt, vEnd) = boost::vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-        unsigned int min_degree = boost::num_vertices(G);
 
+        unsigned int min_degree = UINT_MAX;
         for(; vIt != vEnd; vIt++){
             unsigned int degree = boost::out_degree(*vIt, G);
             if(degree != 0 && degree < min_degree){
@@ -53,22 +53,7 @@ unsigned int _minDegree(G_t &G){
             upper_bound = min_degree;
         }
 
-        //Collect the neighbours of min_vertex.
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> neighbours(boost::out_degree(min_vertex, G));
-
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-
-        unsigned int i = 0;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
-            neighbours[i++] = *nIt;
-        }
-
-        //Make the neighbours of min_vertex a clique.
-        for(unsigned int i = 0; i < neighbours.size(); i++){
-            for(unsigned int j = i+1; j < neighbours.size(); j++){
-                boost::add_edge(neighbours[i], neighbours[j], G);
-            }
-        }
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -81,10 +66,65 @@ unsigned int minDegree(G_t G){
     return _minDegree(G);
 }
 
+template <typename G_t>
+unsigned int _minFill(G_t &G){
+    unsigned int upper_bound = 0;
+
+    while(boost::num_edges(G) > 0){
+        //Search a vertex v such that least edges are missing for making the neighbourhood of v a clique.
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        boost::tie(vIt, vEnd) = boost::vertices(G);
+        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
+
+        unsigned int min_fill = UINT_MAX;
+        for(; vIt != vEnd; vIt++){
+            if(boost::out_degree(*vIt, G) == 0){
+                continue;
+            }
+
+            unsigned int current_fill = 0;
+
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+            for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++){
+                nIt2 = nIt1;
+                nIt2++;
+                for(; nIt2 != nEnd; nIt2++){
+                    if(!boost::edge(*nIt1, *nIt2, G).second){
+                        current_fill++;
+                    }
+                }
+            }
+
+            if(current_fill < min_fill){
+                min_fill = current_fill;
+                min_vertex = *vIt;
+                if(current_fill == 0){
+                    break;
+                }
+            }
+        }
+
+        if(boost::degree(min_vertex, G) > upper_bound){
+            upper_bound = boost::degree(min_vertex, G);
+        }
+
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
+
+        boost::clear_vertex(min_vertex, G);
+    }
+
+    return upper_bound;
+}
+
+template <typename G_t>
+unsigned int minFill(G_t G){
+    return _minFill(G);
+}
+
 } //namespace ub
 
 } //namespace treedec
 
-#endif //ifdef TD_UPPER_BOUNDS
+#endif //TD_UPPER_BOUNDS
 
 // vim:ts=8:sw=4:et

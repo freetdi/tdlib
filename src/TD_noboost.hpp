@@ -137,7 +137,7 @@ unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descript
     noboost::make_clique(boost::adjacent_vertices(v, G), G);
     unsigned int deg = boost::degree(v, G);
     boost::clear_vertex(v, G);
-    return deg+1;
+    return deg;
 }
 
 
