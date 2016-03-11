@@ -452,9 +452,11 @@ void id_bag_to_descriptor_bag(G_t &G,
 template <typename T_t>
 void reorder_ids_decomposition(T_t &T, std::vector<unsigned int> &id_map){
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        std::set<unsigned int> new_bag;
-        for(std::set<unsigned int>::iterator sIt = noboost::bag(T, *tIt).begin(); sIt != noboost::bag(T, *tIt).end(); sIt++){
+        bag_type new_bag;
+        for(typename bag_type::iterator sIt=noboost::bag(T, *tIt).begin();
+                sIt!=noboost::bag(T, *tIt).end(); sIt++){
             new_bag.insert(id_map[*sIt]);
         }
 
