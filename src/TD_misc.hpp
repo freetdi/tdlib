@@ -173,7 +173,9 @@ int is_valid_treedecomposition(G_t G, T_t T){
     typename noboost::treedec_traits<T_t>::bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        vertices.insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt);
+        typename noboost::treedec_traits<T_t>::bag_type::value_type v;
+        v = noboost::get_vd(G, *vIt);
+        vertices.insert(v);
     }
 
     if(coded_vertices != vertices){
