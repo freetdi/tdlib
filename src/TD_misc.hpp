@@ -192,10 +192,12 @@ int is_valid_treedecomposition(G_t G, T_t T){
 
             bool is_contained = false;
             for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-                if(noboost::bag(T,*tIt).find((typename noboost::treedec_traits<T_t>::bag_type::value_type) *vIt)
-                != noboost::bag(T,*tIt).end() &&
-                   noboost::bag(T,*tIt).find((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt)
-                != noboost::bag(T,*tIt).end()){
+                typedef typename noboost::treedec_traits<T_t>::bag_type::value_type vd_type;
+                vd_type V(*vIt);
+                vd_type N(*nIt);
+
+                if(noboost::bag(T,*tIt).find(V) != noboost::bag(T,*tIt).end() &&
+                   noboost::bag(T,*tIt).find(N) != noboost::bag(T,*tIt).end()){
                     is_contained = true;
                     break;
                 }
