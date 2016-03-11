@@ -132,6 +132,14 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G){
     }
 }
 
+template<typename G_t>
+unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex descritpr v, G_t &G){
+    noboost::make_clique(boost::adjacent_vertices(v, G), G);
+    unsigned int deg = boost::degree(G);
+    boost::clear_vertex(v, G);
+    return deg+1;
+}
+
 
 template<typename G>
 inline unsigned get_id(const G& g, const vertex_descriptor_G& v )

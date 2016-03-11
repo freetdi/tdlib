@@ -19,4 +19,5 @@ pkginclude_HEADERS = \
   TD_upper_bounds.hpp \
   TD_std.hpp \
   TD_degree.hpp \
-  TD_random.hpp
+  TD_random.hpp \
+  TD_branch_and_bound.hpp
