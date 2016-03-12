@@ -335,8 +335,8 @@ void seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
     seperate_vertices(G, disabled, X, Y, S, UINT_MAX);
 }
 
-}
+} //namespace treedec
 
-#endif
+#endif //TD_NETWORK_FLOW
 
 // vim:ts=8:sw=4:et

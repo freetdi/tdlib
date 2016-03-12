@@ -295,8 +295,8 @@ unsigned seperator_algorithm(G_t &G, T_t &T){
     return 4*k;
 }
 
-}
+} //namespace treedec
 
-#endif //ifdef TD_SEPERATOR_ALGORITHM
+#endif //TD_SEPERATOR_ALGORITHM
 
 // vim:ts=8:sw=4:et:

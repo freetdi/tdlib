@@ -134,7 +134,8 @@ int branch_and_bound(G_t &G){
     unsigned int ub = treedec::ub::minFill(G);
 
     if(lb == ub){
-        
+        return ub;
+    }
 
     //Postorder traversal.
     while(!leafs.empty()){
@@ -171,3 +172,4 @@ int branch_and_bound(G_t &G){
 } //namespace treedec
 
 #endif //TD_BRANCH_AND_BOUND
+
