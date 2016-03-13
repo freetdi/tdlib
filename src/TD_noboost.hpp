@@ -56,6 +56,11 @@ namespace noboost{
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
 #endif
 
+template<class G>
+void check(G const&)
+{
+}
+
 template<typename G>
 void remove_vertex(vertex_iterator_G u, G &g)
 {
