@@ -115,19 +115,12 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
-        std::vector<unsigned int> old_elim_ordering;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
 
-        G_t H;
-        treedec::remove_isolated_vertices(H, G);
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(H, id_map);
-
-        treedec::fillIn_ordering(H, old_elim_ordering);
-        treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
-        treedec::ordering_to_treedec(H, new_elim_ordering, T);
-
-        treedec::reorder_ids_decomposition(T, id_map);
+        treedec::fillIn_ordering(G, old_elim_ordering, true); //true = ignore isolated vertices
+        treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
+        treedec::ordering_to_treedec(G, new_elim_ordering, T);
     }
     treedec::preprocessing_glue_bags(bags, T);
 }

@@ -461,11 +461,21 @@ template <typename G_t>
 void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
                      std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_,
                      G_t &H,
-                     typename std::vector<typename noboost::treedec_chooser<G_t>::bag_type::value_type> &vdMap)
+                     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
         unsigned int pos = noboost::get_pos(*sIt, H);
         S_.insert(vdMap[pos]);
+    }
+}
+
+template <typename G_t>
+void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+                             typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &B)
+{
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::value_type vd = *sIt;
+        B.insert(vd);
     }
 }
 

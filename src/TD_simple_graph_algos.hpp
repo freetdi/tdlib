@@ -30,38 +30,57 @@ namespace treedec{
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_noboost.hpp"
 
+//Provides a mapping (version for bags).
 template <typename G_t>
-void delete_edges(G_t &G, std::vector<std::vector<unsigned int> > &edges){
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(unsigned int i = 0; i < edges.size(); i++){
-        for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-            unsigned sid=noboost::get_id(G, boost::source(*eIt, G));
-            unsigned tid=noboost::get_id(G, boost::target(*eIt, G));
-            if((sid == edges[i][0] && tid == edges[i][1])
-             ||(sid == edges[i][1] && tid == edges[i][0])){
-                boost::remove_edge(boost::source(*eIt, G), boost::target(*eIt, G), G);
-                break;
-            }
-        }
-    }
-}
-
-//Provides a mapping.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                      typename std::vector<typename noboost::treedec_chooser<G_t>::bag_type::value_type> &vdMap)
+void induced_subgraph(G_t &H, G_t &G,
+                      typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
+                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
     std::vector<bool> disabled(boost::num_vertices(G), true);
     vdMap.resize(X.size());
 
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
+    for(typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::iterator sIt
+         = X.begin(); sIt != X.end(); sIt++)
+    {
        unsigned int pos1 = noboost::get_pos(*sIt, G);
        internal_map[pos1] = boost::add_vertex(H);
+       disabled[pos1] = false;
+       H[internal_map[pos1]].id = G[*sIt].id; //remove later
 
        unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
-       typename noboost::treedec_chooser<G_t>::bag_type::value_type vd = *sIt;
-       vdMap[pos2] = vd;
+       vdMap[pos2] = *sIt;
+    }
+
+    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
+        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
+        if(!disabled[spos] && !disabled[dpos]){
+            boost::add_edge(internal_map[spos], internal_map[dpos], H);
+        }
+    }
+}
+
+//Provides a mapping (version for set<descriptor>)
+template <typename G_t>
+void induced_subgraph(G_t &H, G_t &G,
+                      typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+{
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
+    std::vector<bool> disabled(boost::num_vertices(G), true);
+    vdMap.resize(X.size());
+
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+         = X.begin(); sIt != X.end(); sIt++)
+    {
+       unsigned int pos1 = noboost::get_pos(*sIt, G);
+       internal_map[pos1] = boost::add_vertex(H);
+       disabled[pos1] = false;
+
+       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
+       vdMap[pos2] = *sIt;
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
@@ -157,7 +176,7 @@ void get_components_provided_map(G_t &G,
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(G, *vIt);
+        unsigned int pos = noboost::get_pos(*vIt, G);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;

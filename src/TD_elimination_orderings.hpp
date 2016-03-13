@@ -251,7 +251,7 @@ void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::v
 
         unsigned int min_degree = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned pos=noboost::get_pos(*vIt, G);
+            unsigned int pos = noboost::get_pos(*vIt, G);
             if(visited[pos]){
                 continue;
             }
@@ -276,13 +276,29 @@ void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::v
     }
 }
 
-//Computes an elimination ordering according to minDegree heuristic (version used for postprocessing algorithms).
+//Computes an elimination ordering according to minDegree heuristic.
 template<typename G_t>
 void minDegree_ordering(G_t G,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
+      bool ignore_isolated_vertices=false)
 {
-    elim_ordering.resize(boost::num_vertices(G));
     std::vector<bool> visited(boost::num_vertices(G), false);
+    unsigned int n_ = 0;
+
+    //Mark isolated vertices as already visited.
+    if(ignore_isolated_vertices){
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            if(boost::degree(*vIt, G) == 0){
+                unsigned int pos = noboost::get_pos(*vIt, G);
+                visited[pos] = true;
+            }
+            else{ n_++; }
+        }
+    }
+    else{ n_ = boost::num_vertices(G); }
+
+    elim_ordering.resize(n_);
 
     _minDegree_ordering(G, elim_ordering, visited);
 }
@@ -290,7 +306,7 @@ void minDegree_ordering(G_t G,
 
 //Computes an elimination ordering according to fillIn heuristic (version used for postprocessing algorithms).
 template<typename G_t>
-void _fillIn_ordering(G_t G,
+void _fillIn_ordering(G_t &G,
        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
        std::vector<bool> &visited)
 {
@@ -303,15 +319,9 @@ void _fillIn_ordering(G_t G,
 
         unsigned int min_fill = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned pos=noboost::get_pos(*vIt, G);
+            unsigned int pos = noboost::get_pos(*vIt, G);
             if(visited[pos]){
                 continue;
-            }
-
-            if(boost::out_degree(*vIt, G) == 0){
-                min_vertex = *vIt;
-                min_fill = 0;
-                break;
             }
 
             unsigned int current_fill = 0;
@@ -348,13 +358,30 @@ void _fillIn_ordering(G_t G,
     }
 }
 
-//Computes an elimination ordering according to fillIn heuristic (version used for postprocessing algorithms).
+//Computes an elimination ordering according to fillIn heuristic.
 template<typename G_t>
-void fillIn_ordering(G_t &G,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+void fillIn_ordering(G_t G,
+      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
+      bool ignore_isolated_vertices=false)
 {
-    elim_ordering.resize(boost::num_vertices(G));
     std::vector<bool> visited(boost::num_vertices(G), false);
+    unsigned int n_ = 0;
+
+    //Mark isolated vertices as already visited.
+    if(ignore_isolated_vertices){
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            if(boost::degree(*vIt, G) == 0){
+                unsigned int pos = noboost::get_pos(*vIt, G);
+                visited[pos] = true;
+            }
+            else{ n_++; }
+        }
+    }
+    else{ n_ = boost::num_vertices(G); }
+
+    elim_ordering.resize(n_);
+
     _fillIn_ordering(G, elim_ordering, visited);
 }
 
