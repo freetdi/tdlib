@@ -177,22 +177,22 @@ inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
 
 template<class G>
 struct outedge_set{
-    typedef std::set<unsigned> type;
+    typedef std::set<long unsigned int> type;
 //	typedef std::set type;
 };
 
 // kludge for balu
 template<class G>
 struct treedec_chooser{
-    typedef unsigned value_type;
-    typedef std::set<unsigned> bag_type;
+    typedef long unsigned int value_type;
+    typedef std::set<long unsigned int> bag_type;
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
 };
 
 // is this really part of noboost?
 template<class T>
 struct treedec_traits{
-    typedef unsigned vd_type;
+    typedef long unsigned int vd_type;
     typedef std::set<vd_type> bag_type;
 };
 

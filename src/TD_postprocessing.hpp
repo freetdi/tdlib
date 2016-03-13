@@ -56,10 +56,15 @@ namespace treedec{
 
 //Creates a modified induced subgraph of the bag 'noboost::bag(T, t_desc)'.
 template <typename G_t, typename T_t>
-bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned int> &X, std::set<unsigned int> &Y,
-                        typename boost::graph_traits<T_t>::vertex_descriptor t_desc, G_t &G, T_t &T)
+bool is_improvement_bag(G_t &H,
+                        std::vector<bool> &disabled,
+                        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+                        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+                        typename boost::graph_traits<T_t>::vertex_descriptor t_desc,
+                        typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> &vdMap,
+                        G_t &G, T_t &T)
 {
-    induced_subgraph(H, G, noboost::bag(T, t_desc));
+    treedec::induced_subgraph(H, G, noboost::bag(T, t_desc), vdMap);
 
     //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent vertex t_desc' of t_desc in T.
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
@@ -70,10 +75,8 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
-                    unsigned int id1=noboost::get_id(H, *vIt1);
-                    unsigned int id2=noboost::get_id(H, *vIt2);
-                    if(noboost::bag(T, *nIt).find(id1) != noboost::bag(T, *nIt).end()
-                    && noboost::bag(T, *nIt).find(id2) != noboost::bag(T, *nIt).end())
+                    if(noboost::bag(T, *nIt).find(*vIt1) != noboost::bag(T, *nIt).end()
+                    && noboost::bag(T, *nIt).find(*vIt2) != noboost::bag(T, *nIt).end())
                     {
                         boost::add_edge(*vIt1, *vIt2, H);
                         break;
@@ -91,19 +94,17 @@ bool is_improvement_bag(G_t &H, std::vector<bool> &disabled, std::set<unsigned i
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
-                    unsigned id=noboost::get_id(H, *nIt);
-                    X.insert(id);
+                    X.insert(*nIt);
                 }
 
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++){
-                    unsigned id=noboost::get_id(H, *nIt);
-                    Y.insert(id);
+                    Y.insert(*nIt);
                 }
 
-                unsigned id1=noboost::get_id(H, *vIt1);
-                unsigned id2=noboost::get_id(H, *vIt2);
-                disabled[id1] = true;
-                disabled[id2] = true;
+                unsigned int pos1 = noboost::get_pos(*vIt1, H);
+                unsigned int pos2 = noboost::get_pos(*vIt2, H);
+                disabled[pos1] = true;
+                disabled[pos2] = true;
 
                 goto BREAK_LOOP;
             }
@@ -138,17 +139,20 @@ void MSVS(G_t &G, T_t &T){
 
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
-        std::set<unsigned int> X, Y;
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y;
         std::vector<bool> disabled(boost::num_vertices(G), false);
+        typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> vdMap;
 
         typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor refinement_bag;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             if(noboost::bag(T, *tIt).size() == width+1){
                 std::vector<bool> disabled_(disabled);
-                if(is_improvement_bag(H, disabled_, X, Y, *tIt, G, T)){
+                typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> vdMap_;
+                if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){
                     refinement_bag = *tIt;
-                    disabled = disabled_;
+                    disabled = MOVE(disabled_);
+                    vdMap = MOVE(vdMap_);
                     break;
                 }
             }
@@ -159,45 +163,45 @@ void MSVS(G_t &G, T_t &T){
             return;
         }
 
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X_, Y_, S_;
-        treedec::id_bag_to_descriptor_bag(H, X_, X);
-        treedec::id_bag_to_descriptor_bag(H, Y_, Y);
-
         //Compute a seperating set S.
-        std::set<unsigned int> S;
-        treedec::seperate_vertices(H, disabled, X_, Y_, S_);
-
-        treedec::descriptor_bag_to_id_bag(H, S, S_);
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
+        treedec::seperate_vertices(H, disabled, X, Y, S);
 
         //Do the refinement.
         std::vector<bool> visited(boost::num_vertices(G), true);
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++){
-            unsigned id=noboost::get_id(H, *vIt);
-            visited[id] = false;
+            unsigned int pos = noboost::get_pos(*vIt, H);
+            visited[pos] = false;
         }
 
-        for(std::set<unsigned int>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
-            visited[*sIt] = true;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+            unsigned int pos = noboost::get_pos(*sIt, H);
+            visited[pos] = true;
         }
 
-        std::vector<std::set<unsigned int> > components;
-        get_components_provided_map(H, components, visited);
+        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
+        treedec::get_components_provided_map(H, components, visited);
 
         typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
-        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN;
+        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN(boost::degree(refinement_bag, T));;
         std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> newN(components.size());
 
+        unsigned int c = 0;
         for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_bag, T); t_nIt != t_nEnd; t_nIt++){
-            oldN.push_back(*t_nIt);
+            oldN[c++] = *t_nIt;
         }
 
         boost::clear_vertex(refinement_bag, T);
 
-        std::set<unsigned int> old_bag = noboost::bag(T, refinement_bag);
-        noboost::bag(T, refinement_bag) = S;
+        typename noboost::treedec_traits<T_t>::bag_type old_bag = noboost::bag(T, refinement_bag);
 
-        std::vector<std::set<unsigned int> > union_S_W_i(components.size());
+        //S consists of vertex descriptors of H. Use vd_map to map there to descriptors of G.
+        typename noboost::treedec_traits<T_t>::bag_type S_;
+        treedec::map_descriptors(S, S_, H, vdMap);
+        noboost::bag(T, refinement_bag) = S_;
+
+        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > union_S_W_i(components.size());
 
         for(unsigned int i = 0; i < components.size(); i++){
             std::set_union(S.begin(), S.end(),
@@ -209,7 +213,7 @@ void MSVS(G_t &G, T_t &T){
         }
 
         for(unsigned int i = 0; i <  oldN.size(); i++){
-            std::set<unsigned int> intersection;
+            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
             std::set_intersection(old_bag.begin(), old_bag.end(),
                                   noboost::bag(T, oldN[i]).begin(),
                                   noboost::bag(T, oldN[i]).end(),

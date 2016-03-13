@@ -457,6 +457,18 @@ void remove_isolated_vertices(G_t &H, G_t &G){
     }
 }
 
+template <typename G_t>
+void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+                     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_,
+                     G_t &H,
+                     typename std::vector<typename noboost::treedec_chooser<G_t>::bag_type::value_type> &vdMap)
+{
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+        unsigned int pos = noboost::get_pos(*sIt, H);
+        S_.insert(vdMap[pos]);
+    }
+}
+
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 
