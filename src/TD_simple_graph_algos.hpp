@@ -18,7 +18,7 @@
 //
 //
 // Offers functionality to compute the connected components of a graph,
-// vertex/edge deletion and other simple operations on graphs
+// vertex/edge deletion and other simple operations on graphs.
 //
 
 #ifndef TD_SIMPLE_GRAPH_ALGOS
@@ -93,29 +93,6 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 }
 
-// Does not provide an mapping. 
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G, std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X){
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
-
-    unsigned int i = 0;
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
-       internal_map[pos1] = boost::add_vertex(H);
-       disabled[pos1] = false;
-    }
-
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
-        if(!disabled[spos] && !disabled[dpos]){
-            boost::add_edge(internal_map[spos], internal_map[dpos], H);
-        }
-    }
-}
-
 template <typename G_t>
 bool is_edge_between_sets(G_t &G,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
@@ -139,8 +116,8 @@ void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-           unsigned id = noboost::get_id(G, *nIt);
-           if(!disabled[id] && X.find(*nIt) == X.end()){
+           unsigned int pos = noboost::get_pos(*nIt, G);
+           if(!disabled[pos] && X.find(*nIt) == X.end()){
                S_X.insert(*nIt);
            }
         }
@@ -186,10 +163,6 @@ void get_components_provided_map(G_t &G,
         }
     }
 }
-
-//Depricated.
-template <typename G_t>
-void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap);
 
 } //namespace treedec
 
