@@ -108,7 +108,6 @@ from libcpp.vector cimport vector
 from tdlib cimport gc_preprocessing
 from tdlib cimport gc_PP_MD
 #from tdlib cimport gc_PP_FI_TM
-from tdlib cimport gc_preprocessing_glue_bags
 
 from tdlib cimport gc_deltaC_min_d
 from tdlib cimport gc_deltaC_max_d
@@ -138,26 +137,33 @@ from tdlib cimport gc_trivial_decomposition
 #which is based on BGL
 
 cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned int] &E):
-    for v in pyV:
-        V.push_back(v)
+    labels_map = list()
+    labels_dict_inv = dict()
+
+    for i in range(0, len(pyV)):
+        V.push_back(i)
+        labels_map.append(pyV[i])
+        labels_dict_inv[pyV[i]] = i
 
     if len(pyE) > 0:
         #tuple representation
         if isinstance(pyE[0], tuple):
             for u,v in pyE:
-                E.push_back(u)
-                E.push_back(v)
+                E.push_back(labels_dict_inv[u])
+                E.push_back(labels_dict_inv[v])
 
         #list representation
         elif isinstance(pyE[0], list):
             for e in pyE:
-                E.push_back(e[0])
-                E.push_back(e[1])
+                E.push_back(labels_dict_inv[e[0]])
+                E.push_back(labels_dict_inv[e[1]])
 
         #internal representation (unfolded tuple/list representation)
         elif isinstance(pyE[0], int):
             for e in pyE:
-                E.push_back(e)
+                E.push_back(labels_dict_inv[e])
+
+    return labels_map
 
 cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E):
     for t in pyV:
@@ -180,6 +186,23 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
         elif isinstance(pyE[0], int):
             for e in pyE:
                 E.push_back(e)
+
+def apply_labeling(X, labels_map):
+    X_ = list()
+    if len(X) > 0: 
+        #X is a list of vertices/edges
+        if isinstance(X[0], int):
+            for x in X:
+                X_.append(labels_map[x])
+        #X is a list of bags
+        if isinstance(X[0], list):
+            for x in X:
+                 Y = list()
+                 for x_ in x:
+                     Y.append(labels_map[x_])
+                 X_.append(Y)
+
+    return X_
 
 ##############################################################
 ############ PREPROCESSING ###################################
@@ -219,13 +242,17 @@ def preprocessing(V, E):
     cdef vector[unsigned int] V_G, E_G
     cdef vector[vector[int]] c_bags;
 
-    cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
 
     cdef int c_lb = -1
 
     py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb)
 
-    return V_G, E_G, c_bags, py_lb
+    V_G_ = apply_labeling(V_G, labels_map)
+    E_G_ = apply_labeling(E_G, labels_map)
+    c_bags_ = apply_labeling(c_bags, labels_map)
+
+    return V_G_, E_G_, c_bags_, py_lb
 
 def PP_MD(V, E):
     """
@@ -257,54 +284,16 @@ def PP_MD(V, E):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
 
     cdef int c_lb = -1
 
     gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
 
-    return V_T, E_T, get_width(V_T, E_T)
+    V_T_ = apply_labeling(V_T, labels_map)
+    E_T_ = apply_labeling(E_T, labels_map)
 
-
-
-def preprocessing_glue_bags(V, E, bags):
-    """
-    Glues a list of bags returned by preprocessing with T according to the 
-    subset-relation. This can be used to make a tree decomposition out of the 
-    results of tdlib.preprocessing() for a given graph G.
-
-    INPUTS:
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
-
-    - bags : a list of bags, e.g. as returned by preprocessing
-
-    OUTPUTS:
-
-    - V_T' : a list of vertices of the input treedecomposition
-
-    - E_T' : a list of edges of the input treedecomposition
-
-    EXAMPLES:
-
-        V_G2, E_G2, bags, lb = tdlib.preprocessing(V_G1, E_G1)
-        ...
-        V_T1, E_T1 = ...
-        ...
-        V_T2, E_T2 = tdlib.preprocessing_glue_bags(V_T1, E_T1, bags)
-    """
-
-    cdef vector[unsigned int] E_T
-    cdef vector[vector[int]] V_T, c_bags
-
-    for i in range(0, len(bags)):
-        c_bags.push_back(bags[i])
-    
-    gc_preprocessing_glue_bags(V_T, E_T, c_bags)
-
-    return V_T, E_T
+    return V_T_, E_T_, get_width(V_T, E_T)
 
 
 ##############################################################
@@ -361,71 +350,17 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
         c_lb = gc_LBN_deltaC(V_G, E_G)
     elif(algorithm == "LBNC_deltaC"):
         c_lb = gc_LBNC_deltaC(V_G, E_G)
+    elif(algorithm == "LBP_deltaC"):
+        c_lb = gc_LBP_deltaC(V_G, E_G)
+    elif(algorithm == "LBPC_deltaC"):
+        c_lb = gc_LBPC_deltaC(V_G, E_G)
     else:
         print("Invalid lower bound algorithm")
         return -2
 
     return c_lb
 
-def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
-    """
-    Checks, if the definition of a tree decomposition holds for
-    a tree decomposition and a graph.
 
-    INPUTS:
-
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
-
-    - message : outputs error message iff (V_T, E_T) is invalid with
-                respect to (V_G, E_G) (optional)
-
-    OUTPUT:
-
-    - error_code :     0, if (V_T, E_T) is valid with respect to (V_G, E_G)
-                   <= -1, if (V_T, E_T) is not a tree
-                   <= -2, if not all vertices of (V_G, E_G) are covered
-                   <= -3, if not all edges of (V_G, E_G) are covered
-                   == -4, if condition (T4) of a treedecomposition is 
-                             not satisfied
-
-    EXAMPLES:
-
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        status = tdlib.is_valid_treedecomposition(V_G, E_G, V_T, E_T)
-    """
-
-    cdef vector[unsigned int] V_G, E_G, E_T
-    cdef vector[vector[int]] V_T
-
-    cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
-    cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T)
-
-    cdef c_status;
-    c_status = gc_is_valid_treedecomposition(V_G, E_G, V_T, E_T);
-    
-    py_status = c_status
-
-    if(message):
-        if(py_status == 0):
-            pass
-        elif(py_status == -1):
-            print("Invalid tree decomposition: tree decomposition is not a tree")
-        elif(py_status == -2):
-            print("Invalid tree decomposition: not all vertices covered")
-        elif(py_status == -3):
-            print("Invalid tree decomposition: not all edges covered")
-        elif(py_status == -4):
-            print("Invalid tree decomposition: some encoded vertices are not connected in the tree decomposition")
-        else:
-            pass
-
-    return py_status
 
 def trivial_decomposition(V, E):
     """
@@ -451,11 +386,14 @@ def trivial_decomposition(V, E):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    cython_make_tdlib_graph(V, E, V_G, E_G)
-    
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
     gc_trivial_decomposition(V_G, E_G, V_T, E_T)
 
-    return V_T, E_T
+    V_T_ = apply_labeling(V_T, labels_map)
+    E_T_ = apply_labeling(E_T, labels_map)
+
+    return V_T_, E_T_
 
 def get_width(V, E):
     """

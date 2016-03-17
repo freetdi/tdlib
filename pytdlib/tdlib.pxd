@@ -5,7 +5,6 @@ cdef extern from "python_tdlib.hpp":
     int gc_preprocessing(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &bags, int lb)
     int gc_PP_MD(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     #int gc_PP_FI_TM(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
-    int gc_preprocessing_glue_bags(vector[vector[int]] &V_T, vector[unsigned int] &E_T, vector[vector[int]] &bags)
 
     int gc_deltaC_min_d(vector[unsigned int] &V, vector[unsigned int] &E)
     int gc_deltaC_max_d(vector[unsigned int] &V, vector[unsigned int] &E)
@@ -13,8 +12,8 @@ cdef extern from "python_tdlib.hpp":
 
     int gc_LBN_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
     int gc_LBNC_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
-    #int gc_LBP_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
-    #int gc_LBPC_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
+    int gc_LBP_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
+    int gc_LBPC_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
 
     #int gc_exact_decomposition_cutset(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     #int gc_exact_decomposition_cutset_decision(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int k)

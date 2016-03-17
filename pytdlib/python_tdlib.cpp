@@ -28,13 +28,13 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, b
 
 void make_tdlib_graph(TD_graph_t &G, std::vector<unsigned int> &V, std::vector<unsigned int> &E){
     unsigned int max = 0;
-    for(unsigned int i = 0; i < V.size(); i++)
+    for(unsigned int i = 0; i < V.size(); i++){
         max = (V[i]>max)? V[i] : max;
+    }
 
     std::vector<TD_graph_t::vertex_descriptor> idxMap(max+1);
-
     for(unsigned int i = 0; i < V.size(); i++){
-        idxMap[V[i]] = boost::add_vertex(G);
+        idxMap[i] = boost::add_vertex(G);
     }
 
     if(E.size() != 0){
@@ -45,6 +45,7 @@ void make_tdlib_graph(TD_graph_t &G, std::vector<unsigned int> &V, std::vector<u
     }
 }
 
+
 template <typename T_t>
 void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<unsigned int> &E){
     std::vector<typename T_t::vertex_descriptor> idxMap(V.size()+1);
@@ -52,8 +53,9 @@ void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<un
     for(unsigned int i = 0; i < V.size(); i++){
         idxMap[i] = boost::add_vertex(T);
         std::set<unsigned int> bag;
-        for(unsigned int j = 0; j < V[i].size(); j++)
-            bag.insert((unsigned int) V[i][j]);
+        for(unsigned int j = 0; j < V[i].size(); j++){
+            bag.insert(V[i][j]);
+        }
         T[idxMap[i]].bag = bag;
     }
 
@@ -66,10 +68,16 @@ void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<un
 
 }
 
-void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
+void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                       bool ignore_isolated_vertices=false)
+{
     boost::graph_traits<TD_graph_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++)
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(ignore_isolated_vertices && boost::degree(*vIt, G) == 0){
+            continue;
+        }
         V_G.push_back(*vIt);
+    }
 
     boost::graph_traits<TD_graph_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
@@ -78,7 +86,9 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
     }
 }
 
-void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
+void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
+                        std::vector<unsigned int> &E_T)
+{
     std::map<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int> vertex_map;
     boost::graph_traits<TD_tree_dec_t>::vertex_iterator tIt, tEnd;
     unsigned int id = 0;
@@ -86,8 +96,9 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T, s
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         vertex_map.insert(std::pair<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int>(*tIt, id++));
         std::vector<int> bag;
-        for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++)
-            bag.push_back((int)*sIt);
+        for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++){
+            bag.push_back(*sIt);
+        }
         V_T.push_back(bag);
     }
     
@@ -105,7 +116,7 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T, s
 /* PREPROCESSING */
 
 int gc_preprocessing(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &bags, int lb){
-    TD_graph_t G, H;
+    TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     std::vector< boost::tuple<
@@ -117,19 +128,18 @@ int gc_preprocessing(std::vector<unsigned int> &V_G, std::vector<unsigned int> &
     V_G.clear();
     E_G.clear();
 
-    //treedec::remove_isolated_vertices(H, G);
-    //G = H;
+    make_python_graph(G, V_G, E_G, true); //ignores isolated vertices
 
-    make_python_graph(G, V_G, E_G);
-
+    bags.resize(td_bags.size());
     for(unsigned int i = 0; i < td_bags.size(); i++){
         std::vector<int> bag;
         bag.push_back(td_bags[i].get<0>());
         for(typename noboost::treedec_traits<typename noboost::treedec_chooser<TD_graph_t>::type>::bag_type::iterator sIt
-                 = td_bags[i].get<1>().begin(); sIt != td_bags[i].get<1>().end(); sIt++){
-            bag.push_back((int)*sIt);
+                 = td_bags[i].get<1>().begin(); sIt != td_bags[i].get<1>().end(); sIt++)
+        {
+            bag.push_back(*sIt);
         }
-        bags.push_back(bag);
+        bags[i] = bag;
     }
 
     return lb;
@@ -170,31 +180,6 @@ int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, 
 
 */
 
-int gc_preprocessing_glue_bags(std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<std::vector<int> > &bags){
-    TD_tree_dec_t T;
-
-    make_tdlib_decomp(T, V_T, E_T);
-
-    std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > td_bags;
-    for(unsigned int i = bags.size(); i > 0; i--){
-        unsigned int v = (unsigned int)bags[i-1][0];
-        std::set<unsigned int> bag;
-        for(unsigned int j = 1; j < bags[i-1].size(); j++)
-            bag.insert(bags[i-1][j]);
-
-        td_bags.push_back(boost::tuple<unsigned int, std::set<unsigned int> >(v, bag));
-    }
-
-    treedec::preprocessing_glue_bags(td_bags, T);
-
-    V_T.clear();
-    E_T.clear();
-
-    make_python_decomp(T, V_T, E_T);
-
-    return treedec::get_width(T);
-}
-
 /* LOWER BOUNDS */
 
 
@@ -233,8 +218,6 @@ int gc_LBNC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
     return treedec::lb::LBNC_deltaC(G);
 }
 
-/*
-
 int gc_LBP_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -249,7 +232,6 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
     return treedec::lb::LBPC_deltaC(G);
 }
 
-*/
 
 /* EXACT TREE DECOMPOSITIONS */
 
@@ -466,7 +448,9 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
 /* MISC */
 
 
-int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
+int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -491,8 +475,8 @@ int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigne
 
 int gc_get_width(std::vector<std::vector<int> > &V_T){
     int width = 0;
-    for(unsigned int i = 0; i< V_T.size(); i++)
+    for(unsigned int i = 0; i< V_T.size(); i++){
         width = ((int)V_T[i].size() > width)? (int)V_T[i].size() : width;
-
+    }
     return width-1;
 }

@@ -106,12 +106,10 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 3)
         lb = tdlib.lower_bound(V_Wagner, E_Wagner, "LBNC_deltaC")
         self.assertEqual(lb, 3)
-        """
         lb = tdlib.lower_bound(V_Wagner, E_Wagner, "LBP_deltaC")
         self.assertEqual(lb, 3)
         lb = tdlib.lower_bound(V_Wagner, E_Wagner, "LBPC_deltaC")
         self.assertEqual(lb, 3)
-        """
 
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "deltaC_min_d")
         self.assertEqual(lb, 4)
@@ -123,12 +121,11 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBNC_deltaC")
         self.assertEqual(lb, 4)
-        """
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBP_deltaC")
         self.assertEqual(lb, 4)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBPC_deltaC")
         self.assertEqual(lb, 4)
-        """
+
     """
     def test_exact_decomposition_cutset(self):
         V, E, tw = tdlib.exact_decomposition_cutset(V_P6, E_P6)
@@ -207,19 +204,24 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 2, 4, 3, 5])
     """
 
+    def test_trivial_decomposition(self):
+        V, E = tdlib.trivial_decomposition(["a", "b", "c"], [])
+        self.assertEqual(V, [["a", "b", "c"]])
+
     """
     def test_MSVS(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
         V, E, w = tdlib.MSVS(V_P6, E_P6, V, E)
         self.assertEqual(w, 1)
     """
-
+    """
     def test_trivial_decomposition(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
         self.assertEqual(V, [[0,1,2,3,4,5]])
 
         V, E = tdlib.trivial_decomposition(V_K5, E_K5)
         self.assertEqual(V, [[0,1,2,3,4]])
+    """
 
     """
     def test_is_valid_treedecomposition(self):
