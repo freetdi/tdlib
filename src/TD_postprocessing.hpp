@@ -290,7 +290,6 @@ void MSVS(G_t &G, T_t &T){
                     std::cout << G[*sIt].id << " ";
                 } std::cout << std::endl;
             }
-            write_dot_td("tmptd.dot", T);
             exit(-1); 
         }
 

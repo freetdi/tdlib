@@ -87,8 +87,8 @@ void get_robber_components(G_t G, std::set<unsigned int> &X, std::vector<std::se
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(std::set<unsigned int>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned id=noboost::get_id(G, *vIt);
-            if (id == *sIt){
+            unsigned int pos = noboost::get_pos(*vIt, G);
+            if(pos == *sIt){
                 boost::clear_vertex(*vIt, G);
                 boost::remove_vertex(*vIt, G);
                 break;
@@ -252,16 +252,16 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned id=noboost::get_id(G, *vIt);
-            noboost::bag(T, t).insert(id);
+            unsigned int pos = noboost::get_pos(*vIt, G);
+            noboost::bag(T, t).insert(pos);
         }
 
         return;
     }
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned id=noboost::get_id(G, *vIt);
-        vertices.insert(id);
+        unsigned int pos = noboost::get_pos(*vIt, G);
+        vertices.insert(pos);
     }
 
     std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > > W(1);

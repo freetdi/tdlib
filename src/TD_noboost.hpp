@@ -140,13 +140,14 @@ unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descript
     return deg;
 }
 
-
+/*
 template<typename G>
 inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
 {
     // works with "TD_graph_t" (augmented adj_list)
     return g[v].id;
 }
+*/
 
 //Return the internal vertex position.
 //To be used as a narrower alternative to vertex_descriptor.
