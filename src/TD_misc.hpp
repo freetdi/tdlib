@@ -22,7 +22,7 @@
 //
 // These functions are most likely to be interesting for outside use:
 //
-// bool is_valid_decomposition(G_t &G, T_t T)
+// bool is_valid_decomposition(G_t const& G, T_t const& T)
 // void trivial_decomposition(G_t &G, T_t &T)
 // int get_width(T_t &T)
 // float get_average_bag_size(T_t &T)
@@ -150,7 +150,7 @@ bool validate_connectivity(T_t &T){
 }
 
 template <typename G_t, typename T_t>
-int is_valid_treedecomposition(G_t &G, T_t &T){
+int is_valid_treedecomposition(G_t const& G, T_t const& T){
     if(boost::num_vertices(T) == 0){
         //The empty graph has a treedecomposition with 1 vertex and an empty bag.
         return -5;
