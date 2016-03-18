@@ -15,7 +15,7 @@ cdef extern from "python_tdlib.hpp":
     int gc_LBP_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
     int gc_LBPC_deltaC(vector[unsigned int] &V, vector[unsigned int] &E)
 
-    #int gc_exact_decomposition_cutset(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
+    int gc_exact_decomposition_cutset(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     #int gc_exact_decomposition_cutset_decision(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int k)
     #int gc_exact_decomposition_dynamic(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
 
