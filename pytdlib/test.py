@@ -124,7 +124,6 @@ class TestTdLib(unittest.TestCase):
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBPC_deltaC")
         self.assertEqual(lb, 4)
 
-    """
     def test_exact_decomposition_cutset(self):
         V, E, tw = tdlib.exact_decomposition_cutset(V_P6, E_P6)
         self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
@@ -145,7 +144,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(V, [[0, 3, 4, 5], [0, 1, 2, 3, 5], [0, 3, 6, 7], [0, 2, 3, 5, 6]])
         self.assertEqual(E, [0, 1, 2, 3, 3, 1])
         self.assertEqual(tw, 4)
-    """
 
     """
     def test_exact_decomposition_dynamic(self):

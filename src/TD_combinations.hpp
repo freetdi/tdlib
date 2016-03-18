@@ -170,6 +170,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
             continue;
         }
 
+
         G_t G_;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
         treedec::induced_subgraph(G_, G, components[i], vdMap);
