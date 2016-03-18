@@ -284,7 +284,7 @@ class TestTdLib(unittest.TestCase):
                 Q, R, w2 = tdlib.PP_FI_TM(V, E)
                 isleq = tdlib.exact_decomposition_cutset_decision(V, E, w2)
                 if(not isleq):
-                    print("error (validate width)! graph: " + str(V) + ", " + str(E))
+                    print("error [validate width], graph: " + str(V) + ", " + str(E))
                     status = False
 
         self.assertEqual(status, True)

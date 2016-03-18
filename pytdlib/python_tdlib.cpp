@@ -464,7 +464,7 @@ int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned 
     return treedec::get_width(T);
 }
 
-/*
+
 void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V, E);
@@ -472,7 +472,6 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
     treedec::treedec_to_ordering(T, elim_ordering);
 }
 
-*/
 /*
 int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
