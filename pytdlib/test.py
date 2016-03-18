@@ -9,13 +9,18 @@ V_K5 = [0,1,2,3,4]
 E_K5 = [(0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)]
 
 V_Petersen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-E_Petersen = [(0, 1), (0, 4), (0, 5), (1, 2), (1, 6), (2, 3), (2, 7), (3, 4), (3, 8), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (7, 9)]
+E_Petersen = [(0, 1), (0, 4), (0, 5), (1, 2), (1, 6), (2, 3), (2, 7), \
+              (3, 4), (3, 8), (4, 9), (5, 7), (5, 8), (6, 8), (6, 9), (7, 9)]
 
 V_Wagner = [0, 1, 2, 3, 4, 5, 6, 7]
-E_Wagner = [(0, 1),(0, 4), (0, 7), (1, 2), (1, 5), (2, 3), (2, 6), (3, 4), (3, 7), (4, 5), (5, 6), (6, 7)]
+E_Wagner = [(0, 1),(0, 4), (0, 7), (1, 2), (1, 5), (2, 3), (2, 6), (3, 4), \
+            (3, 7), (4, 5), (5, 6), (6, 7)]
 
 V_Pappus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-E_Pappus = [(0, 1), (0, 5), (0, 6), (1, 2), (1, 7), (2, 3), (2, 8), (3, 4), (3, 9), (4, 5), (4, 10), (5, 11), (6, 13), (6, 17), (7, 12), (7, 14), (8, 13), (8, 15), (9, 14), (9, 16), (10, 15), (10, 17), (11, 12), (11, 16), (12, 15), (13, 16), (14, 17)]
+E_Pappus = [(0, 1), (0, 5), (0, 6), (1, 2), (1, 7), (2, 3), (2, 8), (3, 4), \
+            (3, 9), (4, 5), (4, 10), (5, 11), (6, 13), (6, 17), (7, 12), \
+            (7, 14), (8, 13), (8, 15), (9, 14), (9, 16), (10, 15), (10, 17), \
+            (11, 12), (11, 16), (12, 15), (13, 16), (14, 17)]
 
 
 #random graphs
@@ -47,7 +52,8 @@ class TestTdLib(unittest.TestCase):
 
         V_, E_, B, lb = tdlib.preprocessing(V_Petersen, E_Petersen)
         self.assertEqual(V_, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-        self.assertEqual(E_, [0,1,0,4,0,5,1,2,1,6,2,3,2,7,3,4,3,8,4,9,5,7,5,8,6,8,6,9,7,9])
+        self.assertEqual(E_, [0,1,0,4,0,5,1,2,1,6,2,3,2,7,3, \
+                              4,3,8,4,9,5,7,5,8,6,8,6,9,7,9])
         self.assertEqual(B, [])
         self.assertEqual(lb, 4)
 
@@ -63,13 +69,19 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
-        self.assertEqual(V, [[1, 4, 7, 8, 9], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], [1, 6, 8, 9], [1, 2, 3, 7], [0, 1, 4, 5]])
+        self.assertEqual(V, [[1, 4, 7, 8, 9], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], \
+                             [1, 6, 8, 9], [1, 2, 3, 7], [0, 1, 4, 5]])
         self.assertEqual(E, [0, 1, 0, 2, 0, 3, 2, 4, 1, 5])
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
-        self.assertEqual(V, [[3, 5, 6, 8, 12, 14, 16], [3, 5, 6, 8, 10, 12, 14], [1, 3, 5, 6, 8, 12, 14], [6, 10, 14, 17], [8, 10, 12, 15], [6, 8, 13, 16], [5, 11, 12, 16], [3, 9, 14, 16], [1, 7, 12, 14], [3, 4, 5, 10], [1, 2, 3, 8], [0, 1, 5, 6]])
-        self.assertEqual(E, [0, 1, 0, 2, 1, 3, 1, 4, 0, 7, 2, 8, 1, 9, 2, 10, 2, 11, 0, 6, 0, 5])
+        self.assertEqual(V, [[3, 5, 6, 8, 12, 14, 16], [3, 5, 6, 8, 10, 12, 14], \
+                             [1, 3, 5, 6, 8, 12, 14], [6, 10, 14, 17], \
+                             [8, 10, 12, 15], [6, 8, 13, 16], [5, 11, 12, 16], \
+                             [3, 9, 14, 16], [1, 7, 12, 14], [3, 4, 5, 10], \
+                             [1, 2, 3, 8], [0, 1, 5, 6]])
+        self.assertEqual(E, [0, 1, 0, 2, 1, 3, 1, 4, 0, 7, 2, 8, 1, 9, 2, \
+                             10, 2, 11, 0, 6, 0, 5])
         self.assertEqual(lb, 6)
 
     def test_PP_FI_TM(self):
@@ -84,13 +96,19 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_FI_TM(V_Petersen, E_Petersen)
-        self.assertEqual(V, [[0, 1, 4, 5], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], [1, 4, 7, 8, 9], [1, 2, 3, 7], [1, 6, 8, 9]])
+        self.assertEqual(V, [[0, 1, 4, 5], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], \
+                             [1, 4, 7, 8, 9], [1, 2, 3, 7], [1, 6, 8, 9]])
         self.assertEqual(E, [1, 2, 1, 3, 2, 4, 3, 5, 1, 0])
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_FI_TM(V_Pappus, E_Pappus)
-        self.assertEqual(V, [[0, 1, 5, 6], [1, 3, 5, 6, 8, 12, 14], [3, 5, 6, 8, 10, 12, 14], [3, 5, 6, 8, 12, 14, 16], [1, 2, 3, 8], [3, 4, 5, 10], [1, 7, 12, 14], [3, 9, 14, 16], [5, 11, 12, 16], [6, 8, 13, 16], [8, 10, 12, 15], [6, 10, 14, 17]])
-        self.assertEqual(E, [1, 2, 1, 3, 2, 5, 1, 6, 3, 7, 3, 8, 3, 9, 2, 10, 2, 11, 1, 4, 1, 0])
+        self.assertEqual(V, [[0, 1, 5, 6], [1, 3, 5, 6, 8, 12, 14], \
+                             [3, 5, 6, 8, 10, 12, 14], [3, 5, 6, 8, 12, 14, 16], \
+                             [1, 2, 3, 8], [3, 4, 5, 10], [1, 7, 12, 14], \
+                             [3, 9, 14, 16], [5, 11, 12, 16], [6, 8, 13, 16], \
+                             [8, 10, 12, 15], [6, 10, 14, 17]])
+        self.assertEqual(E, [1, 2, 1, 3, 2, 5, 1, 6, 3, 7, 3, 8, 3, 9, 2, \
+                             10, 2, 11, 1, 4, 1, 0])
         self.assertEqual(lb, 6)
 
     def test_lower_bounds(self):
@@ -136,12 +154,14 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(tw, 4)
 
         V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen)
-        self.assertEqual(V, [[4, 6, 7, 9], [0, 3, 4, 6, 7], [0, 2, 3, 6, 7], [3, 5, 6, 8], [0, 3, 5, 6, 7], [0, 1, 2, 3, 6]])
+        self.assertEqual(V, [[4, 6, 7, 9], [0, 3, 4, 6, 7], [0, 2, 3, 6, 7], \
+                             [3, 5, 6, 8], [0, 3, 5, 6, 7], [0, 1, 2, 3, 6]])
         self.assertEqual(E, [0, 1, 1, 2, 1, 4, 2, 5, 3, 4])
         self.assertEqual(tw, 4)
 
-        V, E, tw = tdlib.exact_decomposition_cutset(V_Wagner, E_Wagner)    
-        self.assertEqual(V, [[0, 3, 4, 5], [0, 1, 2, 3, 5], [0, 3, 6, 7], [0, 2, 3, 5, 6]])
+        V, E, tw = tdlib.exact_decomposition_cutset(V_Wagner, E_Wagner)
+        self.assertEqual(V, [[0, 3, 4, 5], [0, 1, 2, 3, 5], [0, 3, 6, 7], \
+                             [0, 2, 3, 5, 6]])
         self.assertEqual(E, [0, 1, 2, 3, 3, 1])
         self.assertEqual(tw, 4)
 
@@ -171,7 +191,12 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.seperator_algorithm(V_Pappus, E_Pappus)
-        self.assertEqual(V, [[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7], [2, 3, 4, 5, 6, 7, 8], [3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10], [5, 6, 7, 8, 9, 10, 11], [6, 7, 8, 9, 10, 11, 12, 14], [6, 8, 9, 10, 11, 12, 13, 14], [6, 10, 13, 14, 17], [8, 9, 10, 11, 12, 13, 14, 15, 16]])
+        self.assertEqual(V, [[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7], \
+                             [2, 3, 4, 5, 6, 7, 8], [3, 4, 5, 6, 7, 8, 9], \
+                             [4, 5, 6, 7, 8, 9, 10], [5, 6, 7, 8, 9, 10, 11], \
+                             [6, 7, 8, 9, 10, 11, 12, 14], \
+                             [6, 8, 9, 10, 11, 12, 13, 14], [6, 10, 13, 14, 17], \
+                             [8, 9, 10, 11, 12, 13, 14, 15, 16]])
         self.assertEqual(E, [1, 0, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8, 7, 9, 7])
         self.assertEqual(lb, 8)
     """
@@ -180,13 +205,15 @@ class TestTdLib(unittest.TestCase):
         O = tdlib.minDegree_ordering(V_Petersen, E_Petersen)
         self.assertEqual(O, [0, 2, 6, 3, 5, 1, 4, 7, 8, 9])
         O = tdlib.minDegree_ordering(V_Pappus, E_Pappus)
-        self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, 10, 3, 5, 6, 8, 12, 14, 16])
+        self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, 10, 3, \
+                             5, 6, 8, 12, 14, 16])
 
     def test_fillIn_ordering(self):
         O = tdlib.fillIn_ordering(V_Petersen, E_Petersen)
         self.assertEqual(O, [0, 2, 6, 3, 5, 1, 4, 7, 8, 9])
         O = tdlib.fillIn_ordering(V_Pappus, E_Pappus)
-        self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, 10, 3, 5, 6, 8, 12, 14, 16])
+        self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, \
+                             10, 3, 5, 6, 8, 12, 14, 16])
 
     """
     def test_treedec_to_ordering(self):
