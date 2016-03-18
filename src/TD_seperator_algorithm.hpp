@@ -209,9 +209,13 @@ bool sep_decomp(G_t &G, T_t &T,
         return true;
     }
 
+    typename noboost::treedec_traits<T_t>::bag_type B1, B2;
+    treedec::map_descriptors_to_bags<G_t>(parent, B2);
+
     //Trivial decomposition
     if(vertices.size() < 4*k + 2){
-        sep_glue_bag(vertices, parent, T);
+        treedec::map_descriptors_to_bags<G_t>(vertices, B1);
+        treedec::sep_glue_bag(B1, B2, T);
         return true;
     }
 
@@ -239,7 +243,8 @@ bool sep_decomp(G_t &G, T_t &T,
         std::set_union(W.begin(), W.end(), S.begin(), S.end(), std::inserter(union_W_S, union_W_S.begin()));
 
         //Create a bag (W' v S) and connect it with the bag containing parent.
-        treedec::sep_glue_bag(union_W_S, parent, T);
+        treedec::map_descriptors_to_bags<G_t>(union_W_S, B1);
+        treedec::sep_glue_bag(B1, B2, T);
 
         for(unsigned int i = 0; i < C.size(); i++){
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> union_C_i_S, is_C_i_W, newW;

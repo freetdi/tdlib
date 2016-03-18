@@ -117,13 +117,14 @@ from tdlib cimport gc_exact_decomposition_cutset
 from tdlib cimport gc_exact_decomposition_cutset_decision
 #from tdlib cimport gc_exact_decomposition_dynamic
 
-#from tdlib cimport gc_seperator_algorithm
-
+from tdlib cimport gc_seperator_algorithm
 from tdlib cimport gc_minDegree_ordering
 from tdlib cimport gc_fillIn_ordering
 
-from tdlib cimport gc_is_valid_treedecomposition
+from tdlib cimport gc_ordering_to_treedec
+#from tdlib cimport gc_is_valid_treedecomposition
 from tdlib cimport gc_trivial_decomposition
+from tdlib cimport gc_get_width
 
 
 ##############################################################
@@ -509,6 +510,43 @@ def exact_decomposition_cutset_decision(V, E, k):
 
 ##############################################################
 ############ APPROXIMATIVE ALGORITHMS ########################
+
+def seperator_algorithm(V, E):
+    """
+    Computes a tree decomposition of a given graph using nearly balanced 
+    seperators. The returned width is at most 4*tw(G)+1.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.seperator_algorithm(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_seperator_algorithm(V_G, E_G, V_T, E_T);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+    E_T_ = apply_labeling(E_T, labels_map)
+
+    return V_T_, E_T_, get_width(V_T, E_T)
+
 
 def minDegree_ordering(V, E):
     """

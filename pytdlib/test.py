@@ -178,7 +178,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(tw, 4)
     """
 
-    """
     def test_seperator_algorithm(self):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         self.assertEqual(V, [[0, 1, 2, 3], [1, 3, 4, 5]])
@@ -199,7 +198,6 @@ class TestTdLib(unittest.TestCase):
                              [8, 9, 10, 11, 12, 13, 14, 15, 16]])
         self.assertEqual(E, [1, 0, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8, 7, 9, 7])
         self.assertEqual(lb, 8)
-    """
 
     def test_minDegree_ordering(self):
         O = tdlib.minDegree_ordering(V_Petersen, E_Petersen)

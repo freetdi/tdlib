@@ -235,7 +235,6 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
 
 /* EXACT TREE DECOMPOSITIONS */
 
-
 int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
 {
@@ -295,9 +294,8 @@ int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<u
 
 */
 
-/* APPOXIMATIVE TREE DECOMPOSITIONS */
 
-/*
+/* APPOXIMATIVE TREE DECOMPOSITIONS */
 
 int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
@@ -315,8 +313,6 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
 
     return treedec::get_width(T);
 }
-
-*/
 
 void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                            std::vector<unsigned int> &elim_ordering)
@@ -347,40 +343,9 @@ void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> 
 }
 
 
-int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                           std::vector<unsigned int> &elim_ordering)
-{
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
-    TD_tree_dec_t T;
-
-    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_(boost::num_vertices(G));
-    for(unsigned int i = 0; i < elim_ordering.size(); i++){
-        elim_ordering_[i] = elim_ordering[i];
-    }
-    treedec::ordering_to_treedec(G, elim_ordering_, T);
-
-    make_python_decomp(T, V_T, E_T);
-
-    return treedec::get_width(T);
-}
-
-/*
-void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
-    TD_tree_dec_t T;
-    make_tdlib_decomp(T, V, E);
-
-    treedec::treedec_to_ordering(T, elim_ordering);
-}
-
-*/
-
 /* POSTPROCESSING */
 
 /*
-
 int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -479,7 +444,36 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
 
 /* MISC */
 
+int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
+                           std::vector<unsigned int> &elim_ordering)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
 
+    TD_tree_dec_t T;
+
+    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_(boost::num_vertices(G));
+    for(unsigned int i = 0; i < elim_ordering.size(); i++){
+        elim_ordering_[i] = elim_ordering[i];
+    }
+    treedec::ordering_to_treedec(G, elim_ordering_, T);
+
+    make_python_decomp(T, V_T, E_T);
+
+    return treedec::get_width(T);
+}
+
+/*
+void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
+    TD_tree_dec_t T;
+    make_tdlib_decomp(T, V, E);
+
+    treedec::treedec_to_ordering(T, elim_ordering);
+}
+
+*/
+/*
 int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
 {
@@ -491,6 +485,7 @@ int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<un
 
     return treedec::is_valid_treedecomposition(G, T);
 }
+*/
 
 int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
     TD_graph_t G;
