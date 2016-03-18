@@ -161,7 +161,6 @@ int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std
     return treedec::get_width(T);
 }
 
-/*
 
 int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
     TD_graph_t G;
@@ -178,7 +177,6 @@ int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, 
     return treedec::get_width(T);
 }
 
-*/
 
 /* LOWER BOUNDS */
 

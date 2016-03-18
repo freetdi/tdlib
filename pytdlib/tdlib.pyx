@@ -134,7 +134,7 @@ from tdlib cimport gc_trivial_decomposition
 ############ GRAPH/DECOMPOSITION ENCODING/DECODING ###########
 #the following will be used implicitly do the translation
 #between the python graph encoding and TdLib graph encoding,
-#which is based on BGL
+#which is based on the BGL.
 
 cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned int] &E):
     labels_map = list()
@@ -165,6 +165,7 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
 
     return labels_map
 
+"""
 cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E):
     for t in pyV:
         V.push_back(t)
@@ -186,6 +187,7 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
         elif isinstance(pyE[0], int):
             for e in pyE:
                 E.push_back(e)
+"""
 
 def apply_labeling(X, labels_map):
     X_ = list()
@@ -289,6 +291,49 @@ def PP_MD(V, E):
     cdef int c_lb = -1
 
     gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
+
+    V_T_ = apply_labeling(V_T, labels_map)
+    E_T_ = apply_labeling(E_T, labels_map)
+
+    return V_T_, E_T_, get_width(V_T, E_T)
+
+def PP_FI_TM(V, E):
+    """
+    Returns a tree decomposition of exact width, iff the treewidth of
+    the given graph G is not greater than 3, otherwise the reduced 
+    instance G' of G will be processed by the fillIn heuristic, which
+    successivly eliminates a vertex, that will cause least new edges
+    within the elimination process. The resulting tree decomposition 
+    will be postprocessed by the minimalChordal algorithm, that may
+    reduce the width of the tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.PP_FI_TM(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    cdef int c_lb = -1
+
+    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
 
     V_T_ = apply_labeling(V_T, labels_map)
     E_T_ = apply_labeling(E_T, labels_map)

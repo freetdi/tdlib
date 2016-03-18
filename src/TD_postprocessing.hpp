@@ -301,21 +301,25 @@ bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_des
                        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, G_t &M)
 {
     //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
-    std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
+    std::vector<unsigned int> elimination_ordering_(boost::num_vertices(M));
     for(unsigned int t = 0; t < elimination_ordering.size(); t++){
         unsigned int pos = noboost::get_pos(elimination_ordering[t], M);
         elimination_ordering_[pos] = t;
+        //std::cout << "elim: " << elimination_ordering[t] << ", pos: " << pos << ", time: " << t << std::endl;
     }
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(edge[0], M); nIt != nEnd; nIt++){
         unsigned int pos = noboost::get_pos(*nIt, M);
+        //std::cout << "vertex: " << *nIt << std::endl;
+        //std::cout << "pos: " << pos << ", elimination_ordering_[pos]: " << elimination_ordering_[pos] << std::endl;
         if(elimination_ordering_[pos] > i && boost::edge(edge[1], *nIt, M).second
        && !boost::edge(*nIt, elimination_ordering[i], M).second)
         {
             return false;
         }
     }
+
     return true;
 }
 
@@ -343,11 +347,12 @@ void minimalChordal(G_t &G,
 
     treedec::make_filled_graph(G, old_elimination_ordering, C, F);
 
+
     for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
         std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
-            if(is_candidate_edge(F[i][j], i, old_elimination_ordering, G)){
+            if(treedec::is_candidate_edge(F[i][j], i, old_elimination_ordering, G)){
                 candidate.push_back(F[i][j]);
                 incident.insert(F[i][j][0]);
                 incident.insert(F[i][j][1]);
@@ -360,9 +365,7 @@ void minimalChordal(G_t &G,
             treedec::delete_edges(W_i, candidate);
 
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
-            std::cout << "1" << std::endl;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
-            std::cout << "2" << std::endl;
 
             //Translate descriptors of W_i to descriptors of G.
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill(keep_fill_.size());
@@ -388,9 +391,7 @@ void minimalChordal(G_t &G,
             treedec::delete_edges(G, candidate);
         }
     }
-            std::cout << "3" << std::endl;
     treedec::LEX_M_minimal_ordering(G, new_elimination_ordering);
-            std::cout << "4" << std::endl;
 }
 
 } //namespace treedec

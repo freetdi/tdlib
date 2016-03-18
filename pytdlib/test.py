@@ -72,7 +72,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(E, [0, 1, 0, 2, 1, 3, 1, 4, 0, 7, 2, 8, 1, 9, 2, 10, 2, 11, 0, 6, 0, 5])
         self.assertEqual(lb, 6)
 
-    """
     def test_PP_FI_TM(self):
         V, E, lb = tdlib.PP_FI_TM(V_P6, E_P6)
         self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
@@ -93,7 +92,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(V, [[0, 1, 5, 6], [1, 3, 5, 6, 8, 12, 14], [3, 5, 6, 8, 10, 12, 14], [3, 5, 6, 8, 12, 14, 16], [1, 2, 3, 8], [3, 4, 5, 10], [1, 7, 12, 14], [3, 9, 14, 16], [5, 11, 12, 16], [6, 8, 13, 16], [8, 10, 12, 15], [6, 10, 14, 17]])
         self.assertEqual(E, [1, 2, 1, 3, 2, 5, 1, 6, 3, 7, 3, 8, 3, 9, 2, 10, 2, 11, 1, 4, 1, 0])
         self.assertEqual(lb, 6)
-    """
 
     def test_lower_bounds(self):
         lb = tdlib.lower_bound(V_Wagner, E_Wagner, "deltaC_min_d")

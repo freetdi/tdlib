@@ -56,8 +56,6 @@
 
 #include <cmath>
 #include <climits>
-#include <algorithm>    // std::random_shuffle
-#include <cstdlib>      // rand()
 
 #include <iostream> //remove later
 
@@ -406,9 +404,14 @@ int get_width_of_elimination_ordering(G_t &G,
 template <typename G_t, typename T_t>
 void _ordering_to_treedec(G_t &G,
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering,
-    T_t &T, unsigned int idx)
+    T_t &T, unsigned int idx, bool ignore_isolated_vertices)
 {
     if(idx == elimination_ordering.size()){
+        return;
+    }
+
+    if(ignore_isolated_vertices && boost::degree(elimination_ordering[idx], G) == 0){
+        treedec::_ordering_to_treedec(G, elimination_ordering, T, idx+1, ignore_isolated_vertices);
         return;
     }
 
@@ -419,19 +422,22 @@ void _ordering_to_treedec(G_t &G,
 
     boost::clear_vertex(elimination_ordering[idx], G);
 
-    _ordering_to_treedec(G, elimination_ordering, T, idx+1);
+    treedec::_ordering_to_treedec(G, elimination_ordering, T, idx+1, ignore_isolated_vertices);
 
-    glue_bag(bag, elimination_ordering[idx], T);
+    treedec::glue_bag(bag, elimination_ordering[idx], T);
 }
 
 template <typename G_t, typename T_t>
-void ordering_to_treedec(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T){
+void ordering_to_treedec(G_t &G,
+                         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering,
+                         T_t &T, bool ignore_isolated_vertices=false)
+{
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
     }
 
-    _ordering_to_treedec(G, elimination_ordering, T, 0);
+    treedec::_ordering_to_treedec(G, elimination_ordering, T, 0, ignore_isolated_vertices);
 }
 
 

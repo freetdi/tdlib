@@ -39,6 +39,8 @@
 
 #ifndef TD_RANDOM
 
+#include <algorithm>    // std::random_shuffle
+#include <cstdlib>      // rand()
 #include "TD_elimination_orderings.hpp"
 
 namespace treedec{

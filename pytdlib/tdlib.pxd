@@ -4,7 +4,7 @@ from libcpp cimport bool
 cdef extern from "python_tdlib.hpp":
     int gc_preprocessing(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &bags, int lb)
     int gc_PP_MD(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
-    #int gc_PP_FI_TM(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
+    int gc_PP_FI_TM(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
 
     int gc_deltaC_min_d(vector[unsigned int] &V, vector[unsigned int] &E)
     int gc_deltaC_max_d(vector[unsigned int] &V, vector[unsigned int] &E)
