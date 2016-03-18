@@ -41,7 +41,6 @@
 
 #include "TD_nice_decomposition.hpp"
 #include "TD_simple_graph_algos.hpp"
-#include "TD_hard_problems.hpp"
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 
@@ -152,7 +151,7 @@ void top_down_computation(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
 
 
 /* MAX CLIQUE */
-
+/*
 template <typename G_t, typename T_t>
 void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int> &global_result, treedec::np::max_clique_base<G_t> &mclb){
     for(unsigned int i = 0; i < boost::num_vertices(T); i++){
@@ -164,7 +163,7 @@ void max_clique_with_treedecomposition(G_t &G, T_t &T, std::vector<unsigned int>
             global_result = result;
     }
 }
-
+*/
 
 /* MAX INDEPENDENT SET */
 

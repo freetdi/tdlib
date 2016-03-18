@@ -758,9 +758,9 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
                 std::set_intersection(N1.begin(), N1.end(), N2.begin(), N2.end(), std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() >= k){
-                    unsigned id1=noboost::get_id(H, *vIt1);
-                    unsigned id2=noboost::get_id(H, *vIt2);
-                    boost::add_edge(map[id1], map[id2], G);
+                    unsigned int pos1 = noboost::get_pos(*vIt1, H);
+                    unsigned int pos2 = noboost::get_pos(*vIt2, H);
+                    boost::add_edge(map[pos1], map[pos2], G);
                 }
             }
         }
@@ -967,15 +967,15 @@ void k_path_improved_graph(G_t &G, unsigned int k){
                 }
 
                 std::vector<bool> disabled(boost::num_vertices(H), false);
-                unsigned id1=noboost::get_id(H, *vIt1);
-                unsigned id2=noboost::get_id(H, *vIt2);
-                disabled[id1] = true;
-                disabled[id2] = true;
+                unsigned int pos1 = noboost::get_pos(*vIt1, H);
+                unsigned int pos2 = noboost::get_pos(*vIt2, H);
+                disabled[pos1] = true;
+                disabled[pos2] = true;
 
                 treedec::seperate_vertices(H, disabled, X, Y, S);
 
                 if(S.size() >= k){
-                    boost::add_edge(map[id1], map[id2], G);
+                    boost::add_edge(map[pos1], map[pos2], G);
                 }
             }
         }
@@ -999,8 +999,6 @@ int LBP_deltaD(const G_t &G){
     while(true){
         G_t H;
         boost::copy_graph(G, H);
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(H, id_map);
 
         k_path_improved_graph(H, lb+1);
 
@@ -1031,8 +1029,6 @@ int LBP_deltaC(const G_t &G){
     while(true){
         G_t H;
         boost::copy_graph(G, H);
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(H, id_map);
 
         k_path_improved_graph(H, lb+1);
 
@@ -1063,8 +1059,6 @@ int LBPC_deltaD(const G_t &G){
     while(true){
         G_t H;
         boost::copy_graph(G, H);
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(H, id_map);
 
         k_path_improved_graph(H, lb+1);
 
@@ -1112,8 +1106,6 @@ int LBPC_deltaC(const G_t &G){
     while(true){
         G_t H;
         boost::copy_graph(G, H);
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(H, id_map);
 
         k_path_improved_graph(H, lb+1);
 

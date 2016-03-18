@@ -61,10 +61,20 @@ bool is_improvement_bag(G_t &H,
                         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
                         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
                         typename boost::graph_traits<T_t>::vertex_descriptor t_desc,
-                        typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> &vdMap,
+                        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap,
                         G_t &G, T_t &T)
 {
+        std::cout << "bag:" << std::endl;
+        for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = noboost::bag(T, t_desc).begin(); sIt != noboost::bag(T, t_desc).end(); sIt++){
+            std::cout << *sIt << " ";
+        } std::cout << std::endl;
+
     treedec::induced_subgraph(H, G, noboost::bag(T, t_desc), vdMap);
+    disabled.assign(boost::num_vertices(H), false);
+
+    std::cout << "H_size: " << boost::num_vertices(H) << std::endl;
+
+    std::cout << "edges: " << boost::num_edges(H) << " " << boost::num_edges(G) << std::endl;
 
     //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent vertex t_desc' of t_desc in T.
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
@@ -75,9 +85,14 @@ bool is_improvement_bag(G_t &H,
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
-                    if(noboost::bag(T, *nIt).find(*vIt1) != noboost::bag(T, *nIt).end()
-                    && noboost::bag(T, *nIt).find(*vIt2) != noboost::bag(T, *nIt).end())
+                    unsigned int pos1 = noboost::get_pos(*vIt1, H);
+                    unsigned int pos2 = noboost::get_pos(*vIt2, H);
+                    typename noboost::treedec_traits<T_t>::bag_type::value_type vd1 = vdMap[pos1];
+                    typename noboost::treedec_traits<T_t>::bag_type::value_type vd2 = vdMap[pos2];
+                    if(noboost::bag(T, *nIt).find(vd1) != noboost::bag(T, *nIt).end()
+                    && noboost::bag(T, *nIt).find(vd2) != noboost::bag(T, *nIt).end())
                     {
+                        std::cout << "add an edge" << std::endl;
                         boost::add_edge(*vIt1, *vIt2, H);
                         break;
                     }
@@ -88,9 +103,11 @@ bool is_improvement_bag(G_t &H,
 
     //Find a non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y.
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
+        std::cout << "!" << std::endl;
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
+            std::cout << "." << std::endl;
             if(!boost::edge(*vIt1, *vIt2, H).second){
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
@@ -105,6 +122,8 @@ bool is_improvement_bag(G_t &H,
                 unsigned int pos2 = noboost::get_pos(*vIt2, H);
                 disabled[pos1] = true;
                 disabled[pos2] = true;
+
+                std::cout << "disable: " << pos1 << " " << pos2 << std::endl;
 
                 goto BREAK_LOOP;
             }
@@ -140,15 +159,15 @@ void MSVS(G_t &G, T_t &T){
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y;
-        std::vector<bool> disabled(boost::num_vertices(G), false);
-        typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> vdMap;
+        std::vector<bool> disabled;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
 
         typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor refinement_bag;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             if(noboost::bag(T, *tIt).size() == width+1){
-                std::vector<bool> disabled_(disabled);
-                typename std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> vdMap_;
+                std::vector<bool> disabled_;
+                typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap_;
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){
                     refinement_bag = *tIt;
                     disabled = MOVE(disabled_);
@@ -163,21 +182,52 @@ void MSVS(G_t &G, T_t &T){
             return;
         }
 
+        std::cout << "X:" << std::endl;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
+            std::cout << *sIt << " ";
+        } std::cout << std::endl;
+
+        std::cout << "Y:" << std::endl;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = Y.begin(); sIt != Y.end(); sIt++){
+            std::cout << *sIt << " ";
+        } std::cout << std::endl;
+
+        std::cout << "enabled: " << std::endl;
+        for(unsigned int i = 0; i < disabled.size(); i++){
+            if(!disabled[i]){
+                std::cout << i << " ";
+            }
+        } std::cout << std::endl;
+
         //Compute a seperating set S.
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
-        treedec::seperate_vertices(H, disabled, X, Y, S);
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S_;
+        treedec::seperate_vertices(H, disabled, X, Y, S_);
 
         //Do the refinement.
-        std::vector<bool> visited(boost::num_vertices(G), true);
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd)= boost::vertices(H); vIt != vEnd; vIt++){
-            unsigned int pos = noboost::get_pos(*vIt, H);
-            visited[pos] = false;
-        }
+        std::vector<bool> visited(boost::num_vertices(H), false);
+
+        //S consists of vertex descriptors of H. Use vd_map to map these to descriptors of G.
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
+        treedec::map_descriptors(S_, S, H, vdMap);
+
+        if(S.size() == 0){ std::cout << "error: no seperator found" << std::endl; }
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
             unsigned int pos = noboost::get_pos(*sIt, H);
             visited[pos] = true;
+        }
+
+        typename noboost::treedec_traits<T_t>::bag_type old_bag = noboost::bag(T, refinement_bag);
+        boost::clear_vertex(refinement_bag, T);
+
+        //Convert the descriptors of G to a bag.
+        typename noboost::treedec_traits<T_t>::bag_type B;
+        treedec::map_descriptors_to_bags<G_t>(S, B);
+        noboost::bag(T, refinement_bag) = MOVE(B);
+
+        std::cout << "seperator:" << std::endl;
+        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+            std::cout << H[*sIt].id << std::endl;
         }
 
         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
@@ -192,23 +242,27 @@ void MSVS(G_t &G, T_t &T){
             oldN[c++] = *t_nIt;
         }
 
-        boost::clear_vertex(refinement_bag, T);
-
-        typename noboost::treedec_traits<T_t>::bag_type old_bag = noboost::bag(T, refinement_bag);
-
-        //S consists of vertex descriptors of H. Use vd_map to map there to descriptors of G.
-        typename noboost::treedec_traits<T_t>::bag_type S_;
-        treedec::map_descriptors(S, S_, H, vdMap);
-        noboost::bag(T, refinement_bag) = S_;
-
         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > union_S_W_i(components.size());
 
         for(unsigned int i = 0; i < components.size(); i++){
+            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
+            treedec::map_descriptors(components[i], component, H, vdMap);
+
+            std::cout << "comp_" << i << ": " << std::endl;
+            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt 
+                 = component.begin(); sIt != component.end(); sIt++)
+            { std::cout << G[*sIt].id << " "; } std::cout << std::endl;
+
+
             std::set_union(S.begin(), S.end(),
-                           components[i].begin(), components[i].end(),
+                           component.begin(), component.end(),
                            std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
             newN[i] = boost::add_vertex(T);
-            noboost::bag(T, newN[i]) = union_S_W_i[i];
+
+            typename noboost::treedec_traits<T_t>::bag_type uB;
+            treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
+
+            noboost::bag(T, newN[i]) = MOVE(uB);
             boost::add_edge(refinement_bag, newN[i], T);
         }
 
@@ -220,37 +274,61 @@ void MSVS(G_t &G, T_t &T){
                                   std::inserter(intersection, intersection.begin()));
 
             for(unsigned int j = 0; j < union_S_W_i.size(); j++){
-                if(std::includes(union_S_W_i[j].begin(), union_S_W_i[j].end(),
+                if(std::includes(noboost::bag(T, newN[j]).begin(), noboost::bag(T, newN[j]).end(),
                                  intersection.begin(), intersection.end())){
                     boost::add_edge(newN[j], oldN[i], T);
                     break;
                 }
             }
         }
+
+        G_t L;
+        boost::copy_graph(G, L);
+        if (treedec::is_valid_treedecomposition(L, T) < 0){ std::cout << "invalid decomposition" << std::endl;
+            for(unsigned int l = 0; l < boost::num_vertices(T); l++){
+                for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = T[l].bag.begin(); sIt != T[l].bag.end(); sIt++){
+                    std::cout << G[*sIt].id << " ";
+                } std::cout << std::endl;
+            }
+            exit(-1); 
+        }
+
     }
 }
 
 template <typename G_t>
-bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vector<unsigned int> &elimination_ordering, G_t &M, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
+bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &edge, unsigned int i,
+                       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, G_t &M)
+{
     //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
-    std::vector<unsigned int> elimination_ordering_(elimination_ordering.size());
+    std::vector<unsigned int> elimination_ordering_(boost::num_vertices(M));
     for(unsigned int t = 0; t < elimination_ordering.size(); t++){
-        elimination_ordering_[elimination_ordering[t]] = t;
+        unsigned int pos = noboost::get_pos(elimination_ordering[t], M);
+        elimination_ordering_[pos] = t;
+        //std::cout << "elim: " << elimination_ordering[t] << ", pos: " << pos << ", time: " << t << std::endl;
     }
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idxMap[edge[0]], M); nIt != nEnd; nIt++){
-        unsigned id=noboost::get_id(M, *nIt);
-        if(elimination_ordering_[id] > i && boost::edge(idxMap[edge[1]], *nIt, M).second
-       && !boost::edge(*nIt, idxMap[elimination_ordering[i]], M).second)
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(edge[0], M); nIt != nEnd; nIt++){
+        unsigned int pos = noboost::get_pos(*nIt, M);
+        //std::cout << "vertex: " << *nIt << std::endl;
+        //std::cout << "pos: " << pos << ", elimination_ordering_[pos]: " << elimination_ordering_[pos] << std::endl;
+        if(elimination_ordering_[pos] > i && boost::edge(edge[1], *nIt, M).second
+       && !boost::edge(*nIt, elimination_ordering[i], M).second)
         {
             return false;
         }
     }
+
     return true;
 }
 
-
+template <typename G_t>
+void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges){
+    for(unsigned int i = 0; i < edges.size(); i++){
+        boost::remove_edge(edges[i][0], edges[i][1], G);
+    }
+}
 
 /* minimalChordal-algorithm
  *
@@ -260,34 +338,52 @@ bool is_candidate_edge(std::vector<unsigned int> &edge, unsigned int i, std::vec
  * possibly causes lower width than 'old_elimination_ordering'.
  */
 template <typename G_t>
-void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
-                    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
+void minimalChordal(G_t &G,
+                typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
+                typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
 {
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
-    make_index_map(G, idxMap);
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
+    std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > F;
 
-    std::vector<std::set<unsigned int> > C;
-    std::vector<std::vector<std::vector<unsigned int> > > F;
-    make_filled_graph(G, old_elimination_ordering, C, F);
+    treedec::make_filled_graph(G, old_elimination_ordering, C, F);
 
     for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
-        std::vector<std::vector<unsigned int> > candidate;
-        std::set<unsigned int> incident;
+        std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
-            if(is_candidate_edge(F[i][j], i, old_elimination_ordering, G, idxMap)){
+            if(treedec::is_candidate_edge(F[i][j], i, old_elimination_ordering, G)){
                 candidate.push_back(F[i][j]);
                 incident.insert(F[i][j][0]);
                 incident.insert(F[i][j][1]);
             }
         }
         if(candidate.size() != 0){
+            std::cout << "incident: ";
+            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = incident.begin(); sIt != incident.end(); sIt++){ std::cout << *sIt << " "; } std::cout << std::endl;
+
             G_t W_i;
-            induced_subgraph(W_i, G, incident);
-            delete_edges(W_i, candidate);
+            typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+            treedec::induced_subgraph(W_i, G, incident, vdMap);
+            //!!!
+            treedec::delete_edges(W_i, candidate); //candidate: vd of G, W_i: possibly not covered..
 
-            std::vector<std::vector<unsigned int> > keep_fill;
-            LEX_M_fill_in(W_i, keep_fill);
+            std::cout << "1" << std::endl;
 
+            std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
+            treedec::LEX_M_fill_in(W_i, keep_fill_);
+
+            std::cout << "2" << std::endl;
+
+            //Translate descriptors of W_i to descriptors of G.
+            std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill(keep_fill_.size());
+            for(unsigned int j = 0; j < keep_fill_.size(); j++){
+                unsigned int pos1 = noboost::get_pos(keep_fill_[j][0], W_i);
+                unsigned int pos2 = noboost::get_pos(keep_fill_[j][1], W_i);
+                keep_fill[j].push_back(vdMap[pos1]);
+                keep_fill[j].push_back(vdMap[pos2]);
+            }
+
+            //Delete all candidate edges that can be deleted in G according to LEX_M_fill_in.
             for(unsigned int j = 0; j < candidate.size(); j++){
                 for(unsigned int k = 0; k < keep_fill.size(); k++){
                     if((candidate[j][0] == keep_fill[k][0] && candidate[j][1] == keep_fill[k][1])
@@ -299,10 +395,10 @@ void minimalChordal(G_t &G, std::vector<unsigned int> &old_elimination_ordering,
                 }
             }
 
-            delete_edges(G, candidate);
+            treedec::delete_edges(G, candidate);
         }
     }
-    LEX_M_minimal_ordering(G, new_elimination_ordering);
+    treedec::LEX_M_minimal_ordering(G, new_elimination_ordering);
 }
 
 } //namespace treedec

@@ -25,7 +25,7 @@
 // {
 //  std::set<unsigned int> bag;
 // };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
+// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
 //
 // Vertices of the input graph have to provide the attribute 'id', e.g.:
 //
@@ -110,7 +110,7 @@ bool explore_cutsets(G_t &G,
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = component_red.begin(); sIt != component_red.end(); sIt++)
         {
-            unsigned pos=noboost::get_id(G, *sIt); //use pos later
+            unsigned int pos = noboost::get_pos(*sIt, G); //use pos later
             visited[pos] = false;
         }
 
