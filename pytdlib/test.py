@@ -124,19 +124,18 @@ class TestTdLib(unittest.TestCase):
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBPC_deltaC")
         self.assertEqual(lb, 4)
 
-    """
     def test_exact_decomposition_cutset(self):
         V, E, tw = tdlib.exact_decomposition_cutset(V_P6, E_P6)
         self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
         self.assertEqual(tw, 1)
 
-        V, E, tw = tdlib.exact_decomposition_cutset(V_K5, E_K5)      
+        V, E, tw = tdlib.exact_decomposition_cutset(V_K5, E_K5)
         self.assertEqual(V, [[0, 1, 2, 3, 4]])
         self.assertEqual(E, [])
         self.assertEqual(tw, 4)
 
-        V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen) 
+        V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen)
         self.assertEqual(V, [[4, 6, 7, 9], [0, 3, 4, 6, 7], [0, 2, 3, 6, 7], [3, 5, 6, 8], [0, 3, 5, 6, 7], [0, 1, 2, 3, 6]])
         self.assertEqual(E, [0, 1, 1, 2, 1, 4, 2, 5, 3, 4])
         self.assertEqual(tw, 4)
@@ -145,7 +144,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(V, [[0, 3, 4, 5], [0, 1, 2, 3, 5], [0, 3, 6, 7], [0, 2, 3, 5, 6]])
         self.assertEqual(E, [0, 1, 2, 3, 3, 1])
         self.assertEqual(tw, 4)
-    """
 
     """
     def test_exact_decomposition_dynamic(self):
@@ -206,19 +204,17 @@ class TestTdLib(unittest.TestCase):
         V, E = tdlib.trivial_decomposition(["a", "b", "c"], [])
         self.assertEqual(V, [["a", "b", "c"]])
 
-    """
-    def test_MSVS(self):
-        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
-        V, E, w = tdlib.MSVS(V_P6, E_P6, V, E)
-        self.assertEqual(w, 1)
-    """
-    """
-    def test_trivial_decomposition(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
         self.assertEqual(V, [[0,1,2,3,4,5]])
 
         V, E = tdlib.trivial_decomposition(V_K5, E_K5)
         self.assertEqual(V, [[0,1,2,3,4]])
+
+    """
+    def test_MSVS(self):
+        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
+        V, E, w = tdlib.MSVS(V_P6, E_P6, V, E)
+        self.assertEqual(w, 1)
     """
 
     """
@@ -253,20 +249,22 @@ class TestTdLib(unittest.TestCase):
                 correct_status.append(0)
                 if(status < 0):
                     print("error (validate decompositions)! graph: " + str(V) + ", " + str(E))
+    """
 
     def test_random_validate_width(self):
         status = True
         for n in range(0, 13):
             for i in range(0, 100):
                 V, E = randomGNP(n, 0.3)
-                N, M, w1 = tdlib.exact_decomposition_cutset(V, E)
                 Q, R, w2 = tdlib.PP_FI_TM(V, E)
-                if(w1 > w2):
+                isleq = tdlib.exact_decomposition_cutset_decision(V, E, w2)
+                if(not isleq):
                     print("error (validate width)! graph: " + str(V) + ", " + str(E))
                     status = False
 
         self.assertEqual(status, True)
 
+    """
     def test_independent_set_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         IS1 = tdlib.max_independent_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)

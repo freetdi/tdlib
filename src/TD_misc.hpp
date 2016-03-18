@@ -395,7 +395,17 @@ void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_
 }
 
 template <typename G_t, typename T_t>
-void apply_map_on_treedec(T_t &T, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap){
+void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap){
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+        typename noboost::treedec_traits<T_t>::bag_type bag_old, bag_new;
+        bag_old = noboost::bag(T, *tIt);
+        for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = bag_old.begin(); sIt != bag_old.end(); sIt++){
+            unsigned int pos = noboost::get_pos(*sIt, G);
+            bag_new.insert(vdMap[pos]);
+        }
+        noboost::bag(T, *tIt) = MOVE(bag_new);
+    }
 }
 
 

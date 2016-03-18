@@ -452,6 +452,51 @@ def exact_decomposition_cutset(V, E, lb=-1):
 
     return V_T_, E_T_, get_width(V_T, E_T)
 
+def exact_decomposition_cutset_decision(V, E, k):
+    """
+    Computes a tree decomposition of exact width, if tw(G)  k. Otherwise
+    a tree decomposition of a width than matches the given lower bound
+    will be computed. This algorithm is faster than 
+    exact_decomposition_dynamic in practical, but asymptotical slower.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - lb : a lower bound to the treewidth of (V_G, E_G),
+           e.g. computed by lower_bound (default: '-1')
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - status : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, status = tdlib.exact_decomposition_cutset(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    cdef int c_k = k 
+
+    is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k)
+    
+    if is_leq is 0:
+        rtn = True
+    else:
+        rtn = False
+
+    return rtn
+
 def minDegree_ordering(V, E):
     """
     Computes an elimination ordering of a given graph based on the minDegree 

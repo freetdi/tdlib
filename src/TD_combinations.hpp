@@ -170,7 +170,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
             continue;
         }
 
-
         G_t G_;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
         treedec::induced_subgraph(G_, G, components[i], vdMap);
@@ -180,7 +179,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
             lb++;
         }
 
-        treedec::apply_map_on_treedec<G_t>(T_, vdMap);
+        treedec::apply_map_on_treedec(T_, G_, vdMap);
 
         treedec::glue_decompositions(T, T_);
     }
@@ -188,7 +187,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     treedec::preprocessing_glue_bags(bags, T);
 }
 
-/*
+
 template <typename G_t, typename T_t>
 bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     //Preprocessing.
@@ -230,32 +229,21 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
             continue;
         }
 
-        //Mark all vertices not in the current component as already visited.
+        G_t G_;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+        treedec::induced_subgraph(G_, G, components[i], vdMap);
         T_t T_;
-        std::vector<bool> visited(boost::num_vertices(G), true);
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-              = components[i].begin(); sIt != components[i].end(); sIt++)
-        {
-            unsigned int pos = noboost::get_pos(*sIt, G);
-            visited[pos] = false;
-        } 
 
-        while(!treedec::exact_cutset(G, T_, visited, lb)){
+        while(!treedec::exact_cutset(G, T_, lb)){
             lb++;
             if(lb > k){
                 return false;
             }
         }
-
-        treedec::glue_decompositions(T, T_);
     }
-
-    treedec::preprocessing_glue_bags(bags, T);
 
     return true;
 }
-
-*/
 
 /*
 template <typename G_t, typename T_t>

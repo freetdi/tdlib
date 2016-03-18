@@ -75,7 +75,6 @@ bool explore_cutsets(G_t &G,
     {
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-            unsigned int pos = noboost::get_pos(*nIt, G);
             if(component.find(*nIt) != component.end()){
                 N.insert(*nIt);
             }
@@ -223,7 +222,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
     for(; vIt != vEnd; vIt++){ component.insert(*vIt); }
 
-    unsigned int k_ = (unsigned int)(k+1);
+    unsigned int k_ = (unsigned int)k;
 
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
 

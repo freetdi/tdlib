@@ -203,12 +203,14 @@ inline typename treedec_traits<T_t>::bag_type& bag(T_t& T,
     return T[v].bag;
 }
 
+
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type const& bag(T_t const& T,
        const typename boost::graph_traits<T_t>::vertex_descriptor& v)
 {
     return T[v].bag;
 }
+
 
 
 } // namespace noboost
