@@ -136,7 +136,7 @@ bool explore_cutsets(G_t &G, std::vector<bool> &visited,
                 }
             }
 
-            if(!treedec::explore_cutsets(G, cut_red, new_components[t], results, k)){
+            if(!treedec::explore_cutsets(G, visited, cut_red, new_components[t], results, k)){
                 all_successful = false;
                 results.erase(results.begin()+idx, results.end());
                 break;

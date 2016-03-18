@@ -196,11 +196,18 @@ struct treedec_traits{
     typedef std::set<vd_type> bag_type;
 };
 
-template<typename T>
-inline typename treedec_traits<T>::bag_type& bag(T& t,
-	const typename boost::graph_traits<T>::vertex_descriptor& v)
+template<typename T_t>
+inline typename treedec_traits<T_t>::bag_type& bag(T_t& T,
+       const typename boost::graph_traits<T_t>::vertex_descriptor& v)
 {
-    return t[v].bag;
+    return T[v].bag;
+}
+
+template<typename T_t>
+inline typename treedec_traits<T_t>::bag_type& bag(T_t& T,
+       typename boost::graph_traits<T_t>::vertex_descriptor v)
+{
+    return T[v].bag;
 }
 
 } // namespace noboost
