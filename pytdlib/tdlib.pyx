@@ -405,6 +405,74 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     return c_lb
 
+def minDegree_ordering(V, E):
+    """
+    Computes an elimination ordering of a given graph based on the minDegree 
+    heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - O : an elimination ordering on (V_G, E_G)
+
+    EXAMPLES:
+
+        O = tdlib.minDegree_ordering(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, elim_ordering
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_minDegree_ordering(V_G, E_G, elim_ordering);
+
+    py_elim_ordering = []
+    cdef i;
+    for i in range(0, len(elim_ordering)):
+        py_elim_ordering.append(elim_ordering[i]);
+
+    elim_ordering_ = apply_labeling(py_elim_ordering, labels_map)
+
+    return elim_ordering_
+
+
+def fillIn_ordering(V, E):
+    """
+    Computes an elimination ordering of a given graph based on the fillIn 
+    heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - O : an elimination ordering on (V_G, E_G)
+
+    EXAMPLES:
+
+        O = tdlib.fillIn_ordering(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, elim_ordering
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_fillIn_ordering(V_G, E_G, elim_ordering)
+
+    py_elim_ordering = []
+    cdef i;
+    for i in range(0, len(elim_ordering)):
+        py_elim_ordering.append(elim_ordering[i])
+
+    elim_ordering_ = apply_labeling(py_elim_ordering, labels_map)
+
+    return elim_ordering_
 
 
 def trivial_decomposition(V, E):

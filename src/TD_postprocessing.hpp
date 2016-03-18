@@ -347,7 +347,6 @@ void minimalChordal(G_t &G,
 
     treedec::make_filled_graph(G, old_elimination_ordering, C, F);
 
-
     for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
         std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
@@ -359,13 +358,21 @@ void minimalChordal(G_t &G,
             }
         }
         if(candidate.size() != 0){
+            std::cout << "incident: ";
+            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = incident.begin(); sIt != incident.end(); sIt++){ std::cout << *sIt << " "; } std::cout << std::endl;
+
             G_t W_i;
             typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
             treedec::induced_subgraph(W_i, G, incident, vdMap);
-            treedec::delete_edges(W_i, candidate);
+            //!!!
+            treedec::delete_edges(W_i, candidate); //candidate: vd of G, W_i: possibly not covered..
+
+            std::cout << "1" << std::endl;
 
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
+
+            std::cout << "2" << std::endl;
 
             //Translate descriptors of W_i to descriptors of G.
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill(keep_fill_.size());

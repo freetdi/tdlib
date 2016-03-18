@@ -178,7 +178,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 8)
     """
 
-    """
     def test_minDegree_ordering(self):
         O = tdlib.minDegree_ordering(V_Petersen, E_Petersen)
         self.assertEqual(O, [0, 2, 6, 3, 5, 1, 4, 7, 8, 9])
@@ -191,6 +190,7 @@ class TestTdLib(unittest.TestCase):
         O = tdlib.fillIn_ordering(V_Pappus, E_Pappus)
         self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, 10, 3, 5, 6, 8, 12, 14, 16])
 
+    """
     def test_treedec_to_ordering(self):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         O = tdlib.treedec_to_ordering(V, E)

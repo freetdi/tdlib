@@ -306,21 +306,33 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
 
 */
 
-/*
-
 void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
     TD_graph_t G;
     make_tdlib_graph(G, V, E);
 
-    treedec::minDegree_ordering(G, elim_ordering);
+    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_;
+    treedec::minDegree_ordering(G, elim_ordering_);
+
+    elim_ordering.resize(boost::num_vertices(G));
+    for(unsigned int i = 0; i < elim_ordering_.size(); i++){
+        elim_ordering[i] = elim_ordering_[i];
+    }
 }
 
 void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
     TD_graph_t G;
     make_tdlib_graph(G, V, E);
 
-    treedec::fillIn_ordering(G, elim_ordering);
+    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_;
+    treedec::fillIn_ordering(G, elim_ordering_);
+
+    elim_ordering.resize(boost::num_vertices(G));
+    for(unsigned int i = 0; i < elim_ordering_.size(); i++){
+        elim_ordering[i] = elim_ordering_[i];
+    }
 }
+
+/*
 
 int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &elim_ordering){
     TD_graph_t G;

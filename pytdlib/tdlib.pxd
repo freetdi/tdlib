@@ -21,8 +21,8 @@ cdef extern from "python_tdlib.hpp":
 
     #int gc_seperator_algorithm(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T)
     
-    #void gc_minDegree_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[unsigned int] &elim_ordering)
-    #void gc_fillIn_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[unsigned int] &elim_ordering)
+    void gc_minDegree_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[unsigned int] &elim_ordering)
+    void gc_fillIn_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[unsigned int] &elim_ordering)
 
     #int gc_ordering_to_treedec(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, vector[unsigned int] &elim_ordering)
     #void gc_treedec_to_ordering(vector[vector[int]] &V, vector[unsigned int] &E, vector[unsigned int] &elim_ordering);
