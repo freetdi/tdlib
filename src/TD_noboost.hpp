@@ -189,27 +189,96 @@ struct treedec_chooser{
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
 };
 
-// is this really part of noboost?
-template<class T>
-struct treedec_traits{
-    typedef unsigned vd_type;
-    typedef std::set<vd_type> bag_type;
+namespace detail{
+// working around balu and bag
+template <bool, typename T = void>
+struct vdstuff {
+    typedef unsigned type;
+    typedef std::set<unsigned> bag_type;
 };
 
+// temporary hack don't touch.
+// specialize teedec_traits (below) in case you must.
+template <typename T>
+struct vdstuff<false, T> {
+    typedef typename T::value_type type;
+    typedef T bag_type;
+};
+} //detail
+
+// FIXME: not part of noboost
+template<class T>
+struct treedec_traits{
+    typedef typename detail::vdstuff<
+       boost::is_same< typename T::vertex_property_type, bag >::value,
+        typename T::vertex_property_type >::type vd_type;
+
+    typedef typename detail::vdstuff<
+       boost::is_same< typename T::vertex_property_type, bag >::value,
+        typename T::vertex_property_type >::bag_type bag_type;
+
+};
+
+namespace detail{
+template<class B, class T, class V>
+struct tmpbaghack{
+    static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v)
+    {
+        return t[v];
+    }
+    static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v)
+    {
+        return t[v];
+    }
+};
+
+template<class T_t, class V>
+struct tmpbaghack<bag, T_t, V>{
+    static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v)
+    {
+        return t[v].bag;
+    }
+    static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v)
+    {
+        return t[v].bag;
+    }
+};
+} //detail
+
 template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type& bag(T_t& T,
-       typename boost::graph_traits<T_t>::vertex_descriptor v)
+inline typename treedec_traits<T_t>::bag_type& bag(
+	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
+        T_t& T)
 {
-    return T[v].bag;
+    typedef    typename T_t::vertex_property_type b; //>::bag_type b;
+    return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
+}
+
+template<typename T_t>
+inline typename treedec_traits<T_t>::bag_type const& bag(
+        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
+        T_t const& T)
+{
+    typedef    typename T_t::vertex_property_type b; //>::bag_type b;
+    return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
+}
+
+// TRANSITIONAL. (remove later)
+template<typename T_t>
+inline typename treedec_traits<T_t>::bag_type& bag_(T_t& T,
+	 const typename boost::graph_traits<T_t>::vertex_descriptor& v)
+{
+    return bag(v,T);
 }
 
 
 template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type const& bag(T_t const& T,
+inline typename treedec_traits<T_t>::bag_type const& bag_(T_t const& T,
        const typename boost::graph_traits<T_t>::vertex_descriptor& v)
 {
-    return T[v].bag;
+    return bag(v,T);
 }
+// end TRANSITIONAL
 
 
 
