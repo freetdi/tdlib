@@ -55,7 +55,9 @@
 #define TD_COMBINATIONS
 
 #include <set>
+#include <vector>
 #include <boost/graph/adjacency_list.hpp>
+
 #include "TD_preprocessing.hpp"
 #include "TD_lower_bounds.hpp"
 #include "TD_elimination_orderings.hpp"
@@ -63,6 +65,7 @@
 #include "TD_dynamicCR.hpp"
 #include "TD_exact_cutset.hpp"
 #include "TD_seperator_algorithm.hpp"
+#include "TD_misc.hpp"
 
 namespace treedec{
 
@@ -167,19 +170,16 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
             continue;
         }
 
-        //Mark all vertices not in the current component as already visited.
+        G_t G_;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+        treedec::induced_subgraph(G_, G, components[i], vdMap);
         T_t T_;
-        std::vector<bool> visited(boost::num_vertices(G), true);
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-              = components[i].begin(); sIt != components[i].end(); sIt++)
-        {
-            unsigned int pos = noboost::get_pos(*sIt, G);
-            visited[pos] = false;
-        } 
 
-        while(!treedec::exact_cutset(G, T_, visited, lb)){
+        while(!treedec::exact_cutset(G_, T_, lb)){
             lb++;
         }
+
+        treedec::apply_map_on_treedec<G_t>(T_, vdMap);
 
         treedec::glue_decompositions(T, T_);
     }

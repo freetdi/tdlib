@@ -394,6 +394,11 @@ void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_
     }
 }
 
+template <typename G_t, typename T_t>
+void apply_map_on_treedec(T_t &T, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap){
+}
+
+
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 

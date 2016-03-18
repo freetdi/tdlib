@@ -49,7 +49,7 @@
 namespace treedec{
 
 template <typename G_t>
-bool explore_cutsets(G_t &G, std::vector<bool> &visited,
+bool explore_cutsets(G_t &G,
          std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut,
          std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component,
          std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &results, unsigned int k)
@@ -75,8 +75,7 @@ bool explore_cutsets(G_t &G, std::vector<bool> &visited,
     {
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-            unsigned int pos = noboost::get_pos(*nIt, G);
-            if(!visited[pos] && component.find(*nIt) != component.end()){
+            if(component.find(*nIt) != component.end()){
                 N.insert(*nIt);
             }
         }
@@ -106,17 +105,16 @@ bool explore_cutsets(G_t &G, std::vector<bool> &visited,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = MOVE(component);
         component_red.erase(candidates[i]);
 
-        std::vector<bool> visited_ = visited;
-
+        std::vector<bool> visited(boost::num_vertices(G), true);
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = component_red.begin(); sIt != component_red.end(); sIt++)
         {
             unsigned int pos = noboost::get_pos(*sIt, G);
-            visited_[pos] = false;
+            visited[pos] = false;
         }
 
         typename std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > new_components;
-        treedec::get_components_provided_map(G, new_components, visited_);
+        treedec::get_components_provided_map(G, new_components, visited);
 
         bool all_successful = true;
 
@@ -129,14 +127,13 @@ bool explore_cutsets(G_t &G, std::vector<bool> &visited,
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
                     unsigned int pos = noboost::get_pos(*nIt, G);
-                    if(//!visited[pos] && 
-                        new_components[t].find(*nIt) != new_components[t].end()){
+                    if(new_components[t].find(*nIt) != new_components[t].end()){
                         cut_red.insert(*sIt);
                     }
                 }
             }
 
-            if(!treedec::explore_cutsets(G, visited, cut_red, new_components[t], results, k)){
+            if(!treedec::explore_cutsets(G, cut_red, new_components[t], results, k)){
                 all_successful = false;
                 results.erase(results.begin()+idx, results.end());
                 break;
@@ -201,7 +198,7 @@ void glue_bags(T_t &T,
 
 
 template <typename G_t, typename T_t>
-bool exact_cutset(G_t &G, T_t &T, std::vector<bool> &visited, int k){
+bool exact_cutset(G_t &G, T_t &T, int k){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return true;
@@ -219,32 +216,16 @@ bool exact_cutset(G_t &G, T_t &T, std::vector<bool> &visited, int k){
         return false;
     }
 
-
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut, component;
-    while(true){
-        unsigned int pos = noboost::get_pos(*vIt, G);
-        if(!visited[pos]){
-            cut.insert(*vIt);
-            break;
-        }
-        else{
-            vIt++;
-        }
-    }
+    cut.insert(*(vIt++));
 
-    vIt++;
-    for(; vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
-        if(!visited[pos]){
-            component.insert(*vIt);
-        }
-    }
+    for(; vIt != vEnd; vIt++){ component.insert(*vIt); }
 
     unsigned int k_ = (unsigned int)(k+1);
 
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > results;
 
-    if(!treedec::explore_cutsets(G, visited, cut, component, results, k_)){
+    if(!treedec::explore_cutsets(G, cut, component, results, k_)){
         return false;
     }
 
@@ -269,19 +250,12 @@ bool exact_cutset(G_t &G, T_t &T, std::vector<bool> &visited, int k){
 }
 
 template <typename G_t, typename T_t>
-void exact_cutset(G_t &G, T_t &T, std::vector<bool> &visited){
+void exact_cutset(G_t &G, T_t &T){
     int lb = 0;
-    while(!treedec::exact_cutset(G, T, visited, lb)){
+    while(!treedec::exact_cutset(G, T, lb)){
         lb++;
     }
 }
-
-template <typename G_t, typename T_t>
-void exact_cutset(G_t &G, T_t &T){
-    std::vector<bool> visited(boost::num_vertices(G), false);
-    treedec::exact_cutset(G, T, visited);
-}
-
 
 } //namespace treedec
 
