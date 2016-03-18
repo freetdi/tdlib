@@ -233,7 +233,7 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
 
 /* EXACT TREE DECOMPOSITIONS */
 
-/*
+
 int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -249,6 +249,7 @@ int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<un
     return treedec::get_width(T);
 }
 
+/*
 int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);

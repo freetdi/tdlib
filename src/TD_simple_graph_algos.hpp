@@ -156,11 +156,11 @@ void t_search_components(G_t &G,
         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
         int comp_idx)
 {
-    unsigned int pos = noboost::get_pos(vertex, G); std::cout << "pos2: " << pos << std::endl;
+    unsigned int pos = noboost::get_pos(vertex, G);
     visited[pos] = true;
     typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vertex, G); nIt != nEnd; nIt++){
-        unsigned int npos = noboost::get_pos(*nIt, G); std::cout << "npos: " << npos << std::endl;
+        unsigned int npos = noboost::get_pos(*nIt, G);
         if(!visited[npos]){
             components[comp_idx].insert(*nIt);
             t_search_components(G, *nIt, visited, components, comp_idx);
@@ -177,7 +177,7 @@ void get_components_provided_map(G_t &G,
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G); std::cout << "pos: " << pos << std::endl;
+        unsigned int pos = noboost::get_pos(*vIt, G);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;

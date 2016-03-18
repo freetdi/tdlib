@@ -49,7 +49,7 @@
 namespace treedec{
 
 template <typename G_t>
-bool explore_cutsets(G_t &G, std::vector<bool> &visited,
+bool explore_cutsets(G_t &G,
          std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut,
          std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component,
          std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &results, unsigned int k)
@@ -76,7 +76,7 @@ bool explore_cutsets(G_t &G, std::vector<bool> &visited,
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
             unsigned int pos = noboost::get_pos(*nIt, G);
-            if(!visited[pos] && component.find(*nIt) != component.end()){
+            if(component.find(*nIt) != component.end()){
                 N.insert(*nIt);
             }
         }
@@ -199,7 +199,7 @@ void glue_bags(T_t &T,
 
 
 template <typename G_t, typename T_t>
-bool exact_cutset(G_t &G, T_t &T, std::vector<bool> &visited, int k){
+bool exact_cutset(G_t &G, T_t &T, int k){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return true;
