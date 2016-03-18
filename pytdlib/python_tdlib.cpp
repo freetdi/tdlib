@@ -236,7 +236,9 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
 /* EXACT TREE DECOMPOSITIONS */
 
 
-int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
+int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -252,7 +254,9 @@ int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<un
 }
 
 
-int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k){
+int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -272,7 +276,9 @@ int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::
 }
 
 /*
-int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
+int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -293,7 +299,9 @@ int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<u
 
 /*
 
-int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
+int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -310,7 +318,9 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
 
 */
 
-void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
+void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
+                           std::vector<unsigned int> &elim_ordering)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V, E);
 
@@ -336,20 +346,28 @@ void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> 
     }
 }
 
-/*
 
-int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &elim_ordering){
+int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
+                           std::vector<unsigned int> &elim_ordering)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     TD_tree_dec_t T;
-    treedec::ordering_to_treedec(G, elim_ordering, T);
+
+    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_(boost::num_vertices(G));
+    for(unsigned int i = 0; i < elim_ordering.size(); i++){
+        elim_ordering_[i] = elim_ordering[i];
+    }
+    treedec::ordering_to_treedec(G, elim_ordering_, T);
 
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
 }
 
+/*
 void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V, E);

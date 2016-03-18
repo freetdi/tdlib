@@ -48,10 +48,6 @@ This module containes the following functions** :
         Applies preprocessing followed by the minFill-heuristic followed by 
         triangulation minimization to a given graph
 
-    - preprocessing_glue_bags
-        Glues the given bags with a given tree decomposition according to 
-        subset-relation
-
     - lower_bound
         Computes a lower bound with respect to treewidth of a given graph
 
@@ -107,28 +103,28 @@ from libcpp.vector cimport vector
 
 from tdlib cimport gc_preprocessing
 from tdlib cimport gc_PP_MD
-#from tdlib cimport gc_PP_FI_TM
+from tdlib cimport gc_PP_FI_TM
 
 from tdlib cimport gc_deltaC_min_d
 from tdlib cimport gc_deltaC_max_d
 from tdlib cimport gc_deltaC_least_c
-
 from tdlib cimport gc_LBN_deltaC
 from tdlib cimport gc_LBNC_deltaC
-#from tdlib cimport gc_LBP_deltaC
-#from tdlib cimport gc_LBPC_deltaC
+from tdlib cimport gc_LBP_deltaC
+from tdlib cimport gc_LBPC_deltaC
 
-#from tdlib cimport gc_exact_decomposition_cutset
-#from tdlib cimport gc_exact_decomposition_cutset_decision
+from tdlib cimport gc_exact_decomposition_cutset
+from tdlib cimport gc_exact_decomposition_cutset_decision
 #from tdlib cimport gc_exact_decomposition_dynamic
 
 #from tdlib cimport gc_seperator_algorithm
 
-#from tdlib cimport gc_minDegree_ordering
-#from tdlib cimport gc_fillIn_ordering
+from tdlib cimport gc_minDegree_ordering
+from tdlib cimport gc_fillIn_ordering
 
 from tdlib cimport gc_is_valid_treedecomposition
 from tdlib cimport gc_trivial_decomposition
+
 
 ##############################################################
 ############ GRAPH/DECOMPOSITION ENCODING/DECODING ###########
@@ -164,6 +160,7 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
                 E.push_back(labels_dict_inv[e])
 
     return labels_map
+
 
 """
 cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E):
@@ -205,6 +202,14 @@ def apply_labeling(X, labels_map):
                  X_.append(Y)
 
     return X_
+
+
+def inverse_labels_map(labels_map):
+    inv_map = dict()
+    for i in range(0, len(labels_map)):
+        inv_map[labels_map[i]] = i
+    return inv_map
+
 
 ##############################################################
 ############ PREPROCESSING ###################################
@@ -256,6 +261,7 @@ def preprocessing(V, E):
 
     return V_G_, E_G_, c_bags_, py_lb
 
+
 def PP_MD(V, E):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
@@ -296,6 +302,7 @@ def PP_MD(V, E):
     E_T_ = apply_labeling(E_T, labels_map)
 
     return V_T_, E_T_, get_width(V_T, E_T)
+
 
 def PP_FI_TM(V, E):
     """
@@ -405,6 +412,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     return c_lb
 
+
 ##############################################################
 ############ EXACT ALGORITHMS ################################
 
@@ -452,6 +460,7 @@ def exact_decomposition_cutset(V, E, lb=-1):
 
     return V_T_, E_T_, get_width(V_T, E_T)
 
+
 def exact_decomposition_cutset_decision(V, E, k):
     """
     Computes a tree decomposition of exact width, if tw(G)  k. Otherwise
@@ -496,6 +505,10 @@ def exact_decomposition_cutset_decision(V, E, k):
         rtn = False
 
     return rtn
+
+
+##############################################################
+############ APPROXIMATIVE ALGORITHMS ########################
 
 def minDegree_ordering(V, E):
     """
@@ -567,6 +580,58 @@ def fillIn_ordering(V, E):
     return elim_ordering_
 
 
+##############################################################
+############ MISC ############################################
+
+def ordering_to_treedec(V, E, O):
+    """
+    Applies an elimination ordering on a graph and returns 
+    the resulting tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - O : an elimination ordering on (V_G, E_G)
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        O = tdlib.fillIn_ordering(V_G, E_G)
+        V_T, E_T, width = tdlib.ordering_to_treedec(V_G, E_G, O)
+    """
+
+    if(sorted(V) != sorted(O)):
+        print("error: an elimination ordering must be a permutation of the vertices!")
+        return
+
+    cdef vector[unsigned int] V_G, E_G, E_T, elim_ordering
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    labels_map_inv = inverse_labels_map(labels_map)
+
+    for i in range(0, len(O)):
+        elim_ordering.push_back(labels_map_inv[O[i]])
+
+    gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering)
+
+    V_T_ = apply_labeling(V_T, labels_map)
+    E_T_ = apply_labeling(E_T, labels_map)
+
+    return V_T_, E_T_, get_width(V_T, E_T)
+
+
 def trivial_decomposition(V, E):
     """
     Returns a trivial tree decomposition of the given graph.
@@ -599,6 +664,7 @@ def trivial_decomposition(V, E):
     E_T_ = apply_labeling(E_T, labels_map)
 
     return V_T_, E_T_
+
 
 def get_width(V, E):
     """

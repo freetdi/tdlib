@@ -193,12 +193,12 @@ class TestTdLib(unittest.TestCase):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         O = tdlib.treedec_to_ordering(V, E)
         self.assertEqual(O, [0, 2, 1, 3, 4, 5])
+    """
 
     def test_ordering_to_treedec(self):
         V, E, lb = tdlib.ordering_to_treedec(V_P6, E_P6, [1,3,0,2,4,5])
         self.assertEqual(V, [[5], [4, 5], [2, 4], [0, 2], [2, 3, 4], [0, 1, 2]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 2, 4, 3, 5])
-    """
 
     def test_trivial_decomposition(self):
         V, E = tdlib.trivial_decomposition(["a", "b", "c"], [])
@@ -307,11 +307,4 @@ class TestTdLib(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-"""
-#todo:
-#preprocessing_glue_bags
-#minimalChordal
-"""
 
