@@ -97,8 +97,9 @@ struct degree_mod : public noboost::vertex_callback<G>{
 
 } //namespace detail
 
-//Constructs a tree decomposition from the elimination ordering obtained by the
-//minimum-degree heuristic. Ignores isolated vertices.
+// Construct a tree decomposition T of G using the elimination ordering
+// obtained by the minimum-degree heuristic. Ignore isolated vertices.
+// There must be a non-isolated vertex in G.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
