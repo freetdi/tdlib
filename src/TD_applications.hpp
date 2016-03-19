@@ -861,7 +861,7 @@ void _colorings_intersection(std::vector<std::vector<int> > &results_left,
 }
 
 template <typename G_t, typename T_t>
-bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k
+bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
                         std::vector<std::vector<std::vector<int> > > &results)
 {
     std::vector<bool> visited(boost::num_vertices(T), false);

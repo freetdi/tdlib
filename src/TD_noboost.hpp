@@ -158,9 +158,10 @@ inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
 //To be used as a narrower alternative to vertex_descriptor.
 //Positions are in {0, 1, ..., num_vertices-1}, where applicable.
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
+// this position must be stable under copy and assignment operations.
 template<typename G_t>
 inline unsigned get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){
-    return (unsigned int)v;
+    return boost::get(boost::get(boost::vertex_index, G), v);
 }
 
 // return "id" where the vertex_descriptor might make more sense.
