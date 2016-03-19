@@ -164,23 +164,30 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
     return labels_map
 
 
-cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E):
+cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E, inv_labels_dict=list()):
     labels_dict = dict()
     labels_map = list()
 
-    i = int(0)
-    for bag in pyV:
-        for v in bag:
-            if v not in labels_dict:
-                labels_dict[v] = i
-                labels_map.append(v)
-                i += 1
+    if(len(inv_labels_dict) == 0):
+        i = int(0)
+        for bag in pyV:
+            for v in bag:
+                if v not in labels_dict:
+                    labels_dict[v] = i
+                    labels_map.append(v)
+                    i += 1
+    else:
+        labels_dict = inv_labels_dict
 
-    for bag in pyV:
-        bag_ = []
-        for v in bag:
-            bag_.append(labels_dict[v])
-        V.push_back(bag_)
+    try:
+        for bag in pyV:
+            bag_ = []
+            for v in bag:
+                bag_.append(labels_dict[v])
+            V.push_back(bag_)
+    except KeyError:
+        print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
+        return False
 
     if len(pyE) > 0:
         #tuple representation
@@ -221,11 +228,11 @@ def apply_labeling(X, labels_map):
     return X_
 
 
-def inverse_labels_map(labels_map):
-    inv_map = dict()
+def inverse_labels_dict(labels_map):
+    inv_dict = dict()
     for i in range(0, len(labels_map)):
-        inv_map[labels_map[i]] = i
-    return inv_map
+        inv_dict[labels_map[i]] = i
+    return inv_dict
 
 
 ##############################################################
@@ -673,10 +680,10 @@ def ordering_to_treedec(V, E, O):
 
     labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
 
-    labels_map_inv = inverse_labels_map(labels_map)
+    inv_labels_dict = inverse_labels_dict(labels_map)
 
     for i in range(0, len(O)):
-        elim_ordering.push_back(labels_map_inv[O[i]])
+        elim_ordering.push_back(inv_labels_dict[O[i]])
 
     gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering)
 
@@ -738,6 +745,71 @@ def trivial_decomposition(V, E):
     E_T_ = apply_labeling(E_T, labels_map)
 
     return V_T_, E_T_
+
+
+def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
+    """
+    Checks, if the definition of a tree decomposition holds for
+    a tree decomposition and a graph.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    - message : outputs error message iff (V_T, E_T) is invalid with
+                respect to (V_G, E_G) (optional)
+
+    OUTPUT:
+
+    - error_code :     0, if (V_T, E_T) is valid with respect to (V_G, E_G)
+                   <= -1, if (V_T, E_T) is not a tree
+                   <= -2, if not all vertices of (V_G, E_G) are covered
+                   <= -3, if not all edges of (V_G, E_G) are covered
+                   == -4, if condition (T4) of a treedecomposition is 
+                             not satisfied
+
+    EXAMPLES:
+
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
+        status = tdlib.is_valid_treedecomposition(V_G, E_G, V_T, E_T)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return -5
+
+    cdef c_status;
+    c_status = gc_is_valid_treedecomposition(V_G, E_G, V_T, E_T);
+    
+    py_status = c_status
+
+    if(message):
+        if(py_status == 0):
+            pass
+        elif(py_status == -1):
+            print("Invalid tree decomposition: tree decomposition is not a tree")
+        elif(py_status == -2):
+            print("Invalid tree decomposition: not all vertices covered")
+        elif(py_status == -3):
+            print("Invalid tree decomposition: not all edges covered")
+        elif(py_status == -4):
+            print("Invalid tree decomposition: some encoded vertices are not connected in the tree decomposition")
+        else:
+            pass
+
+    return py_status
 
 
 def get_width(V, E):

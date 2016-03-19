@@ -472,7 +472,7 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
     treedec::treedec_to_ordering(T, elim_ordering);
 }
 
-/*
+
 int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
 {
@@ -484,7 +484,7 @@ int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<un
 
     return treedec::is_valid_treedecomposition(G, T);
 }
-*/
+
 
 int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
     TD_graph_t G;

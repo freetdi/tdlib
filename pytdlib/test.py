@@ -245,7 +245,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(w, 1)
     """
 
-    """
     def test_is_valid_treedecomposition(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
         
@@ -253,7 +252,7 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(status, 0)
 
         status = tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E, message=False)
-        self.assertEqual(status, -2)
+        self.assertEqual(status, -5)
 
         V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen) 
         status = tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E, message=False)
@@ -262,9 +261,7 @@ class TestTdLib(unittest.TestCase):
         V, E, tw = tdlib.exact_decomposition_cutset(V_Wagner, E_Wagner) 
         status = tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E, message=False)
         self.assertEqual(status, 0)
-    """
 
-    """
     def test_random_valid_treedecomposition(self):
         status_list = list()
         correct_status = list()
@@ -277,7 +274,6 @@ class TestTdLib(unittest.TestCase):
                 correct_status.append(0)
                 if(status < 0):
                     print("error (validate decompositions)! graph: " + str(V) + ", " + str(E))
-    """
 
     def test_random_validate_width(self):
         status = True
