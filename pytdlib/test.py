@@ -213,12 +213,15 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, \
                              10, 3, 5, 6, 8, 12, 14, 16])
 
-    """
     def test_treedec_to_ordering(self):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         O = tdlib.treedec_to_ordering(V, E)
         self.assertEqual(O, [0, 2, 1, 3, 4, 5])
-    """
+
+        V = [["a", "d", "c"], ["c", "b", "e"]]
+        E = [0, 1]
+        O = tdlib.treedec_to_ordering(V, E)
+        self.assertEqual(O, ["a", "d", "c", "b", "e"])
 
     def test_ordering_to_treedec(self):
         V, E, lb = tdlib.ordering_to_treedec(V_P6, E_P6, [1,3,0,2,4,5])

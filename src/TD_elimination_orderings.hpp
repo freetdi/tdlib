@@ -449,7 +449,7 @@ void _treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && !noboost::bag(T, *tIt).empty()){
+        if(boost::out_degree(*tIt, T) <= 1 && !noboost::bag(*tIt, T).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -464,21 +464,21 @@ void _treedec_to_ordering(T_t &T,
         typename noboost::treedec_traits<T_t>::bag_type difference;
 
         if(boost::out_degree(leaf, T) == 1){
-            if(!std::includes(noboost::bag(T, parent).begin(),
-                              noboost::bag(T, parent).end(),
-                              noboost::bag(T, leaf).begin(),
-                              noboost::bag(T, leaf).end()))
+            if(!std::includes(noboost::bag(parent, T).begin(),
+                              noboost::bag(parent, T).end(),
+                              noboost::bag(leaf, T).begin(),
+                              noboost::bag(leaf, T).end()))
             {
-                std::set_difference(noboost::bag(T, leaf).begin(),
-                                    noboost::bag(T, leaf).end(),
-                                    noboost::bag(T, parent).begin(),
-                                    noboost::bag(T, parent).end(),
+                std::set_difference(noboost::bag(leaf, T).begin(),
+                                    noboost::bag(leaf, T).end(),
+                                    noboost::bag(parent, T).begin(),
+                                    noboost::bag(parent, T).end(),
                                     std::inserter(difference, difference.begin()));
             }
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = MOVE(noboost::bag(T, leaf));
+            difference = MOVE(noboost::bag(leaf, T));
         }
 
         for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();
@@ -487,7 +487,7 @@ void _treedec_to_ordering(T_t &T,
             elimination_ordering.push_back(*sIt);
         }
 
-        noboost::bag(T, leaf).clear();
+        noboost::bag(leaf, T).clear();
 
         _treedec_to_ordering(T, elimination_ordering);
     }

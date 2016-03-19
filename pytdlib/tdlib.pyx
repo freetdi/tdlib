@@ -122,6 +122,7 @@ from tdlib cimport gc_minDegree_ordering
 from tdlib cimport gc_fillIn_ordering
 
 from tdlib cimport gc_ordering_to_treedec
+from tdlib cimport gc_treedec_to_ordering
 #from tdlib cimport gc_is_valid_treedecomposition
 from tdlib cimport gc_trivial_decomposition
 from tdlib cimport gc_get_width
@@ -163,10 +164,23 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
     return labels_map
 
 
-"""
 cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E):
-    for t in pyV:
-        V.push_back(t)
+    labels_dict = dict()
+    labels_map = list()
+
+    i = int(0)
+    for bag in pyV:
+        for v in bag:
+            if v not in labels_dict:
+                labels_dict[v] = i
+                labels_map.append(v)
+                i += 1
+
+    for bag in pyV:
+        bag_ = []
+        for v in bag:
+            bag_.append(labels_dict[v])
+        V.push_back(bag_)
 
     if len(pyE) > 0:
         #tuple representation
@@ -185,7 +199,9 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
         elif isinstance(pyE[0], int):
             for e in pyE:
                 E.push_back(e)
-"""
+
+    return labels_map
+
 
 def apply_labeling(X, labels_map):
     X_ = list()
@@ -668,6 +684,26 @@ def ordering_to_treedec(V, E, O):
     E_T_ = apply_labeling(E_T, labels_map)
 
     return V_T_, E_T_, get_width(V_T, E_T)
+
+
+def treedec_to_ordering(V, E):
+    cdef vector[unsigned int] E_T, elim_ordering
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_decomp(V, E, V_T, E_T)
+
+    gc_treedec_to_ordering(V_T, E_T, elim_ordering)
+
+    py_elim_ordering_ = []
+    cdef i;
+    for i in range(0, len(elim_ordering)):
+        py_elim_ordering_.append(elim_ordering[i])
+
+    py_elim_ordering = []
+    for i in range(0, len(py_elim_ordering_)):
+        py_elim_ordering.append(labels_map[py_elim_ordering_[i]])
+
+    return py_elim_ordering
 
 
 def trivial_decomposition(V, E):
