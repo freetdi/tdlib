@@ -81,6 +81,14 @@ public:
     container_type _degs;
 private:
     const G& _g;
+}; // DEGS
+
+template<class G>
+struct deg_chooser{
+    typedef typename misc::DEGS<G> degs_type;
+    typedef typename misc::DEGS<G> type;
+    static void alloc_init(size_t){
+    }
 };
 
 template<class VC, class G, class CB>
