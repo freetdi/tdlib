@@ -54,7 +54,7 @@
 
 namespace treedec{
 
-//Creates a modified induced subgraph of the bag 'noboost::bag(T, t_desc)'.
+//Creates a modified induced subgraph of the bag 'noboost::bag(t_desc, T)'.
 template <typename G_t, typename T_t>
 bool is_improvement_bag(G_t &H,
                         std::vector<bool> &disabled,
@@ -65,11 +65,11 @@ bool is_improvement_bag(G_t &H,
                         G_t &G, T_t &T)
 {
         std::cout << "bag:" << std::endl;
-        for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = noboost::bag(T, t_desc).begin(); sIt != noboost::bag(T, t_desc).end(); sIt++){
+        for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = noboost::bag(t_desc, T).begin(); sIt != noboost::bag(t_desc, T).end(); sIt++){
             std::cout << *sIt << " ";
         } std::cout << std::endl;
 
-    treedec::induced_subgraph(H, G, noboost::bag(T, t_desc), vdMap);
+    treedec::induced_subgraph(H, G, noboost::bag(t_desc, T), vdMap);
     disabled.assign(boost::num_vertices(H), false);
 
     std::cout << "H_size: " << boost::num_vertices(H) << std::endl;
@@ -89,8 +89,8 @@ bool is_improvement_bag(G_t &H,
                     unsigned int pos2 = noboost::get_pos(*vIt2, H);
                     typename noboost::treedec_traits<T_t>::bag_type::value_type vd1 = vdMap[pos1];
                     typename noboost::treedec_traits<T_t>::bag_type::value_type vd2 = vdMap[pos2];
-                    if(noboost::bag(T, *nIt).find(vd1) != noboost::bag(T, *nIt).end()
-                    && noboost::bag(T, *nIt).find(vd2) != noboost::bag(T, *nIt).end())
+                    if(noboost::bag(*nIt, T).find(vd1) != noboost::bag(*nIt, T).end()
+                    && noboost::bag(*nIt, T).find(vd2) != noboost::bag(*nIt, T).end())
                     {
                         std::cout << "add an edge" << std::endl;
                         boost::add_edge(*vIt1, *vIt2, H);
@@ -165,7 +165,7 @@ void MSVS(G_t &G, T_t &T){
         typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor refinement_bag;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(noboost::bag(T, *tIt).size() == width+1){
+            if(noboost::bag(*tIt, T).size() == width+1){
                 std::vector<bool> disabled_;
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap_;
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){
@@ -217,13 +217,13 @@ void MSVS(G_t &G, T_t &T){
             visited[pos] = true;
         }
 
-        typename noboost::treedec_traits<T_t>::bag_type old_bag = noboost::bag(T, refinement_bag);
+        typename noboost::treedec_traits<T_t>::bag_type old_bag = noboost::bag(refinement_bag, T);
         boost::clear_vertex(refinement_bag, T);
 
         //Convert the descriptors of G to a bag.
         typename noboost::treedec_traits<T_t>::bag_type B;
         treedec::map_descriptors_to_bags<G_t>(S, B);
-        noboost::bag(T, refinement_bag) = MOVE(B);
+        noboost::bag(refinement_bag, T) = MOVE(B);
 
         std::cout << "seperator:" << std::endl;
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
@@ -262,19 +262,19 @@ void MSVS(G_t &G, T_t &T){
             typename noboost::treedec_traits<T_t>::bag_type uB;
             treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
 
-            noboost::bag(T, newN[i]) = MOVE(uB);
+            noboost::bag(newN[i], T) = MOVE(uB);
             boost::add_edge(refinement_bag, newN[i], T);
         }
 
         for(unsigned int i = 0; i <  oldN.size(); i++){
             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
             std::set_intersection(old_bag.begin(), old_bag.end(),
-                                  noboost::bag(T, oldN[i]).begin(),
-                                  noboost::bag(T, oldN[i]).end(),
+                                  noboost::bag(oldN[i], T).begin(),
+                                  noboost::bag(oldN[i], T).end(),
                                   std::inserter(intersection, intersection.begin()));
 
             for(unsigned int j = 0; j < union_S_W_i.size(); j++){
-                if(std::includes(noboost::bag(T, newN[j]).begin(), noboost::bag(T, newN[j]).end(),
+                if(std::includes(noboost::bag(newN[j], T).begin(), noboost::bag(newN[j], T).end(),
                                  intersection.begin(), intersection.end())){
                     boost::add_edge(newN[j], oldN[i], T);
                     break;
