@@ -68,32 +68,42 @@ This module containes the following functions** :
 
     - minDegree_ordering
         Computes an elimination ordering according to the minDegree-heuristic
-    
+
     - fillIn_ordering
         Computes an elimination ordering according to the minFill-heuristic
 
     - MSVS
         Possibly reduces the width of a given tree decomposition with help 
         of minimal seperating vertex sets
-    
+
     - minimalChordal
         Possibly reduces the width of a given tree decomposition by 
         triangulation minimization
 
+    - max_clique_with_treedecomposition
+
+    - max_independent_set_with_treedecomposition
+
+    - max_vertex_cover_with_treedecomposition
+
+    - min_dominating_set_with_treedecomposition
+
+    - min_coloring_with_treedecomposition
+
     - treedec_to_ordering
         Computes an elimination ordering out of a tree decomposition
-    
+
     - ordering_to_treedec
         Computes a tree decomposition out of an elimination ordering
 
     - trivial_decomposition
         Returns a trivial decomposition of a given graph
-    
-    - get_width
-        Returns the width of a given tree decomposition
-    
+
     - is_valid_treedecomposition
         Checks, if a tree decomposition is valid with respect to a given graph
+
+    - get_width
+        Returns the width of a given tree decomposition
 
 AUTHOR: Lukas Larisch (now): Initial version
 -------
@@ -121,10 +131,16 @@ from tdlib cimport gc_seperator_algorithm
 from tdlib cimport gc_minDegree_ordering
 from tdlib cimport gc_fillIn_ordering
 
+from tdlib cimport gc_max_clique_with_treedecomposition
+#from tdlib cimport gc_max_independent_set_with_treedecomposition
+#from tdlib cimport gc_min_vertex_cover_with_treedecomposition
+#from tdlib cimport gc_min_dominating_set_with_treedecomposition
+#from tdlib cimport gc_min_coloring_with_treedecomposition
+
 from tdlib cimport gc_ordering_to_treedec
 from tdlib cimport gc_treedec_to_ordering
-#from tdlib cimport gc_is_valid_treedecomposition
 from tdlib cimport gc_trivial_decomposition
+from tdlib cimport gc_is_valid_treedecomposition
 from tdlib cimport gc_get_width
 
 
@@ -164,7 +180,7 @@ cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned 
     return labels_map
 
 
-cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E, inv_labels_dict=list()):
+cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned int] &E, inv_labels_dict=dict()):
     labels_dict = dict()
     labels_map = list()
 
@@ -640,6 +656,98 @@ def fillIn_ordering(V, E):
 
     return elim_ordering_
 
+
+##############################################################
+############ APPLICATIONS ####################################
+
+def max_clique_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a maximum clique with help of a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUT:
+
+    - C:    a maximum clique in the input graph
+
+    EXAMPLES:
+
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
+        C = tdlib.max_clique_with_treedecomposition(V_G, E_G, V_T, E_T)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, C_
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+
+    py_C = []
+    cdef i;
+    for i in range(0, len(C_)):
+        pyCi = C_[i]
+        py_C.append(pyCi)
+
+    return py_C
+
+
+def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a maximum sized independent set with help of a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUT:
+
+    - IS:    a maximum sized independent set in the input graph
+
+    EXAMPLES:
+
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
+        IS = tdlib.max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, IS_
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_);
+
+    py_IS = []
+    cdef i;
+    for i in range(0, len(IS_)):
+        pyISi = IS_[i]
+        py_IS.append(pyISi)
+
+    return py_IS
 
 ##############################################################
 ############ MISC ############################################
