@@ -265,7 +265,7 @@ class TestTdLib(unittest.TestCase):
     def test_random_valid_treedecomposition(self):
         status_list = list()
         correct_status = list()
-        for n in range(0, 13):
+        for n in range(1, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.3)
                 N, M, tw = tdlib.exact_decomposition_cutset(V, E)
@@ -288,8 +288,24 @@ class TestTdLib(unittest.TestCase):
 
         self.assertEqual(status, True)
 
-    """
-    def test_independent_set_with_treedecomposition(self):
+    def test_max_clique_with_treedecomposition(self):
+        V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
+        C1 = tdlib.max_clique_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
+        self.assertEqual(len(C1), 2)
+
+        V_T2, E_T2, lb = tdlib.PP_MD(V_Wagner, E_Wagner)
+        C2 = tdlib.max_clique_with_treedecomposition(V_Wagner, E_Wagner, V_T2, E_T2)
+        self.assertEqual(len(C2), 2)
+
+        V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
+        C3 = tdlib.max_clique_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
+        self.assertEqual(len(C3), 2)
+
+        V_T4, E_T4, lb = tdlib.PP_MD(V_K5, E_K5)
+        C4 = tdlib.max_clique_with_treedecomposition(V_K5, E_K5, V_T4, E_T4)
+        self.assertEqual(len(C4), 5)
+
+    def test_max_independent_set_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         IS1 = tdlib.max_independent_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
         self.assertEqual(len(IS1), 4)
@@ -302,7 +318,12 @@ class TestTdLib(unittest.TestCase):
         IS3 = tdlib.max_independent_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
         self.assertEqual(len(IS3), 9)
 
-    def test_vertex_cover_with_treedecomposition(self):
+        V_T4, E_T4, lb = tdlib.PP_MD(V_K5, E_K5)
+        IS4 = tdlib.max_independent_set_with_treedecomposition(V_K5, E_K5, V_T4, E_T4)
+        self.assertEqual(len(IS4), 1)
+
+    """
+    def test_min_vertex_cover_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         VC1 = tdlib.min_vertex_cover_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
         self.assertEqual(len(VC1), 6)
@@ -315,7 +336,7 @@ class TestTdLib(unittest.TestCase):
         VC3 = tdlib.min_vertex_cover_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
         self.assertEqual(len(VC3), 9)
 
-    def test_dominating_set_with_treedecomposition(self):
+    def test_min_dominating_set_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         DS1 = tdlib.min_dominating_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
         self.assertEqual(len(DS1), 3)
@@ -327,6 +348,8 @@ class TestTdLib(unittest.TestCase):
         V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
         DS3 = tdlib.min_dominating_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
         self.assertEqual(len(DS3), 5)
+
+    def test_min_coloring_with_treedecomposition(self):
     """
 
 if __name__ == '__main__':

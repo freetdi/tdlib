@@ -45,21 +45,9 @@
 
 namespace treedec{
 
-
-/* Checks if a tree decomposition is valid with respect to G.
- *
- *  0 = valid
- * -1 = (at least) not a tree
- * -2 = (at least) not all vertices covered (but a tree)
- * -3 = (at least) not all edges covered (but a tree and all vertices covered)
- * -4 = there exist vertices, coded in the bags of T, that are not connected in T
- *                           (but T is a tree and all edges/vertices are covered)
- * -5 = The empty graph must have a treedecomposition with one vertex and an empty bag
- */
-
 // Find a root of an acyclic graph T.
 // Complexity: Linear in the number of vertices of T.
-template <class T_t>
+template <typename T_t>
 typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
@@ -81,43 +69,48 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
 }
 
 template <typename T_t>
-bool validate_connectivity(T_t &T){
-    //Compute a postorder traversal.
-    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s1;
-    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> s2;
+void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
+    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
 
     std::vector<bool> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
-    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-    s1.push(root);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::find_root(T);
+    S_tmp.push(root);
     visited[root] = true;
 
-    while(!s1.empty()){
-        typename boost::graph_traits<T_t>::vertex_descriptor v = s1.top();
-        s1.pop();
-        s2.push(v);
+    while(!S_tmp.empty()){
+        typename boost::graph_traits<T_t>::vertex_descriptor v = S_tmp.top();
+        S_tmp.pop();
+        S.push(v);
 
         typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
             if(!visited[*nIt]){
-                s1.push(*nIt);
+                S_tmp.push(*nIt);
                 visited[*nIt] = true;
             }
         }
     }
+}
 
-    visited.assign(boost::num_vertices(T), false);
+template <typename T_t>
+bool validate_connectivity(T_t &T){
+    //Compute a postorder traversal.
+    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
+    treedec::postorder_traversal(T, S);
+
+    std::vector<bool> visited(boost::num_vertices(T), false);
     typename noboost::treedec_traits<T_t>::bag_type forgotten;
 
     while(true){
-        typename boost::graph_traits<T_t>::vertex_descriptor cur = s2.top();
-        s2.pop();
+        typename boost::graph_traits<T_t>::vertex_descriptor cur = S.top();
+        S.pop();
         visited[cur] = true;
 
         //Get the parent of cur.
         typename boost::graph_traits<T_t>::vertex_descriptor parent;
-        if(!s2.empty()){
+        if(!S.empty()){
             typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
             for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
                 if(!visited[*nIt]){ parent = *nIt; break; }
@@ -137,7 +130,7 @@ bool validate_connectivity(T_t &T){
             else{ it2++; }
         }
 
-        if(s2.empty()){
+        if(S.empty()){
             return true;
         }
 
@@ -149,6 +142,17 @@ bool validate_connectivity(T_t &T){
     }
 }
 
+
+/* Checks if a tree decomposition is valid with respect to G.
+ *
+ *  0 = valid
+ * -1 = (at least) not a tree
+ * -2 = (at least) not all vertices covered (but a tree)
+ * -3 = (at least) not all edges covered (but a tree and all vertices covered)
+ * -4 = there exist vertices, coded in the bags of T, that are not connected in T
+ *                           (but T is a tree and all edges/vertices are covered)
+ * -5 = The empty graph must have a treedecomposition with one vertex and an empty bag
+ */
 template <typename G_t, typename T_t>
 int is_valid_treedecomposition(G_t const& G, T_t const& T){
     if(boost::num_vertices(T) == 0){

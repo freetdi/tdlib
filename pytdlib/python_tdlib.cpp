@@ -378,11 +378,35 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
 
 */
 
+
 /* APPLICATIONS */
 
-/*
+void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                          std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
+                                          std::vector<unsigned int> &C)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
 
-void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &IS){
+    TD_tree_dec_directed_t T;
+    make_tdlib_decomp(T, V_T, E_T);
+
+    treedec::nice::nicify(T);
+
+    std::set<unsigned int> result;
+    treedec::app::max_clique_with_treedecomposition(G, T, result);
+
+    C.resize(result.size());
+    unsigned int i = 0;
+    for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
+        C[i++] = *sIt;
+    }
+}
+
+void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
+                                                   std::vector<unsigned int> &IS)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -401,6 +425,7 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     }
 }
 
+/*
 void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, std::vector<unsigned int> &VC){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -473,19 +498,6 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
 }
 
 
-int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
-{
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
-    TD_tree_dec_t T;
-    make_tdlib_decomp(T, V_T, E_T);
-
-    return treedec::is_valid_treedecomposition(G, T);
-}
-
-
 int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -498,6 +510,20 @@ int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigne
 
     return treedec::get_width(T);
 }
+
+
+int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+    make_tdlib_decomp(T, V_T, E_T);
+
+    return treedec::is_valid_treedecomposition(G, T);
+}
+
 
 int gc_get_width(std::vector<std::vector<int> > &V_T){
     int width = 0;

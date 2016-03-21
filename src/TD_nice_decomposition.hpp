@@ -30,7 +30,9 @@
 
 #include <set>
 #include <vector>
+
 #include <boost/graph/adjacency_list.hpp>
+
 #include "TD_noboost.hpp"
 #include "TD_misc.hpp"
 
@@ -38,42 +40,18 @@ namespace treedec{
 
 namespace nice{
 
-template <typename G_t, typename T_t>
-typename boost::graph_traits<G_t>::vertex_descriptor get_introduced_vertex(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T,
-          std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    if(noboost::bag(v, T).size() == 1){
-        return idxMap[*(noboost::bag(v, T).begin())];
-    }
-    else{
-        typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
-        std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
-        sIt1 = noboost::bag(v, T).begin();
-        sIt2 = noboost::bag(child, T).begin();
-        sEnd1 = noboost::bag(v, T).end();
-        sEnd2 = noboost::bag(child, T).end();
-
-        //If *sIt1 != *sIt2, then *sIt1 must be the introduced vertex.
-        for(; sIt1 != sEnd1 && sIt2 != sEnd2; ){
-            if(*sIt1 == *sIt2){
-                sIt1++;
-                sIt2++;
-            }
-            else{
-                return idxMap[*sIt1];
-            }
-        }
-        return idxMap[*(noboost::bag(v, T).rbegin())];
-    }
-}
-
 template <typename T_t>
-unsigned int get_introduced_vertex_id(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T){
+typename noboost::treedec_traits<T_t>::bag_type::value_type
+          get_introduced_vertex(
+              typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T)
+{
     if(noboost::bag(v, T).size() == 1){
         return *(noboost::bag(v, T).begin());
     }
     else{
-        typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
-        std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
+        typename boost::graph_traits<T_t>::vertex_descriptor child =
+                                  *(boost::adjacent_vertices(v, T).first);
+        typename noboost::treedec_traits<T_t>::bag_type::iterator sIt1, sIt2, sEnd1, sEnd2;
         sIt1 = noboost::bag(v, T).begin();
         sIt2 = noboost::bag(child, T).begin();
         sEnd1 = noboost::bag(v, T).end();
@@ -93,18 +71,19 @@ unsigned int get_introduced_vertex_id(typename boost::graph_traits<T_t>::vertex_
     }
 }
 
-template <typename G_t, typename T_t>
-typename boost::graph_traits<G_t>::vertex_descriptor
-  get_forgotten_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, T_t &T,
-                       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap)
+template <typename T_t>
+typename noboost::treedec_traits<T_t>::bag_type::value_type
+          get_forgotten_vertex(
+              typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T)
 {
-    typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
+    typename boost::graph_traits<T_t>::vertex_descriptor child =
+                            *(boost::adjacent_vertices(v, T).first);
 
     if(noboost::bag(child, T).size() == 1){
-        return idxMap[*(noboost::bag(child, T).begin())];
+        return *(noboost::bag(child, T).begin());
     }
 
-    std::set<unsigned int>::iterator sIt1, sIt2, sEnd1, sEnd2;
+    typename noboost::treedec_traits<T_t>::bag_type::iterator sIt1, sIt2, sEnd1, sEnd2;
     sIt1 = noboost::bag(v, T).begin();
     sIt2 = noboost::bag(child, T).begin();
     sEnd1 = noboost::bag(v, T).end();
@@ -117,10 +96,10 @@ typename boost::graph_traits<G_t>::vertex_descriptor
             sIt2++;
         }
         else{
-            return idxMap[*sIt2];
+            return *sIt2;
         }
     }
-    return idxMap[*(noboost::bag(child, T).rbegin())];
+    return *(noboost::bag(child, T).rbegin());
 }
 
 
@@ -153,42 +132,45 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
     }
 }
 
-template <typename T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor next_node_preorder(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T, std::vector<bool> &visited){
-    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-    if(!visited[v]){
-        visited[v] = true;
-        return v;
+//Find a root of an acyclic graph T
+//Complexity: Linear in the number of vertices of T.
+template <class T_t>
+typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
+    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
+    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
+
+    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
+        t = boost::source(*e, T);
     }
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
-        if(!visited[*nIt]){
-            visited[*nIt] = true;
-            return *nIt; 
-        }
-        typename boost::graph_traits<T_t>::vertex_descriptor rtn = next_node_preorder(*nIt, T, visited);
-        if(rtn != -1){
-            visited[rtn] = true;
-            return rtn;
-        }
-        else{
-            continue;
-        }
-    }
-    return -1;
+
+    return t;
 }
 
 template <typename T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor next_node_postorder(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T, std::vector<bool> &visited){
-    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
-        if(!visited[*nIt]){
-            return next_node_postorder(*nIt, T, visited);
+void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
+    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
+
+    std::vector<bool> visited(boost::num_vertices(T), false);
+
+    //The root can be chosen freely.
+    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    S_tmp.push(root);
+    visited[root] = true;
+
+    while(!S_tmp.empty()){
+        typename boost::graph_traits<T_t>::vertex_descriptor v = S_tmp.top();
+        S_tmp.pop();
+        S.push(v);
+
+        typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, T); nIt != nEnd; nIt++){
+            if(!visited[*nIt]){
+                S_tmp.push(*nIt);
+                visited[*nIt] = true;
+            }
         }
     }
-    visited[v] = true;
-    return v;
 }
-
 
 //author: Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
 //functions: nicify_joins, nicify_diffs, nicify_diffs_more, find_root, nicify
@@ -363,20 +345,6 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     noboost::bag(d, T).erase(i);
 
     nicify_diffs_more(T, t);
-}
-
-//Find a root of an acyclic graph T
-//Complexity: Linear in the number of vertices of T.
-template <class T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
-    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-
-    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
-        t = boost::source(*e, T);
-    }
-
-    return t;
 }
 
 //Transform a tree decomposition into a nice tree decomposition.
