@@ -41,8 +41,6 @@
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
 
-#include <iostream> //
-
 namespace treedec{
 
 // Find a root of an acyclic graph T.

@@ -92,7 +92,7 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 }
 
-//Provides a mapping (version for bags).
+//Version for bags.
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G,
                       typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X)
