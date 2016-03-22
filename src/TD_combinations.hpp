@@ -1,4 +1,4 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -17,39 +17,29 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers some recommended combinations of the algorithms.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-//
-//
-//
-// These functions are most likely to be interesting for outside use:
-//
-// void PP_MD(G_t &G, T_t &T)
-// void PP_MD(G_t &G, T_t &T, int &low)
-// void PP_FI(G_t &G, T_t &T)
-// void PP_FI(G_t &G, T_t &T, int &low)
-// void PP_FI_TM(G_t &G, T_t &T)
-// void PP_FI_TM(G_t &G, T_t &T, int &low)
-// void FI_TM(G_t &G, T_t &T)
-// void FI_TM(G_t &G, T_t &T, int &low)
-// void exact_decomposition_cutset(G_t &G, T_t &T)
-// void exact_decomposition_cutset(G_t &G, T_t &T, int low)
-// void exact_decomposition_cutset_decision(G_t &G, T_t &T, int k)
-// void exact_decomposition_dynamic(G_t &G, T_t &T)
-// void exact_decomposition_dynamic(G_t &G, T_t &T, int low)
-// void seperator_algorithm_MSVS(G_t &G, T_t &T)
-// void seperator_algorithm_TM(G_t &G, T_t &T)
-// void MSVS_trivial(G_t &G, T_t &T)
-//
+
+/*
+ Offers some recommended combinations of the algorithms.
+
+ These functions are most likely to be interesting for outside use:
+
+ - void PP_MD(G_t &G, T_t &T)
+ - void PP_MD(G_t &G, T_t &T, int &low)
+ - void PP_FI(G_t &G, T_t &T)
+ - void PP_FI(G_t &G, T_t &T, int &low)
+ - void PP_FI_TM(G_t &G, T_t &T)
+ - void PP_FI_TM(G_t &G, T_t &T, int &low)
+ - void FI_TM(G_t &G, T_t &T)
+ - void FI_TM(G_t &G, T_t &T, int &low)
+ - void exact_decomposition_cutset(G_t &G, T_t &T)
+ - void exact_decomposition_cutset(G_t &G, T_t &T, int low)
+ - void exact_decomposition_cutset_decision(G_t &G, T_t &T, int k)
+ - void exact_decomposition_dynamic(G_t &G, T_t &T)
+ - void exact_decomposition_dynamic(G_t &G, T_t &T, int low)
+ - void seperator_algorithm_MSVS(G_t &G, T_t &T)
+ - void seperator_algorithm_TM(G_t &G, T_t &T)
+ - void MSVS_trivial(G_t &G, T_t &T)
+*/
 
 #ifndef TD_COMBINATIONS
 #define TD_COMBINATIONS
@@ -69,8 +59,8 @@
 
 namespace treedec{
 
-//recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
-//this version applies the minDegree-heuristic on not fully preprocessable graph instances
+//Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
+//this version applies the minDegree-heuristic on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<
@@ -85,8 +75,8 @@ void PP_MD(G_t &G, T_t &T, int &low){
     treedec::preprocessing_glue_bags(bags, T);
 }
 
-//recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
-//this version applies the minDegree-heuristic on not fully preprocessable graph instances
+//Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
+//this version applies the minDegree-heuristic on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_FI(G_t &G, T_t &T, int &low){
     std::vector<boost::tuple<
@@ -125,7 +115,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     treedec::preprocessing_glue_bags(bags, T);
 }
 
-//This version applies the fillIn-heuristic followed by triangulation minimization.
+//This version applies the fillIn-heuristic followed by triangulation minimization on the input graph.
 template <typename G_t, typename T_t>
 void FI_TM(G_t &G, T_t &T){
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
@@ -301,10 +291,9 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 }
 */
 
-/*
 template <typename G_t, typename T_t>
 void exact_decomposition_chordal(G_t &G, T_t &T){
-    std::vector<unsigned int> elim_ordering;
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> elim_ordering;
     treedec::LEX_M_minimal_ordering(G, elim_ordering);
     treedec::ordering_to_treedec(G, elim_ordering, T);
 }
@@ -315,23 +304,24 @@ void seperator_algorithm_MSVS(G_t &G, T_t &T){
     treedec::MSVS(G, T);
 }
 
+/*
 template <typename G_t, typename T_t>
 void seperator_algorithm_TM(G_t &G, T_t &T){
     treedec::seperator_algorithm(G, T);
-    std::vector<unsigned int> old_elim_ordering;
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
     treedec::treedec_to_ordering(T, old_elim_ordering);
     treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
     T.clear();
     treedec::ordering_to_treedec(G, new_elim_ordering, T);
 }
+*/
 
 template <typename G_t, typename T_t>
 void MSVS_trivial(G_t &G, T_t &T){
     treedec::trivial_decomposition(G, T);
     treedec::MSVS(G, T);
 }
-*/
 
 template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T){
