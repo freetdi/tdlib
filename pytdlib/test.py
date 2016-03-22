@@ -238,12 +238,24 @@ class TestTdLib(unittest.TestCase):
         V, E = tdlib.trivial_decomposition(V_K5, E_K5)
         self.assertEqual(V, [[0,1,2,3,4]])
 
-    """
     def test_MSVS(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
         V, E, w = tdlib.MSVS(V_P6, E_P6, V, E)
         self.assertEqual(w, 1)
-    """
+        status = tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E, message=False)
+        self.assertEqual(status, 0)
+
+        V, E = tdlib.trivial_decomposition(V_Petersen, E_Petersen)
+        V, E, w = tdlib.MSVS(V_Petersen, E_Petersen, V, E)
+        self.assertEqual(w, 4)
+        status = tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E, message=False)
+        self.assertEqual(status, 0)
+
+        V, E = tdlib.trivial_decomposition(V_Pappus, E_Pappus)
+        V, E, w = tdlib.MSVS(V_Pappus, E_Pappus, V, E)
+        self.assertEqual(w, 6)
+        status = tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E, message=False)
+        self.assertEqual(status, 0)
 
     def test_is_valid_treedecomposition(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)

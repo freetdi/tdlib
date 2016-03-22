@@ -345,8 +345,9 @@ void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> 
 
 /* POSTPROCESSING */
 
-/*
-int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
+int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -363,6 +364,7 @@ int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std:
     return treedec::get_width(T);
 }
 
+/*
 void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &old_elimination_ordering, std::vector<unsigned int> &new_elimination_ordering){
     TD_graph_t G;
     make_tdlib_graph(G, V, E);

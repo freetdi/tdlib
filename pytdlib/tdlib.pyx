@@ -657,6 +657,55 @@ def fillIn_ordering(V, E):
 
 
 ##############################################################
+############ POSTPROCESSING ##################################
+
+def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    This may reduce the maximal bag size of a tree decomposition by refinement
+    of the bags with help of minimal seperating vertex sets. 
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - V_T' : a list of vertices of a treedecomposition
+
+    - E_T' : a list of edges of a treedecomposition
+
+    - width : the width of (V_T', E_T')
+
+    EXAMPLES:
+
+        V_T1, E_T1 = tdlib.trivial_decomposition(V_G, E_G)
+        V_T2, E_T2, width = tdlib.MSVS(V_G, E_G, V_T1, E_T1)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_MSVS(V_G, E_G, V_T, E_T)
+
+    new_width = get_width(V_T, E_T)
+
+    return V_T, E_T, new_width
+
+
+##############################################################
 ############ APPLICATIONS ####################################
 
 def max_clique_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):

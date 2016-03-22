@@ -33,8 +33,12 @@ cdef extern from "python_tdlib.hpp":
     void gc_fillIn_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                             vector[unsigned int] &elim_ordering)
 
-    #int gc_MSVS(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T)
-    #void gc_minimalChordal(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[unsigned int] &old_elimination_ordering, vector[unsigned int] &new_elimination_ordering)
+    int gc_MSVS(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                vector[vector[int]] &V_T, vector[unsigned int] &E_T)
+
+    #void gc_minimalChordal(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+    #                        vector[unsigned int] &old_elimination_ordering,
+    #                        vector[unsigned int] &new_elimination_ordering)
 
     void gc_max_clique_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                               vector[vector[int]] &V_T, vector[unsigned int] &E_T,
@@ -48,6 +52,7 @@ cdef extern from "python_tdlib.hpp":
     void gc_min_coloring_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                     vector[vector[int]] &col)
+
     #void gc_min_dominating_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, vector[unsigned int] &DS)
 
 
