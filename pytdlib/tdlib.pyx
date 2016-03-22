@@ -132,10 +132,10 @@ from tdlib cimport gc_minDegree_ordering
 from tdlib cimport gc_fillIn_ordering
 
 from tdlib cimport gc_max_clique_with_treedecomposition
-#from tdlib cimport gc_max_independent_set_with_treedecomposition
-#from tdlib cimport gc_min_vertex_cover_with_treedecomposition
+from tdlib cimport gc_max_independent_set_with_treedecomposition
+from tdlib cimport gc_min_vertex_cover_with_treedecomposition
 #from tdlib cimport gc_min_dominating_set_with_treedecomposition
-#from tdlib cimport gc_min_coloring_with_treedecomposition
+from tdlib cimport gc_min_coloring_with_treedecomposition
 
 from tdlib cimport gc_ordering_to_treedec
 from tdlib cimport gc_treedec_to_ordering
@@ -202,7 +202,6 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
                 bag_.append(labels_dict[v])
             V.push_back(bag_)
     except KeyError:
-        print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
         return False
 
     if len(pyE) > 0:
@@ -749,6 +748,99 @@ def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
 
     return py_IS
 
+
+def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a minimum vertex cover with help of a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUT:
+
+    - VC:    a minimal vertex cover in the input graph
+
+    EXAMPLES:
+
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
+        VC = tdlib.min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, VC_
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_);
+
+    py_VC = []
+    cdef i;
+    for i in range(0, len(VC_)):
+        pyVCi = VC_[i]
+        py_VC.append(pyVCi)
+
+    return py_VC
+
+
+def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a minimum coloring with help of a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUT:
+
+    - VC:    a minimal coloring of the input graph
+
+    EXAMPLES:
+
+        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
+        VC = tdlib.min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T, C_
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+
+    py_C = []
+    cdef i;
+    for i in range(0, len(C_)):
+        pyCi = []
+        for j in range(0, len(C_[i])):
+            pyCij = C_[i][j]
+            pyCi.append(pyCij)
+        py_C.append(pyCi)
+
+    return py_C
+
 ##############################################################
 ############ MISC ############################################
 
@@ -896,7 +988,9 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
     rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
-        return -5
+        if message:
+            print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
+        return -6
 
     cdef c_status;
     c_status = gc_is_valid_treedecomposition(V_G, E_G, V_T, E_T);

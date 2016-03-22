@@ -47,7 +47,7 @@ cdef extern from "python_tdlib.hpp":
                                                     vector[unsigned int] &VC)
     void gc_min_coloring_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-                                                    vector[unsigned int] &col)
+                                                    vector[vector[int]] &col)
     #void gc_min_dominating_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G, vector[vector[int]] &V_T, vector[unsigned int] &E_T, vector[unsigned int] &DS)
 
 

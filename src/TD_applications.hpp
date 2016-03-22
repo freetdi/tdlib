@@ -27,7 +27,7 @@
  * - void min_vertex_cover_with_treedecomposition(G_t&, T_t&, typename noboost::treedec_traits<T_t>::bag_type &result)
  * - void min_dominating_set_with_treedecomposition(G_t&, T_t&, typename noboost::treedec_traits<T_t>::bag_type &result)
  * - void min_coloring_with_treedecomposition(G_t&, T_t&,
- *                   std::vector<int> &result) //pos -> color
+ *                   std::vector<typename noboost::treedec_traits<T_t>::bag_type> &result)
  *
  */
 
@@ -797,8 +797,6 @@ void top_down_computation_min_coloring(G_t &G, T_t &T,
         typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex =
                                  treedec::nice::get_forgotten_vertex(cur, T);
 
-        unsigned int pos = noboost::get_pos(forgotten_vertex, G);
-
         for(unsigned int i = 0; i < results[child].size(); i++){
             bool valid = true;
             for(unsigned int j = 0; j < results[child][i].size(); j++){
@@ -835,8 +833,7 @@ void top_down_computation_min_coloring(G_t &G, T_t &T,
 
 template <typename G_t, typename T_t>
 unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
-                                 std::vector<int> &global_result //pos -> color
-)
+                          std::vector<typename noboost::treedec_traits<T_t>::bag_type> &global_result)
 {
     std::vector<std::vector<std::vector<int> > > results(boost::num_vertices(T));
 
@@ -845,7 +842,8 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
         return 0;
     }
     if(boost::num_vertices(T) == 1){
-        global_result.push_back(0);
+        global_result.resize(1);
+        global_result[0].insert(*(boost::vertices(G).first));
         return 1;
     }
 
@@ -857,9 +855,22 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
         results.resize(boost::num_vertices(T));
     }
 
-    global_result.assign(boost::num_vertices(G), -1);
+    std::vector<int> global_results_map(boost::num_vertices(G), -1);
     typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
-    treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_result);
+    treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_results_map);
+
+    typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned int pos = noboost::get_pos(*vIt, G);
+        inv_map[pos] = *vIt;
+    }
+
+    global_result.resize(k);
+    for(unsigned int i = 0; i < global_results_map.size(); i++){
+        unsigned int pos = global_results_map[i];
+        global_result[pos].insert(inv_map[pos]);
+    }
 
     return k;
 }
