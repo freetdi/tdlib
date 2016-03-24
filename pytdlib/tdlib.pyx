@@ -724,7 +724,7 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
 def minimalChordal(V, E, O):
     """
-    Returns an alternative elimination E' ordering than the given elimination 
+    Returns an alternative elimination ordering E' than the given elimination 
     ordering E, which may cause a lower width than E, when applied to the
     input graph for computing a tree decomposition.
 

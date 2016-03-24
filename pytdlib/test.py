@@ -275,7 +275,15 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(status, 0)
 
     def test_minimalChordal(self):
-        pass
+        V1, E1, lb1 = tdlib.ordering_to_treedec(V_Pappus, E_Pappus, [0, 1, 2, 3, 4, 5, 6, 7, 8, \
+                                                              9, 10, 11, 12, 13, 14, 15, 16, 17])
+        self.assertEqual(lb1, 8)
+
+        O2 = tdlib.minimalChordal(V_Pappus, E_Pappus, [0, 1, 2, 3, 4, 5, 6, 7, 8, \
+                                                  9, 10, 11, 12, 13, 14, 15, 16, 17])
+        V2, E2, lb2 = tdlib.ordering_to_treedec(V_Pappus, E_Pappus, O2)
+        self.assertEqual(lb2, 6)
+
 
 ##############################################################
 ############ APPLICATIONS ####################################
@@ -377,6 +385,7 @@ class TestTdLib(unittest.TestCase):
         V_T4, E_T4, lb = tdlib.PP_MD(V_K5, E_K5)
         C = tdlib.min_coloring_with_treedecomposition(V_K5, E_K5, V_T4, E_T4)
         self.assertEqual(len(C), 5)
+
 
 ##############################################################
 ############ MISC ############################################
