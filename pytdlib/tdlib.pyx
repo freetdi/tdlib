@@ -145,7 +145,7 @@ from tdlib cimport gc_fillIn_ordering
 #from tdlib cimport gc_random_elimination_orderings
 
 from tdlib cimport gc_MSVS
-#from tdlib cimport gc_minimalChordal
+from tdlib cimport gc_minimalChordal
 
 from tdlib cimport gc_max_clique_with_treedecomposition
 from tdlib cimport gc_max_independent_set_with_treedecomposition
@@ -722,6 +722,53 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
     return V_T, E_T, new_width
 
 
+def minimalChordal(V, E, O):
+    """
+    Returns an alternative elimination E' ordering than the given elimination 
+    ordering E, which may cause a lower width than E, when applied to the
+    input graph for computing a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - O : an elimination ordering on (V_G, E_G)
+
+    OUTPUT:
+
+    - An elimination ordering on G that may cause a lower width of the 
+      treedecomposition, that can be made out of it, than the width, 
+      that O will cause.
+
+    EXAMPLES:
+
+        V_T1, E_T1, w1 = tdlib.ordering_to_treedec(V_G, E_G, O1)
+        O2 = tdlib.minimalChordal(V_G, E_G, O1)
+        V_T2, E_T2, w2 = tdlib.ordering_to_treedec(V_G, E_G, O2)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, old_elim_ordering, new_elim_ordering
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    for l in range(0, len(O)):
+        old_elim_ordering.push_back(O[l])
+
+    gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering)
+
+    py_new_elim_ordering_ = []
+    cdef i;
+    for i in range(0, len(new_elim_ordering)):
+        py_new_elim_ordering_.append(new_elim_ordering[i])
+
+    py_new_elim_ordering = []
+    for i in range(0, len(py_new_elim_ordering_)):
+        py_new_elim_ordering.append(labels_map[py_new_elim_ordering_[i]])
+
+    return py_new_elim_ordering
+
+
 ##############################################################
 ############ APPLICATIONS ####################################
 
@@ -906,6 +953,7 @@ def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
         py_C.append(pyCi)
 
     return py_C
+
 
 ##############################################################
 ############ MISC ############################################

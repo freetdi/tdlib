@@ -402,20 +402,30 @@ int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
     return treedec::get_width(T);
 }
 
-/*
-void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &old_elimination_ordering, std::vector<unsigned int> &new_elimination_ordering){
+void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
+                       std::vector<unsigned int> &old_elimination_ordering,
+                       std::vector<unsigned int> &new_elimination_ordering)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V, E);
 
-    typename std::vector<TD_graph_t::vertex_descriptor> new_elimination_ordering_tmp;
+    typename std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor>
+                   old_elimination_ordering_tmp(old_elimination_ordering.size());
 
-    treedec::minimalChordal(G, old_elimination_ordering, new_elimination_ordering_tmp);
+    for(unsigned int i = 0; i < old_elimination_ordering.size(); i++){
+        old_elimination_ordering_tmp[i] = old_elimination_ordering[i];
+    }
 
-    TD_graph_t::vertex_iterator vIt, vEnd;
-    for(unsigned int i = 0; i < new_elimination_ordering_tmp.size(); i++)
-        new_elimination_ordering.push_back(G[new_elimination_ordering_tmp[i]].id);
+    typename std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor>
+                                                     new_elimination_ordering_tmp;
+
+    treedec::minimalChordal(G, old_elimination_ordering_tmp, new_elimination_ordering_tmp);
+
+    new_elimination_ordering.resize(new_elimination_ordering_tmp.size());
+    for(unsigned int i = 0; i < new_elimination_ordering_tmp.size(); i++){
+        new_elimination_ordering[i] = (unsigned int) new_elimination_ordering_tmp[i];
+    }
 }
-*/
 
 
 /* APPLICATIONS */

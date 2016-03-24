@@ -57,9 +57,9 @@ cdef extern from "python_tdlib.hpp":
     int gc_MSVS(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                 vector[vector[int]] &V_T, vector[unsigned int] &E_T)
 
-    #void gc_minimalChordal(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                        vector[unsigned int] &old_elimination_ordering,
-    #                        vector[unsigned int] &new_elimination_ordering)
+    void gc_minimalChordal(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                           vector[unsigned int] &old_elimination_ordering,
+                           vector[unsigned int] &new_elimination_ordering)
 
 ##############################################################
 ############ APPLICATIONS ####################################

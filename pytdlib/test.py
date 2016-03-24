@@ -274,6 +274,9 @@ class TestTdLib(unittest.TestCase):
         status = tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E, message=False)
         self.assertEqual(status, 0)
 
+    def test_minimalChordal(self):
+        pass
+
 ##############################################################
 ############ APPLICATIONS ####################################
 
