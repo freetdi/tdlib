@@ -304,18 +304,16 @@ void seperator_algorithm_MSVS(G_t &G, T_t &T){
     treedec::MSVS(G, T);
 }
 
-/*
 template <typename G_t, typename T_t>
 void seperator_algorithm_TM(G_t &G, T_t &T){
     treedec::seperator_algorithm(G, T);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
-    treedec::treedec_to_ordering(T, old_elim_ordering);
+    treedec::treedec_to_ordering<G_t, T_t>(T, old_elim_ordering);
     treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
     T.clear();
     treedec::ordering_to_treedec(G, new_elim_ordering, T);
 }
-*/
 
 template <typename G_t, typename T_t>
 void MSVS_trivial(G_t &G, T_t &T){
@@ -354,7 +352,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T){
     int lb = -1;
     exact_decomposition_cutset(G, T, lb);
 }
-
 
 } //namespace treedec
 

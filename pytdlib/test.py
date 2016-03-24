@@ -37,6 +37,10 @@ def randomGNP(n, p):
 
 
 class TestTdLib(unittest.TestCase):
+
+##############################################################
+############ PREPROCESSING ###################################
+
     def test_preprocessing(self):
         V_, E_, B, lb = tdlib.preprocessing(V_P6, E_P6)
         self.assertEqual(V_, [])
@@ -111,6 +115,9 @@ class TestTdLib(unittest.TestCase):
                              10, 2, 11, 1, 4, 1, 0])
         self.assertEqual(lb, 6)
 
+##############################################################
+############ LOWER BOUNDS ####################################
+
     def test_lower_bounds(self):
         lb = tdlib.lower_bound(V_Wagner, E_Wagner, "deltaC_min_d")
         self.assertEqual(lb, 3)
@@ -141,6 +148,9 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBPC_deltaC")
         self.assertEqual(lb, 4)
+
+##############################################################
+############ EXACT ALGORITHMS ################################
 
     def test_exact_decomposition_cutset(self):
         V, E, tw = tdlib.exact_decomposition_cutset(V_P6, E_P6)
@@ -178,6 +188,35 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(tw, 4)
     """
 
+    def test_random_valid_treedecomposition(self):
+        status_list = list()
+        correct_status = list()
+        for n in range(1, 13):
+            for i in range(0, 10):
+                V, E = randomGNP(n, 0.3)
+                N, M, tw = tdlib.exact_decomposition_cutset(V, E)
+                status = tdlib.is_valid_treedecomposition(V, E, N, M, message=True)
+                status_list.append(status)
+                correct_status.append(0)
+                if(status < 0):
+                    print("error in [validate decompositions], graph: " + str(V) + ", " + str(E))
+
+    def test_random_validate_width(self):
+        status = True
+        for n in range(0, 13):
+            for i in range(0, 100):
+                V, E = randomGNP(n, 0.3)
+                Q, R, w2 = tdlib.PP_FI_TM(V, E)
+                isleq = tdlib.exact_decomposition_cutset_decision(V, E, w2)
+                if(not isleq):
+                    print("error [validate width], graph: " + str(V) + ", " + str(E))
+                    status = False
+
+        self.assertEqual(status, True)
+
+##############################################################
+############ APPROXIMATIVE ALGORITHMS ########################
+
     def test_seperator_algorithm(self):
         V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
         self.assertEqual(V, [[0, 1, 2, 3], [1, 3, 4, 5]])
@@ -213,30 +252,8 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, \
                              10, 3, 5, 6, 8, 12, 14, 16])
 
-    def test_treedec_to_ordering(self):
-        V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
-        O = tdlib.treedec_to_ordering(V, E)
-        self.assertEqual(O, [0, 2, 1, 3, 4, 5])
-
-        V = [["a", "d", "c"], ["c", "b", "e"]]
-        E = [0, 1]
-        O = tdlib.treedec_to_ordering(V, E)
-        self.assertEqual(O, ["a", "d", "c", "b", "e"])
-
-    def test_ordering_to_treedec(self):
-        V, E, lb = tdlib.ordering_to_treedec(V_P6, E_P6, [1,3,0,2,4,5])
-        self.assertEqual(V, [[5], [4, 5], [2, 4], [0, 2], [2, 3, 4], [0, 1, 2]])
-        self.assertEqual(E, [0, 1, 1, 2, 2, 3, 2, 4, 3, 5])
-
-    def test_trivial_decomposition(self):
-        V, E = tdlib.trivial_decomposition(["a", "b", "c"], [])
-        self.assertEqual(V, [["a", "b", "c"]])
-
-        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
-        self.assertEqual(V, [[0,1,2,3,4,5]])
-
-        V, E = tdlib.trivial_decomposition(V_K5, E_K5)
-        self.assertEqual(V, [[0,1,2,3,4]])
+##############################################################
+############ POSTPROCESSING ##################################
 
     def test_MSVS(self):
         V, E = tdlib.trivial_decomposition(V_P6, E_P6)
@@ -257,48 +274,8 @@ class TestTdLib(unittest.TestCase):
         status = tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E, message=False)
         self.assertEqual(status, 0)
 
-    def test_is_valid_treedecomposition(self):
-        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
-        
-        status = tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E, message=False)
-        self.assertEqual(status, 0)
-
-        status = tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E, message=False)
-        self.assertEqual(status, -6)
-
-        V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen) 
-        status = tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E, message=False)
-        self.assertEqual(status, 0)
-
-        V, E, tw = tdlib.exact_decomposition_cutset(V_Wagner, E_Wagner) 
-        status = tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E, message=False)
-        self.assertEqual(status, 0)
-
-    def test_random_valid_treedecomposition(self):
-        status_list = list()
-        correct_status = list()
-        for n in range(1, 13):
-            for i in range(0, 10):
-                V, E = randomGNP(n, 0.3)
-                N, M, tw = tdlib.exact_decomposition_cutset(V, E)
-                status = tdlib.is_valid_treedecomposition(V, E, N, M, message=True)
-                status_list.append(status)
-                correct_status.append(0)
-                if(status < 0):
-                    print("error in [validate decompositions], graph: " + str(V) + ", " + str(E))
-
-    def test_random_validate_width(self):
-        status = True
-        for n in range(0, 13):
-            for i in range(0, 100):
-                V, E = randomGNP(n, 0.3)
-                Q, R, w2 = tdlib.PP_FI_TM(V, E)
-                isleq = tdlib.exact_decomposition_cutset_decision(V, E, w2)
-                if(not isleq):
-                    print("error [validate width], graph: " + str(V) + ", " + str(E))
-                    status = False
-
-        self.assertEqual(status, True)
+##############################################################
+############ APPLICATIONS ####################################
 
     def test_max_clique_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
@@ -366,6 +343,21 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(len(DS3), 5)
     """
 
+    """
+    def test_min_feedback_vertex_set_with_treedecomposition(self):
+        V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
+        FVS1 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
+        self.assertEqual(len(FVS1), 3)
+
+        V_T2, E_T2, lb = tdlib.PP_MD(V_Wagner, E_Wagner)
+        FVS2 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Wagner, E_Wagner, V_T2, E_T2)
+        self.assertEqual(len(FVS2), 3)
+
+        V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
+        FVS3 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
+        self.assertEqual(len(FVS3), 5)
+    """
+
     def test_min_coloring_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         C = tdlib.min_coloring_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
@@ -382,6 +374,51 @@ class TestTdLib(unittest.TestCase):
         V_T4, E_T4, lb = tdlib.PP_MD(V_K5, E_K5)
         C = tdlib.min_coloring_with_treedecomposition(V_K5, E_K5, V_T4, E_T4)
         self.assertEqual(len(C), 5)
+
+##############################################################
+############ MISC ############################################
+
+    def test_treedec_to_ordering(self):
+        V, E, lb = tdlib.seperator_algorithm(V_P6, E_P6)
+        O = tdlib.treedec_to_ordering(V, E)
+        self.assertEqual(O, [0, 2, 1, 3, 4, 5])
+
+        V = [["a", "d", "c"], ["c", "b", "e"]]
+        E = [0, 1]
+        O = tdlib.treedec_to_ordering(V, E)
+        self.assertEqual(O, ["a", "d", "c", "b", "e"])
+
+    def test_ordering_to_treedec(self):
+        V, E, lb = tdlib.ordering_to_treedec(V_P6, E_P6, [1,3,0,2,4,5])
+        self.assertEqual(V, [[5], [4, 5], [2, 4], [0, 2], [2, 3, 4], [0, 1, 2]])
+        self.assertEqual(E, [0, 1, 1, 2, 2, 3, 2, 4, 3, 5])
+
+    def test_trivial_decomposition(self):
+        V, E = tdlib.trivial_decomposition(["a", "b", "c"], [])
+        self.assertEqual(V, [["a", "b", "c"]])
+
+        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
+        self.assertEqual(V, [[0,1,2,3,4,5]])
+
+        V, E = tdlib.trivial_decomposition(V_K5, E_K5)
+        self.assertEqual(V, [[0,1,2,3,4]])
+
+    def test_is_valid_treedecomposition(self):
+        V, E = tdlib.trivial_decomposition(V_P6, E_P6)
+        
+        status = tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E, message=False)
+        self.assertEqual(status, 0)
+
+        status = tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E, message=False)
+        self.assertEqual(status, -6)
+
+        V, E, tw = tdlib.exact_decomposition_cutset(V_Petersen, E_Petersen) 
+        status = tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E, message=False)
+        self.assertEqual(status, 0)
+
+        V, E, tw = tdlib.exact_decomposition_cutset(V_Wagner, E_Wagner) 
+        status = tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E, message=False)
+        self.assertEqual(status, 0)
 
 if __name__ == '__main__':
     unittest.main()

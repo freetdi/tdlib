@@ -19,7 +19,7 @@
 //
 
 /*
- Offers functionality to possibly reduce the width of a tree decomposition of graph.
+ Offers functionality to possibly reduce the width of a tree decomposition of a given graph.
 
  These functions are most likely to be interesting for outside use:
 
@@ -245,14 +245,11 @@ bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_des
     for(unsigned int t = 0; t < elimination_ordering.size(); t++){
         unsigned int pos = noboost::get_pos(elimination_ordering[t], M);
         elimination_ordering_[pos] = t;
-        //std::cout << "elim: " << elimination_ordering[t] << ", pos: " << pos << ", time: " << t << std::endl;
     }
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(edge[0], M); nIt != nEnd; nIt++){
         unsigned int pos = noboost::get_pos(*nIt, M);
-        //std::cout << "vertex: " << *nIt << std::endl;
-        //std::cout << "pos: " << pos << ", elimination_ordering_[pos]: " << elimination_ordering_[pos] << std::endl;
         if(elimination_ordering_[pos] > i && boost::edge(edge[1], *nIt, M).second
        && !boost::edge(*nIt, elimination_ordering[i], M).second)
         {
@@ -264,7 +261,7 @@ bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_des
 }
 
 template <typename G_t>
-void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges){
+inline void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges){
     for(unsigned int i = 0; i < edges.size(); i++){
         boost::remove_edge(edges[i][0], edges[i][1], G);
     }
@@ -282,12 +279,15 @@ void minimalChordal(G_t &G,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
 {
+    //Make 'G' a filled-in graph according to 'old_elimination_ordering'. This operation stores
+    //all new edges in F.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
     std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > F;
-
     treedec::make_filled_graph(G, old_elimination_ordering, C, F);
 
     for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
+        //Checks if F[i][j] is an candidate edge. If this is the case, F[i][j] will be stored in
+        //'candidate'. The endpoints of F[i][j] will be stored in 'incident'.
         std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
@@ -298,21 +298,15 @@ void minimalChordal(G_t &G,
             }
         }
         if(candidate.size() != 0){
-            std::cout << "incident: ";
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = incident.begin(); sIt != incident.end(); sIt++){ std::cout << *sIt << " "; } std::cout << std::endl;
-
+            //If there is some candidate edge, create W_i := (incident, G[incident] \ candidate)
+            //and run the LEX_M algorithm. The algorithm will possibly return some edges not in W_I that
+            //have to be added to W_i to make the graph chordal. 
             G_t W_i;
             typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
-            treedec::induced_subgraph(W_i, G, incident, vdMap);
-            //!!!
-            treedec::delete_edges(W_i, candidate); //candidate: vd of G, W_i: possibly not covered..
-
-            std::cout << "1" << std::endl;
+            treedec::induced_subgraph_omit_edges(W_i, G, incident, candidate, vdMap);
 
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
-
-            std::cout << "2" << std::endl;
 
             //Translate descriptors of W_i to descriptors of G.
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill(keep_fill_.size());

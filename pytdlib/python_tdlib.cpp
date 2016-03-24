@@ -1,3 +1,29 @@
+// Lukas Larisch, 2014 - 2016
+//
+// (c) 2014-2016 Goethe-Universität Frankfurt
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
+//
+// Offers functionality to compute tree decompositions of graphs
+// according to various heuristic and functions, that convert
+// tree decompositions to elimination orderings and vice versa.
+// Also the LEX-M algorithm is included in this header
+//
+//
+
 #include <boost/tuple/tuple.hpp>
 #include <map>
 
@@ -68,6 +94,7 @@ void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<un
 
 }
 
+
 void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                        bool ignore_isolated_vertices=false)
 {
@@ -85,6 +112,7 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
         E_G.push_back(boost::target(*eIt, G));
     }
 }
+
 
 void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
                         std::vector<unsigned int> &E_T)
@@ -164,7 +192,9 @@ int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 }
 
 
-int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb){
+int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+               std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -190,12 +220,14 @@ int gc_deltaC_min_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E
     return treedec::lb::deltaC_min_d(G);
 }
 
+
 int gc_deltaC_max_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     return treedec::lb::deltaC_max_d(G);
 }
+
 
 int gc_deltaC_least_c(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
@@ -204,12 +236,14 @@ int gc_deltaC_least_c(std::vector<unsigned int> &V_G, std::vector<unsigned int> 
     return treedec::lb::deltaC_least_c(G);
 }
 
+
 int gc_LBN_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     return treedec::lb::LBN_deltaC(G);
 }
+
 
 int gc_LBNC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
@@ -218,12 +252,14 @@ int gc_LBNC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
     return treedec::lb::LBNC_deltaC(G);
 }
 
+
 int gc_LBP_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     return treedec::lb::LBP_deltaC(G);
 }
+
 
 int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
     TD_graph_t G;
@@ -314,6 +350,7 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
     return treedec::get_width(T);
 }
 
+
 void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                            std::vector<unsigned int> &elim_ordering)
 {
@@ -328,6 +365,7 @@ void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned in
         elim_ordering[i] = elim_ordering_[i];
     }
 }
+
 
 void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
     TD_graph_t G;
@@ -377,7 +415,6 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
     for(unsigned int i = 0; i < new_elimination_ordering_tmp.size(); i++)
         new_elimination_ordering.push_back(G[new_elimination_ordering_tmp[i]].id);
 }
-
 */
 
 
@@ -403,6 +440,7 @@ void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::v
     }
 }
 
+
 void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                    std::vector<unsigned int> &IS)
@@ -424,6 +462,7 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
         IS[i++] = *sIt;
     }
 }
+
 
 void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
@@ -522,7 +561,13 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V, E);
 
-    treedec::treedec_to_ordering(T, elim_ordering);
+    std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor> elim_ordering_;
+    treedec::treedec_to_ordering<TD_graph_t, TD_tree_dec_t>(T, elim_ordering_);
+
+    elim_ordering.resize(elim_ordering_.size());
+    for(unsigned int i = 0; i < elim_ordering_.size(); i++){
+        elim_ordering[i] = (unsigned int) elim_ordering_[i];
+    }
 }
 
 
@@ -560,3 +605,5 @@ int gc_get_width(std::vector<std::vector<int> > &V_T){
     }
     return width-1;
 }
+
+

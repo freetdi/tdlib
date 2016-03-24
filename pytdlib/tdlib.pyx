@@ -63,6 +63,9 @@ This module containes the following functions** :
         Computes a tree decomposition of exact width of a given graph 
         (asymptotically faster than the greedy version)
 
+    #- treedecomposition_exact_branch_and_bound
+        Computes a tree decomposition of exact width of a given graph 
+
     - seperator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
 
@@ -80,13 +83,19 @@ This module containes the following functions** :
         Possibly reduces the width of a given tree decomposition by 
         triangulation minimization
 
+    #- random_branch_and_bound
+
+    #- random_elimination_orderings
+
     - max_clique_with_treedecomposition
 
     - max_independent_set_with_treedecomposition
 
     - max_vertex_cover_with_treedecomposition
 
-    - min_dominating_set_with_treedecomposition
+    #- min_dominating_set_with_treedecomposition
+
+    #- min_feedback_vertex_set_with_treedecomposition
 
     - min_coloring_with_treedecomposition
 
@@ -126,15 +135,23 @@ from tdlib cimport gc_LBPC_deltaC
 from tdlib cimport gc_exact_decomposition_cutset
 from tdlib cimport gc_exact_decomposition_cutset_decision
 #from tdlib cimport gc_exact_decomposition_dynamic
+#from tdlib cimport gc_exact_decomposition_branch_and_bound
 
 from tdlib cimport gc_seperator_algorithm
 from tdlib cimport gc_minDegree_ordering
 from tdlib cimport gc_fillIn_ordering
 
+#from tdlib cimport gc_random_branch_and_bound
+#from tdlib cimport gc_random_elimination_orderings
+
+from tdlib cimport gc_MSVS
+#from tdlib cimport gc_minimalChordal
+
 from tdlib cimport gc_max_clique_with_treedecomposition
 from tdlib cimport gc_max_independent_set_with_treedecomposition
 from tdlib cimport gc_min_vertex_cover_with_treedecomposition
 #from tdlib cimport gc_min_dominating_set_with_treedecomposition
+#from tdlib cimport gc_min_feedback_vertex_set_with_treedecomposition
 from tdlib cimport gc_min_coloring_with_treedecomposition
 
 from tdlib cimport gc_ordering_to_treedec

@@ -30,7 +30,49 @@ namespace treedec{
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_noboost.hpp"
 
-//Provides a mapping (version for bags).
+template <typename G_t>
+void induced_subgraph_omit_edges(G_t &H, G_t &G,
+                      typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+                      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges,
+                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+{
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
+    std::vector<bool> disabled(boost::num_vertices(G), true);
+    vdMap.resize(X.size());
+
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+         = X.begin(); sIt != X.end(); sIt++)
+    {
+       unsigned int pos1 = noboost::get_pos(*sIt, G);
+       internal_map[pos1] = boost::add_vertex(H);
+       disabled[pos1] = false;
+
+       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
+       vdMap[pos2] = *sIt;
+    }
+
+    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
+        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
+        if(!disabled[spos] && !disabled[dpos]){
+            bool omit = false;
+            for(unsigned int i = 0; i < edges.size(); i++){
+                if((edges[i][0] == boost::source(*eIt, G) && edges[i][1] == boost::target(*eIt, G))
+                || (edges[i][1] == boost::source(*eIt, G) && edges[i][0] == boost::target(*eIt, G)))
+                {
+                    omit = true;
+                    break;
+                }
+            }
+            if(!omit){
+                boost::add_edge(internal_map[spos], internal_map[dpos], H);
+            }
+        }
+    }
+}
+
+//Version for bags.
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G,
                       typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
@@ -61,7 +103,7 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 }
 
-//Provides a mapping (version for set<descriptor>)
+//Version for set<descriptor>.
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G,
                       typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
