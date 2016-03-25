@@ -17,40 +17,28 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers some recommended combinations of the algorithms.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// Vertices of the input graph have to provide the attribute 'id', e.g.:
-//
-// struct Vertex
-// {
-//  unsigned int id;
-// };
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
-//
-//
+
 
 #ifndef TD_RANDOM
 
+#include <vector>
 #include <algorithm>    // std::random_shuffle
-#include <cstdlib>      // rand()
-#include "TD_elimination_orderings.hpp"
 
-namespace treedec{
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/copy.hpp>
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
+#include "TD_elimination_orderings.hpp"
+
+namespace treedec{
+
+namespace random{
+
 template <typename G_t>
-int randomly_try_some_elimination_orderings(G_t &G,
+int try_some_elimination_orderings(G_t &G,
        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &best_elim_ordering,
        unsigned int count = 10)
 {
@@ -71,9 +59,8 @@ int randomly_try_some_elimination_orderings(G_t &G,
     #pragma omp parallel for
     for(unsigned int i = 0; i < count; i++){
         G_t H;
-        boost::copy_graph(G, H); // ..(H, G)..?! "unavoidable"?
+        boost::copy_graph(G, H);
         int width_i = treedec::get_width_of_elimination_ordering(H, elimination_orderings[i]);
-
         if(width_i < min_width){
             min_width = width_i;
             best_elim_ordering = MOVE(elimination_orderings[i]);
@@ -82,6 +69,8 @@ int randomly_try_some_elimination_orderings(G_t &G,
 
     return min_width;
 }
+
+} //namespace random
 
 } //namespace treedec
 

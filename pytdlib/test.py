@@ -115,6 +115,7 @@ class TestTdLib(unittest.TestCase):
                              10, 2, 11, 1, 4, 1, 0])
         self.assertEqual(lb, 6)
 
+
 ##############################################################
 ############ LOWER BOUNDS ####################################
 
@@ -148,6 +149,7 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 4)
         lb = tdlib.lower_bound(V_Pappus, E_Pappus, "LBPC_deltaC")
         self.assertEqual(lb, 4)
+
 
 ##############################################################
 ############ EXACT ALGORITHMS ################################
@@ -214,6 +216,7 @@ class TestTdLib(unittest.TestCase):
 
         self.assertEqual(status, True)
 
+
 ##############################################################
 ############ APPROXIMATIVE ALGORITHMS ########################
 
@@ -251,6 +254,7 @@ class TestTdLib(unittest.TestCase):
         O = tdlib.fillIn_ordering(V_Pappus, E_Pappus)
         self.assertEqual(O, [0, 2, 4, 7, 9, 11, 13, 15, 17, 1, \
                              10, 3, 5, 6, 8, 12, 14, 16])
+
 
 ##############################################################
 ############ POSTPROCESSING ##################################
