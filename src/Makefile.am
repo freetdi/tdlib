@@ -20,4 +20,5 @@ pkginclude_HEADERS = \
   TD_std.hpp \
   TD_random.hpp \
   TD_branch_and_bound.hpp \
-  TD_preprocessing_experiments.hpp
+  TD_preprocessing_experiments.hpp \
+  TD_lower_bounds_ex.hpp

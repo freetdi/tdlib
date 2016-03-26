@@ -622,23 +622,20 @@ int deltaC_least_c(G_t G){
 
 template <typename G_t>
 void k_neighbour_improved_graph(G_t &G, unsigned int k){
-    G_t H;
-    boost::copy_graph(G, H);
-    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    make_index_map(G, map);
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > edges_to_add;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-    for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
+    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
-            if(!boost::edge(*vIt1, *vIt2, H).second){
+            if(!boost::edge(*vIt1, *vIt2, G).second){
                 std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){
                     N1.insert(*nIt);
                 }
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){
                     N2.insert(*nIt);
                 }
                 std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
@@ -646,12 +643,16 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
                 std::set_intersection(N1.begin(), N1.end(), N2.begin(), N2.end(), std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() >= k){
-                    unsigned int pos1 = noboost::get_pos(*vIt1, H);
-                    unsigned int pos2 = noboost::get_pos(*vIt2, H);
-                    boost::add_edge(map[pos1], map[pos2], G);
+                    std::set<typename boost::graph_traits<G_t>::vertex_descriptor> edge;
+                    edge.insert(*vIt1); edge.insert(*vIt2);
+                    edges_to_add.push_back(edge);
                 }
             }
         }
+    }
+
+    for(unsigned int i = 0; i < edges_to_add.size(); i++){
+        boost::add_edge(*(edges_to_add[i].begin()), *(++edges_to_add[i].begin()), G);
     }
 }
 
@@ -715,7 +716,7 @@ int LBN_deltaC(const G_t &G){
 }
 
 template <typename G_t>
-int LBNC_deltaD(G_t &G){
+int LBNC_deltaD(const G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -760,7 +761,7 @@ int LBNC_deltaD(G_t &G){
 }
 
 template <typename G_t>
-int LBNC_deltaC(G_t &G){
+int LBNC_deltaC(const G_t &G){
     if(boost::num_vertices(G) == 0){
         return -1;
     }
@@ -808,40 +809,43 @@ int LBNC_deltaC(G_t &G){
 
 template <typename G_t>
 void k_path_improved_graph(G_t &G, unsigned int k){
-    G_t H;
-    boost::copy_graph(G, H);
-    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> map;
-    make_index_map(G, map);
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > edges_to_add;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-    for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
+    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
-            if(!boost::edge(*vIt1, *vIt2, H).second){
+            if(!boost::edge(*vIt1, *vIt2, G).second){
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y, S;
 
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){
                     X.insert(*nIt);
                 }
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, H); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){
                     Y.insert(*nIt);
                 }
 
-                std::vector<bool> disabled(boost::num_vertices(H), false);
-                unsigned int pos1 = noboost::get_pos(*vIt1, H);
-                unsigned int pos2 = noboost::get_pos(*vIt2, H);
+                std::vector<bool> disabled(boost::num_vertices(G), false);
+                unsigned int pos1 = noboost::get_pos(*vIt1, G);
+                unsigned int pos2 = noboost::get_pos(*vIt2, G);
                 disabled[pos1] = true;
                 disabled[pos2] = true;
 
-                treedec::seperate_vertices(H, disabled, X, Y, S);
+                treedec::seperate_vertices(G, disabled, X, Y, S);
 
                 if(S.size() >= k){
-                    boost::add_edge(map[pos1], map[pos2], G);
+                    std::set<typename boost::graph_traits<G_t>::vertex_descriptor> edge;
+                    edge.insert(*vIt1); edge.insert(*vIt2);
+                    edges_to_add.push_back(edge);
                 }
             }
         }
+    }
+
+    for(unsigned int i = 0; i < edges_to_add.size(); i++){
+        boost::add_edge(*(edges_to_add[i].begin()), *(++edges_to_add[i].begin()), G);
     }
 }
 

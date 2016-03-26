@@ -90,10 +90,6 @@ struct degree_mod : public noboost::vertex_callback<G>{
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T){
-    typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename misc::deg_chooser<G_t>::type degs_type;
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
     std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));

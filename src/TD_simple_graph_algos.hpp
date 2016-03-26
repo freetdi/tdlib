@@ -30,6 +30,7 @@ namespace treedec{
 #include <boost/graph/adjacency_list.hpp>
 #include "TD_noboost.hpp"
 
+//This function is used in the minimalChordal algorithm.
 template <typename G_t>
 void induced_subgraph_omit_edges(G_t &H, G_t &G,
                       typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
@@ -246,23 +247,6 @@ void get_components(G_t &G,
             components[comp_idx].insert(*vIt);
             t_search_components(G, *vIt, visited, components, comp_idx);
         }
-    }
-}
-
-template <typename G_t>
-void make_index_map(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap){
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    unsigned int max = 0;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
-        max = (pos > max)? pos : max;
-    }
-
-    idxMap.resize(max+1);
-
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
-        idxMap[pos] = *vIt;
     }
 }
 
