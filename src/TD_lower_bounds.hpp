@@ -48,11 +48,8 @@
  * - int LBPC_deltaD(G_t &G)
  * - int LBPC_deltaC(G_t &G)
  *
- * - void MCS_random(G_t &G, int &lb)
- * - std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_all_start_vertices(G_t &G, int &lb)
- * - void MCSC_min_deg(G_t G, int &lb)
- * - void MCSC_last_mcs(G_t G, int &lb)
- * - void MCSC_max_mcs(G_t G, int &lb)
+ * - int MCS(G_t &G)
+ * - int MCSC(G_t G)
  *
  * - int relation_edges_vertices(G_t &G)
  *
@@ -81,10 +78,13 @@
 #ifndef TD_LOWER_BOUNDS
 #define TD_LOWER_BOUNDS
 
-#include <vector>
 #include <set>
+#include <vector>
 #include <climits>
+
 #include <boost/graph/adjacency_list.hpp>
+#include <utility>
+
 #include "TD_simple_graph_algos.hpp"
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
@@ -1137,179 +1137,100 @@ int LBPC_deltaC(const G_t &G){
 }
 
 
-
-
 /* Maximum Cardinality Search-based */
 
-//Does a maximum cardinality search and returns the vertex descriptors of the maximum visited degree-vertex and the last visited vertex.
+namespace detail{
+
+//Applies a maximum cardinality search on G and returns the vertex descriptors of the maximum visited
+//degree-vertex and the last visited vertex.
 template <typename G_t>
-std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_single(G_t &G, int &lb, typename boost::graph_traits<G_t>::vertex_descriptor start_vertex){
-    std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N, visited;
-    visited.insert(start_vertex);
-    int current_visited_degree, max_visited_degree = 0;
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor current_visited_vertex, max_visited_vertex;
-    current_visited_vertex = start_vertex;
+typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> MCS(G_t &G){
+    std::vector<int> visited_degree(boost::num_vertices(G), 0);
 
-    for(unsigned int i = 1; i < boost::num_vertices(G); i++){
-        current_visited_degree = 0;
+    int max = -1;
+    typename boost::graph_traits<G_t>::vertex_descriptor max_vertex;
 
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(current_visited_vertex, G); nIt != nEnd; nIt++){
-            if(visited.find(*nIt) == visited.end()){
-                N.insert(*nIt);
+    for(unsigned int i = 0; i < boost::num_vertices(G); i++){
+        int cur_max = -1;
+        unsigned int cur_pos = 0;
+        for(unsigned int j = 0; j < visited_degree.size(); j++){
+            if(visited_degree[j] > cur_max){
+                cur_max = visited_degree[j];
+                cur_pos = j;
             }
         }
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N.begin(); sIt != N.end(); sIt++){
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> n;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-                n.insert(*nIt);
-            }
+        typename boost::graph_traits<G_t>::vertex_iterator cur_vertex_it = boost::vertices(G).first;
+        std::advance(cur_vertex_it, cur_pos);
 
-            std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
-            std::set_intersection(visited.begin(), visited.end(), n.begin(), n.end(), std::inserter(intersection, intersection.begin()));
-
-            if((int)intersection.size() > current_visited_degree){
-                current_visited_degree = (int)intersection.size();
-                current_visited_vertex = *sIt;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*cur_vertex_it, G); nIt != nEnd; nIt++){
+            unsigned int pos = noboost::get_pos(*nIt, G);
+            if(visited_degree[pos] > -1){
+                visited_degree[pos]++;
             }
         }
-        if(current_visited_degree > max_visited_degree){
-            max_visited_degree = current_visited_degree;
-            max_visited_vertex = current_visited_vertex;
+
+        if(visited_degree[cur_pos] > max){
+            max = visited_degree[cur_pos];
+            max_vertex = *cur_vertex_it;
         }
 
-        visited.insert(current_visited_vertex);
-        N.erase(current_visited_vertex);
+        visited_degree[cur_pos] = -1;
     }
-    lb = (lb > max_visited_degree) ? lb : max_visited_degree;
 
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
-    rtn.push_back(max_visited_vertex);
-    rtn.push_back(current_visited_vertex);
-    return rtn;
+    return std::make_pair(max, max_vertex);
 }
 
-template <typename G_t>
-std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> MCS_all_start_vertices(G_t &G, int &lb){
-    if(boost::num_vertices(G) == 0){
-        lb = -1;
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
-        return rtn;
-    }
-    else if(boost::num_edges(G) == 0){
-        lb = 0;
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
-        return rtn;
-    }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        lb = boost::num_vertices(G)-1;
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> rtn;
-        return rtn;
-    }
+} //namespace detail (for MCS)
 
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    int last_lb = lb;
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data, rtn;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::out_degree(*vIt, G) == 0){
-            continue;
-        }
-        data = MCS_single(G, lb, *vIt);
-        if(last_lb < lb){
-            rtn = data;
-        }
-        last_lb = lb;
-    }
-    return rtn;
+
+//Returns the maximum visited degree in a maximum cardinality search.
+template <typename G_t>
+int MCS(G_t &G){
+    return treedec::lb::detail::MCS(G).first;
 }
 
+//This is the contraction version of the maximal cardinality search lower bound algorithm.
+//Heuristic: max_mcs.
 template <typename G_t>
-void MCS_random(G_t &G, int &lb){
-    std::srand(time(NULL));
+int MCSC(G_t G){
+    int max = -1;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    boost::tie(vIt, vEnd) = boost::vertices(G);
-    std::advance(vIt, rand() % boost::num_vertices(G));
+    while(boost::num_edges(G) > 0){
+        typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> result = treedec::lb::detail::MCS(G);
+        max = (result.first > max)? result.first : max;
+        typename boost::graph_traits<G_t>::vertex_descriptor v = result.second;
 
-    if(boost::out_degree(*vIt, G) == 0){
-        MCS_random(G, lb);
-        return;
-    }
+        unsigned int min_common = UINT_MAX;
 
-    MCS_single(G, lb, *vIt);
-}
+        typename boost::graph_traits<G_t>::vertex_descriptor w = *(boost::vertices(G).first);
 
-template <typename G_t>
-void MCSC_min_deg(G_t H, int &lb){
-    if(boost::num_vertices(H) == 0){
-        lb = -1;
-        return;
-    }
-    else if(boost::num_edges(H) == 0){
-        lb = 0;
-        return;
-    }
-    else if(2*boost::num_edges(H) == boost::num_vertices(H)*(boost::num_vertices(H)-1)){
-        lb = boost::num_vertices(H)-1;
-        return;
-    }
-
-    typename boost::graph_traits<G_t>::vertex_descriptor v, w;
-    w = *(boost::vertices(H).first);
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> data;
-    data = MCS_all_start_vertices(H, lb);
-    v = data[0];
-
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    while(boost::num_edges(H) > 0){
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, H); nIt != nEnd; nIt++){
-            N2.insert(*nIt);
-        }
-
-        int cnt_common, min_common = (int)N2.size();
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1, sIt2;
-
-        for(sIt1 = N2.begin(); sIt1 != N2.end(); sIt1++){
-            cnt_common = 0;
-            sIt2 = sIt1;
-            sIt2++;
-            for(; sIt2 != N2.end(); sIt2++){
-                if(boost::edge(*sIt1, *sIt2, H).second){
-                    cnt_common += 1;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
+        for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(v, G); nIt1 != nEnd1; ++nIt1){
+            unsigned int cnt_common = 0;
+            for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(v, G); nIt2 != nEnd2; ++nIt2){
+                if(boost::edge(*nIt1, *nIt2, G).second){
+                    cnt_common++;
+                }
+                if(cnt_common >= min_common){
+                    break;
                 }
             }
             if(cnt_common < min_common){
-                w = *sIt1;
+                w = *nIt1;
                 min_common = cnt_common;
             }
         }
 
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, H); nIt != nEnd; nIt++){
-            N1.insert(*nIt);
-        }
-
-        N1.erase(v);
-
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = N1.begin(); sIt != N1.end(); sIt++){
-            boost::add_edge(v, *sIt, H);
-        }
-
-        boost::clear_vertex(w, H);
-
-        int deg, min_deg = (int)boost::num_vertices(H);
-        for(boost::tie(vIt, vEnd) = boost::vertices(H); vIt != vEnd; vIt++){
-            deg = boost::out_degree(*vIt, H);
-            if(deg < min_deg && deg > 0){
-                min_deg = deg;
-                v = *vIt;
-            }
-        }
+        noboost::contract_edge(w, v, G);
     }
+
+    return max;
 }
 
+/*
 template <typename G_t>
 void MCSC_last_mcs(G_t H, int &lb){
     if(boost::num_vertices(H) == 0){
@@ -1437,6 +1358,7 @@ void MCSC_max_mcs(G_t H, int &lb){
         v = data[0];
     }
 }
+*/
 
 template <typename G_t>
 int relation_edges_vertices(G_t &G){
