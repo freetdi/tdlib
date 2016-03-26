@@ -72,6 +72,7 @@ void Islet(G_t &G, std::vector<boost::tuple<
          > > &bags, int &low)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -80,8 +81,7 @@ void Islet(G_t &G, std::vector<boost::tuple<
             typename noboost::treedec_traits<T_t>::bag_type emptybag;
 
             bags.push_back(
-                    boost::tuple<
-                    typename noboost::treedec_traits<T_t>::vd_type,
+                    boost::tuple<vd_type,
                     typename noboost::treedec_traits<T_t>::bag_type
                     >(vd, emptybag));
 
@@ -233,6 +233,7 @@ bool Buddy(G_t &G, std::vector<boost::tuple<
          > > &bags, int &low)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type vd_type;
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vEnd;
 
     for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
@@ -263,18 +264,16 @@ bool Buddy(G_t &G, std::vector<boost::tuple<
 
                 noboost::make_clique(boost::adjacent_vertices(*vIt1, G), G);
 
-                unsigned vd1=noboost::get_vd(G, *vIt1);
-                unsigned vd2=noboost::get_vd(G, *vIt2);
+                vd_type vd1=noboost::get_vd(G, *vIt1);
+                vd_type vd2=noboost::get_vd(G, *vIt2);
 
                 bags.push_back(
-                    boost::tuple<
-                    typename noboost::treedec_traits<T_t>::vd_type,
+                    boost::tuple<vd_type,
                     typename noboost::treedec_traits<T_t>::bag_type
                     >(vd1, N1));
 
                 bags.push_back(
-                    boost::tuple<
-                    typename noboost::treedec_traits<T_t>::vd_type,
+                    boost::tuple<vd_type,
                     typename noboost::treedec_traits<T_t>::bag_type
                     >(vd2, N2));
 
@@ -297,6 +296,7 @@ bool Cube(G_t &G, std::vector<boost::tuple<
          > > &bags, int &low)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -354,16 +354,18 @@ bool Cube(G_t &G, std::vector<boost::tuple<
 
         if((Nc[0] == v && Nc[1] == w) || (Nc[1] == v && Nc[0] == w)){
             bag.clear();
-            unsigned vdu=noboost::get_vd(G, u); unsigned vdv=noboost::get_vd(G, v);
-            unsigned vdw=noboost::get_vd(G, w); unsigned vdx=noboost::get_vd(G, x);
-            unsigned vda=noboost::get_vd(G, a); unsigned vdb=noboost::get_vd(G, b);
-            unsigned vdc=noboost::get_vd(G, c);
+            vd_type vdu=noboost::get_vd(G, u);
+            vd_type vdv=noboost::get_vd(G, v);
+            vd_type vdw=noboost::get_vd(G, w);
+            vd_type vdx=noboost::get_vd(G, x);
+            vd_type vda=noboost::get_vd(G, a);
+            vd_type vdb=noboost::get_vd(G, b);
+            vd_type vdc=noboost::get_vd(G, c);
 
             bag.insert(vdu); bag.insert(vdv); bag.insert(vdx);
 
             bags.push_back(
-                boost::tuple<
-                typename noboost::treedec_traits<T_t>::vd_type,
+                boost::tuple<vd_type,
                 typename noboost::treedec_traits<T_t>::bag_type
                 >(vda, bag));
 
@@ -413,6 +415,7 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<
          > > &bags, int &low)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -441,10 +444,9 @@ bool Simplicial(G_t &G, std::vector<boost::tuple<
             typename noboost::treedec_traits<T_t>::bag_type bag;
             noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(*vIt, G), G);
 
-            unsigned vd=noboost::get_vd(G, *vIt);
+            vd_type vd=noboost::get_vd(G, *vIt);
             bags.push_back(
-                boost::tuple<
-                typename noboost::treedec_traits<T_t>::vd_type,
+                boost::tuple<vd_type,
                 typename noboost::treedec_traits<T_t>::bag_type
                 >(vd, bag));
 
@@ -466,6 +468,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
          > > &bags, int &low)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -539,10 +542,9 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
             typename noboost::treedec_traits<T_t>::bag_type bag;
             noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(*vIt, G), G);
 
-            unsigned vd=noboost::get_vd(G, *vIt);
+            vd_type vd=noboost::get_vd(G, *vIt);
             bags.push_back(
-                boost::tuple<
-                typename noboost::treedec_traits<T_t>::vd_type,
+                boost::tuple<vd_type,
                 typename noboost::treedec_traits<T_t>::bag_type
                 >(vd, bag));
 
