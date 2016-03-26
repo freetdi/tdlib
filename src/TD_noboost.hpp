@@ -80,7 +80,7 @@ template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
-                   bool /*erase*/=true,
+                   bool /*erase*/=false,
                    vertex_callback<G>* cb=NULL)
 {
     adjacency_iterator_G I, E;
@@ -108,7 +108,7 @@ template<typename G>
 inline void contract_edge(vertex_iterator_G v,
                    vertex_descriptor_G into,
                    G &g,
-                   bool erase=true,
+                   bool erase=false,
                    vertex_callback<G>* cb=NULL)
 {
     contract_edge(*v, into, g, erase, cb);
@@ -137,6 +137,54 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G){
     }
 }
 
+template <typename G_t>
+inline typename boost::graph_traits<G_t>::vertex_descriptor 
+   get_min_degree_vertex(const G_t &G, bool ignore_isolated_vertices=false)
+{
+    unsigned int min_degree = UINT_MAX;
+
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    boost::tie(vIt, vEnd) = boost::vertices(G);
+    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt++;
+    for(; vIt != vEnd; vIt++){
+        unsigned int degree = boost::degree(*vIt, G);
+        if(degree <= min_degree){
+            if(ignore_isolated_vertices && degree == 0){ continue; }
+            min_degree = degree;
+            min_vertex = *vIt;
+        }
+    }
+
+    return min_vertex;
+}
+
+template <typename G_t>
+inline typename boost::graph_traits<G_t>::vertex_descriptor
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex, const G_t &G)
+{
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
+    typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
+
+    unsigned int min_common = UINT_MAX;
+
+    for(; nIt1 != nEnd; nIt1++){
+        unsigned int cnt_common = 0;
+        nIt2 = boost::adjacent_vertices(min_vertex, G).first;
+        for(; nIt2 != nEnd; nIt2++){
+            if(boost::edge(*nIt1, *nIt2, G).second){
+                cnt_common++;
+            }
+        }
+        if(cnt_common < min_common){
+            w = *nIt1;
+            min_common = cnt_common;
+        }
+    }
+
+    return w;
+}
+
 template<typename G_t>
 unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){
     noboost::make_clique(boost::adjacent_vertices(v, G), G);
@@ -145,14 +193,30 @@ unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descript
     return deg;
 }
 
-/*
-template<typename G>
-inline unsigned get_id(const G& g, const vertex_descriptor_G& v )
+template <typename G_t>
+inline void make_degree_sequence(const G_t &G,
+          std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence)
 {
-    // works with "TD_graph_t" (augmented adj_list)
-    return g[v].id;
+    unsigned int max_degree = 0;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned int degree = boost::degree(*vIt, G);
+        max_degree = (degree>max_degree)? degree : max_degree;
+    }
+
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        unsigned int degree = boost::degree(*vIt, G);
+        if(degree > 0){
+            buckets[degree].push_back(*vIt);
+        }
+    }
+    for(unsigned int i = 1; i <= max_degree; i++){
+        for(unsigned int j = 0; j < buckets[i].size(); j++){
+            degree_sequence.push_back(buckets[i][j]);
+        }
+    }
 }
-*/
 
 //Return the internal vertex position.
 //To be used as a narrower alternative to vertex_descriptor.
