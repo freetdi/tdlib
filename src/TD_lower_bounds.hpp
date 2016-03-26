@@ -256,7 +256,7 @@ int delta2D(const G_t &G){
 namespace detail{
 
 template <typename G_t>
-void gammaD_left(const G_t &G, unsigned int &lb){
+void gammaD_left(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0){
         return;
     }
@@ -307,7 +307,7 @@ int gammaD_left(G_t G){
 namespace detail{
 
 template <typename G_t>
-void gammaD_right(const G_t &G, unsigned int &lb){
+void gammaD_right(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0){
         return;
     }
@@ -357,7 +357,7 @@ int gammaD_right(G_t G){
 namespace detail{
 
 template <typename G_t>
-void gammaD_min_e(const G_t &G, unsigned int &lb){
+void gammaD_min_e(G_t &G, unsigned int &lb){
     if(boost::num_edges(G) == 0){
         return;
     }
