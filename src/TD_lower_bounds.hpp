@@ -126,7 +126,6 @@ int delta2(const G_t &G){
     unsigned int snd = min;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor v_min;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::degree(*vIt, G);
         if(degree <= min){

@@ -117,7 +117,7 @@ void make_clique(VC V, G& g, CB* cb)
                 assert(boost::degree(*nIt1,g));
                 assert(boost::degree(*nIt2,g));
 
-            if(cb){ untested();
+            if(cb){
                 // need to redegree all vertices.
             }
             else if(newedge){ untested();
