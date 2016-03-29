@@ -51,15 +51,15 @@ This module containes the following functions** :
     - lower_bound
         Computes a lower bound with respect to treewidth of a given graph
 
-    - treedecomposition_exact_cutset
+    - exact_decomposition_cutset
         Computes a tree decomposition of exact width of a given graph 
         (faster than the dynamic version in practice)
 
-    - treedecomposition_exact_cutset_decision
+    - exact_decomposition_cutset_decision
         Computes a tree decomposition of exact width of a given graph
         and returns true, if tw(G) <= k. Otherwise false will be returned
 
-    - treedecomposition_exact_dynamic
+    - exact_decomposition_dynamic
         Computes a tree decomposition of exact width of a given graph 
         (asymptotically faster than the greedy version)
 
@@ -312,10 +312,9 @@ def preprocessing(V, E):
     py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb)
 
     V_G_ = apply_labeling(V_G, labels_map)
-    E_G_ = apply_labeling(E_G, labels_map)
     c_bags_ = apply_labeling(c_bags, labels_map)
 
-    return V_G_, E_G_, c_bags_, py_lb
+    return V_G_, E_G, c_bags_, py_lb
 
 
 def PP_MD(V, E):
@@ -355,9 +354,8 @@ def PP_MD(V, E):
     gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_, get_width(V_T, E_T)
+    return V_T_, E_T, get_width(V_T, E_T)
 
 
 def PP_FI_TM(V, E):
@@ -399,9 +397,8 @@ def PP_FI_TM(V, E):
     gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_, get_width(V_T, E_T)
+    return V_T_, E_T, get_width(V_T, E_T)
 
 
 ##############################################################
@@ -512,9 +509,8 @@ def exact_decomposition_cutset(V, E, lb=-1):
     gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb)
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_, get_width(V_T, E_T)
+    return V_T_, E_T, get_width(V_T, E_T)
 
 
 def exact_decomposition_cutset_decision(V, E, k):
@@ -598,9 +594,8 @@ def seperator_algorithm(V, E):
     gc_seperator_algorithm(V_G, E_G, V_T, E_T);
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_, get_width(V_T, E_T)
+    return V_T_, E_T, get_width(V_T, E_T)
 
 
 def minDegree_ordering(V, E):
@@ -1002,9 +997,8 @@ def ordering_to_treedec(V, E, O):
     gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering)
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_, get_width(V_T, E_T)
+    return V_T_, E_T, get_width(V_T, E_T)
 
 
 def treedec_to_ordering(V, E):
@@ -1056,9 +1050,8 @@ def trivial_decomposition(V, E):
     gc_trivial_decomposition(V_G, E_G, V_T, E_T)
 
     V_T_ = apply_labeling(V_T, labels_map)
-    E_T_ = apply_labeling(E_T, labels_map)
 
-    return V_T_, E_T_
+    return V_T_, E_T
 
 
 def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
