@@ -56,6 +56,7 @@
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
+//#include "TD_trace.hpp"
 
 namespace treedec{
 
@@ -109,7 +110,7 @@ void redegree(U, G& g, B& neighborhood, D& d)
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 template <typename G_t, typename T_t>
 void _minDegree_decomp(G_t &G, T_t &T)
-{
+{ untested();
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -127,7 +128,7 @@ void _minDegree_decomp(G_t &G, T_t &T)
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
     unsigned num_vert = boost::num_vertices(G);
-    while(boost::num_edges(G) > 0){
+    while(boost::num_edges(G) > 0){ untested();
         assert(min_ntd != num_vert);
         //Search a minimum degree vertex.
         vertex_iterator vIt, vEnd;
@@ -135,25 +136,25 @@ void _minDegree_decomp(G_t &G, T_t &T)
 
         // recompute ntd can only increase from here
         vertex_descriptor c;
-        if(min_ntd>1){
+        if(min_ntd>1){ untested();
             --min_ntd;
         }
         boost::tie(c, min_ntd) = degs.pick_min(min_ntd, num_vert);
         assert(min_ntd == boost::degree(c,G));
 
         adjacency_iterator I, E;
-        for(boost::tie(I, E) = boost::adjacent_vertices(c, G); I!=E; ++I){
+        for(boost::tie(I, E) = boost::adjacent_vertices(c, G); I!=E; ++I){ untested();
                 assert(*I!=c); // no self loops...
-                // typename boost::graph_traits<G_t>::vertex_descriptor i=*I;
                 vertex_descriptor i=*I;
                 assert(boost::out_degree(*I,G)>0);
                 degs.unlink(i);
         }
 
-        noboost::make_clique_and_hijack(c, G, (void*)NULL, bags[i]);
+        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, bags[i]);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
+        redegree(NULL, G, bags[i], degs);
 
         degs.unlink(c, min_ntd);
         assert(boost::out_degree(c, G)==0);
@@ -161,7 +162,7 @@ void _minDegree_decomp(G_t &G, T_t &T)
         // this is an unsigned for balu...
         elim_vertices[i] = noboost::get_vd(G, c);
 
-        if(min_ntd>1){
+        if(min_ntd>1){ untested();
             // if a neigbor of c was already connected to the others,
             // min_ntd possibly decreases by one.
             --min_ntd;
@@ -175,7 +176,7 @@ void _minDegree_decomp(G_t &G, T_t &T)
     }
     assert(boost::num_edges(G)==0);
 
-    for(; i > 0; i--){
+    for(; i > 0; i--){ untested();
         typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
         glue_bag(bags[i-1], e, T);
     }

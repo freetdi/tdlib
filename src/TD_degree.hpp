@@ -135,6 +135,7 @@ struct deg_chooser{
     }
 };
 
+#if 0 // not here?
 template<class VC, class G, class CB>
 void make_clique(VC V, G& g, CB* cb)
 {
@@ -142,11 +143,11 @@ void make_clique(VC V, G& g, CB* cb)
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
     typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-    typename misc::DEGS<G> &degs=*cb->_degs;
 
     std::set<vertex_descriptor> redeg;
     for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
         if(cb){
+            typename misc::DEGS<G> &degs=*cb->_degs;
             unsigned deg = boost::degree(*nIt1,g);
             size_t n=degs[deg].erase(*nIt1);
             (void)n;
@@ -216,6 +217,7 @@ void make_clique(VC V, G& g, CB* cb)
         degs.check();
     }
 }
+#endif
 
 } //namespace MISC
 

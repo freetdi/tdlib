@@ -345,6 +345,20 @@ inline typename treedec_traits<T_t>::bag_type const& bag_(T_t const& T,
 }
 // end TRANSITIONAL
 
+template<class G>
+void hijack_neighborhood(
+        typename boost::graph_traits<G>::vertex_descriptor& c,
+        G& g, typename noboost::outedge_set<G>::type& bag)
+{
+//    typename noboost::outedge_set<G>::type bag;
+    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
+            nIt1 != nEnd; nIt1++){ // untested();
+        bag.insert(noboost::get_vd(g, *nIt1));
+    }
+    boost::clear_vertex(c, g);
+}
 
 
 } // namespace noboost

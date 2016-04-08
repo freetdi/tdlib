@@ -459,7 +459,10 @@ void make_clique_and_hijack(
         typename boost::graph_traits<G>::vertex_descriptor c,
         G& g, CB* cb, typename noboost::outedge_set<G>::type& bag)
 {
-    misc::make_clique(boost::adjacent_vertices(c, g), g, cb);
+    if(cb){incomplete();
+        // probably unneeded now.
+    }
+    noboost::make_clique(boost::adjacent_vertices(c, g), g);
     return hijack_neighborhood(c, g, bag);
 }
 
