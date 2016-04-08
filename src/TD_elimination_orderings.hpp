@@ -86,6 +86,25 @@ struct degree_mod : public noboost::vertex_callback<G>{
 
 } //namespace detail
 
+// register a 1-neigborhood to DEGS
+template<class U, class G, class B, class D>
+void redegree(U, G& g, B& neighborhood, D& d)
+{
+    BOOST_AUTO( i, neighborhood.begin() );
+    BOOST_AUTO( e, neighborhood.end() );
+
+    for(; i!=e ; ++i){
+        size_t deg=boost::degree(*i,g);
+        // assert(deg>0);
+#ifdef NDEBUG
+        if(deg)
+#endif
+        {
+        d.reg(*i,deg);
+        }
+    }
+}
+
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 template <typename G_t, typename T_t>
