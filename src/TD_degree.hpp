@@ -17,7 +17,7 @@ template<class G>
 class DEGS{
     DEGS(const DEGS&){}
 
-public:
+public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
     typedef std::set<vertex_descriptor> bag_type;
@@ -25,13 +25,57 @@ public:
     typedef std::vector<std::set<vertex_descriptor> > container_type;
     typedef typename container_type::iterator iterator;
     typedef typename container_type::const_iterator const_iterator;
+    typedef typename boost::graph_traits<G>::vertices_size_type degree_t;
 
+public: // construct
     DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
     {
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
         }
+    }
+
+
+public: // queueing
+    void unlink(const vertex_descriptor& v, size_t d)
+    {
+        int n=_degs[d].erase(v);
+        (void)n;
+        assert(n==1);
+    }
+    void unlink(const vertex_descriptor& v)
+    {
+        size_t d=boost::degree(v,_g);
+        unlink(v,d);
+    }
+
+    void reg(const vertex_descriptor& v)
+    { untested();
+        size_t d=boost::degree(v,_g);
+        reg(v,d);
+    }
+    void reg(const vertex_descriptor& v, size_t d){
+        bool n=_degs[d].insert(v).second;
+        assert(n); (void)n;
+    }
+
+public: // picking
+    vertex_descriptor pick(unsigned degree)
+    {
+        return *_degs[degree].begin();
+    }
+    // pick a minimum degree vertex within degree range [lower, upper]
+    std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
+    { untested();
+        while(_degs[lower].empty()){ untested();
+            ++lower;
+            // min_ntd==num_vert contradicts the outer loop condition
+            // (this loop should be safe)
+            assert(lower != upper+1);
+        }
+        vertex_descriptor min_nv=*_degs[lower].begin();
+        return std::make_pair(min_nv, lower);
     }
 
     size_t num_nodes() const{ untested();
@@ -175,3 +219,4 @@ void make_clique(VC V, G& g, CB* cb)
 
 } //namespace MISC
 
+// vim:ts=8:sw=4:et
