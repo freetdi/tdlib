@@ -108,49 +108,76 @@ void redegree(U, G& g, B& neighborhood, D& d)
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 template <typename G_t, typename T_t>
-void _minDegree_decomp(G_t &G, T_t &T){
-#if 0 // currently unused
+void _minDegree_decomp(G_t &G, T_t &T)
+{
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
-#endif
     typedef typename misc::deg_chooser<G_t>::type degs_type;
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
+    std::vector<my_vd> elim_vertices(boost::num_vertices(G));
 
     degs_type degs(G);
-    detail::degree_mod<G_t> cb(&degs, &G);
+
+#ifndef NDEBUG
+    noboost::check(G);
+#endif
 
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
+    unsigned num_vert = boost::num_vertices(G);
     while(boost::num_edges(G) > 0){
-        //Search a minimum degree vertex by recomputing min_ntd.
-        //(min_ntd==num_vert contradicts the outer loop condition (-> safe)).
-        for(; degs[min_ntd].empty(); min_ntd++);
+        assert(min_ntd != num_vert);
+        //Search a minimum degree vertex.
+        vertex_iterator vIt, vEnd;
+        boost::tie(vIt, vEnd) = boost::vertices(G);
 
-        typename misc::DEGS<G_t>::bag_iterator mdvi = degs[min_ntd].begin(); // min degree vertex iterator
-
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*mdvi, G); nIt != nEnd; nIt++){
-            // inefficient. //if this cast failes to compile, the bag_type::value_type is a bad choice
-            bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
-        }
-
-        misc::make_clique(boost::adjacent_vertices(*mdvi, G), G, &cb);
-
-        elim_vertices[i++] =  *mdvi;
-
-        degs[min_ntd].erase(*mdvi);
-
-        boost::clear_vertex(*mdvi, G);
-        if(min_ntd > 1){
+        // recompute ntd can only increase from here
+        vertex_descriptor c;
+        if(min_ntd>1){
             --min_ntd;
         }
+        boost::tie(c, min_ntd) = degs.pick_min(min_ntd, num_vert);
+        assert(min_ntd == boost::degree(c,G));
+
+        adjacency_iterator I, E;
+        for(boost::tie(I, E) = boost::adjacent_vertices(c, G); I!=E; ++I){
+                assert(*I!=c); // no self loops...
+                // typename boost::graph_traits<G_t>::vertex_descriptor i=*I;
+                vertex_descriptor i=*I;
+                assert(boost::out_degree(*I,G)>0);
+                degs.unlink(i);
+        }
+
+        noboost::make_clique_and_hijack(c, G, (void*)NULL, bags[i]);
+#ifndef NDEBUG // safety net.
+        noboost::check(G);
+#endif
+
+        degs.unlink(c, min_ntd);
+        assert(boost::out_degree(c, G)==0);
+
+        // this is an unsigned for balu...
+        elim_vertices[i] = noboost::get_vd(G, c);
+
+        if(min_ntd>1){
+            // if a neigbor of c was already connected to the others,
+            // min_ntd possibly decreases by one.
+            --min_ntd;
+        }
+        assert(boost::out_degree(c, G)==0);
+
+#ifndef NDEBUG //redundant, for checking only
+        degs.reg(c,0);
+#endif
+        ++i; // number of nodes in tree decomposition tree
     }
+    assert(boost::num_edges(G)==0);
 
     for(; i > 0; i--){
-        treedec::glue_bag(bags[i-1], elim_vertices[i-1], T);
+        typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
+        glue_bag(bags[i-1], e, T);
     }
 }
 
