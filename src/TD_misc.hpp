@@ -453,6 +453,18 @@ static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
 
 } // namespace treedec
 
+namespace noboost {
+template<class G, class CB>
+void make_clique_and_hijack(
+        typename boost::graph_traits<G>::vertex_descriptor c,
+        G& g, CB* cb, typename noboost::outedge_set<G>::type& bag)
+{
+    misc::make_clique(boost::adjacent_vertices(c, g), g, cb);
+    return hijack_neighborhood(c, g, bag);
+}
+
+} // noboost
+
 #endif //TD_MISC
 
 // vim:ts=8:sw=4:et
