@@ -685,7 +685,8 @@ int LBN_deltaD(const G_t &G){
         return boost::num_vertices(G)-1;
     }
 
-    int lb = treedec::lb::deltaD(G);
+    G_t H(G);
+    int lb = treedec::lb::deltaD(H);
 
     while(true){
         G_t H;
@@ -743,7 +744,8 @@ int LBNC_deltaD(const G_t &G){
         return boost::num_vertices(G)-1;
     }
 
-    int lb = deltaD(G);
+    G_t H(G);
+    int lb = deltaD(H);
 
     while(true){
         G_t H;
@@ -877,7 +879,8 @@ int LBP_deltaD(const G_t &G){
         return boost::num_vertices(G)-1;
     }
 
-    int lb = treedec::lb::deltaD(G);
+    G_t H(G);
+    int lb = treedec::lb::deltaD(H);
 
     while(true){
         G_t H;
@@ -937,7 +940,8 @@ int LBPC_deltaD(const G_t &G){
         return boost::num_vertices(G)-1;
     }
 
-    int lb = treedec::lb::deltaD(G);
+    G_t H(G);
+    int lb = treedec::lb::deltaD(H);
 
     while(true){
         G_t H;
