@@ -164,6 +164,8 @@ int gamma(const G_t &G){
             }
         }
     }
+    unreachable();
+    return 0;
 }
 
 namespace detail{
