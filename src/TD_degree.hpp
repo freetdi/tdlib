@@ -67,8 +67,8 @@ public: // picking
     }
     // pick a minimum degree vertex within degree range [lower, upper]
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
-    { untested();
-        while(_degs[lower].empty()){ untested();
+    {
+        while(_degs[lower].empty()){
             ++lower;
             // min_ntd==num_vert contradicts the outer loop condition
             // (this loop should be safe)
