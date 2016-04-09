@@ -34,6 +34,11 @@
 #ifndef TD_MISC
 #define TD_MISC
 
+// here (for now)
+#ifndef unreachable
+#define unreachable()
+#endif
+
 #include <stack>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
