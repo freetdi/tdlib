@@ -62,7 +62,7 @@ unsigned int _minDegree(G_t &G){
 }
 
 template <typename G_t>
-unsigned int minDegree(G_t G){
+unsigned int minDegree(G_t& G){
     return _minDegree(G);
 }
 
