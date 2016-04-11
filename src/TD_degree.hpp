@@ -1,3 +1,5 @@
+#ifndef TD_DEGREE_H
+#define TD_DEGREE_H
 
 // temporary.
 #ifndef untested
@@ -221,4 +223,5 @@ void make_clique(VC V, G& g, CB* cb)
 
 } //namespace MISC
 
+#endif // guard
 // vim:ts=8:sw=4:et
