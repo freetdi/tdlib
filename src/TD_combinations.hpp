@@ -143,7 +143,8 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     }
 
     //Lower bound on the treewidth of the reduced instance of G.
-    int lb_deltaC = treedec::lb::deltaC_least_c(G);
+    G_t H(G);
+    int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
     lb = (low > lb)? low : lb;
     lb = (lb_deltaC > lb)? lb_deltaC : lb;
@@ -198,7 +199,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     }
 
     //Lower bound on the treewidth of the reduced instance of G.
-    int lb_deltaC = treedec::lb::deltaC_least_c(G);
+    G_t H(G);
+    int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
     int lb = low;
     lb = (lb_deltaC > lb)? lb_deltaC : lb;
