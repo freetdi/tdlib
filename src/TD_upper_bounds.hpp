@@ -25,40 +25,17 @@
 
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
+#include "TD_elimination_orderings.hpp"
 
 namespace treedec{
 
 namespace ub{
 
+// remove later (underscore prefix, to be considered detail/private)
 template <typename G_t>
-unsigned int _minDegree(G_t &G){
-    unsigned int upper_bound = 0;
-
-    while(boost::num_edges(G) > 0){
-        //Search a minimum degree vertex.
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        boost::tie(vIt, vEnd) = boost::vertices(G);
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-
-        unsigned int min_degree = UINT_MAX;
-        for(; vIt != vEnd; vIt++){
-            unsigned int degree = boost::out_degree(*vIt, G);
-            if(degree != 0 && degree < min_degree){
-                min_degree = degree;
-                min_vertex = *vIt;
-            }
-        }
-
-        if(min_degree > upper_bound){
-            upper_bound = min_degree;
-        }
-
-        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
-
-        boost::clear_vertex(min_vertex, G);
-    }
-
-    return upper_bound;
+unsigned int _minDegree(G_t &G)
+{
+    return treedec::impl::minDegree_decomp(G);
 }
 
 template <typename G_t>

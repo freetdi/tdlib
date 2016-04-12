@@ -106,18 +106,34 @@ void redegree(U, G& g, B& neighborhood, D& d)
     }
 }
 
+namespace impl {
+
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
+#if __cplusplus >= 201103L
+template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T=NULL)
+#else
 template <typename G_t, typename T_t>
-void _minDegree_decomp(G_t &G, T_t &T)
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
+#endif
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename misc::deg_chooser<G_t>::type degs_type;
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
-    std::vector<my_vd> elim_vertices(boost::num_vertices(G));
+    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    std::vector<bag_type> bags;
+    bag_type bag_i;
+    bag_type* bags_i=&bag_i;
+    std::vector<my_vd> elim_vertices;
+
+    if(T){
+        bags.resize(boost::num_vertices(G));
+        elim_vertices.resize(boost::num_vertices(G));
+    }else{
+    }
 
     degs_type degs(G);
 
@@ -127,6 +143,7 @@ void _minDegree_decomp(G_t &G, T_t &T)
 
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
+    unsigned upper_bound=0; // computed, if T
     unsigned num_vert = boost::num_vertices(G);
     while(boost::num_edges(G) > 0){
         assert(min_ntd != num_vert);
@@ -150,17 +167,29 @@ void _minDegree_decomp(G_t &G, T_t &T)
                 degs.unlink(i);
         }
 
-        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, bags[i]);
+        if(T){
+            bags_i = &bags[i];
+        }
+
+        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
-        redegree(NULL, G, bags[i], degs);
+        redegree(NULL, G, *bags_i, degs);
+        if(!T){
+            bags_i->clear();
+        }
 
         degs.unlink(c, min_ntd);
-        assert(boost::out_degree(c, G)==0);
 
-        // this is an unsigned for balu...
-        elim_vertices[i] = noboost::get_vd(G, c);
+        if(T){
+            elim_vertices[i] = noboost::get_vd(G, c);
+        }else if(min_ntd > upper_bound){
+            upper_bound = min_ntd;
+        }else{
+        }
+
+        assert(boost::out_degree(c, G)==0);
 
         if(min_ntd>1){
             // if a neigbor of c was already connected to the others,
@@ -173,14 +202,31 @@ void _minDegree_decomp(G_t &G, T_t &T)
         degs.reg(c,0);
 #endif
         ++i; // number of nodes in tree decomposition tree
+        degs.flush();
     }
     assert(boost::num_edges(G)==0);
 
-    for(; i > 0; i--){
-        typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
-        glue_bag(bags[i-1], e, T);
+
+    if(T){
+        for(; i > 0; i--){
+            typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
+            glue_bag(bags[i-1], e, *T);
+        }
+        return 0;
+    }else{
+        return upper_bound;
     }
 }
+
+#if __cplusplus < 201103L
+template <typename G_t>
+size_t /*FIXME*/ minDegree_decomp(G_t &G)
+{
+    return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
+}
+#endif
+
+} // impl
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
@@ -195,7 +241,7 @@ void minDegree_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     Islet(G, bags);
-    _minDegree_decomp(G, T);
+    impl::minDegree_decomp(G, &T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
