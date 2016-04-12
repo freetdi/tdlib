@@ -162,9 +162,9 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
         degs.unlink(c, min_ntd);
 
         if(T){ untested();
-        }else if(min_ntd > upper_bound){ untested();
+        }else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
-        }else{ untested();
+        }else{
         }
 
         assert(boost::out_degree(c, G)==0);
@@ -193,7 +193,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
             glue_bag(bags[i-1], e, *T);
         }
         return 0;
-    }else{ untested();
+    }else{
         return upper_bound;
     }
 }
@@ -201,7 +201,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
 // #ifdef c++<11 /*WORKAROUND*/
 template <typename G_t>
 size_t /*FIXME*/ minDegree_decomp(G_t &G)
-{ untested();
+{
     return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
 }
 // #endif
