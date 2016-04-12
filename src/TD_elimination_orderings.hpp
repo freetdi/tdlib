@@ -106,10 +106,12 @@ void redegree(U, G& g, B& neighborhood, D& d)
     }
 }
 
+namespace impl {
+
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
-template <typename G_t, typename T_t>
-void _minDegree_decomp(G_t &G, T_t &T)
+template <typename G_t, typename T_t/*=typename noboost::treedec_chooser<G_t>::type c++11)*/>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
@@ -176,10 +178,26 @@ void _minDegree_decomp(G_t &G, T_t &T)
     }
     assert(boost::num_edges(G)==0);
 
-    for(; i > 0; i--){
-        typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
-        glue_bag(bags[i-1], e, T);
+
+    if(T){ untested();
+        for(; i > 0; i--){
+            typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
+            glue_bag(bags[i-1], e, *T);
+        }
+        return 0;
+    }else{
+        incomplete();
+        return 17;
     }
+}
+
+} // impl
+
+// FIXME: remove (underscore prefix: private)
+template <typename G_t, typename T_t>
+void _minDegree_decomp(G_t &G, T_t& T)
+{
+    impl::minDegree_decomp(G, &T);
 }
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
