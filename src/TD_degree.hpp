@@ -1,5 +1,26 @@
-#ifndef TD_DEGREE_H
-#define TD_DEGREE_H
+// Felix Salfelder 2016
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
+//
+// keeping track of degrees
+//
+#ifndef TD_DEGREE_HPP
+#define TD_DEGREE_HPP
+
+#include "TD_noboost.hpp"
 
 // temporary.
 #ifndef untested
@@ -12,7 +33,6 @@
 #define incomplete()
 #endif
 
-
 namespace misc {
 
 template<class G>
@@ -22,9 +42,9 @@ class DEGS{
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
-    typedef std::set<vertex_descriptor> bag_type;
+    typedef typename noboost::deg_chooser<G>::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
-    typedef std::vector<std::set<vertex_descriptor> > container_type;
+    typedef std::vector<bag_type> container_type;
     typedef typename container_type::iterator iterator;
     typedef typename container_type::const_iterator const_iterator;
     typedef typename boost::graph_traits<G>::vertices_size_type degree_t;
@@ -37,7 +57,6 @@ public: // construct
             _degs[boost::degree(*vIt, g)].insert(*vIt);
         }
     }
-
 
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t d)
@@ -124,7 +143,7 @@ public: // picking
 #endif
     } //void check()
 
-    std::set<vertex_descriptor>& operator[](size_t x){return _degs[x];}
+		  bag_type& operator[](size_t x){return _degs[x];}
 
     size_t size() const {return _degs.size();}
 
@@ -226,7 +245,7 @@ void make_clique(VC V, G& g, CB* cb)
 }
 #endif
 
-} //namespace MISC
+} //namespace misc
 
 #endif // guard
 // vim:ts=8:sw=4:et

@@ -87,6 +87,7 @@
 #include "TD_simple_graph_algos.hpp"
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
+#include "TD_degree.hpp"
 #include "TD_noboost.hpp"
 
 namespace treedec{

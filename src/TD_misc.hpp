@@ -38,6 +38,9 @@
 #ifndef unreachable
 #define unreachable()
 #endif
+#ifndef incomplete
+#define incomplete()
+#endif
 
 #include <stack>
 #include <boost/graph/adjacency_list.hpp>
