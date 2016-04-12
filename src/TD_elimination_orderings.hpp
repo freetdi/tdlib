@@ -124,10 +124,10 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
     bag_type* bags_i=&bag_i;
     std::vector<my_vd> elim_vertices;
 
-    if(T){ untested();
+    if(T){
         bags.resize(boost::num_vertices(G));
         elim_vertices.resize(boost::num_vertices(G));
-    }else{ untested();
+    }else{
     }
 
     degs_type degs(G);
@@ -171,13 +171,13 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
         noboost::check(G);
 #endif
         redegree(NULL, G, *bags_i, degs);
-        if(!T){ untested();
+        if(!T){
             bags_i->clear();
         }
 
         degs.unlink(c, min_ntd);
 
-        if(T){ untested();
+        if(T){
             elim_vertices[i] = noboost::get_vd(G, c);
         }else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
@@ -201,7 +201,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
     assert(boost::num_edges(G)==0);
 
 
-    if(T){ untested();
+    if(T){
         for(; i > 0; i--){
             typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
             glue_bag(bags[i-1], e, *T);
