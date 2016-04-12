@@ -118,8 +118,17 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename misc::deg_chooser<G_t>::type degs_type;
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
-    std::vector<my_vd> elim_vertices(boost::num_vertices(G));
+    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    std::vector<bag_type> bags;
+    bag_type bag_i;
+    bag_type* bags_i=&bag_i;
+    std::vector<my_vd> elim_vertices;
+
+    if(T){ untested();
+        bags.resize(boost::num_vertices(G));
+        elim_vertices.resize(boost::num_vertices(G));
+    }else{ untested();
+    }
 
     degs_type degs(G);
 
@@ -153,24 +162,29 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
                 degs.unlink(i);
         }
 
-        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, bags[i]);
+        if(T){
+            bags_i = &bags[i];
+        }
+
+        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
-        redegree(NULL, G, bags[i], degs);
+        redegree(NULL, G, *bags_i, degs);
+        if(!T){ untested();
+            bags_i->clear();
+        }
 
         degs.unlink(c, min_ntd);
 
         if(T){ untested();
+            elim_vertices[i] = noboost::get_vd(G, c);
         }else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
         }else{
         }
 
         assert(boost::out_degree(c, G)==0);
-
-        // this is an unsigned for balu...
-        elim_vertices[i] = noboost::get_vd(G, c);
 
         if(min_ntd>1){
             // if a neigbor of c was already connected to the others,
