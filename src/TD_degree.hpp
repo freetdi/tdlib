@@ -35,6 +35,23 @@
 
 namespace misc {
 
+namespace detail {
+// FIXME: not here
+template<class G>
+struct deg_config{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
+#if __cplusplus < 201103L
+    typedef std::set<vd_type> bag_type;
+#else
+    typedef std::unordered_set<vd_type> bag_type;
+#endif
+    // typedef stx::btree_set<vd_type> bag_type;
+    static void alloc_init(size_t){
+    }
+    static unsigned num_threads(){return 1;}
+};
+}
+
 template<class G>
 class DEGS{
     DEGS(const DEGS&){}
