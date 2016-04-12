@@ -644,7 +644,9 @@ void preprocessing_glue_bags(std::vector< boost::tuple<
              > > &bags, T_t &T)
 {
     for(unsigned int i = bags.size(); i > 0; i--){
-        glue_bag_preprocessing(bags[i-1].get<1>(), bags[i-1].get<0>(), T);
+        typename noboost::treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
+        typename noboost::treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
+        glue_bag_preprocessing(second, first, T);
     }
 }
 

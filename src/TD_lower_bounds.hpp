@@ -533,8 +533,10 @@ int deltaC_max_d(G_t& G)
 template<typename G_t>
 struct degree_decrease : public noboost::vertex_callback<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    degree_decrease(std::vector<std::set<vertex_descriptor> >*d, G_t*g) :
-        degs(d), G(g){}
+    typedef typename misc::DEGS<G_t>::bag_type degbag;
+
+    degree_decrease(typename misc::DEGS<G_t>*d, G_t*g) :
+        _degs(d), G(g){}
 
     void operator()(vertex_descriptor v){
         size_t degree = boost::degree(v, *G);
@@ -547,17 +549,17 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
             // a degree one node does not change its degree during collapse
             assert(false);
         }else{
-            size_t found=(*degs)[degree].erase(v);
+            size_t found=(*_degs)[degree].erase(v);
             assert(found); // sanity check on degs.
             (void) found;
-            bool done=(*degs)[degree-1].insert(v).second;
+            bool done=(*_degs)[degree-1].insert(v).second;
             assert(done);
             (void) done;
         }
     }
-    private:
-        std::vector<std::set<vertex_descriptor> >*degs;
-        G_t* G;
+private:
+    misc::DEGS<G_t>*_degs;
+    G_t* G;
 };
 
 namespace detail{
@@ -569,7 +571,7 @@ int deltaC_least_c(G_t &G)
 
     unsigned int lb = 0;
     misc::DEGS<G_t> degs(G);
-    degree_decrease<G_t> cb(&degs._degs, &G);
+    degree_decrease<G_t> cb(&degs, &G);
 
     unsigned int min_degree = 1;
 

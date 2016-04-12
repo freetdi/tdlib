@@ -143,9 +143,14 @@ public: // picking
 #endif
     } //void check()
 
-		  bag_type& operator[](size_t x){return _degs[x];}
-
-    size_t size() const {return _degs.size();}
+    bag_type& operator[](size_t x)
+    {
+        return _degs[x];
+    }
+    size_t size() const
+    {
+        return _degs.size();
+    }
 
 //private: // later.
     container_type _degs;

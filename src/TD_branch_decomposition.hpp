@@ -82,7 +82,6 @@ int is_valid_branchdecomposition(G_t &G, T_t &T){
     for(std::vector<std::set<unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++){
         typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor t_node;
-        unsigned int covered_count = 0;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
             if(*it == noboost::bag(*tIt, T)){
                 visited[*tIt] = true;
