@@ -129,6 +129,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
 
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
+    unsigned upper_bound=0; // computed, if T
     unsigned num_vert = boost::num_vertices(G);
     while(boost::num_edges(G) > 0){
         assert(min_ntd != num_vert);
@@ -159,6 +160,13 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
         redegree(NULL, G, bags[i], degs);
 
         degs.unlink(c, min_ntd);
+
+        if(T){ untested();
+        }else if(min_ntd > upper_bound){ untested();
+            upper_bound = min_ntd;
+        }else{ untested();
+        }
+
         assert(boost::out_degree(c, G)==0);
 
         // this is an unsigned for balu...
@@ -185,11 +193,18 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
             glue_bag(bags[i-1], e, *T);
         }
         return 0;
-    }else{
-        incomplete();
-        return 17;
+    }else{ untested();
+        return upper_bound;
     }
 }
+
+// #ifdef c++<11 /*WORKAROUND*/
+template <typename G_t>
+size_t /*FIXME*/ minDegree_decomp(G_t &G)
+{ untested();
+    return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
+}
+// #endif
 
 } // impl
 
