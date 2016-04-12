@@ -160,13 +160,18 @@ public: // picking
 #endif
     } //void check()
 
-    bag_type& operator[](size_t x)
+    bag_type const& operator[](size_t x) const
     {
         return _degs[x];
     }
     size_t size() const
     {
         return _degs.size();
+    }
+private:
+    bag_type& operator[](size_t x)
+    {
+        return _degs[x];
     }
 
 //private: // later.

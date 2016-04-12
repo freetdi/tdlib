@@ -549,12 +549,8 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
             // a degree one node does not change its degree during collapse
             assert(false);
         }else{
-            size_t found=(*_degs)[degree].erase(v);
-            assert(found); // sanity check on degs.
-            (void) found;
-            bool done=(*_degs)[degree-1].insert(v).second;
-            assert(done);
-            (void) done;
+            _degs->unlink(v);
+            _degs->reg(v, degree-1);
         }
     }
 private:
@@ -571,15 +567,16 @@ int deltaC_least_c(G_t &G)
 
     unsigned int lb = 0;
     misc::DEGS<G_t> degs(G);
+    misc::DEGS<G_t> const& cdegs(degs);
     degree_decrease<G_t> cb(&degs, &G);
 
     unsigned int min_degree = 1;
 
     while(boost::num_edges(G) > 0){
         //Search a minimum-degree-vertex.
-        if(degs[min_degree].empty()){
+        if(cdegs[min_degree].empty()){
             for(min_degree = 1; min_degree < degs.size(); min_degree++){
-                if(!degs[min_degree].empty()){
+                if(!cdegs[min_degree].empty()){
                     break;
                 }
             }
@@ -590,7 +587,7 @@ int deltaC_least_c(G_t &G)
         }
 
         vertex_descriptor min_vertex;
-        min_vertex = *degs[min_degree].begin();
+        min_vertex = *cdegs[min_degree].begin();
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
@@ -598,11 +595,14 @@ int deltaC_least_c(G_t &G)
 
         size_t outdegw = boost::degree(w, G);
         size_t outdegmin = boost::degree(min_vertex, G);
-        assert(degs[outdegw].find(w) != degs[outdegw].end());
-        assert(degs[outdegmin].find(min_vertex) != degs[outdegmin].end());
 
-        degs[outdegw].erase(w);
-        degs[outdegmin].erase(min_vertex);
+        (void) outdegw;
+        assert(cdegs[outdegw].find(w) != cdegs[outdegw].end());
+        (void) outdegmin;
+        assert(cdegs[outdegmin].find(min_vertex) != cdegs[outdegmin].end());
+
+        degs.unlink(w);
+        degs.unlink(min_vertex);
 
         //Contract the edge between min_vertex into w.
         //Clear min_vertex and rearrange degs through callback.
@@ -612,7 +612,7 @@ int deltaC_least_c(G_t &G)
         assert(boost::degree(min_vertex, G)==0);
 
         outdegw = boost::degree(w, G);
-        degs[outdegw].insert(w);
+        degs.reg(w);
     }
     return (int)lb;
 }
