@@ -110,8 +110,13 @@ namespace impl {
 
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
-template <typename G_t, typename T_t/*=typename noboost::treedec_chooser<G_t>::type c++11)*/>
-size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
+#if __cplusplus >= 201103L
+template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T=NULL)
+#else
+template <typename G_t, typename T_t>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
+#endif
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
@@ -213,13 +218,13 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
     }
 }
 
-// #ifdef c++<11 /*WORKAROUND*/
+#if __cplusplus < 201103L
 template <typename G_t>
 size_t /*FIXME*/ minDegree_decomp(G_t &G)
 {
     return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
 }
-// #endif
+#endif
 
 } // impl
 
