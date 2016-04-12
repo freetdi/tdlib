@@ -222,13 +222,6 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G)
 
 } // impl
 
-// FIXME: remove (underscore prefix: private)
-template <typename G_t, typename T_t>
-void _minDegree_decomp(G_t &G, T_t& T)
-{
-    impl::minDegree_decomp(G, &T);
-}
-
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
@@ -242,7 +235,7 @@ void minDegree_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     Islet(G, bags);
-    _minDegree_decomp(G, T);
+    impl::minDegree_decomp(G, &T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
