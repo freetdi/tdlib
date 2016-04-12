@@ -197,6 +197,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
         degs.reg(c,0);
 #endif
         ++i; // number of nodes in tree decomposition tree
+        degs.flush();
     }
     assert(boost::num_edges(G)==0);
 

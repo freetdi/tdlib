@@ -57,9 +57,14 @@ public: // queueing
         size_t d=boost::degree(v,_g);
         reg(v,d);
     }
-    void reg(const vertex_descriptor& v, size_t d){
+    void reg(const vertex_descriptor& v, size_t d)
+    {
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
+    }
+
+    void flush() const
+    {
     }
 
 public: // picking
