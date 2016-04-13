@@ -20,7 +20,7 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
-#include "TD_noboost.hpp"
+//#include "TD_noboost.hpp"
 
 // temporary.
 #ifndef untested
@@ -50,16 +50,19 @@ struct deg_config{
     }
     static unsigned num_threads(){return 1;}
 };
-}
+} // detail
 
 template<class G>
 class DEGS{
-    DEGS(const DEGS&){}
+    DEGS(const DEGS&)
+    { untested();
+    }
 
 public: // types
+    typedef typename detail::deg_config<G> deg_config;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
-    typedef typename noboost::deg_chooser<G>::bag_type bag_type;
+    typedef typename deg_config::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
     typedef std::vector<bag_type> container_type;
     typedef typename container_type::iterator iterator;
@@ -68,7 +71,7 @@ public: // types
 
 public: // construct
     DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
-    {
+    { untested();
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
@@ -180,16 +183,8 @@ private:
     const G& _g;
 }; // DEGS
 
-template<class G>
-struct deg_chooser{
-    typedef typename misc::DEGS<G> degs_type;
-    typedef typename misc::DEGS<G> type;
-    static void alloc_init(size_t){
-    }
-};
-
-
 } //namespace misc
+
 
 #endif // guard
 // vim:ts=8:sw=4:et

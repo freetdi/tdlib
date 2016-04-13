@@ -87,8 +87,8 @@
 #include "TD_simple_graph_algos.hpp"
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
-#include "TD_degree.hpp"
 #include "TD_noboost.hpp"
+#include "TD_degree.hpp"
 
 namespace treedec{
 
@@ -534,8 +534,9 @@ template<typename G_t>
 struct degree_decrease : public noboost::vertex_callback<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename misc::DEGS<G_t>::bag_type degbag;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
 
-    degree_decrease(typename misc::DEGS<G_t>*d, G_t*g) :
+    degree_decrease(degs_type* d, G_t*g) :
         _degs(d), G(g){}
 
     void operator()(vertex_descriptor v){
@@ -554,7 +555,7 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
         }
     }
 private:
-    misc::DEGS<G_t>*_degs;
+    degs_type*_degs;
     G_t* G;
 };
 
@@ -564,10 +565,11 @@ template <typename G_t>
 int deltaC_least_c(G_t &G)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
 
     unsigned int lb = 0;
-    misc::DEGS<G_t> degs(G);
-    misc::DEGS<G_t> const& cdegs(degs);
+    degs_type degs(G);
+    degs_type const& cdegs(degs);
     degree_decrease<G_t> cb(&degs, &G);
 
     unsigned int min_degree = 1;
