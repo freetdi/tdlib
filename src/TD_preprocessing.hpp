@@ -567,7 +567,7 @@ void glue_bag_preprocessing(
     if(boost::num_vertices(T) == 0){
         bag.insert(preprocessed_node);
         typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-        noboost::bag_(T,t_dec_node) = MOVE(bag);
+        noboost::bag(t_dec_node, T) = MOVE(bag);
 
         return;
     }
@@ -575,13 +575,13 @@ void glue_bag_preprocessing(
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(std::includes(noboost::bag_(T,*vIt).begin(),
-                         noboost::bag_(T,*vIt).end(),
+        if(std::includes(noboost::bag(*vIt, T).begin(),
+                         noboost::bag(*vIt, T).end(),
                          bag.begin(), bag.end()))
         {
             bag.insert(preprocessed_node);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            noboost::bag_(T,t_dec_node) = MOVE(bag);
+            noboost::bag(t_dec_node, T) = MOVE(bag);
 
             boost::add_edge(*vIt, t_dec_node, T);
             return;
@@ -591,7 +591,7 @@ void glue_bag_preprocessing(
     //Case for a disconnected graph.
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     bag.insert(preprocessed_node);
-    noboost::bag_(T,t_dec_node) = MOVE(bag);
+    noboost::bag(t_dec_node, T) = MOVE(bag);
     boost::tie(vIt, vEnd) = boost::vertices(T);
     boost::add_edge(*vIt, t_dec_node, T);
 

@@ -345,22 +345,6 @@ struct deg_chooser{
     }
 };
 
-// TRANSITIONAL. (remove later)
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type& bag_(T_t& T,
-	 const typename boost::graph_traits<T_t>::vertex_descriptor& v)
-{
-    return bag(v,T);
-}
-
-
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type const& bag_(T_t const& T,
-       const typename boost::graph_traits<T_t>::vertex_descriptor& v)
-{
-    return bag(v,T);
-}
-// end TRANSITIONAL
 
 template<class G>
 void hijack_neighborhood(

@@ -123,11 +123,11 @@ bool validate_connectivity(T_t &T){
             }
         }
 
-        //Test if forgotten and noboost::bag_(T, cur) have an entry in common.
+        //Test if forgotten and noboost::bag(cur, T) have an entry in common.
         typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
-        BOOST_AUTO(it2, noboost::bag_(T, cur).begin());
+        BOOST_AUTO(it2, noboost::bag(cur, T).begin());
 
-        for(; it1 != forgotten.end() && it2 != noboost::bag_(T, cur).end(); ){
+        for(; it1 != forgotten.end() && it2 != noboost::bag(cur, T).end(); ){
             if(*it1 == *it2){
                 //There are coded vertices, that are not connected in T.
                 return false;
@@ -140,10 +140,10 @@ bool validate_connectivity(T_t &T){
             return true;
         }
 
-        std::set_difference(noboost::bag_(T, cur).begin(),
-                            noboost::bag_(T, cur).end(),
-                            noboost::bag_(T, parent).begin(),
-                            noboost::bag_(T, parent).end(),
+        std::set_difference(noboost::bag(cur, T).begin(),
+                            noboost::bag(cur, T).end(),
+                            noboost::bag(parent, T).begin(),
+                            noboost::bag(parent, T).end(),
                             std::inserter(forgotten, forgotten.begin()));
     }
 }
@@ -177,8 +177,8 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
     typename noboost::treedec_traits<T_t>::bag_type coded_vertices;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        coded_vertices.insert(noboost::bag_(T, *tIt).begin(),
-                              noboost::bag_(T, *tIt).end());
+        coded_vertices.insert(noboost::bag(*tIt, T).begin(),
+                              noboost::bag(*tIt, T).end());
     }
 
     typename noboost::treedec_traits<T_t>::bag_type vertices;
@@ -208,8 +208,8 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
                 vd_type v(*vIt);
                 vd_type n(*nIt);
 
-                if(noboost::bag_(T,*tIt).find(v) != noboost::bag_(T,*tIt).end() &&
-                   noboost::bag_(T,*tIt).find(n) != noboost::bag_(T,*tIt).end()){
+                if(noboost::bag(*tIt, T).find(v) != noboost::bag(*tIt, T).end() &&
+                   noboost::bag(*tIt, T).find(n) != noboost::bag(*tIt, T).end()){
                     is_contained = true;
                     break;
                 }
@@ -235,7 +235,7 @@ void trivial_decomposition(G_t &G, T_t &T){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename noboost::treedec_traits<T_t>::bag_type::value_type v = *vIt;
-        noboost::bag_(T, t).insert(v);
+        noboost::bag(t, T).insert(v);
     }
 }
 
@@ -258,7 +258,7 @@ float get_average_bag_size(T_t &T){
     float avg = 0.0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        avg += noboost::bag_(T, *tIt).size();
+        avg += noboost::bag(*tIt, T).size();
     }
 
     return (boost::num_vertices(T) > 0)? avg/boost::num_vertices(T) : 0.0;
@@ -323,14 +323,14 @@ void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
                          noboost::bag(*vIt, T).end(),
                          bag.begin(), bag.end()))
         {
-            if(noboost::bag_(T, *vIt).find(elim_vertex) != noboost::bag_(T, *vIt).end()){
+            if(noboost::bag(*vIt, T).find(elim_vertex) != noboost::bag(*vIt, T).end()){
                 return;
             }
 
             t_dec_node = boost::add_vertex(T);
-            noboost::bag_(T,t_dec_node) = MOVE(bag);
+            noboost::bag(t_dec_node, T) = MOVE(bag);
             bag.clear();
-            noboost::bag_(T,t_dec_node).insert(elim_vertex);
+            noboost::bag(t_dec_node, T).insert(elim_vertex);
             boost::add_edge(*vIt, t_dec_node, T);
             return;
         }
@@ -341,9 +341,9 @@ void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
     }
 
     t_dec_node = boost::add_vertex(T);
-    noboost::bag_(T,t_dec_node) = MOVE(bag);
+    noboost::bag(t_dec_node, T) = MOVE(bag);
     bag.clear();
-    noboost::bag_(T,t_dec_node).insert(elim_vertex);
+    noboost::bag(t_dec_node, T).insert(elim_vertex);
 
     if(boost::num_vertices(T) > 1){
         boost::add_edge(*vIt, t_dec_node, T);
@@ -362,7 +362,7 @@ void glue_decompositions(T_t &T1, T_t &T2){
     for(boost::tie(tIt, tEnd) = boost::vertices(T2); tIt != tEnd; tIt++){
         idxMap[id] = boost::add_vertex(T1);
         vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id));
-        noboost::bag_(T1, idxMap[id++]) = noboost::bag_(T2, *tIt);
+        noboost::bag(idxMap[id++], T1) = noboost::bag(*tIt, T2);
     }
 
     typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
@@ -409,7 +409,7 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         typename noboost::treedec_traits<T_t>::bag_type bag_old, bag_new;
-        bag_old = noboost::bag_(T, *tIt);
+        bag_old = noboost::bag(*tIt, T);
         for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = bag_old.begin(); sIt != bag_old.end(); sIt++){
             unsigned int pos = noboost::get_pos(*sIt, G);
             bag_new.insert(vdMap[pos]);
