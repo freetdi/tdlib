@@ -1,5 +1,26 @@
-#ifndef TD_DEGREE_H
-#define TD_DEGREE_H
+// Felix Salfelder 2016
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
+//
+// keeping track of degrees
+//
+#ifndef TD_DEGREE_HPP
+#define TD_DEGREE_HPP
+
+//#include "TD_noboost.hpp"
 
 // temporary.
 #ifndef untested
@@ -12,32 +33,50 @@
 #define incomplete()
 #endif
 
-
 namespace misc {
 
+namespace detail {
+// FIXME: not here
 template<class G>
+struct deg_config{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
+#if __cplusplus < 201103L
+    typedef std::set<vd_type> bag_type;
+#else
+    typedef std::unordered_set<vd_type> bag_type;
+#endif
+    // typedef stx::btree_set<vd_type> bag_type;
+    static void alloc_init(size_t){
+    }
+    static unsigned num_threads(){return 1;}
+};
+} // detail
+
+template<class G, class CFG=detail::deg_config<G> >
 class DEGS{
-    DEGS(const DEGS&){}
+    DEGS(const DEGS&)
+    { untested();
+    }
 
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
-    typedef std::set<vertex_descriptor> bag_type;
+    typedef typename CFG::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
-    typedef std::vector<std::set<vertex_descriptor> > container_type;
+    typedef std::vector<bag_type> container_type;
     typedef typename container_type::iterator iterator;
     typedef typename container_type::const_iterator const_iterator;
     typedef typename boost::graph_traits<G>::vertices_size_type degree_t;
 
 public: // construct
     DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
-    {
+    { untested();
+        CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
         }
     }
-
 
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t d)
@@ -53,7 +92,7 @@ public: // queueing
     }
 
     void reg(const vertex_descriptor& v)
-    { untested();
+    {
         size_t d=boost::degree(v,_g);
         reg(v,d);
     }
@@ -124,9 +163,19 @@ public: // picking
 #endif
     } //void check()
 
-    std::set<vertex_descriptor>& operator[](size_t x){return _degs[x];}
-
-    size_t size() const {return _degs.size();}
+    bag_type const& operator[](size_t x) const
+    {
+        return _degs[x];
+    }
+    size_t size() const
+    {
+        return _degs.size();
+    }
+private:
+    bag_type& operator[](size_t x)
+    {
+        return _degs[x];
+    }
 
 //private: // later.
     container_type _degs;
@@ -134,99 +183,8 @@ private:
     const G& _g;
 }; // DEGS
 
-template<class G>
-struct deg_chooser{
-    typedef typename misc::DEGS<G> degs_type;
-    typedef typename misc::DEGS<G> type;
-    static void alloc_init(size_t){
-    }
-};
+} //namespace misc
 
-#if 0 // not here?
-template<class VC, class G, class CB>
-void make_clique(VC V, G& g, CB* cb)
-{
-    //FIXME: permit any container...
-    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-
-    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-
-    std::set<vertex_descriptor> redeg;
-    for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-        if(cb){
-            typename misc::DEGS<G> &degs=*cb->_degs;
-            unsigned deg = boost::degree(*nIt1,g);
-            size_t n=degs[deg].erase(*nIt1);
-            (void)n;
-            assert(n==1);
-        }
-    }
-    for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-        nIt2 = nIt1;
-        nIt2++;
-        for(; nIt2 != nEnd; nIt2++){
-            bool newedge = boost::add_edge(*nIt1, *nIt2, g).second;
-                assert(boost::degree(*nIt1,g));
-                assert(boost::degree(*nIt2,g));
-
-            if(cb){
-                // need to redegree all vertices.
-            }
-            else if(newedge){ untested();
-                // need to redegree *nIt1...
-                if(redeg.insert(*nIt1).second){ untested();
-                    unsigned deg = boost::degree(*nIt1,g);
-                    // std::cerr << "queued 4 redeg " << *nIt1 << " deg" << deg-1 << "\n";
-                    size_t n=degs[deg-1].erase(*nIt1);
-                    (void)n;
-                    assert(n==1);
-                }else{ untested();
-                    // already queued for redegree
-                }
-
-                // need to redegree *nIt2...
-                if(redeg.insert(*nIt2).second){ untested();
-                    unsigned deg = boost::degree(*nIt2,g);
-                    // std::cerr << "queued 4 redeg " << *nIt2 << " deg" << deg-1 << "\n";
-                    size_t n=degs[deg-1].erase(*nIt2);
-                    (void)n;
-                    assert(n==1);
-                }else{ untested();
-                    // already queued for redegree
-                }
-            }else{ untested();
-                // nothing to do.
-            }
-        }
-    }
-    if(cb){
-        for(boost::tie(nIt1, nEnd) = V; nIt1 != nEnd; nIt1++){
-            (*cb)(*nIt1);
-        }
-    }else{ incomplete();
-        for(typename std::set<vertex_descriptor>::iterator i=redeg.begin(); i!=redeg.end(); ++i){
-            // std::cerr << "redegging " << *i << "\n";
-            if(cb){ untested();
-            }else{ incomplete();
-                // just reinsert
-                size_t deg=boost::degree(*i,g);
-                assert(deg>0);
-                bool done=degs[deg].insert(*i).second;
-                (void)done;
-                assert(done);
-            }
-        }
-    }
-
-    if(cb){
-        // degs might be in an inconsistent state, depending on what cb is
-    }else{ untested();
-        degs.check();
-    }
-}
-#endif
-
-} //namespace MISC
 
 #endif // guard
 // vim:ts=8:sw=4:et

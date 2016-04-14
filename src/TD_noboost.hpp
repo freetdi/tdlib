@@ -31,6 +31,8 @@
 
 #include "TD_degree.hpp"
 
+//#include "TD_degree.hpp"
+
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG
 struct bag{
@@ -327,6 +329,21 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     typedef    typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
+
+template<class G>
+struct deg_chooser{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
+    typedef typename misc::DEGS<G> degs_type; //??
+    typedef typename misc::DEGS<G> type;
+#if __cplusplus < 201103L
+    typedef std::set<vd_type> bag_type;
+#else
+    typedef std::unordered_set<vd_type> bag_type;
+#endif
+    // typedef stx::btree_set<vd_type> bag_type;
+    static void alloc_init(size_t){
+    }
+};
 
 // TRANSITIONAL. (remove later)
 template<typename T_t>

@@ -53,6 +53,7 @@
 
 #include "TD_preprocessing.hpp"
 #include "TD_simple_graph_algos.hpp"
+#include "TD_degree.hpp"
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
@@ -62,6 +63,7 @@ namespace treedec{
 
 namespace detail{
 
+#if 0 // obsolete
 //DRAFT (no useful interface).
 template<typename G>
 struct degree_mod : public noboost::vertex_callback<G>{
@@ -84,6 +86,7 @@ struct degree_mod : public noboost::vertex_callback<G>{
         degree_mod(const degree_mod&){}
         G* _g;
 };
+#endif
 
 } //namespace detail
 
@@ -122,7 +125,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
-    typedef typename misc::deg_chooser<G_t>::type degs_type;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     std::vector<bag_type> bags;
     bag_type bag_i;
@@ -171,7 +174,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
             bags_i = &bags[i];
         }
 
-        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, *bags_i);
+        noboost::make_clique_and_hijack(c, G, (void*)NULL, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
