@@ -52,17 +52,16 @@ struct deg_config{
 };
 } // detail
 
-template<class G>
+template<class G, class CFG=detail::deg_config<G> >
 class DEGS{
     DEGS(const DEGS&)
     { untested();
     }
 
 public: // types
-    typedef typename detail::deg_config<G> deg_config;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
-    typedef typename deg_config::bag_type bag_type;
+    typedef typename CFG::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
     typedef std::vector<bag_type> container_type;
     typedef typename container_type::iterator iterator;
@@ -72,6 +71,7 @@ public: // types
 public: // construct
     DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
     { untested();
+        CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
@@ -92,7 +92,7 @@ public: // queueing
     }
 
     void reg(const vertex_descriptor& v)
-    { untested();
+    {
         size_t d=boost::degree(v,_g);
         reg(v,d);
     }

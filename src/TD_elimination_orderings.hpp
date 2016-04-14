@@ -63,6 +63,7 @@ namespace treedec{
 
 namespace detail{
 
+#if 0 // obsolete
 //DRAFT (no useful interface).
 template<typename G>
 struct degree_mod : public noboost::vertex_callback<G>{
@@ -85,6 +86,7 @@ struct degree_mod : public noboost::vertex_callback<G>{
         degree_mod(const degree_mod&){}
         G* _g;
 };
+#endif
 
 } //namespace detail
 
@@ -172,7 +174,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
             bags_i = &bags[i];
         }
 
-        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, *bags_i);
+        noboost::make_clique_and_hijack(c, G, (void*)NULL, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
