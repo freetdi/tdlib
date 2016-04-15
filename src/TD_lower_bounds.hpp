@@ -573,11 +573,11 @@ int deltaC_least_c(G_t &G)
 
     unsigned int min_ntd = 2;
 
-    while(boost::num_edges(G) > 0){ untested();
+    while(boost::num_edges(G) > 0){
         //Search a minimum-degree-vertex.
-        if(min_ntd>1){untested();
+        if(min_ntd>1){
             --min_ntd;
-        }else{ untested();
+        }else{
         }
 
         std::pair<vertex_descriptor, unsigned> min_pair;

@@ -70,7 +70,7 @@ public: // types
 
 public: // construct
     DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
-    { untested();
+    {
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){

@@ -461,12 +461,12 @@ static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
 
 } // namespace treedec
 
-namespace noboost {
+namespace noboost { // MOVE
 template<class G, class CB>
 void make_clique_and_hijack(
         typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g, CB* cb, typename noboost::outedge_set<G>::type& bag)
-{
+        G& g, CB* cb, typename outedge_set<G>::type& bag)
+{ untested();
     if(cb){incomplete();
         // probably unneeded now.
     }
