@@ -79,18 +79,26 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 #endif
 
-//Copies the induced subgraph of G formed by disabled into diG. The graph diG is a digraph, that is for each edge of the induced
-//subgraph we have an edge and a reverse edge. diG has vertex and edge properties, in which the iterativly computed edge set of
-//the disjoint paths is stored. A new vertex in diG called 'source' is connected with each vertex in X (no reverse edges) and
-//each vertex in Y is connected with another new vertex called 'sink' (no reverse edges). 'idxMap' is used for the conversion from
-//vertex descriptors of diG to vertex descriptors of G, needed to translate a seperator of diG to a seperator of G.
-//Complexity: O(|V| + |E|)
+//Copies the induced subgraph of G formed by disabled into diG. The graph diG
+//is a digraph, that is for each edge of the induced subgraph we have an edge
+//and a reverse edge. diG has vertex and edge properties, in which the
+//iterativly computed edge set of the disjoint paths is stored. A new vertex in
+//diG called 'source' is connected with each vertex in X (no reverse edges) and
+//each vertex in Y is connected with another new vertex called 'sink' (no
+//reverse edges). 'idxMap' is used for the conversion from vertex descriptors
+//of diG to vertex descriptors of G, needed to translate a seperator of diG to
+//a seperator of G.  Complexity: O(|V| + |E|)
 //
-// (If G would have the properties 'visited' and 'predecessor' on vertices and 'path' on edges, the copy step would not be necessary)
+// (If G would have the properties 'visited' and 'predecessor' on vertices and
+// 'path' on edges, the copy step would not be necessary)
 //
 
 template <typename G_t>
-std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor> make_digraph(G_t &G, std::vector<bool> &disabled, digraph_t &diG, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y){
+std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
+    make_digraph(G_t &G, std::vector<bool> &disabled, digraph_t &diG,
+                 std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
