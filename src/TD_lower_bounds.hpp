@@ -570,39 +570,31 @@ int deltaC_least_c(G_t &G)
 
     unsigned int lb = 0;
     degs_type degs(G);
-    degs_type const& cdegs(degs);
     degree_decrease<G_t> cb(&degs, &G);
 
-    unsigned int min_degree = 1;
+    unsigned int min_ntd = 2;
 
     while(boost::num_edges(G) > 0){
         //Search a minimum-degree-vertex.
-        if(cdegs[min_degree].empty()){
-            for(min_degree = 1; min_degree < degs.size(); min_degree++){
-                if(!cdegs[min_degree].empty()){
-                    break;
-                }
-            }
+        if(min_ntd>1){
+            --min_ntd;
+        }else{
         }
 
-        if(lb <= min_degree){
-            lb = min_degree;
+        std::pair<vertex_descriptor, unsigned> min_pair;
+        min_pair = degs.pick_min(min_ntd);
+        min_ntd = min_pair.second;
+
+        if(lb < min_ntd){
+            lb = min_ntd;
         }
 
         vertex_descriptor min_vertex;
-        min_vertex = *cdegs[min_degree].begin();
+        min_vertex = min_pair.first;
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
-        typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, G);
-
-        size_t outdegw = boost::degree(w, G);
-        size_t outdegmin = boost::degree(min_vertex, G);
-
-        (void) outdegw;
-        assert(cdegs[outdegw].find(w) != cdegs[outdegw].end());
-        (void) outdegmin;
-        assert(cdegs[outdegmin].find(min_vertex) != cdegs[outdegmin].end());
+        vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, G);
 
         degs.unlink(w);
         degs.unlink(min_vertex);
@@ -612,9 +604,7 @@ int deltaC_least_c(G_t &G)
         noboost::contract_edge(min_vertex, w, G, false, &cb);
 
         assert(0==boost::degree(min_vertex, G));
-        assert(boost::degree(min_vertex, G)==0);
 
-        outdegw = boost::degree(w, G);
         degs.reg(w);
     }
     return (int)lb;
