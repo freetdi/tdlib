@@ -531,7 +531,8 @@ int deltaC_max_d(G_t& G)
 }
 
 template<typename G_t>
-struct degree_decrease : public noboost::vertex_callback<G_t>{
+struct degree_decrease
+   : public noboost::vertex_callback<typename boost::graph_traits<G_t>::vertex_descriptor>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename misc::DEGS<G_t>::bag_type degbag;
     typedef typename noboost::deg_chooser<G_t>::type degs_type;

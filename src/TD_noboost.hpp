@@ -69,22 +69,23 @@ void remove_vertex(vertex_iterator_G u, G &g)
     remove_vertex(*u, g);
 }
 
-template<typename G>
+template<typename vertex_descriptor>
 struct vertex_callback{
     virtual ~vertex_callback(){};
-    virtual void operator()(vertex_descriptor_G)=0;
+    virtual void operator()(vertex_descriptor)=0;
 };
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
 //before dg will drop.
+// FIXME: pass edge or edge iterator.
 template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
                    bool /*erase*/=false,
-                   vertex_callback<G>* cb=NULL)
-{
+                   vertex_callback<vertex_descriptor_G>* cb=NULL)
+{ untested();
     adjacency_iterator_G I, E;
     for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
         assert(boost::edge(v, *I, g).second);
@@ -111,8 +112,8 @@ inline void contract_edge(vertex_iterator_G v,
                    vertex_descriptor_G into,
                    G &g,
                    bool erase=false,
-                   vertex_callback<G>* cb=NULL)
-{
+                   vertex_callback<vertex_descriptor_G>* cb=NULL)
+{ untested();
     contract_edge(*v, into, g, erase, cb);
     if(erase){
         noboost::remove_vertex(v, g);
