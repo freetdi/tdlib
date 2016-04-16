@@ -1,8 +1,8 @@
-#                                               -*- Autoconf -*-
+#     -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([tdlib], [0.7.0], [larisch@informatik.uni-frankfurt.de])
+AC_INIT([tdlib], [0.8.1], [larisch@informatik.uni-frankfurt.de])
 AC_CONFIG_SRCDIR([src/TD_misc.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AC_CONFIG_HEADERS([config.h])

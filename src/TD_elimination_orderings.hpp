@@ -56,7 +56,6 @@
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
-//#include "TD_trace.hpp"
 
 namespace treedec{
 
