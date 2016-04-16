@@ -49,36 +49,12 @@
 #include <map>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
+
 #include "TD_simple_graph_algos.hpp"
+#include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 
 namespace treedec{
-
-#ifndef TD_SUBSETS
-#define TD_SUBSETS
-
-//collects all subsets of X of size k in subs (todo: replacement by enumeration in hunt())
-static void subsets(std::set<unsigned int> &X, int size, int k, unsigned int idx, std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
-    if(k==0){
-        std::set<unsigned int> subS;
-        for(unsigned int i = 0; i < sub.size(); i++)
-            subS.insert(sub[i]);
-        subs.push_back(subS);
-        return;
-    }
-
-    unsigned int i = idx;
-    std::set<unsigned int>::iterator sIt = X.begin();
-    std::advance(sIt, i);
-    for(; i<X.size();i++){
-        sub.push_back(*sIt);
-        subsets(X,X.size(),k-1,i+1,sub, subs);
-        sub.pop_back();
-        sIt++;
-    }
-}
-
-#endif
 
 //computes the robber space with respect to X and y and saves it in R
 template <typename G_t>

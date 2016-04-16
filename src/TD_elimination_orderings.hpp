@@ -60,36 +60,7 @@
 
 namespace treedec{
 
-namespace detail{
-
-#if 0 // obsolete
-//DRAFT (no useful interface).
-template<typename G>
-struct degree_mod : public noboost::vertex_callback<G>{
-    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-    degree_mod(misc::DEGS<G>* d, G* g) : _degs(d), _g(g){}
-
-    //Reinsert with degree-1.
-    void operator()(vertex_descriptor v){
-        unsigned deg=boost::degree(v,*_g);
-        (void)deg;
-        assert(deg);
-        bool done=(*_degs)[deg-1].insert(v).second;
-        (void)done;
-        assert(done);
-    }
-    //private: not yet.
-//    BUG:: hardcoded type
-        misc::DEGS<G>* _degs;
-    private:
-        degree_mod(const degree_mod&){}
-        G* _g;
-};
-#endif
-
-} //namespace detail
-
-// register a 1-neigborhood to DEGS
+//register a 1-neigborhood to DEGS
 template<class U, class G, class B, class D>
 void redegree(U, G& g, B& neighborhood, D& d)
 {
@@ -228,7 +199,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G)
 }
 #endif
 
-} // impl
+} // namespace impl
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.

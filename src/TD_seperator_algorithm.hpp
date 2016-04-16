@@ -23,15 +23,9 @@
 // {
 //  std::set<unsigned int> bag;
 // };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
+// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
 //
-// Vertices of the input graph have to provide the attribute 'id', e.g.:
-//
-// struct Vertex
-// {
-//  unsigned int id;
-// };
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
+// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 //
 //
 // These function is most likely to be interesting for outside use:
@@ -54,6 +48,7 @@
 
 #include <set>
 #include <vector>
+
 #include "TD_NetworkFlow.hpp"
 #include "TD_simple_graph_algos.hpp"
 #include "TD_misc.hpp"
@@ -61,40 +56,24 @@
 
 namespace treedec{
 
-//Collects all subsets of 'X' of size 'k' and stores it in 'subs'.
+//Collects all pairs of disjoint subsets of 'X' of size 'min_card' up to
+//'max_card' and stores it in 'subsX' and 'subsY'.
 template <typename T>
-void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std::vector<std::set<T> > &subs){
-    if(k==0){
-        typename std::set<T> subS;
-        for(unsigned int i = 0; i < sub.size(); i++){
-            subS.insert(sub[i]);
-        }
-        subs.push_back(subS);
-        return;
-    }
-
-    int i = idx;
-    typename std::set<T>::iterator sIt = X.begin();
-    std::advance(sIt, i);
-    for(; i<size;i++){
-        sub.push_back(*sIt);
-        subsets(X,size,k-1,i+1,sub, subs);
-        sub.pop_back();
-        sIt++;
-    }
-}
-
-//Collects all pairs of disjoint subsets of 'X' of size 'min_card' up to 'max_card' and stores it in 'subsX' and 'subsY'.
-template <typename T>
-void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_card, std::vector<T> &sub, std::vector<std::set<T> > &subsX, std::vector<std::vector<std::set<T> > > &subsY){
+void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_card,
+                      std::vector<T> &sub, std::vector<std::set<T> > &subsX,
+                      std::vector<std::vector<std::set<T> > > &subsY)
+{
     for(unsigned int i = min_card; i <=max_card; i++){
         subsets(X, X.size(), i, 0, sub, subsX);
     }
     for(unsigned int i = 0; i < subsX.size(); i++){
         std::set<T> difference;
-        std::set_difference(X.begin(), X.end(), subsX[i].begin(), subsX[i].end(), std::inserter(difference, difference.begin()));
+        std::set_difference(X.begin(), X.end(),
+                            subsX[i].begin(), subsX[i].end(),
+                       std::inserter(difference, difference.begin()));
 
-        unsigned int maximum = (difference.size() > max_card)? max_card : difference.size();
+        unsigned int maximum =
+             (difference.size() > max_card)? max_card : difference.size();
 
         std::vector<std::set<T> > subsXY;
         for(unsigned int t = 1; t <= maximum; t++){
@@ -113,12 +92,14 @@ void superset(T &X, T &V, unsigned int size){
     }
 }
 
-//Finds a nearly balanced seperator S of W by doing an extended deepth-first-search which finds a minimal X-Y-seperator.
+//Finds a nearly balanced seperator S of W by doing an extended
+//deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
 template <typename G_t>
-bool nearly_balanced_seperator(G_t &G, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
-                               typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-                               std::vector<bool> &disabled, unsigned int k)
+bool nearly_balanced_seperator(G_t &G,
+    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
+    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+    std::vector<bool> &disabled, unsigned int k)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> sub;
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > subsX;
@@ -138,8 +119,12 @@ bool nearly_balanced_seperator(G_t &G, typename std::set<typename boost::graph_t
             std::vector<bool> disabled_(disabled);
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> sX, sY, X_Y, Z;
 
-            std::set_union(subsX[i].begin(), subsX[i].end(), subsY[i][j].begin(), subsY[i][j].end(), std::inserter(X_Y, X_Y.begin()));
-            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(), std::inserter(Z, Z.begin()));
+            std::set_union(subsX[i].begin(), subsX[i].end(),
+                           subsY[i][j].begin(), subsY[i][j].end(),
+                           std::inserter(X_Y, X_Y.begin()));
+
+            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                                std::inserter(Z, Z.begin()));
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
             treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
@@ -162,7 +147,8 @@ bool nearly_balanced_seperator(G_t &G, typename std::set<typename boost::graph_t
 
             //S now is a sX-sY-seperator. Check if S holds the remaining property of a nearly balanced seperator.
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> isS_W;
-            std::set_intersection(S.begin(), S.end(), W.begin(), W.end(), std::inserter(isS_W, isS_W.begin()));
+            std::set_intersection(S.begin(), S.end(), W.begin(), W.end(),
+                                  std::inserter(isS_W, isS_W.begin()));
 
             if(isS_W == Z){
                 return true;
@@ -248,10 +234,14 @@ bool sep_decomp(G_t &G, T_t &T,
 
         for(unsigned int i = 0; i < C.size(); i++){
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> union_C_i_S, is_C_i_W, newW;
-            std::set_union(C[i].begin(), C[i].end(), S.begin(), S.end(), std::inserter(union_C_i_S, union_C_i_S.begin()));
+            std::set_union(C[i].begin(), C[i].end(), S.begin(), S.end(),
+                           std::inserter(union_C_i_S, union_C_i_S.begin()));
 
-            std::set_intersection(C[i].begin(), C[i].end(), W.begin(), W.end(), std::inserter(is_C_i_W, is_C_i_W.begin()));
-            std::set_union(is_C_i_W.begin(), is_C_i_W.end(), S.begin(), S.end(), std::inserter(newW, newW.begin()));
+            std::set_intersection(C[i].begin(), C[i].end(), W.begin(), W.end(),
+                                  std::inserter(is_C_i_W, is_C_i_W.begin()));
+
+            std::set_union(is_C_i_W.begin(), is_C_i_W.end(), S.begin(), S.end(),
+                           std::inserter(newW, newW.begin()));
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
             for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
@@ -270,8 +260,8 @@ bool sep_decomp(G_t &G, T_t &T,
     return false;
 }
 
-//Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole graph could be decomposed.
-//returns an upper bound for the treewidth
+//Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
+//graph could be decomposed.
 template <typename G_t, typename T_t>
 void seperator_algorithm(G_t &G, T_t &T){
     unsigned int k = 0;

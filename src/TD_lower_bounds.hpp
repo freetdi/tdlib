@@ -180,7 +180,8 @@ template <typename G_t>
 int deltaD(G_t &G){
     unsigned int maxmin = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *(boost::vertices(G).second);
+    typename boost::graph_traits<G_t>::vertex_descriptor min_vertex =
+                                            *(boost::vertices(G).second);
 
     while(true){
         unsigned int min_degree = boost::num_vertices(G);
@@ -670,7 +671,8 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
                 }
                 std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
 
-                std::set_intersection(N1.begin(), N1.end(), N2.begin(), N2.end(), std::inserter(intersection, intersection.begin()));
+                std::set_intersection(N1.begin(), N1.end(), N2.begin(), N2.end(),
+                                      std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() >= k){
                     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> edge;
@@ -784,9 +786,10 @@ int LBNC_deltaD(const G_t &G){
             }
 
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
-                      = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
+                = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
-            typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, H);
+            typename boost::graph_traits<G_t>::vertex_descriptor w =
+                          noboost::get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -832,9 +835,10 @@ int LBNC_deltaC(G_t &G){
             }
 
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
-                      = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
+                 = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
-            typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, H);
+            typename boost::graph_traits<G_t>::vertex_descriptor w =
+                    noboost::get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -993,9 +997,10 @@ int LBPC_deltaD(const G_t &G){
             }
 
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
-                      = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
+                  = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
-            typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, H);
+            typename boost::graph_traits<G_t>::vertex_descriptor w =
+                   noboost::get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -1045,9 +1050,10 @@ int LBPC_deltaC(G_t &G){
             }
 
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
-                      = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
+                = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
-            typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, H);
+            typename boost::graph_traits<G_t>::vertex_descriptor w =
+                       noboost::get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 

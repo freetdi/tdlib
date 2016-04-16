@@ -125,7 +125,7 @@ bool validate_connectivity(T_t &T){
 
         //Test if forgotten and noboost::bag(cur, T) have an entry in common.
         typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
-        BOOST_AUTO(it2, noboost::bag(cur, T).begin());
+        typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(cur, T).begin();
 
         for(; it1 != forgotten.end() && it2 != noboost::bag(cur, T).end(); ){
             if(*it1 == *it2){
@@ -388,7 +388,9 @@ void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descript
                      G_t &H,
                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+                                 = S.begin(); sIt != S.end(); sIt++)
+    {
         unsigned int pos = noboost::get_pos(*sIt, H);
         S_.insert(vdMap[pos]);
     }
@@ -398,7 +400,9 @@ template <typename G_t>
 void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
                              typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &B)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++){
+    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
+                  S.begin(); sIt != S.end(); sIt++)
+    {
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::value_type vd = *sIt;
         B.insert(vd);
     }
@@ -422,11 +426,11 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 
-//collects all subsets of X of size k in subs (todo: replacement by enumeration in hunt())
-static void subsets(std::set<unsigned int> &X, int /*size*/, int k, unsigned int idx,
-        std::vector<unsigned int> &sub, std::vector<std::set<unsigned int> > &subs){
+//Collects all subsets of 'X' of size 'k' and stores it in 'subs'.
+template <typename T>
+void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std::vector<std::set<T> > &subs){
     if(k==0){
-        std::set<unsigned int> subS;
+        typename std::set<T> subS;
         for(unsigned int i = 0; i < sub.size(); i++){
             subS.insert(sub[i]);
         }
@@ -434,30 +438,18 @@ static void subsets(std::set<unsigned int> &X, int /*size*/, int k, unsigned int
         return;
     }
 
-    unsigned int i = idx;
-    std::set<unsigned int>::iterator sIt = X.begin();
+    int i = idx;
+    typename std::set<T>::iterator sIt = X.begin();
     std::advance(sIt, i);
-    for(; i<X.size();i++){
+    for(; i<size;i++){
         sub.push_back(*sIt);
-        subsets(X,X.size(),k-1,i+1,sub, subs);
+        subsets(X,size,k-1,i+1,sub, subs);
         sub.pop_back();
         sIt++;
     }
 }
 
 #endif //TD_SUBSETS
-
-#ifndef TD_POWERSET
-#define TD_POWERSET
-
-static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned int> > &subs){
-    std::vector<unsigned int> sub;
-    for(unsigned int i = 0; i <=X.size(); i++){
-        subsets(X, X.size(), i, 0, sub, subs);
-    }
-}
-
-#endif //ifdef TD_POWERSET
 
 } // namespace treedec
 
