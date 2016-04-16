@@ -143,14 +143,16 @@ int delta2(const G_t &G){
 template <typename G_t>
 int gamma(const G_t &G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E+1 == V*(V-1u)) {
+    }
+    else if(2*E+1 == V*(V-1u)){
         return V-1;
     }
 
@@ -296,16 +298,19 @@ void gammaD_left(G_t &G, unsigned int &lb){
 template <typename G_t>
 int gammaD_left(G_t& G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E == V*(V-1u)) {
+    }
+    else if(2*E == V*(V-1u)){
         return V-1;
-    }else{
+    }
+    else{
         unsigned int lb = 0;
         detail::gammaD_left(G, lb);
         return lb;
@@ -348,16 +353,19 @@ void gammaD_right(G_t &G, unsigned int &lb){
 template <typename G_t>
 int gammaD_right(G_t& G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E == V*(V-1u)) {
+    }
+    else if(2*E == V*(V-1u)){
         return V-1;
-    }else{
+    }
+    else{
         unsigned int lb = 0;
         detail::gammaD_right(G, lb);
         return lb;
@@ -411,16 +419,19 @@ void gammaD_min_e(G_t &G, unsigned int &lb){
 template <typename G_t>
 int gammaD_min_e(G_t& G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E+1 == V*(V-1u)) {
+    }
+    else if(2*E+1 == V*(V-1u)){
         return V-1;
-    }else{
+    }
+    else{
         unsigned int lb = 0;
         detail::gammaD_min_e(G, lb);
         return lb;
@@ -465,16 +476,19 @@ int deltaC_min_d(G_t &G){
 template <typename G_t>
 int deltaC_min_d(G_t& G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E+1 == V*(V-1u)) {
+    }
+    else if(2*E+1 == V*(V-1u)){
         return V-1;
-    }else{
+    }
+    else{
         return detail::deltaC_min_d(G);
     }
 }
@@ -516,16 +530,19 @@ int deltaC_max_d(G_t &G){
 template <typename G_t>
 int deltaC_max_d(G_t& G)
 {
-    BOOST_AUTO(V, boost::num_vertices(G));
-    BOOST_AUTO(E, boost::num_edges(G));
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }else if(E == 0){
+    }
+    else if(E == 0){
         return 0;
-    }else if(2*E == V*(V-1u)) {
+    }
+    else if(2*E == V*(V-1u)){
         return V-1u;
-    }else{
+    }
+    else{
         return detail::deltaC_max_d(G);
     }
 }
@@ -578,7 +595,6 @@ int deltaC_least_c(G_t &G)
         //Search a minimum-degree-vertex.
         if(min_ntd>1){
             --min_ntd;
-        }else{
         }
 
         std::pair<vertex_descriptor, unsigned> min_pair;
@@ -603,8 +619,6 @@ int deltaC_least_c(G_t &G)
         //Clear min_vertex and rearrange degs through callback.
         noboost::contract_edge(min_vertex, w, G, false, &cb);
 
-        assert(0==boost::degree(min_vertex, G));
-
         degs.reg(w);
     }
     return (int)lb;
@@ -616,17 +630,21 @@ int deltaC_least_c(G_t &G)
 template <typename G_t>
 int deltaC_least_c(G_t& G)
 {
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1u)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
-
-    return treedec::lb::detail::deltaC_least_c(G);
+    else{
+        return treedec::lb::detail::deltaC_least_c(G);
+    }
 }
 
 
@@ -671,14 +689,17 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
 
 template <typename G_t>
 int LBN_deltaD(const G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     G_t H(G);
@@ -701,14 +722,17 @@ int LBN_deltaD(const G_t &G){
 
 template <typename G_t>
 int LBN_deltaC(G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     int lb = treedec::lb::deltaC_least_c(G);
@@ -730,14 +754,17 @@ int LBN_deltaC(G_t &G){
 
 template <typename G_t>
 int LBNC_deltaD(const G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     G_t H(G);
@@ -776,14 +803,17 @@ int LBNC_deltaD(const G_t &G){
 
 template <typename G_t>
 int LBNC_deltaC(G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     int lb = treedec::lb::deltaC_least_c(G);
@@ -865,14 +895,17 @@ void k_path_improved_graph(G_t &G, unsigned int k){
 
 template <typename G_t>
 int LBP_deltaD(const G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     G_t H(G);
@@ -896,14 +929,17 @@ int LBP_deltaD(const G_t &G){
 
 template <typename G_t>
 int LBP_deltaC(G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     int lb = treedec::lb::deltaC_least_c(G);
@@ -926,14 +962,17 @@ int LBP_deltaC(G_t &G){
 
 template <typename G_t>
 int LBPC_deltaD(const G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     G_t H(G);
@@ -975,14 +1014,17 @@ int LBPC_deltaD(const G_t &G){
 
 template <typename G_t>
 int LBPC_deltaC(G_t &G){
-    if(boost::num_vertices(G) == 0){
+    unsigned int V = boost::num_vertices(G);
+    unsigned int E = boost::num_edges(G);
+
+    if(V == 0){
         return -1;
     }
-    else if(boost::num_edges(G) == 0){
+    else if(E == 0){
         return 0;
     }
-    else if(2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
-        return boost::num_vertices(G)-1;
+    else if(2*E == V*(V-1u)){
+        return V-1u;
     }
 
     int lb = treedec::lb::deltaC_least_c(G);
@@ -1033,7 +1075,8 @@ typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> MC
     std::vector<int> visited_degree(boost::num_vertices(G), 0);
 
     int max = -1;
-    BOOST_AUTO(vertices, boost::vertices(G));
+    std::pair<typename boost::graph_traits<G_t>::vertex_descriptor,
+              typename boost::graph_traits<G_t>::vertex_descriptor> vertices = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor max_vertex=*vertices.first;
 
     for(unsigned int i = 0; i < boost::num_vertices(G); i++){
