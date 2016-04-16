@@ -124,8 +124,9 @@ bool validate_connectivity(T_t &T){
         }
 
         //Test if forgotten and noboost::bag(cur, T) have an entry in common.
-        typename noboost::treedec_traits<T_t>::bag_type::iterator it1 = forgotten.begin();
-        typename noboost::treedec_traits<T_t>::bag_type::iterator it2 = noboost::bag(cur, T).begin();
+        typedef typename noboost::treedec_traits<T_t>::bag_type::const_iterator const_iterator;
+        const_iterator it1 = forgotten.begin();
+        const_iterator it2 = noboost::bag(cur, T).begin();
 
         for(; it1 != forgotten.end() && it2 != noboost::bag(cur, T).end(); ){
             if(*it1 == *it2){
