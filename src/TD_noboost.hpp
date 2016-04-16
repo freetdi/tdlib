@@ -31,6 +31,8 @@
 
 #include "TD_degree.hpp"
 
+//#include "TD_degree.hpp"
+
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG
 struct bag{
@@ -67,22 +69,23 @@ void remove_vertex(vertex_iterator_G u, G &g)
     remove_vertex(*u, g);
 }
 
-template<typename G>
+template<typename vertex_descriptor>
 struct vertex_callback{
     virtual ~vertex_callback(){};
-    virtual void operator()(vertex_descriptor_G)=0;
+    virtual void operator()(vertex_descriptor)=0;
 };
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
 //before dg will drop.
+// FIXME: pass edge or edge iterator.
 template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
                    bool /*erase*/=false,
-                   vertex_callback<G>* cb=NULL)
-{
+                   vertex_callback<vertex_descriptor_G>* cb=NULL)
+{ untested();
     adjacency_iterator_G I, E;
     for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
         assert(boost::edge(v, *I, g).second);
@@ -109,8 +112,8 @@ inline void contract_edge(vertex_iterator_G v,
                    vertex_descriptor_G into,
                    G &g,
                    bool erase=false,
-                   vertex_callback<G>* cb=NULL)
-{
+                   vertex_callback<vertex_descriptor_G>* cb=NULL)
+{ untested();
     contract_edge(*v, into, g, erase, cb);
     if(erase){
         noboost::remove_vertex(v, g);
@@ -328,22 +331,21 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
-// TRANSITIONAL. (remove later)
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type& bag_(T_t& T,
-	 const typename boost::graph_traits<T_t>::vertex_descriptor& v)
-{
-    return bag(v,T);
-}
+template<class G>
+struct deg_chooser{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
+    typedef typename misc::DEGS<G> degs_type; //??
+    typedef typename misc::DEGS<G> type;
+#if __cplusplus < 201103L
+    typedef std::set<vd_type> bag_type;
+#else
+    typedef std::unordered_set<vd_type> bag_type;
+#endif
+    // typedef stx::btree_set<vd_type> bag_type;
+    static void alloc_init(size_t){
+    }
+};
 
-
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type const& bag_(T_t const& T,
-       const typename boost::graph_traits<T_t>::vertex_descriptor& v)
-{
-    return bag(v,T);
-}
-// end TRANSITIONAL
 
 template<class G>
 void hijack_neighborhood(

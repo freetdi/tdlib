@@ -167,14 +167,14 @@ void glue_bags(T_t &T,
     bool bag1_found = false;
     bool bag2_found = false;
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
-        if(noboost::bag_(T, *vIt1) == bag1){
+        if(noboost::bag(*vIt1, T) == bag1){
             b1 = *vIt1;
             bag1_found = true;
             break;
         }
     }
     for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
-        if(noboost::bag_(T, *vIt2) == bag2){
+        if(noboost::bag(*vIt2, T) == bag2){
             b2 = *vIt2;
             bag2_found = true;
             break;
@@ -183,12 +183,12 @@ void glue_bags(T_t &T,
 
     if(!bag1_found){
         b1 = boost::add_vertex(T);
-        noboost::bag_(T, b1) = bag1;
+        noboost::bag(b1, T) = bag1;
     }
 
     if(!bag2_found){
         b2 = boost::add_vertex(T);
-        noboost::bag_(T, b2) = bag2;
+        noboost::bag(b2, T) = bag2;
     }
 
     if(!(boost::edge(b1, b2, T).second || boost::edge(b2, b1, T).second)){
@@ -209,7 +209,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
     if(boost::num_vertices(G) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        noboost::bag_(T, t).insert(*vIt);
+        noboost::bag(t, T).insert(*vIt);
         if(k <= 0){
             return true;
         }

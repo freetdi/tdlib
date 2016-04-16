@@ -53,6 +53,7 @@
 
 #include "TD_preprocessing.hpp"
 #include "TD_simple_graph_algos.hpp"
+#include "TD_degree.hpp"
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
 #include "TD_std.hpp"
@@ -61,6 +62,7 @@ namespace treedec{
 
 namespace detail{
 
+#if 0 // obsolete
 //DRAFT (no useful interface).
 template<typename G>
 struct degree_mod : public noboost::vertex_callback<G>{
@@ -83,6 +85,7 @@ struct degree_mod : public noboost::vertex_callback<G>{
         degree_mod(const degree_mod&){}
         G* _g;
 };
+#endif
 
 } //namespace detail
 
@@ -109,14 +112,19 @@ namespace impl {
 
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
-template <typename G_t, typename T_t/*=typename noboost::treedec_chooser<G_t>::type c++11)*/>
-size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
+#if __cplusplus >= 201103L
+template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T=NULL)
+#else
+template <typename G_t, typename T_t>
+size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
+#endif
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
-    typedef typename misc::deg_chooser<G_t>::type degs_type;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     std::vector<bag_type> bags;
     bag_type bag_i;
@@ -165,7 +173,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
             bags_i = &bags[i];
         }
 
-        noboost::make_clique_and_hijack(c, G, (detail::degree_mod<G_t>*)NULL, *bags_i);
+        noboost::make_clique_and_hijack(c, G, (void*)NULL, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
@@ -212,13 +220,13 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T/*=NULL (need c++11)*/)
     }
 }
 
-// #ifdef c++<11 /*WORKAROUND*/
+#if __cplusplus < 201103L
 template <typename G_t>
 size_t /*FIXME*/ minDegree_decomp(G_t &G)
 {
     return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
 }
-// #endif
+#endif
 
 } // impl
 

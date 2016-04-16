@@ -88,6 +88,7 @@
 #include "TD_NetworkFlow.hpp"
 #include "TD_misc.hpp"
 #include "TD_noboost.hpp"
+#include "TD_degree.hpp"
 
 namespace treedec{
 
@@ -530,10 +531,14 @@ int deltaC_max_d(G_t& G)
 }
 
 template<typename G_t>
-struct degree_decrease : public noboost::vertex_callback<G_t>{
+struct degree_decrease
+   : public noboost::vertex_callback<typename boost::graph_traits<G_t>::vertex_descriptor>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    degree_decrease(std::vector<std::set<vertex_descriptor> >*d, G_t*g) :
-        degs(d), G(g){}
+    typedef typename misc::DEGS<G_t>::bag_type degbag;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
+
+    degree_decrease(degs_type* d, G_t*g) :
+        _degs(d), G(g){}
 
     void operator()(vertex_descriptor v){
         size_t degree = boost::degree(v, *G);
@@ -546,17 +551,13 @@ struct degree_decrease : public noboost::vertex_callback<G_t>{
             // a degree one node does not change its degree during collapse
             assert(false);
         }else{
-            size_t found=(*degs)[degree].erase(v);
-            assert(found); // sanity check on degs.
-            (void) found;
-            bool done=(*degs)[degree-1].insert(v).second;
-            assert(done);
-            (void) done;
+            _degs->unlink(v);
+            _degs->reg(v, degree-1);
         }
     }
-    private:
-        std::vector<std::set<vertex_descriptor> >*degs;
-        G_t* G;
+private:
+    degs_type*_degs;
+    G_t* G;
 };
 
 namespace detail{
@@ -565,51 +566,46 @@ template <typename G_t>
 int deltaC_least_c(G_t &G)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
 
     unsigned int lb = 0;
-    misc::DEGS<G_t> degs(G);
-    degree_decrease<G_t> cb(&degs._degs, &G);
+    degs_type degs(G);
+    degree_decrease<G_t> cb(&degs, &G);
 
-    unsigned int min_degree = 1;
+    unsigned int min_ntd = 2;
 
     while(boost::num_edges(G) > 0){
         //Search a minimum-degree-vertex.
-        if(degs[min_degree].empty()){
-            for(min_degree = 1; min_degree < degs.size(); min_degree++){
-                if(!degs[min_degree].empty()){
-                    break;
-                }
-            }
+        if(min_ntd>1){
+            --min_ntd;
+        }else{
         }
 
-        if(lb <= min_degree){
-            lb = min_degree;
+        std::pair<vertex_descriptor, unsigned> min_pair;
+        min_pair = degs.pick_min(min_ntd);
+        min_ntd = min_pair.second;
+
+        if(lb < min_ntd){
+            lb = min_ntd;
         }
 
         vertex_descriptor min_vertex;
-        min_vertex = *degs[min_degree].begin();
+        min_vertex = min_pair.first;
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
-        typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, G);
+        vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, G);
 
-        size_t outdegw = boost::degree(w, G);
-        size_t outdegmin = boost::degree(min_vertex, G);
-        assert(degs[outdegw].find(w) != degs[outdegw].end());
-        assert(degs[outdegmin].find(min_vertex) != degs[outdegmin].end());
-
-        degs[outdegw].erase(w);
-        degs[outdegmin].erase(min_vertex);
+        degs.unlink(w);
+        degs.unlink(min_vertex);
 
         //Contract the edge between min_vertex into w.
         //Clear min_vertex and rearrange degs through callback.
         noboost::contract_edge(min_vertex, w, G, false, &cb);
 
         assert(0==boost::degree(min_vertex, G));
-        assert(boost::degree(min_vertex, G)==0);
 
-        outdegw = boost::degree(w, G);
-        degs[outdegw].insert(w);
+        degs.reg(w);
     }
     return (int)lb;
 }
