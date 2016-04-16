@@ -20,6 +20,7 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
+#include <unordered_set>
 //#include "TD_noboost.hpp"
 
 // temporary.
