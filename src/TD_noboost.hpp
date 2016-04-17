@@ -131,7 +131,8 @@ void make_clique(nIter_t nIter, G_t &G){
 }
 
 template<typename B_t, typename nIter_t, typename G_t>
-void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G){
+void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){
         B.insert(*nIt);

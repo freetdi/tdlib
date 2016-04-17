@@ -223,8 +223,14 @@ namespace impl{
 
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
+#if __cplusplus >= 201103L
+template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T=NULL)
+#else
 template <typename G_t, typename T_t>
-void fillIn_decomp(G_t &G, T_t &T){
+size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
+#endif
+{
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
     std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
 
@@ -275,10 +281,22 @@ void fillIn_decomp(G_t &G, T_t &T){
         boost::clear_vertex(min_vertex, G);
     }
 
-    for(; i > 0; i--){
-        treedec::glue_bag(bags[i-1], elim_vertices[i-1], T);
+    if(T){
+        for(; i > 0; i--){
+            treedec::glue_bag(bags[i-1], elim_vertices[i-1], *T);
+        }
+    }else{incomplete();
+        return 17;
     }
 }
+
+#if __cplusplus < 201103L
+template <typename G_t>
+size_t /*FIXME*/ fillIn_decomp(G_t &G)
+{ untested();
+    return fillIn_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
+}
+#endif
 } // impl
 
 
