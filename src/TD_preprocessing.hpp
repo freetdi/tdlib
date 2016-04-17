@@ -1,6 +1,6 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// (c) 2014-2016 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -22,11 +22,9 @@
 // input graph has tree-width at most 3 allow us to determine it's tree-width exactly
 // and in addition compute the corresponding tree decomposition. If the tree-width
 // is larger, the reduction rules return a possibly smaller instance of the same
-// tree-width as the original graph, a partial tree decomposition and a lower bound
+// tree-width as the original graph, a 'partial' tree decomposition and a lower bound
 // with respect to tree-width, such that
 // further algorithms can be applied to the resulting graph.
-// Currently, the minDegree-heuristic will be applied to the resulting graph,
-// if the input graph can't be fully preprocessed.
 //
 // A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
 //
@@ -34,24 +32,19 @@
 // {
 //  std::set<unsigned int> bag;
 // };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
+// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
 //
-// Vertices of the input graph have to provide the attribute 'id', e.g.:
-//
-// struct Vertex
-// {
-//  unsigned int id;
-// };
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
+// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> graph_t;
 //
 //
-//
-// These functions are most likely to be interesting for outside use:
-//
-// void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags)
-// void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
-// void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, T_t &T)
-//
+
+/*
+These functions are most likely to be interesting for outside use:
+
+   -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags)
+   -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
+   -void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, T_t &T)
+*/
 
 #ifndef TD_PREPROCESSING
 #define TD_PREPROCESSING
@@ -482,7 +475,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
         unsigned int c = 0;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            N[c++] = *nIt;
+            N[++c] = *nIt;
         }
 
         //N except one vertex now potentially is a clique.
