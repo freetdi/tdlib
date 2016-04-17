@@ -86,7 +86,7 @@ void PP_FI(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
-        treedec::_fillIn_decomp(G, T);
+        treedec::impl::fillIn_decomp(G, T);
     }
     treedec::preprocessing_glue_bags(bags, T);
 }

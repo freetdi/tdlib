@@ -219,10 +219,12 @@ void minDegree_decomp(G_t &G, T_t &T){
 }
 
 
-//Constructs a tree decomposition from the elimination ordering obtained by the
+namespace impl{
+
+//Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
 template <typename G_t, typename T_t>
-void _fillIn_decomp(G_t &G, T_t &T){
+void fillIn_decomp(G_t &G, T_t &T){
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
     std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
 
@@ -277,6 +279,14 @@ void _fillIn_decomp(G_t &G, T_t &T){
         treedec::glue_bag(bags[i-1], elim_vertices[i-1], T);
     }
 }
+} // impl
+
+
+// transition
+template <typename G_t, typename T_t>
+void _fillIn_decomp(G_t &G, T_t &T){
+    return impl::fillIn_decomp(G,T);
+}
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic.
@@ -291,7 +301,7 @@ void fillIn_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     treedec::Islet(G, bags);
-    treedec::_fillIn_decomp(G, T);
+    impl::fillIn_decomp(G, T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 
