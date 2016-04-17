@@ -125,6 +125,15 @@ public: // picking
         vertex_descriptor min_nv=*_degs[lower].begin();
         return std::make_pair(min_nv, lower);
     }
+    std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower, unsigned upper, bool erase)
+    {
+        BOOST_AUTO(p, pick_min(lower,upper));
+        if(erase){ untested();
+            unlink(p.first,p.second);
+        }else{untested();
+        }
+        return p;
+    }
 
     size_t num_nodes() const{ untested();
         unsigned N=0;
