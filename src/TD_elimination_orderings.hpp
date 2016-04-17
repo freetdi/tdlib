@@ -303,7 +303,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G)
 // transition
 template <typename G_t, typename T_t>
 void _fillIn_decomp(G_t &G, T_t &T){
-    return impl::fillIn_decomp(G,T);
+    return impl::fillIn_decomp(G, &T);
 }
 
 //Constructs a tree decomposition from the elimination ordering obtained by the
@@ -319,7 +319,7 @@ void fillIn_decomp(G_t &G, T_t &T){
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
     treedec::Islet(G, bags);
-    impl::fillIn_decomp(G, T);
+    impl::fillIn_decomp(G, &T);
     treedec::preprocessing_glue_bags(bags, T);
 }
 

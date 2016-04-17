@@ -1,6 +1,6 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// (c) 2014-2016 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -17,7 +17,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute upper bounds on tree width
+// Offers functionality to compute upper bounds on the tree width of a graph.
 //
 
 #ifndef TD_UPPER_BOUNDS
