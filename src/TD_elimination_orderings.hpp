@@ -19,7 +19,7 @@
 //
 //
 // Offers functionality to compute tree decompositions of graphs
-// according to various heuristic and functions, that convert
+// according to various heuristic, and functions which convert
 // tree decompositions to elimination orderings and vice versa.
 // Also the LEX-M algorithm is included in this header
 //
@@ -136,7 +136,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
         for(boost::tie(I, E) = boost::adjacent_vertices(c, G); I!=E; ++I){
                 assert(*I!=c); // no self loops...
                 vertex_descriptor i=*I;
-                assert(boost::out_degree(*I,G)>0);
+                assert(boost::degree(*I,G)>0);
                 degs.unlink(i);
         }
 
@@ -157,19 +157,20 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 
         if(T){
             elim_vertices[i] = noboost::get_vd(G, c);
-        }else if(min_ntd > upper_bound){
-            upper_bound = min_ntd;
-        }else{
         }
+        else if(min_ntd > upper_bound){
+            upper_bound = min_ntd;
+        }
+        else{}
 
-        assert(boost::out_degree(c, G)==0);
+        assert(boost::degree(c, G)==0);
 
         if(min_ntd>1){
             // if a neigbor of c was already connected to the others,
             // min_ntd possibly decreases by one.
             --min_ntd;
         }
-        assert(boost::out_degree(c, G)==0);
+        assert(boost::degree(c, G)==0);
 
 #ifndef NDEBUG //redundant, for checking only
         degs.reg(c,0);
@@ -233,6 +234,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 {
     std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
     std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
+    unsigned upper_bound=0;
 
     unsigned int i = 0;
     while(boost::num_edges(G) > 0){
@@ -243,7 +245,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 
         unsigned int min_fill = UINT_MAX;
         for(; vIt != vEnd; vIt++){
-            if(boost::out_degree(*vIt, G) == 0){
+            if(boost::degree(*vIt, G) == 0){
                 continue;
             }
 
@@ -269,10 +271,16 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
             }
         }
 
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
-            bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
+        if(T){
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
+                bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
+            }
         }
+        else if(boost::degree(min_vertex, G) > upper_bound){
+            upper_bound = boost::degree(min_vertex, G);
+        }
+        else{}
 
         noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G); //replace this with make_clique_and_hijack?!
 
@@ -285,8 +293,9 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
         for(; i > 0; i--){
             treedec::glue_bag(bags[i-1], elim_vertices[i-1], *T);
         }
-    }else{incomplete();
-        return 17;
+    }
+    else{
+        return upper_bound;
     }
 }
 
@@ -297,7 +306,8 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G)
     return fillIn_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
 }
 #endif
-} // impl
+
+} //namespace impl
 
 
 // transition
@@ -342,7 +352,7 @@ void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::v
                 continue;
             }
 
-            unsigned int degree = boost::out_degree(*vIt, G);
+            unsigned int degree = boost::degree(*vIt, G);
             if(degree < min_degree){
                 min_degree  = degree;
                 min_vertex = *vIt;
@@ -538,7 +548,7 @@ void _treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && !noboost::bag(*tIt, T).empty()){
+        if(boost::degree(*tIt, T) <= 1 && !noboost::bag(*tIt, T).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -552,7 +562,7 @@ void _treedec_to_ordering(T_t &T,
 
         typename noboost::treedec_traits<T_t>::bag_type difference;
 
-        if(boost::out_degree(leaf, T) == 1){
+        if(boost::degree(leaf, T) == 1){
             if(!std::includes(noboost::bag(parent, T).begin(),
                               noboost::bag(parent, T).end(),
                               noboost::bag(leaf, T).begin(),
