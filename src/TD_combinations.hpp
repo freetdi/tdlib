@@ -63,6 +63,11 @@ namespace treedec{
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T, int &low){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     std::vector<boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
@@ -79,6 +84,11 @@ void PP_MD(G_t &G, T_t &T, int &low){
 //this version applies the minDegree-heuristic on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_FI(G_t &G, T_t &T, int &low){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     std::vector<boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
@@ -96,6 +106,11 @@ void PP_FI(G_t &G, T_t &T, int &low){
 //This version applies the fillIn-heuristic followed by triangulation minimization on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_FI_TM(G_t &G, T_t &T, int &low){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     std::vector<boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
@@ -118,6 +133,11 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 //This version applies the fillIn-heuristic followed by triangulation minimization on the input graph.
 template <typename G_t, typename T_t>
 void FI_TM(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
     treedec::fillIn_ordering(G, old_elim_ordering);
@@ -128,6 +148,11 @@ void FI_TM(G_t &G, T_t &T){
 
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     //Preprocessing.
     int low = -1;
 
@@ -156,7 +181,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
 
     for(unsigned int i = 0; i < components.size(); i++){
-        //Ignore isolated vertices (already included 'bags').
+        //Ignore isolated vertices (already included in 'bags').
         if(components[i].size() == 1){
             continue;
         }
@@ -181,6 +206,12 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
 
 template <typename G_t, typename T_t>
 bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        if(k >= -1){ return true; }
+        else{ return false; }
+    }
+
     //Preprocessing.
     int low = -1;
 
@@ -216,7 +247,7 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
 
     for(unsigned int i = 0; i < components.size(); i++){
-        //Ignore isolated vertices (already included 'bags').
+        //Ignore isolated vertices (already included in 'bags').
         if(components[i].size() == 1){
             continue;
         }
@@ -295,6 +326,11 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 
 template <typename G_t, typename T_t>
 void exact_decomposition_chordal(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> elim_ordering;
     treedec::LEX_M_minimal_ordering(G, elim_ordering);
     treedec::ordering_to_treedec(G, elim_ordering, T);
@@ -302,12 +338,22 @@ void exact_decomposition_chordal(G_t &G, T_t &T){
 
 template <typename G_t, typename T_t>
 void seperator_algorithm_MSVS(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     treedec::seperator_algorithm(G, T);
     treedec::MSVS(G, T);
 }
 
 template <typename G_t, typename T_t>
 void seperator_algorithm_TM(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     treedec::seperator_algorithm(G, T);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
@@ -319,6 +365,11 @@ void seperator_algorithm_TM(G_t &G, T_t &T){
 
 template <typename G_t, typename T_t>
 void MSVS_trivial(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     treedec::trivial_decomposition(G, T);
     treedec::MSVS(G, T);
 }
