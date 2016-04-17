@@ -29,7 +29,9 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include <unordered_set>
+#if __cplusplus >= 201103L
+# include <unordered_set>
+#endif
 
 #include "TD_degree.hpp"
 

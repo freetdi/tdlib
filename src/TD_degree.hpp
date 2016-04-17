@@ -20,8 +20,9 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
-#include <unordered_set>
-//#include "TD_noboost.hpp"
+#if __cplusplus >= 201103L
+# include <unordered_set>
+#endif
 
 // temporary.
 #ifndef untested
