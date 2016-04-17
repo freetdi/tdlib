@@ -1081,9 +1081,7 @@ typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> MC
     std::vector<int> visited_degree(boost::num_vertices(G), 0);
 
     int max = -1;
-    std::pair<typename boost::graph_traits<G_t>::vertex_descriptor,
-              typename boost::graph_traits<G_t>::vertex_descriptor> vertices = boost::vertices(G);
-    typename boost::graph_traits<G_t>::vertex_descriptor max_vertex=*vertices.first;
+    typename boost::graph_traits<G_t>::vertex_descriptor max_vertex=*(boost::vertices(G).first);
 
     for(unsigned int i = 0; i < boost::num_vertices(G); i++){
         int cur_max = -1;
@@ -1095,7 +1093,7 @@ typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> MC
             }
         }
 
-        typename boost::graph_traits<G_t>::vertex_iterator cur_vertex_it = vertices.first;
+        typename boost::graph_traits<G_t>::vertex_iterator cur_vertex_it = boost::vertices(G).first;
         std::advance(cur_vertex_it, cur_pos);
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
