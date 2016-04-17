@@ -482,7 +482,7 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
         unsigned int c = 0;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            N[c++] = *nIt;
+            N[++c] = *nIt;
         }
 
         //N except one vertex now potentially is a clique.
