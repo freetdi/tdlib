@@ -983,8 +983,7 @@ int LBPC_deltaD(const G_t &G){
     int lb = treedec::lb::deltaD(H);
 
     while(true){
-        G_t H;
-        boost::copy_graph(G, H);
+        H = G;
 
         treedec::lb::k_path_improved_graph(H, lb+1);
 
