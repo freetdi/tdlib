@@ -32,7 +32,7 @@
  - void fillIn_decomp(G_t G&, T_t &T)
  - void minDegree_ordering(G_t G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
- - void fillIn_ordering(G_t G,
+ - void fillIn_ordering(G_t& G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
  - void ordering_to_treedec(G_t G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T)
@@ -457,7 +457,7 @@ void _fillIn_ordering(G_t &G,
 
 //Computes an elimination ordering according to fillIn heuristic.
 template<typename G_t>
-void fillIn_ordering(G_t G,
+void fillIn_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false)
 {
