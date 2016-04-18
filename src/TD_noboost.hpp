@@ -240,7 +240,13 @@ inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
     return v;
 }
 
-
+// test if v is a valid vertex_descriptor of g
+template<typename G>
+inline bool is_valid(const vertex_descriptor_G& v, const G& g)
+{
+    // base case: don't know. lets say yes (better in assertions)
+    return true;
+}
 
 template<class G>
 struct outedge_set{

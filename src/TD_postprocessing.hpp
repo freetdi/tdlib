@@ -283,6 +283,11 @@ void minimalChordal(G_t &G,
     //all new edges in F.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
     std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > F;
+#ifndef NDEBUG
+    for( auto i : old_elimination_ordering){
+        assert(noboost::is_valid(i,G));
+    }
+#endif
     treedec::make_filled_graph(G, old_elimination_ordering, C, F);
 
     for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
