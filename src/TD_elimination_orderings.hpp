@@ -632,7 +632,7 @@ void make_filled_graph(G_t &G,
         C[i].insert(elim_ordering[i]);
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){
-            unsigned int pos = noboost::get_pos(*nIt, G);
+            unsigned int /*fixme*/ pos = noboost::get_pos(*nIt, G);
             if(!visited[pos]){
                 C[i].insert(*nIt);
             }
@@ -663,11 +663,11 @@ template <typename G_t>
 void LEX_M_fill_in(G_t &G,
      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &fill_in_edges)
 {
-    unsigned int max = boost::num_vertices(G);
-    std::vector<bool> visited(max+1);
-    std::vector<float> label(max+1);
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> alpha_inv(max+1);
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(max+1);
+    unsigned int nv = boost::num_vertices(G);
+    std::vector<bool> visited(nv+1);
+    std::vector<float> label(nv+1);
+    std::vector<bool> alpha_inv(nv);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv+1);
 
     //Initializing.
     unsigned int i = 0;
@@ -675,7 +675,7 @@ void LEX_M_fill_in(G_t &G,
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int pos = noboost::get_pos(*vIt, G);
         label[pos] = 1.0;
-        alpha_inv[i++] = 0;
+        alpha_inv[i++] = false;
         visited[pos] = false;
     }
 
@@ -686,7 +686,7 @@ void LEX_M_fill_in(G_t &G,
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int pos = noboost::get_pos(*vIt, G);
-            if(alpha_inv[pos] == 0){
+            if(!alpha_inv[pos]){
                 if(label[pos] > max){
                     max = (unsigned int) label[pos];
                     v = *vIt;
@@ -695,14 +695,14 @@ void LEX_M_fill_in(G_t &G,
         }
         unsigned int pos = noboost::get_pos(v, G);
         visited[pos] = true;
-        alpha_inv[pos] = i+1;
+        alpha_inv[pos] = true;
 
         for(unsigned int j = 0; j < k; j++){
             reached_i[j].clear();
         }
 
         for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(alpha_inv[j] == 0){
+            if(!alpha_inv[j]){
                 visited[j] = false;
             }
         }
@@ -710,7 +710,7 @@ void LEX_M_fill_in(G_t &G,
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
             unsigned int posn = noboost::get_pos(*nIt, G);
-            if(alpha_inv[posn] == 0){
+            if(!alpha_inv[posn]){
                 reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
                 label[posn] += 0.5;
@@ -755,12 +755,12 @@ template <typename G_t>
 void LEX_M_minimal_ordering(G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
 {
-    unsigned int max = boost::num_vertices(G);
+    unsigned int nv = boost::num_vertices(G);
     alpha.resize(boost::num_vertices(G));
-    std::vector<bool> visited(max+1);
-    std::vector<float> label(max+1);
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> alpha_inv(max+1);
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(max+1);
+    std::vector<bool> visited(nv+1);
+    std::vector<float> label(nv+1);
+    std::vector<bool> alpha_inv(nv);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv+1);
 
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -778,7 +778,7 @@ void LEX_M_minimal_ordering(G_t &G,
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int pos = noboost::get_pos(*vIt, G);
-            if(alpha_inv[pos] == 0){
+            if(!alpha_inv[pos]){
                 if((unsigned int)label[pos] > max){
                     max = (unsigned int) label[pos];
                     v = *vIt;
@@ -788,14 +788,14 @@ void LEX_M_minimal_ordering(G_t &G,
         unsigned int posv = noboost::get_pos(v, G);
         visited[posv] = true;
         alpha[i] = v;
-        alpha_inv[posv] = i+1;
+        alpha_inv[posv] = true;
 
         for(unsigned int j = 0; j < k; j++){
             reached_i[j].clear();
         }
 
         for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(alpha_inv[j] == 0){
+            if(!alpha_inv[j]){
                 visited[j] = false;
             }
         }
@@ -803,8 +803,8 @@ void LEX_M_minimal_ordering(G_t &G,
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
             unsigned int posn = noboost::get_pos(*nIt, G);
-            if(alpha_inv[posn] == 0){
-                reached_i[(int)label[posn]-1].push_back(posn);
+            if(!alpha_inv[posn]){
+                reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
                 label[posn] += 0.5;
             }
