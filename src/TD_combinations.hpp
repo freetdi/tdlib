@@ -123,6 +123,11 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
 
         treedec::fillIn_ordering(G, old_elim_ordering, true); //true = ignore isolated vertices
+#ifndef NDEBUG
+        for( auto i : old_elim_ordering){
+            assert(noboost::is_valid(i,G));
+        }
+#endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
         treedec::ordering_to_treedec(G, new_elim_ordering, T, true); //true = ignore isolated vertices
     }
