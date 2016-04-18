@@ -293,6 +293,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
         for(; i > 0; i--){
             treedec::glue_bag(bags[i-1], elim_vertices[i-1], *T);
         }
+        return 0;
     }
     else{
         return upper_bound;
