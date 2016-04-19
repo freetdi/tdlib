@@ -255,8 +255,10 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
     return false;
 }
 
+namespace detail{
+
 template <typename G_t>
-bool _disjoint_ways(G_t &G, std::vector<bool> &disabled,
+bool disjoint_ways(G_t &G, std::vector<bool> &disabled,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
@@ -313,6 +315,7 @@ bool _disjoint_ways(G_t &G, std::vector<bool> &disabled,
 
     return true;
 }
+} // detail
 
 //This version immediatly aborts after at most k+1 iterations. The return value indicates, whether a seperator of size at most k
 //exists or not.
@@ -340,7 +343,7 @@ bool seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
         disabled[pos] = true;
     }
 
-    return _disjoint_ways(G, disabled, X_, Y_, S, k);
+    return detail::disjoint_ways(G, disabled, X_, Y_, S, k);
 }
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
