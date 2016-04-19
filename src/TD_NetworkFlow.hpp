@@ -157,12 +157,10 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 
     diG[j].visited = false;
     diG[j].predecessor = -1;
-    idxMap.push_back(j);
 
     j++;
     diG[j].visited = false;
     diG[j].predecessor = -1;
-    idxMap.push_back(j);
 
     return std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>(source, sink);
 }
