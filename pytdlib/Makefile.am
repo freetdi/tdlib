@@ -14,10 +14,21 @@ AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
 AM_CPPFLAGS = -DNDEBUG @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -omit-version
 
-TESTS = test.py
+TESTS = \
+	test_approx.py \
+	test_apps.py \
+	test_exact.py \
+	test_lb.py \
+	test_misc.py \
+	test_post.py \
+	test_pre.py
+
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
     export PYTHONPATH='.';
 
 EXTRA_DIST = tdlib.pxd tdlib.pyx python_tdlib.hpp $(TESTS)
+
+$(TESTS:%.py=%.log): P
+.PHONY: P
