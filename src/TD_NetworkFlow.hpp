@@ -89,8 +89,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 //of diG to vertex descriptors of G, needed to translate a seperator of diG to
 //a seperator of G.  Complexity: O(|V| + |E|)
 //
-// (If G would have the properties 'visited' and 'predecessor' on vertices and
-// 'path' on edges, the copy step would not be necessary)
+// (If G had the properties 'visited' and 'predecessor' on vertices and 'path'
+// on edges, the copy step would not be necessary)
 //
 
 template <typename G_t>
