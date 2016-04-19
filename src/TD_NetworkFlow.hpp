@@ -101,7 +101,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 template <typename G_t>
 std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
-    make_digraph(G_t &G, std::vector<bool> &disabled, digraph_t &diG,
+    make_digraph(G_t const &G, std::vector<bool> const &disabled, digraph_t &diG,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
@@ -214,7 +214,7 @@ static bool t_search_disjoint_ways(
         bool edge_used, unsigned int source,
         std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> &dangerous,
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
-        G_t &G)
+        G_t const &G)
 {
     diG[v].visited = true;
     bool on_a_path = diG[v].predecessor != -1;
@@ -279,7 +279,7 @@ static bool t_search_disjoint_ways(
 namespace detail{
 
 template <typename G_t>
-bool disjoint_ways(G_t &G, std::vector<bool> &disabled,
+bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
