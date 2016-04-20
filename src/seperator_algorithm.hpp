@@ -49,7 +49,7 @@
 #include <set>
 #include <vector>
 
-#include "NetworkFlow.hpp"
+#include "network_flow.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "noboost.hpp"

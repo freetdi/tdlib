@@ -33,7 +33,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "elimination_orderings.hpp"
-#include "NetworkFlow.hpp"
+#include "network_flow.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "noboost.hpp"

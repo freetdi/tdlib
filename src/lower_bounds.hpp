@@ -85,7 +85,7 @@
 #include <utility>
 
 #include "simple_graph_algos.hpp"
-#include "NetworkFlow.hpp"
+#include "network_flow.hpp"
 #include "misc.hpp"
 #include "noboost.hpp"
 #include "degree.hpp"
