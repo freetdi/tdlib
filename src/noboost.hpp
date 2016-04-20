@@ -29,7 +29,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "TD_degree.hpp"
+#include "degree.hpp"
 
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG

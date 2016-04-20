@@ -28,7 +28,7 @@ namespace treedec{
 
 #include <set>
 #include <boost/graph/adjacency_list.hpp>
-#include "TD_noboost.hpp"
+#include "noboost.hpp"
 
 //This function is used in the minimalChordal algorithm.
 template <typename G_t>

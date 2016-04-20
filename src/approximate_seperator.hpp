@@ -22,7 +22,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
-#include "TD_simple_graph_algos.hpp"
+#include "simple_graph_algos.hpp"
 
 
 template <typename G_t>

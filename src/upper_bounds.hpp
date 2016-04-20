@@ -31,7 +31,7 @@
 #ifndef TD_UPPER_BOUNDS
 #define TD_UPPER_BOUNDS
 
-#include "TD_elimination_orderings.hpp"
+#include "elimination_orderings.hpp"
 
 namespace treedec{
 

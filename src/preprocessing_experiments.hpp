@@ -59,8 +59,8 @@
 #include <vector>
 #include <set>
 #include <boost/tuple/tuple.hpp>
-#include "TD_noboost.hpp"
-#include "TD_misc.hpp"
+#include "noboost.hpp"
+#include "misc.hpp"
 
 namespace treedec{
 

@@ -32,11 +32,11 @@
 #define TD_POSTPROCESSING
 
 #include <boost/graph/adjacency_list.hpp>
-#include "TD_elimination_orderings.hpp"
-#include "TD_NetworkFlow.hpp"
-#include "TD_simple_graph_algos.hpp"
-#include "TD_misc.hpp"
-#include "TD_noboost.hpp"
+#include "elimination_orderings.hpp"
+#include "NetworkFlow.hpp"
+#include "simple_graph_algos.hpp"
+#include "misc.hpp"
+#include "noboost.hpp"
 
 namespace treedec{
 

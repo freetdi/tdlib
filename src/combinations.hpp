@@ -48,14 +48,14 @@
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "TD_preprocessing.hpp"
-#include "TD_lower_bounds.hpp"
-#include "TD_elimination_orderings.hpp"
-#include "TD_postprocessing.hpp"
-#include "TD_dynamicCR.hpp"
-#include "TD_exact_cutset.hpp"
-#include "TD_seperator_algorithm.hpp"
-#include "TD_misc.hpp"
+#include "preprocessing.hpp"
+#include "lower_bounds.hpp"
+#include "elimination_orderings.hpp"
+#include "postprocessing.hpp"
+#include "dynamicCR.hpp"
+#include "exact_cutset.hpp"
+#include "seperator_algorithm.hpp"
+#include "misc.hpp"
 
 namespace treedec{
 

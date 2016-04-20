@@ -31,7 +31,7 @@
 #include <omp.h>
 #endif
 
-#include "TD_elimination_orderings.hpp"
+#include "elimination_orderings.hpp"
 
 namespace treedec{
 

@@ -49,10 +49,10 @@
 #include <set>
 #include <vector>
 
-#include "TD_NetworkFlow.hpp"
-#include "TD_simple_graph_algos.hpp"
-#include "TD_misc.hpp"
-#include "TD_noboost.hpp"
+#include "NetworkFlow.hpp"
+#include "simple_graph_algos.hpp"
+#include "misc.hpp"
+#include "noboost.hpp"
 
 namespace treedec{
 

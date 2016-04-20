@@ -65,7 +65,7 @@
 #include <vector>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
-#include "TD_noboost.hpp"
+#include "noboost.hpp"
 
 namespace treedec{
 

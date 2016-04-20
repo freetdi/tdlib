@@ -42,10 +42,10 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include "TD_nice_decomposition.hpp"
-#include "TD_simple_graph_algos.hpp"
-#include "TD_misc.hpp"
-#include "TD_noboost.hpp"
+#include "nice_decomposition.hpp"
+#include "simple_graph_algos.hpp"
+#include "misc.hpp"
+#include "noboost.hpp"
 
 namespace treedec{
 

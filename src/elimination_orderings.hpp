@@ -51,12 +51,12 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "TD_preprocessing.hpp"
-#include "TD_simple_graph_algos.hpp"
-#include "TD_degree.hpp"
-#include "TD_misc.hpp"
-#include "TD_noboost.hpp"
-#include "TD_std.hpp"
+#include "preprocessing.hpp"
+#include "simple_graph_algos.hpp"
+#include "degree.hpp"
+#include "misc.hpp"
+#include "noboost.hpp"
+#include "std.hpp"
 
 namespace treedec{
 

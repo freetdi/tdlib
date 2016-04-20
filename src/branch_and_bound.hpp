@@ -3,9 +3,9 @@
 #define TD_BRANCH_AND_BOUND
 
 #include <stack>
-#include "TD_lower_bounds.hpp"
-#include "TD_upper_bounds.hpp"
-#include "TD_elimination_orderings.hpp"
+#include "lower_bounds.hpp"
+#include "upper_bounds.hpp"
+#include "elimination_orderings.hpp"
 
 namespace treedec{
 

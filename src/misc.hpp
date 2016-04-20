@@ -45,9 +45,9 @@
 #include <stack>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
-#include "TD_simple_graph_algos.hpp"
-#include "TD_noboost.hpp"
-#include "TD_std.hpp"
+#include "simple_graph_algos.hpp"
+#include "noboost.hpp"
+#include "std.hpp"
 
 namespace treedec{
 

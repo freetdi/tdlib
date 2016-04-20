@@ -40,10 +40,10 @@
 #define TD_APPROXIMATION
 
 #include <set>
-#include "TD_approximate_seperator.hpp"
-#include "TD_misc.hpp"
-#include "TD_simple_graph_algos.hpp"
-#include "TD_noboost.hpp"
+#include "approximate_seperator.hpp"
+#include "misc.hpp"
+#include "simple_graph_algos.hpp"
+#include "noboost.hpp"
 
 namespace treedec{
 
