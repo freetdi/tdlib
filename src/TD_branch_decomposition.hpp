@@ -35,7 +35,11 @@ namespace treedec{
  * -3 = the bags of the leafs of T are not exactly the edges of G (but T is a tree)
  */
 template <typename G_t, typename T_t>
-int is_valid_branchdecomposition(G_t &G, T_t &T){
+int is_valid_branchdecomposition(G_t &G, T_t &T)
+{
+    typedef std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges_vt;
+    typedef typename edges_vt::iterator eIter;
+
     if(boost::num_edges(G) == 0 && boost::num_vertices(T) == 0){
         return 0;
     }
@@ -79,7 +83,7 @@ int is_valid_branchdecomposition(G_t &G, T_t &T){
     std::vector<bool> visited(boost::num_vertices(G), false);
 
     //Checks if the bags of the leafs of T are exactly the edges of G.
-    for(std::vector<std::set<unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++){
+    for(eIter it = edges.begin(); it != edges.end(); it++){
         typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor t_node;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
@@ -183,7 +187,9 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
     //Collect the edges of G.
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges(boost::num_edges(G));
+    typedef std::vector<typename noboost::treedec_traits<T_t>::bag_type> edges_vt;
+    typedef typename edges_vt::iterator eIter;
+    edges_vt edges(boost::num_edges(G));
     unsigned int c = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename noboost::treedec_traits<T_t>::bag_type edge;
@@ -198,7 +204,7 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
         }
     }
 
-    for(std::vector<std::set<unsigned int> >::iterator it = edges.begin(); it != edges.end(); it++){
+    for(eIter it = edges.begin(); it != edges.end(); it++){
         typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<T_t>::vertex_descriptor t_node;
         unsigned int covered_count = 0;

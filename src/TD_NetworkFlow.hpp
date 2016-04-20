@@ -31,25 +31,31 @@
 //
 // This algorithm is based on Menger's theorem (1927):
 //
-//   Let G = (V, E) be a graph and A, B subsets of V. Then the minimum number of vertices seperating A from B in G is
-//   equal to the maximum number of disjoint A-B paths in G.
+//   Let G = (V, E) be a graph and A, B subsets of V. Then the minimum number
+//   of vertices seperating A from B in G is equal to the maximum number of
+//   disjoint A-B paths in G.
 //
-// Let P be a family of pairwise disjoint paths in G from X to Y. A P-alternating walk is a sequence Q = w_1 . . . w_m of
-// vertices of G such that {w_i, w_(i+1)} is in E for all i in {1, .., m-1} and:
-//   (i)  No edge occurs twice on Q; that is, {w_i, w_(i+1)}  != {w_j , w_(j+1)} for all distinct i, j in {1, .., m-1}.
-//   (ii) If w_i occurs on a path P = v_1 .. v_l in P, say w_i = v_j, then w_(i+1) = v_(j−1) or w_(i-1) = v_(j+1).
+// Let P be a family of pairwise disjoint paths in G from X to Y. A
+// P-alternating walk is a sequence Q = w_1 . . . w_m of vertices of G such
+// that {w_i, w_(i+1)} is in E for all i in {1, .., m-1} and: (i)  No edge
+// occurs twice on Q; that is, {w_i, w_(i+1)}  != {w_j , w_(j+1)} for all
+// distinct i, j in {1, .., m-1}.  (ii) If w_i occurs on a path P = v_1 .. v_l
+// in P, say w_i = v_j, then w_(i+1) = v_(j−1) or w_(i-1) = v_(j+1).
 //
-// The algorithm below computes the maximum number of disjoint A-B paths in G successivly extending a family of disjoint paths P by
-// computing a P-alternating walk W, if such one exists. If such a walk exists, P can be extended to P' such that P'
-// containes |P| + 1 disjoint paths.
+// The algorithm below computes the maximum number of disjoint A-B paths in G
+// successivly extending a family of disjoint paths P by computing a
+// P-alternating walk W, if such one exists. If such a walk exists, P can be
+// extended to P' such that P' containes |P| + 1 disjoint paths.
 //
 // For some proofs of Menger's theorem, including a contructive one, see
 //
-//   Reinhard Diestel: Graph Theory, 4th Edition. Graduate texts in mathematics 173, Springer 2012, ISBN 978-3-642-14278-9
+//   Reinhard Diestel: Graph Theory, 4th Edition. Graduate texts in mathematics
+//                     173, Springer 2012, ISBN 978-3-642-14278-9
 //
 // For a proof of correctness of the algorithm below, see e.g.
 //
-//   J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in Theoretical Computer Science. an EATCS Series).
+//   J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in
+//                         Theoretical Computer Science. an EATCS Series).
 //   Springer-Verlag New York, Inc., Secaucus, NJ, USA.
 //
 
@@ -79,6 +85,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 #endif
 
+namespace detail{
+
 //Copies the induced subgraph of G formed by disabled into diG. The graph diG
 //is a digraph, that is for each edge of the induced subgraph we have an edge
 //and a reverse edge. diG has vertex and edge properties, in which the
@@ -89,20 +97,22 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 //of diG to vertex descriptors of G, needed to translate a seperator of diG to
 //a seperator of G.  Complexity: O(|V| + |E|)
 //
-// (If G would have the properties 'visited' and 'predecessor' on vertices and
-// 'path' on edges, the copy step would not be necessary)
+// (If G had the properties 'visited' and 'predecessor' on vertices and 'path'
+// on edges, the copy step would not be necessary)
 //
 
 template <typename G_t>
 std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
-    make_digraph(G_t &G, std::vector<bool> &disabled, digraph_t &diG,
+    make_digraph(G_t const &G, std::vector<bool> const &disabled, digraph_t &diG,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y){
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
+{
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
-    //G may be a graph with ids not in range [0, |V(G)|). The maximum id of a vertex in G is disabled.size().
+    //G may be a graph with ids not in range [0, |V(G)|). The maximum id of a
+    //vertex in G is disabled.size().
     std::vector<digraph_t::vertex_descriptor> internal_idxMap(disabled.size()+3); //needed for linear copy of the edge set of G
 
     unsigned int j = 0;
@@ -149,20 +159,22 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 
     diG[j].visited = false;
     diG[j].predecessor = -1;
-    idxMap.push_back(j);
 
     j++;
     diG[j].visited = false;
     diG[j].predecessor = -1;
-    idxMap.push_back(j);
 
     return std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>(source, sink);
 }
 
-//Builds the computed disjoint paths by following the edge set of the disjoint paths stored in the edge properties of diG, starting
-//in 'source'.
-//Complexity: O(|V| + k*|E|), where k is the parameter of the function 'seperate_vertices' or tw(G), if k is not given.
-static void make_paths(digraph_t &diG, unsigned int source, unsigned int sink, std::vector<std::vector<unsigned int> > &P){
+//Build the computed disjoint paths by following the edge set of the disjoint
+//paths stored in the edge properties of diG, starting in 'source'.
+//Complexity: O(|V| + k*|E|), where k is the parameter of the function
+//'seperate_vertices' or tw(G), if k is not given.
+static void make_paths(
+        digraph_t &diG, unsigned int source, unsigned int sink,
+        std::vector<std::vector<unsigned int> > &P)
+{
     boost::graph_traits<digraph_t>::adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
     unsigned int i = 0;
     for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(source, diG); nIt1 != nEnd1; nIt1++){
@@ -187,14 +199,23 @@ static void make_paths(digraph_t &diG, unsigned int source, unsigned int sink, s
     }
 }
 
-//An extended depth-first-search: Do a depth-first-search-step if a vertex is visited, that is not on a path in P. If
-//a path is entered by visiting a vertex, say v, the vertex that has to be visited next is the predecessor of v on the path,
-//in which v is contained. Once a P-alternating walk W has been computed, the extended family of of disjoint paths P' with respect
-//to W is formed by the symetric difference of the edge set of paths in P and the edge set of W. The symmetric difference will be
-//immediatly by manipulating the edge property of edges, that have been used.
-//Complexity: O(|V| + |E|) for a complete search.
+//An extended depth-first-search: Do a depth-first-search-step if a vertex is
+//visited, that is not on a path in P. If a path is entered by visiting a
+//vertex, say v, the vertex that has to be visited next is the predecessor of v
+//on the path, in which v is contained. Once a P-alternating walk W has been
+//computed, the extended family of of disjoint paths P' with respect to W is
+//formed by the symetric difference of the edge set of paths in P and the edge
+//set of W. The symmetric difference will be immediatly by manipulating the
+//edge property of edges, that have been used.  Complexity: O(|V| + |E|) for a
+//complete search.
 template <typename G_t>
-static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int sink, bool edge_used, unsigned int source, std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> &dangerous, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap, G_t &G){
+static bool t_search_disjoint_ways(
+        digraph_t &diG, unsigned int v, unsigned int sink,
+        bool edge_used, unsigned int source,
+        std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> &dangerous,
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
+        G_t const &G)
+{
     diG[v].visited = true;
     bool on_a_path = diG[v].predecessor != -1;
 
@@ -203,8 +224,9 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
         return true;
     }
 
-    //Case, that v is on a path in P and the last visited vertex was not the predecessor of v on this path in P.
-    //This vertex could be possibly reached by the predecessor of v on the path at a later time.
+    //Case, that v is on a path in P and the last visited vertex was not the
+    //predecessor of v on this path in P.  This vertex could be possibly
+    //reached by the predecessor of v on the path at a later time.
     if(on_a_path && !edge_used){
         diG[v].visited = false;
         std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor>::iterator it = dangerous.find(v);
@@ -255,14 +277,20 @@ static bool t_search_disjoint_ways(digraph_t &diG, unsigned int v, unsigned int 
 }
 
 template <typename G_t>
-bool _disjoint_ways(G_t &G, std::vector<bool> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S, unsigned int k){ 
+bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+        unsigned int k)
+{
     digraph_t diG;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap;
 
     digraph_t::vertex_descriptor source, sink;
     boost::tie(source, sink) = make_digraph(G, disabled, diG, idxMap, X, Y);
 
-    //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one for the unavailing try).
+    //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one
+    //for the unavailing try).
     unsigned int iter = 0;
     for(; iter < X.size()+1; iter++){
         if(S.size()+iter > k){
@@ -291,8 +319,9 @@ bool _disjoint_ways(G_t &G, std::vector<bool> &disabled, typename std::set<typen
 
     make_paths(diG, source, sink, P);
 
-    //Compute a seperator by taking the last vertex on each path, that could be reached by a P-alternating walk.
-    //If no such one exists, the first vertex on a path is taken.
+    //Compute a separator by taking the last vertex on each path, that could be
+    //reached by a P-alternating walk. If no such separator exists, the first
+    //vertex on a path is taken.
     for(unsigned int i = 0; i < P.size(); i++){
         for(unsigned int j = P[i].size(); j > 0; j--){
             if(diG[P[i][j-1]].visited){
@@ -308,10 +337,19 @@ bool _disjoint_ways(G_t &G, std::vector<bool> &disabled, typename std::set<typen
     return true;
 }
 
-//This version immediatly aborts after at most k+1 iterations. The return value indicates, whether a seperator of size at most k
+} //namespace detail
+
+//This version immediatly aborts after at most k+1 iterations. The return value
+//indicates, whether a seperator of size at most k
 //exists or not.
 template <typename G_t>
-bool seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S, unsigned int k){ 
+bool seperate_vertices(
+        G_t &G, std::vector<bool> &disabled,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+        unsigned int k)
+{
     //Common neighbours must be contained in a seperator.
     std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(S, S.begin()));
 
@@ -334,12 +372,16 @@ bool seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<ty
         disabled[pos] = true;
     }
 
-    return _disjoint_ways(G, disabled, X_, Y_, S, k);
+    return detail::disjoint_ways(G, disabled, X_, Y_, S, k);
 }
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
 template <typename G_t>
-void seperate_vertices(G_t &G, std::vector<bool> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S){  
+void seperate_vertices(G_t &G, std::vector<bool> &disabled,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S)
+{
     seperate_vertices(G, disabled, X, Y, S, UINT_MAX);
 }
 

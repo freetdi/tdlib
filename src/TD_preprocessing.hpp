@@ -587,7 +587,6 @@ void glue_bag_preprocessing(
     noboost::bag(t_dec_node, T) = MOVE(bag);
     boost::tie(vIt, vEnd) = boost::vertices(T);
     boost::add_edge(*vIt, t_dec_node, T);
-
 }
 
 //Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition

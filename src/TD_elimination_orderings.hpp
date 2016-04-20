@@ -102,9 +102,10 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
     bag_type* bags_i=&bag_i;
     std::vector<my_vd> elim_vertices;
 
+    typename boost::graph_traits<G_t>::vertices_size_type num_vert=boost::num_vertices(G);
     if(T){
-        bags.resize(boost::num_vertices(G));
-        elim_vertices.resize(boost::num_vertices(G));
+        bags.resize(num_vert);
+        elim_vertices.resize(num_vert);
     }else{
     }
 
@@ -116,8 +117,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 
     unsigned int i = 0;
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
-    unsigned upper_bound=0; // computed, if T
-    unsigned num_vert = boost::num_vertices(G);
+    unsigned upper_bound = 0; // computed, if T
     while(boost::num_edges(G) > 0){
         assert(min_ntd != num_vert);
         //Search a minimum degree vertex.
@@ -232,9 +232,16 @@ template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 #endif
 {
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags(boost::num_vertices(G));
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices(boost::num_vertices(G));
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags;
+    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices;
+    typename boost::graph_traits<G_t>::vertices_size_type nv=boost::num_vertices(G);
     unsigned upper_bound=0;
+
+    if(T){
+        bags.resize(nv);
+        elim_vertices.resize(nv);
+    }else{
+    }
 
     unsigned int i = 0;
     while(boost::num_edges(G) > 0){
@@ -284,7 +291,9 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 
         noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G); //replace this with make_clique_and_hijack?!
 
-        elim_vertices[i++] = min_vertex;
+        if(T){
+            elim_vertices[i++] = min_vertex;
+        }
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -654,11 +663,11 @@ template <typename G_t>
 void LEX_M_fill_in(G_t &G,
      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &fill_in_edges)
 {
-    unsigned int max = boost::num_vertices(G);
-    std::vector<bool> visited(max+1);
-    std::vector<float> label(max+1);
-    std::vector<bool> alpha_inv(max+1); // why +1?
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(max+1);
+    unsigned int nv = boost::num_vertices(G);
+    std::vector<bool> visited(nv);
+    std::vector<float> label(nv);
+    std::vector<bool> alpha_inv(nv);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     //Initializing.
     unsigned int i = 0;
@@ -746,12 +755,12 @@ template <typename G_t>
 void LEX_M_minimal_ordering(G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
 {
-    unsigned int max = boost::num_vertices(G);
+    unsigned int nv = boost::num_vertices(G);
     alpha.resize(boost::num_vertices(G));
-    std::vector<bool> visited(max+1);
-    std::vector<float> label(max+1);
-    std::vector<bool> alpha_inv(max+1); // why +1?
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(max+1);
+    std::vector<bool> visited(nv);
+    std::vector<float> label(nv);
+    std::vector<bool> alpha_inv(nv);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

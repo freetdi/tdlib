@@ -505,7 +505,10 @@ void _preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
          > > &bags, int &low)
 {
-    misc::DEGS<G_t> degs(G);
+
+    typedef typename noboost::deg_chooser<G_t>::type degs_type;
+    degs_type degs(G);
+
     detail::degree_mod<G_t> cb(&degs, &G);
     unsigned min_ntd = 1;
     while(boost::num_edges(G) > 0){
