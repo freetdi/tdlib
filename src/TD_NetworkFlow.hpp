@@ -85,6 +85,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 #endif
 
+namespace detail{
+
 //Copies the induced subgraph of G formed by disabled into diG. The graph diG
 //is a digraph, that is for each edge of the induced subgraph we have an edge
 //and a reverse edge. diG has vertex and edge properties, in which the
@@ -274,8 +276,6 @@ static bool t_search_disjoint_ways(
     return false;
 }
 
-namespace detail{
-
 template <typename G_t>
 bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
@@ -336,7 +336,8 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
 
     return true;
 }
-} // detail
+
+} //namespace detail
 
 //This version immediatly aborts after at most k+1 iterations. The return value
 //indicates, whether a seperator of size at most k

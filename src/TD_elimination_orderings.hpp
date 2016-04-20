@@ -664,10 +664,10 @@ void LEX_M_fill_in(G_t &G,
      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &fill_in_edges)
 {
     unsigned int nv = boost::num_vertices(G);
-    std::vector<bool> visited(nv+1);
-    std::vector<float> label(nv+1);
+    std::vector<bool> visited(nv);
+    std::vector<float> label(nv);
     std::vector<bool> alpha_inv(nv);
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv+1);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     //Initializing.
     unsigned int i = 0;
@@ -757,10 +757,10 @@ void LEX_M_minimal_ordering(G_t &G,
 {
     unsigned int nv = boost::num_vertices(G);
     alpha.resize(boost::num_vertices(G));
-    std::vector<bool> visited(nv+1);
-    std::vector<float> label(nv+1);
+    std::vector<bool> visited(nv);
+    std::vector<float> label(nv);
     std::vector<bool> alpha_inv(nv);
-    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv+1);
+    std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
