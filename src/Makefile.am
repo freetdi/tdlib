@@ -1,23 +1,23 @@
 
 pkginclude_HEADERS = \
-  TD_applications.hpp \
-  TD_degree.hpp \
-  TD_noboost.hpp \
-  TD_simple_graph_algos.hpp \
-  TD_branch_decomposition.hpp \
-  TD_combinations.hpp \
-  TD_dynamicCR.hpp \
-  TD_elimination_orderings.hpp \
-  TD_exact_cutset.hpp \
-  TD_lower_bounds.hpp \
-  TD_misc.hpp \
-  TD_NetworkFlow.hpp \
-  TD_nice_decomposition.hpp \
-  TD_postprocessing.hpp \
-  TD_preprocessing.hpp \
-  TD_seperator_algorithm.hpp \
-  TD_upper_bounds.hpp \
-  TD_std.hpp \
-  TD_random.hpp \
-  TD_branch_and_bound.hpp \
-  TD_preprocessing_experiments.hpp
+  applications.hpp \
+  branch_and_bound.hpp \
+  branch_decomposition.hpp \
+  combinations.hpp \
+  degree.hpp \
+  dynamicCR.hpp \
+  elimination_orderings.hpp \
+  exact_cutset.hpp \
+  lower_bounds.hpp \
+  misc.hpp \
+  network_flow.hpp \
+  nice_decomposition.hpp \
+  noboost.hpp \
+  postprocessing.hpp \
+  preprocessing_experiments.hpp \
+  preprocessing.hpp \
+  random.hpp \
+  seperator_algorithm.hpp \
+  simple_graph_algos.hpp \
+  std.hpp \
+  upper_bounds.hpp
