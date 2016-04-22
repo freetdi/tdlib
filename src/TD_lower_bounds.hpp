@@ -773,8 +773,7 @@ int LBNC_deltaD(const G_t &G){
     int lb = deltaD(H);
 
     while(true){
-        G_t H;
-        boost::copy_graph(G, H);
+        H = G;
         treedec::lb::k_neighbour_improved_graph(H, lb+1);
 
         int new_lb;
