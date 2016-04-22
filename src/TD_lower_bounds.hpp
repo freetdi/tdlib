@@ -776,7 +776,7 @@ int LBNC_deltaD(const G_t &G){
         H = G;
         treedec::lb::k_neighbour_improved_graph(H, lb+1);
 
-        int new_lb;
+        int new_lb=0;
 
         while(boost::num_edges(H) > 0){
             new_lb = treedec::lb::deltaD(H);
@@ -986,7 +986,7 @@ int LBPC_deltaD(const G_t &G){
 
         treedec::lb::k_path_improved_graph(H, lb+1);
 
-        int new_lb;
+        int new_lb=0;
 
         while(boost::num_edges(H) > 0){
             new_lb = treedec::lb::deltaD(H);
