@@ -50,6 +50,8 @@ bool is_improvement_bag(G_t &H,
                         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap,
                         G_t &G, T_t &T)
 {
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+    typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
     treedec::induced_subgraph(H, G, noboost::bag(t_desc, T), vdMap);
     disabled.assign(boost::num_vertices(H), false);
 
@@ -105,8 +107,11 @@ bool is_improvement_bag(G_t &H,
 
     BREAK_LOOP:
 
+    vertices_size_type nv=boost::num_vertices(H);
+    edges_size_type ne=boost::num_edges(H);
+
     //Test for completeness.
-    if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
+    if(nv*(nv-1u) == 2*ne){
         H.clear();
         X.clear();
         Y.clear();
