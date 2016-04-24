@@ -28,14 +28,14 @@
 #include <map>
 
 #include <boost/graph/adjacency_list.hpp>
-#include "TD_preprocessing.hpp"
-#include "TD_combinations.hpp"
-#include "TD_lower_bounds.hpp"
-#include "TD_elimination_orderings.hpp"
-#include "TD_nice_decomposition.hpp"
-#include "TD_applications.hpp"
-#include "TD_misc.hpp"
-#include "TD_noboost.hpp"
+#include "preprocessing.hpp"
+#include "combinations.hpp"
+#include "lower_bounds.hpp"
+#include "elimination_orderings.hpp"
+#include "nice_decomposition.hpp"
+#include "applications.hpp"
+#include "misc.hpp"
+#include "noboost.hpp"
 
 
 #ifndef TD_STRUCT_BAG
