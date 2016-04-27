@@ -342,8 +342,10 @@ void fillIn_decomp(G_t &G, T_t &T){
 
 //Compute an elimination ordering according to the minDegree heuristic
 //(version used for postprocessing algorithms).
+// TODO use impl::minDegree (how?)
 template<typename G_t>
-void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
+void _minDegree_ordering(G_t G,
+       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
        std::vector<bool> &visited)
 {
     unsigned int i = 0;
