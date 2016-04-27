@@ -28,15 +28,15 @@
 /*
  These functions are most likely to be interesting for outside use:
 
- - void minDegree_decomp(G_t G&, T_t &T)
- - void fillIn_decomp(G_t G&, T_t &T)
- - void minDegree_ordering(G_t G,
+ - void minDegree_decomp(G_t &G, T_t &T)
+ - void fillIn_decomp(G_t &G, T_t &T)
+ - void minDegree_ordering(G_t &G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
  - void fillIn_ordering(G_t& G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
- - void ordering_to_treedec(G_t G,
+ - void ordering_to_treedec(G_t &G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T)
- - void treedec_to_ordering<G_t, T_t>(T_t T,
+ - void treedec_to_ordering<G_t, T_t>(T_t &T,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering)
  - void LEX_M_minimal_ordering(G_t &G,
          typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
@@ -384,7 +384,7 @@ void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::v
 
 //Computes an elimination ordering according to minDegree heuristic.
 template<typename G_t>
-void minDegree_ordering(G_t G,
+void minDegree_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false)
 {
