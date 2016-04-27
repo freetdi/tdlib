@@ -320,13 +320,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G)
 } //namespace impl
 
 
-// transition
-template <typename G_t, typename T_t>
-void _fillIn_decomp(G_t &G, T_t &T){
-    return impl::fillIn_decomp(G, &T);
-}
-
-//Constructs a tree decomposition from the elimination ordering obtained by the
+//Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic.
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t &T){
