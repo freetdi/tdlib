@@ -50,11 +50,15 @@ bool is_improvement_bag(G_t &H,
                         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap,
                         G_t &G, T_t &T)
 {
+    typedef typename boost::graph_traits<G_t> graph_traits;
+    typedef typename graph_traits::vertex_iterator vertex_iterator;
+    typedef typename graph_traits::adjacency_iterator adjacency_iterator;
     treedec::induced_subgraph(H, G, noboost::bag(t_desc, T), vdMap);
     disabled.assign(boost::num_vertices(H), false);
 
-    //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent vertex t_desc' of t_desc in T.
-    typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
+    //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent
+    //vertex t_desc' of t_desc in T.
+    vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
@@ -84,7 +88,7 @@ bool is_improvement_bag(G_t &H,
         vIt2++;
         for(; vIt2 != vEnd; vIt2++){
             if(!boost::edge(*vIt1, *vIt2, H).second){
-                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, H); nIt != nEnd; nIt++){
                     X.insert(*nIt);
                 }
@@ -106,7 +110,9 @@ bool is_improvement_bag(G_t &H,
     BREAK_LOOP:
 
     //Test for completeness.
-    if(boost::num_vertices(H)*(boost::num_vertices(H)-1) == 2*boost::num_edges(H)){
+    typename graph_traits::vertices_size_type nv=boost::num_vertices(H);
+    typename graph_traits::edges_size_type ne=boost::num_edges(H);
+    if(nv*(nv-1u) == 2*ne){
         H.clear();
         X.clear();
         Y.clear();
