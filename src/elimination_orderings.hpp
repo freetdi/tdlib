@@ -245,7 +245,9 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 
     unsigned int i = 0;
     while(boost::num_edges(G) > 0){
-        //Search a vertex v such that least edges are missing for making the neighbourhood of v a clique.
+        //Search a vertex v such that least edges are missing for making the
+        //neighbourhood of v a clique.
+
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         boost::tie(vIt, vEnd) = boost::vertices(G);
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
@@ -338,7 +340,8 @@ void fillIn_decomp(G_t &G, T_t &T){
 }
 
 
-//Computes an elimination ordering according to the minDegree heuristic (version used for postprocessing algorithms).
+//Compute an elimination ordering according to the minDegree heuristic
+//(version used for postprocessing algorithms).
 template<typename G_t>
 void _minDegree_ordering(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
        std::vector<bool> &visited)
@@ -414,7 +417,9 @@ void fillIn_ordering(G_t &G,
 {
     unsigned int i = 0;
     while(true){
-        //Search a vertex v such that least edges are missing for making the neighbourhood of v a clique.
+        //Search a vertex v such that least edges are missing for making the
+        //neighbourhood of v a clique.
+
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
@@ -610,8 +615,8 @@ void treedec_to_ordering(T_t &T,
     _treedec_to_ordering<G_t, T_t>(T, elimination_ordering);
 }
 
-//Make G a filled graph according to the provided elimination_ordering. Stores the cliques in C and the additional
-//edges in F.
+//Make G a filled graph according to the provided elimination_ordering. Stores
+//the cliques in C and the additional edges in F.
 template <typename G_t>
 void make_filled_graph(G_t &G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
