@@ -404,9 +404,11 @@ void minDegree_ordering(G_t& G,
 }
 
 
-//Computes an elimination ordering according to fillIn heuristic (version used for postprocessing algorithms).
+namespace detail{
+//Compute an elimination ordering according to fillIn heuristic (version used
+//for postprocessing algorithms).
 template<typename G_t>
-void _fillIn_ordering(G_t &G,
+void fillIn_ordering(G_t &G,
        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
        std::vector<bool> &visited)
 {
@@ -457,6 +459,7 @@ void _fillIn_ordering(G_t &G,
         boost::clear_vertex(min_vertex, G);
     }
 }
+} //detail
 
 //Computes an elimination ordering according to fillIn heuristic.
 template<typename G_t>
@@ -482,7 +485,7 @@ void fillIn_ordering(G_t& G,
 
     elim_ordering.resize(n_);
 
-    _fillIn_ordering(G, elim_ordering, visited);
+    detail::fillIn_ordering(G, elim_ordering, visited);
 }
 
 
