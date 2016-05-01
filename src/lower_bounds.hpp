@@ -84,11 +84,11 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <utility>
 
-#include "simple_graph_algos.hpp"
-#include "network_flow.hpp"
-#include "misc.hpp"
-#include "noboost.hpp"
 #include "degree.hpp"
+#include "graph.hpp"
+#include "misc.hpp"
+#include "network_flow.hpp"
+#include "simple_graph_algos.hpp"
 
 namespace treedec{
 

@@ -63,9 +63,11 @@
 #define TD_NETWORK_FLOW
 
 #include <vector>
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
-#include "noboost.hpp"
+
+#include "graph.hpp"
 
 namespace treedec{
 

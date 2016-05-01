@@ -33,7 +33,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include "noboost.hpp"
+#include "graph.hpp"
 #include "misc.hpp"
 
 namespace treedec{

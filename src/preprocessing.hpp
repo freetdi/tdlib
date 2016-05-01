@@ -52,7 +52,7 @@ These functions are most likely to be interesting for outside use:
 #include <vector>
 #include <set>
 #include <boost/tuple/tuple.hpp>
-#include "noboost.hpp"
+#include "graph.hpp"
 #include "misc.hpp"
 
 namespace treedec{

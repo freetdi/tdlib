@@ -36,7 +36,7 @@
 #include "network_flow.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
-#include "noboost.hpp"
+#include "graph.hpp"
 
 namespace treedec{
 

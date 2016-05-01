@@ -22,7 +22,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "simple_graph_algos.hpp"
-#include "noboost.hpp"
+#include "graph.hpp"
 
 namespace treedec{
 

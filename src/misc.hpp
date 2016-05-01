@@ -43,10 +43,12 @@
 #endif
 
 #include <stack>
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
+
+#include "graph.hpp"
 #include "simple_graph_algos.hpp"
-#include "noboost.hpp"
 #include "std.hpp"
 
 namespace treedec{
@@ -61,7 +63,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
 
     visited[t] = true;
 
-    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
+    for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end;
+        boost::tie(e, e_end)=boost::in_edges(t, T)){
         if(!visited[t]){
             t = boost::source(*e, T);
             visited[t] = true;
@@ -119,7 +122,10 @@ bool validate_connectivity(T_t &T){
         if(!S.empty()){
             typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
             for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
-                if(!visited[*nIt]){ parent = *nIt; break; }
+                if(!visited[*nIt]){
+                    parent = *nIt;
+                    break;
+                }
             }
         }
 
@@ -132,9 +138,11 @@ bool validate_connectivity(T_t &T){
             if(*it1 == *it2){
                 //There are coded vertices, that are not connected in T.
                 return false;
+            }else if(*it1 < *it2){
+                it1++;
+            }else{
+                it2++;
             }
-            else if(*it1 < *it2){ it1++; }
-            else{ it2++; }
         }
 
         if(S.empty()){
@@ -459,7 +467,7 @@ template<class G, class CB>
 void make_clique_and_hijack(
         typename boost::graph_traits<G>::vertex_descriptor c,
         G& g, CB* cb, typename outedge_set<G>::type& bag)
-{ untested();
+{ itested();
     if(cb){incomplete();
         // probably unneeded now.
     }

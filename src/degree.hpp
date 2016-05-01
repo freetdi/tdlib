@@ -20,6 +20,9 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
+#include <boost/graph/graph_traits.hpp>
+#include <assert.h>
+
 #if __cplusplus >= 201103L
 # include <unordered_set>
 #endif
@@ -127,7 +130,7 @@ public: // picking
     }
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower, unsigned upper, bool erase)
     {
-        BOOST_AUTO(p, pick_min(lower,upper));
+        vertex_descriptor p=pick_min(lower,upper);
         if(erase){ untested();
             unlink(p.first,p.second);
         }else{untested();
