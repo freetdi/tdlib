@@ -62,6 +62,9 @@
 
 namespace treedec{
 
+#ifndef REDEGREE
+#define REDEGREE
+
 //register a 1-neigborhood to DEGS
 template<class U, class G_t, class B, class D>
 void redegree(U, G_t &G, B& neighborhood, D& degree)
@@ -74,6 +77,8 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
         degree.reg(*I, deg);
     }
 }
+
+#endif
 
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
@@ -364,11 +369,6 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         //neighbourhood of v a clique.
         vertex_descriptor v;
         boost::tie(v, min_fill) = fill.pick_min(0, num_vert);
-/*
-        std::cout << "v: " << G[v].id << std::endl;
-        std::cout << "val: " << min_fill << std::endl;
-        std::cout << std::endl;
-*/
 
         //Unlink the 2-neighbourhood of v
         adjacency_iterator I, E;
@@ -410,16 +410,6 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         refill(NULL, G, *bags_i, fill);
 
         ++i; // number of nodes in tree decomposition tree
-/*
-        std::cout << "FILL:" << std::endl;
-        for(unsigned int l = 0; l < num_vert; l++){
-            std::cout << l << ": ";
-            for(typename std::unordered_set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = fill[l].begin(); sIt != fill[l].end(); sIt++){
-                std::cout << G[*sIt].id << ", ";
-            }
-            std::cout << std::endl;
-        }
-*/
     }
 
     if(T){
