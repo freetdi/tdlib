@@ -15,8 +15,10 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// keeping track of degrees
+// Keeping track of degrees.
 //
+
+
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
@@ -42,9 +44,9 @@ namespace misc {
 
 namespace detail {
 // FIXME: not here
-template<class G>
+template<class G_t>
 struct deg_config{
-    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
 #if __cplusplus < 201103L
     typedef std::set<vd_type> bag_type;
 #else
@@ -57,24 +59,24 @@ struct deg_config{
 };
 } // detail
 
-template<class G, class CFG=detail::deg_config<G> >
+template<class G_t, class CFG=detail::deg_config<G_t> >
 class DEGS{
     DEGS(const DEGS&)
     { untested();
     }
 
 public: // types
-    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G>::vertex_iterator vertex_iterator;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename CFG::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
     typedef std::vector<bag_type> container_type;
     typedef typename container_type::iterator iterator;
     typedef typename container_type::const_iterator const_iterator;
-    typedef typename boost::graph_traits<G>::vertices_size_type degree_t;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
 
 public: // construct
-    DEGS(const G& g): _degs(boost::num_vertices(g)), _g(g)
+    DEGS(const G_t &g): _degs(boost::num_vertices(g)), _g(g)
     {
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
@@ -193,12 +195,14 @@ private:
 
 //private: // later.
     container_type _degs;
+
 private:
-    const G& _g;
+    const G_t& _g;
 }; // DEGS
 
 } //namespace misc
 
 
 #endif // guard
+
 // vim:ts=8:sw=4:et
