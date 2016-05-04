@@ -5,6 +5,7 @@ pkginclude_HEADERS = \
   branch_decomposition.hpp \
   combinations.hpp \
   degree.hpp \
+  fill.hpp \
   dynamicCR.hpp \
   elimination_orderings.hpp \
   exact_cutset.hpp \
@@ -20,4 +21,5 @@ pkginclude_HEADERS = \
   seperator_algorithm.hpp \
   simple_graph_algos.hpp \
   std.hpp \
-  upper_bounds.hpp
+  upper_bounds.hpp \
+  graph.hpp

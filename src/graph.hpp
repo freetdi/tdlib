@@ -42,6 +42,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "degree.hpp"
+#include "fill.hpp"
 
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG
@@ -350,10 +351,16 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
-template<class G>
+template<class G_t>
 struct deg_chooser{
-    typedef typename misc::DEGS<G> type;
+    typedef typename misc::DEGS<G_t> type;
     typedef type degs_type; // transition? don't use.
+};
+
+template<class G_t>
+struct fill_chooser{
+    typedef typename misc::FILL<G_t> type;
+    typedef type fill_type; // transition? don't use.
 };
 
 
