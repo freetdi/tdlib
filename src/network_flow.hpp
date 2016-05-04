@@ -231,10 +231,7 @@ static bool t_search_disjoint_ways(
     //reached by the predecessor of v on the path at a later time.
     if(on_a_path && !edge_used){
         diG[v].visited = false;
-        std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor>::iterator it = dangerous.find(v);
-        if(it == dangerous.end()){
-            dangerous.insert(v);
-        }
+        dangerous.insert(v);
 
         if(diG[diG[v].predecessor].visited){
             return false;
