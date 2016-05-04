@@ -241,7 +241,7 @@ inline void make_degree_sequence(const G_t &G,
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
 template<typename G_t>
-inline unsigned get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){
+inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){
     return boost::get(boost::get(boost::vertex_index, G), v);
 }
 

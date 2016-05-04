@@ -23,6 +23,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
+#include "graph.hpp"
+
 #if __cplusplus >= 201103L
 # include <unordered_set>
 #endif
@@ -93,12 +95,15 @@ public: // types
 public: // construct
     FILL(const G_t& g): _fill(boost::num_vertices(g)*boost::num_vertices(g)), _g(g)
     {
+        _vals.resize(boost::num_vertices(g));
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             if(boost::degree(*vIt, g) > 0){ //skip isolated vertices
                 size_t missing_edges = get_missing_edges_count(*vIt, g);
                 _fill[missing_edges].insert(*vIt);
+                unsigned int pos = boost::get(boost::get(boost::vertex_index, g), *vIt);
+                _vals[pos] = missing_edges;
             }
         }
     }
@@ -112,8 +117,8 @@ public: // queueing
     }
     void unlink(const vertex_descriptor& v)
     {
-        size_t f = get_missing_edges_count(v, _g);
-        unlink(v, f);
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        unlink(v, _vals[pos]);
     }
 
     void reg(const vertex_descriptor& v, size_t f)
@@ -123,8 +128,11 @@ public: // queueing
     }
     void reg(const vertex_descriptor& v)
     {
-        size_t f = get_missing_edges_count(v, _g);
-        reg(v, f);
+        size_t missing_edges = get_missing_edges_count(v, _g);
+        reg(v, missing_edges);
+
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        _vals[pos] = missing_edges;
     }
 
 public: // picking
@@ -176,6 +184,7 @@ public:
 
 //private: // later.
     container_type _fill;
+    std::vector<int> _vals;
 
 private:
     const G_t& _g;

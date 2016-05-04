@@ -56,8 +56,6 @@
 #include "misc.hpp"
 
 #include "graph.hpp"
-#include "degree.hpp"
-#include "fill.hpp"
 #include "std.hpp"
 
 namespace treedec{
@@ -329,6 +327,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
     }
 }
 
+//#define DEBUGA
 
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
@@ -379,7 +378,9 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
             adjacency_iterator I2, E2;
             for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
                 w = *I2;
-                fill.unlink(w);
+                //if(w > *I){
+                    fill.unlink(w);
+                //}
             }
         }
 
