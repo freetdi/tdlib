@@ -113,7 +113,6 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 #endif
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename noboost::deg_chooser<G_t>::type degs_type;
@@ -340,7 +339,6 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
 #endif
 {
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename noboost::fill_chooser<G_t>::type fill_type;

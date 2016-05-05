@@ -60,7 +60,8 @@ struct fill_config{
 } // detail
 
 template <typename G_t>
-inline size_t get_missing_edges_count(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){
+inline size_t get_missing_edges_count(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G)
+{
     size_t missing_edges = 0;
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
