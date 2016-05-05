@@ -187,7 +187,7 @@ public: // picking
     {
         return _degs.size();
     }
-private:
+public:
     bag_type& operator[](size_t x)
     {
         return _degs[x];
