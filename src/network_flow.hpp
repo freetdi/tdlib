@@ -93,8 +93,8 @@ namespace detail{
 //is a digraph, that is for each edge of the induced subgraph we have an edge
 //and a reverse edge. diG has vertex and edge properties, in which the
 //iterativly computed edge set of the disjoint paths is stored. A new vertex in
-//diG called 'source' is connected with each vertex in X (no reverse edges) and
-//each vertex in Y is connected with another new vertex called 'sink' (no
+//diG called 'source' is connected to each vertex in X (no reverse edges) and
+//each vertex in Y is connected to another new vertex called 'sink' (no
 //reverse edges). 'idxMap' is used for the conversion from vertex descriptors
 //of diG to vertex descriptors of G, needed to translate a seperator of diG to
 //a seperator of G.  Complexity: O(|V| + |E|)
@@ -155,7 +155,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
         unsigned int pos = noboost::get_pos(*sIt, G);
-        digraph_t::edge_descriptor e =  boost::add_edge(internal_idxMap[pos], sink, diG).first;
+        digraph_t::edge_descriptor e = boost::add_edge(internal_idxMap[pos], sink, diG).first;
         diG[e].path = false;
     }
 
@@ -174,7 +174,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 //Complexity: O(|V| + k*|E|), where k is the parameter of the function
 //'seperate_vertices' or tw(G), if k is not given.
 static void make_paths(
-        digraph_t &diG, unsigned int source, unsigned int sink,
+        digraph_t const &diG, unsigned int source, unsigned int sink,
         std::vector<std::vector<unsigned int> > &P)
 {
     boost::graph_traits<digraph_t>::adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
@@ -215,7 +215,7 @@ static bool t_search_disjoint_ways(
         digraph_t &diG, unsigned int v, unsigned int sink,
         bool edge_used, unsigned int source,
         std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> &dangerous,
-        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
+        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> const &idxMap,
         G_t const &G)
 {
     diG[v].visited = true;

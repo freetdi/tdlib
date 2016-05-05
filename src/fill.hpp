@@ -119,7 +119,7 @@ public: // queueing
     {
         int n=_fill[f].erase(v);
         (void)n;
-        //assert(n==1); // oops?
+        assert(n==1);
     }
     void unlink(const vertex_descriptor& v)
     {
@@ -131,7 +131,7 @@ private:
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
         bool n=_fill[missing_edges].insert(v).second;
-        // assert(n); // BUG? multiple regs!
+        assert(n);
         (void)n;
 
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);

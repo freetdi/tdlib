@@ -80,23 +80,22 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
 
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
-void refill(U, G_t &G, B& neighborhood, F& fill)
+void refill(U, G_t &G, B& range, F& fill)
 {
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
+ //   typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+//    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
 
-    BOOST_AUTO(I, neighborhood.begin());
-    BOOST_AUTO(E, neighborhood.end());
+    BOOST_AUTO(I, range.begin());
+    BOOST_AUTO(E, range.end());
 
     for(; I != E; ++I){
-        vertex_descriptor w = *I;
-        fill.reg(w);
+        fill.reg(*I);
 
-        adjacency_iterator I2, E2;
-        for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
-            w = *I2;
-            fill.reg(w);
-        }
+//        adjacency_iterator I2, E2;
+//        for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
+//            w = *I2;
+//            fill.reg(w);
+//        }
     }
 }
 
@@ -348,6 +347,8 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
     bag_type* bags_i = &bag_i;
     std::vector<my_vd> elim_vertices;
 
+    std::set<vertex_descriptor> refill_q;
+
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
     if(T){
         bags.resize(num_vert);
@@ -360,7 +361,6 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
     unsigned int min_fill = 0;
     unsigned int upper_bound = 0; // computed, if T
 
-
     while(boost::num_edges(G) > 0){
         //Search a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
@@ -369,16 +369,28 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
 
         //Unlink the 2-neighbourhood of v
         adjacency_iterator I, E;
+//        fill.unlink(v); later.
         for(boost::tie(I, E) = boost::adjacent_vertices(v, G); I != E; ++I){
             vertex_descriptor w = *I;
-            fill.unlink(w);
+
+            if(refill_q.insert(w).second){
+                fill.unlink(w);
+            }else{
+                // already queued/unlinked.
+            }
 
             adjacency_iterator I2, E2;
             for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
                 w = *I2;
                 //if(w > *I){
-                    fill.unlink(w);
                 //}
+                if(w==v){ itested();
+                    // don't reinsert center.
+                }else if(refill_q.insert(w).second){
+                    fill.unlink(w);
+                }else{
+                    // already queued/unlinked.
+                }
             }
         }
 
@@ -406,7 +418,8 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         boost::clear_vertex(v, G);
 
         fill.unlink(v, min_fill);
-        refill(NULL, G, *bags_i, fill);
+        refill(NULL, G, refill_q, fill);
+        refill_q.clear();
 
         ++i; // number of nodes in tree decomposition tree
     }
