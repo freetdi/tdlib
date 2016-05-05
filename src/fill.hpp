@@ -101,10 +101,7 @@ public: // construct
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             if(boost::degree(*vIt, g) > 0){ //skip isolated vertices
-                size_t missing_edges = get_missing_edges_count(*vIt, g);
-                _fill[missing_edges].insert(*vIt);
-                unsigned int pos = boost::get(boost::get(boost::vertex_index, g), *vIt);
-                _vals[pos] = missing_edges;
+                reg(*vIt);
             }
         }
     }
@@ -114,7 +111,7 @@ public: // queueing
     {
         int n=_fill[f].erase(v);
         (void)n;
-        //assert(n==1);
+        //assert(n==1); // oops?
     }
     void unlink(const vertex_descriptor& v)
     {
@@ -122,18 +119,21 @@ public: // queueing
         unlink(v, _vals[pos]);
     }
 
-    void reg(const vertex_descriptor& v, size_t f)
+private:
+    void reg(const vertex_descriptor& v, size_t missing_edges)
     {
-        bool n=_fill[f].insert(v).second;
-        //assert(n); (void)n;
+        bool n=_fill[missing_edges].insert(v).second;
+        // assert(n); // BUG? multiple regs!
+        (void)n;
+
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        _vals[pos] = missing_edges;
     }
+public:
     void reg(const vertex_descriptor& v)
     {
         size_t missing_edges = get_missing_edges_count(v, _g);
         reg(v, missing_edges);
-
-        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
-        _vals[pos] = missing_edges;
     }
 
 public: // picking
