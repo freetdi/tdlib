@@ -365,7 +365,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         //Search a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
         vertex_descriptor v;
-        boost::tie(v, min_fill) = fill.pick_min(0, num_vert);
+        boost::tie(v, min_fill) = fill.pick_min(0);
 
         //Unlink the 2-neighbourhood of v
         adjacency_iterator I, E;

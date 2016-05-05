@@ -93,8 +93,16 @@ public: // types
     typedef typename container_type::const_iterator const_iterator;
     typedef typename boost::graph_traits<G_t>::vertices_size_type fill_t;
 
+private:
+    size_t max_missing_edges() const
+    {
+        // isolated nodes?
+        size_t nv=boost::num_vertices(_g);
+        return (nv-1)*(nv-2);
+    }
+
 public: // construct
-    FILL(const G_t& g): _fill(boost::num_vertices(g)*boost::num_vertices(g)), _g(g)
+    FILL(const G_t& g): _g(g), _fill(max_missing_edges()+1)
     {
         _vals.resize(boost::num_vertices(g));
         CFG::alloc_init(boost::num_vertices(g));
@@ -146,7 +154,7 @@ public: // picking
     {
         while(_fill[lower].empty()){
             ++lower;
-            assert(lower != upper+1);
+            assert(lower < max_missing_edges());
         }
         vertex_descriptor min_nv = *_fill[lower].begin();
         return std::make_pair(min_nv, lower);
@@ -183,12 +191,11 @@ public:
         return _fill[x];
     }
 
+private:
+    const G_t& _g;
 //private: // later.
     container_type _fill;
     std::vector<int> _vals;
-
-private:
-    const G_t& _g;
 }; // FILL
 
 } //namespace misc
