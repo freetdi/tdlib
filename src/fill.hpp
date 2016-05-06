@@ -69,15 +69,29 @@ class FILL{
     FILL(const FILL&)
     { untested();
     }
+public:
+#if 0
+    class firstless{
+        public:
+            bool operator()( pair_t a, pair_t b){
+                if(a.first<b.first){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+    };
+#endif
 
 public: // types
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename CFG::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
-    typedef std::vector<bag_type> container_type;
-    typedef typename container_type::iterator iterator;
-    typedef typename container_type::const_iterator const_iterator;
+    //typedef std::vector<bag_type> container_type;
+    typedef std::set<std::pair<size_t, vertex_descriptor> > container_type;
+    // typedef typename container_type::iterator iterator;
+    // typedef typename container_type::const_iterator const_iterator;
     typedef typename boost::graph_traits<G_t>::vertices_size_type fill_t;
 
 private:
@@ -89,10 +103,10 @@ private:
     }
 
 public: // construct
-    FILL(const G_t& g): _g(g), _fill(max_missing_edges()+1)
+    FILL(const G_t& g): _g(g)
     {
         _vals.resize(boost::num_vertices(g));
-        CFG::alloc_init(boost::num_vertices(g));
+     //   CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             if(boost::degree(*vIt, g) > 0){ //skip isolated vertices
@@ -104,7 +118,7 @@ public: // construct
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t f)
     {
-        int n=_fill[f].erase(v);
+        int n=_fill.erase(std::make_pair(f,v));
         (void)n;
         assert(n==1);
     }
@@ -117,7 +131,7 @@ public: // queueing
 private:
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
-        bool n=_fill[missing_edges].insert(v).second;
+        bool n=_fill.insert(std::make_pair(missing_edges,v)).second;
         assert(n);
         (void)n;
 
@@ -132,19 +146,17 @@ public:
     }
 
 public: // picking
-    vertex_descriptor pick(unsigned fill)
-    {
-        return *_fill[fill].begin();
-    }
+    // vertex_descriptor pick(unsigned fill)
+    // {
+    //     return *_fill[fill].begin();
+    // }
     // pick a minimum fill vertex within fill range [lower, upper]
     std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0, unsigned upper=-1) const
     {
-        while(_fill[lower].empty()){
-            ++lower;
-            assert(lower < max_missing_edges());
-        }
-        vertex_descriptor min_nv = *_fill[lower].begin();
-        return std::make_pair(min_nv, lower);
+        assert(lower==0); // for now.
+
+        auto b=_fill.begin();
+        return std::make_pair(b->second, b->first);
     }
     std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower, unsigned upper, bool erase)
     {
@@ -155,14 +167,18 @@ public: // picking
         return p;
     }
 
-    size_t num_nodes() const{ untested();
+#if 0
+    size_t num_nodes() const
+    { untested();
         unsigned N=0;
         for(const_iterator i=_fill.begin(); i!=_fill.end(); ++i) { itested();
             N+=i->size();
         }
         return N;
     }
+#endif
 
+#if 0
     bag_type const& operator[](size_t x) const
     {
         return _fill[x];
@@ -171,12 +187,15 @@ public: // picking
     {
         return _fill.size();
     }
+#endif
 
+#if 0
 public:
     bag_type& operator[](size_t x)
     {
         return _fill[x];
     }
+#endif
 
 private:
     const G_t& _g;
