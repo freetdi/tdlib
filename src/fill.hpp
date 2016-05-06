@@ -60,7 +60,7 @@ struct fill_config{
 } // detail
 
 template <typename G_t>
-inline size_t get_missing_edges_count(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
+inline size_t count_missing_edges(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
 {
     size_t missing_edges = 0;
 
@@ -140,7 +140,7 @@ private:
 public:
     void reg(const vertex_descriptor& v)
     {
-        size_t missing_edges = get_missing_edges_count(v, _g);
+        size_t missing_edges = count_missing_edges(v, _g);
         reg(v, missing_edges);
     }
 
