@@ -274,7 +274,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
                 continue;
             }
 
-            unsigned current_fill=misc::count_missing_edges(*vIt, G);
+            unsigned current_fill=treedec::count_missing_edges(*vIt, G);
 
             if(current_fill < min_fill){
                 min_fill = current_fill;

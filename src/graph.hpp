@@ -42,7 +42,9 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "degree.hpp"
-#include "fill.hpp"
+
+// OUCH
+//#include "fill.hpp"
 
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG
@@ -357,11 +359,6 @@ struct deg_chooser{
     typedef type degs_type; // transition? don't use.
 };
 
-template<class G_t>
-struct fill_chooser{
-    typedef typename misc::FILL<G_t> type;
-    typedef type fill_type; // transition? don't use.
-};
 
 
 template<class G>
@@ -383,6 +380,28 @@ void hijack_neighborhood(
 
 } // namespace noboost
 
+
+namespace treedec{
+
+template <typename G_t>
+inline size_t count_missing_edges(
+        const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
+{ untested();
+    size_t missing_edges = 0;
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){
+        nIt2 = nIt1;
+        nIt2++;
+        for(; nIt2 != nEnd; nIt2++){
+            if(!boost::edge(*nIt1, *nIt2, G).second){
+                ++missing_edges;
+            }
+        }
+    }
+    return missing_edges;
+}
+} // treedec
 
 #endif //TD_NOBOOST_H
 
