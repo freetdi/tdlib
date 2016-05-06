@@ -83,20 +83,11 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
 template<class U, class G_t, class B, class F>
 void refill(U, G_t &G, B& range, F& fill)
 {
- //   typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-//    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
-
     BOOST_AUTO(I, range.begin());
     BOOST_AUTO(E, range.end());
 
     for(; I != E; ++I){
         fill.reg(*I);
-
-//        adjacency_iterator I2, E2;
-//        for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
-//            w = *I2;
-//            fill.reg(w);
-//        }
     }
 }
 
