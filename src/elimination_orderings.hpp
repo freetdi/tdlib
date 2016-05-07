@@ -81,14 +81,25 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
 
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
-void refill(U, G_t &G, B& range, F& fill)
+std::pair<typename boost::graph_traits<G_t>::vertex_descriptor,unsigned>
+        refill(U, G_t &G, B& range, F& fill)
 {
-    BOOST_AUTO(I, range.begin());
-    BOOST_AUTO(E, range.end());
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
 
-    for(; I != E; ++I){
-        fill.reg(*I);
+    while(!range.empty()){
+        BOOST_AUTO(b, *range.begin());
+        range.erase(range.begin());
+
+        unsigned current_fill=treedec::count_missing_edges(b, G);
+
+        if(!current_fill){
+            return std::make_pair(b,0);
+        }else{
+            fill.reg(b, current_fill);
+        }
+
     }
+    return std::make_pair(vertex_descriptor(),-1);
 }
 
 namespace impl {
@@ -339,14 +350,18 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
     fill_type fill(G);
 
     unsigned int i = 0;
-    unsigned int min_fill = 0;
+    unsigned int min_fill = -1;
     unsigned int upper_bound = 0; // computed, if T
+
+    vertex_descriptor v;
 
     while(boost::num_edges(G) > 0){
         //Search a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
-        vertex_descriptor v;
-        boost::tie(v, min_fill) = fill.pick_min(0);
+        if(min_fill){
+            boost::tie(v, min_fill) = fill.pick_min(0);
+            fill.unlink(v, min_fill);
+        }
 
         //Unlink the 2-neighbourhood of v
         adjacency_iterator I, E;
@@ -354,6 +369,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         for(boost::tie(I, E) = boost::adjacent_vertices(v, G); I != E; ++I){
             vertex_descriptor w = *I;
 
+            // neighbors likely need updating...
             if(refill_q.insert(w).second){
                 fill.unlink(w);
             }else{
@@ -361,7 +377,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
             }
 
             adjacency_iterator I2, E2;
-            for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2 != E2; ++I2){
+            for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2!=E2; ++I2){
                 w = *I2;
                 //if(w > *I){
                 //}
@@ -398,9 +414,8 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
 
         boost::clear_vertex(v, G);
 
-        fill.unlink(v, min_fill);
-        refill(NULL, G, refill_q, fill);
-        refill_q.clear();
+        boost::tie(v, min_fill) = refill(NULL, G, refill_q, fill);
+        // refill_q.clear();
 
         ++i; // number of nodes in tree decomposition tree
     }

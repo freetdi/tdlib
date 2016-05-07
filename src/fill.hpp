@@ -128,7 +128,7 @@ public: // queueing
         unlink(v, _vals[pos]);
     }
 
-private:
+public:
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
         bool n=_fill.insert(std::make_pair(missing_edges,v)).second;
@@ -155,7 +155,7 @@ public: // picking
     {
         assert(lower==0); // for now.
 
-        auto b=_fill.begin();
+        BOOST_AUTO(b, _fill.begin());
         return std::make_pair(b->second, b->first);
     }
     std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower, unsigned upper, bool erase)
