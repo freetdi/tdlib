@@ -403,6 +403,22 @@ inline size_t count_missing_edges(
 }
 } // treedec
 
+namespace noboost {
+template<class G, class CB>
+void make_clique_and_hijack(
+        typename boost::graph_traits<G>::vertex_descriptor c,
+        G& g, CB* cb, typename outedge_set<G>::type& bag)
+{ itested();
+    if(cb){incomplete();
+        // probably unneeded now.
+    }
+    noboost::make_clique(boost::adjacent_vertices(c, g), g);
+    return hijack_neighborhood(c, g, bag);
+}
+
+} // noboost
+
+
 #endif //TD_NOBOOST_H
 
 // vim:ts=8:sw=4:et
