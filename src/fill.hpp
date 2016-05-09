@@ -40,6 +40,7 @@
 #define incomplete()
 #endif
 
+
 namespace misc {
 
 namespace detail {
@@ -58,24 +59,10 @@ struct fill_config{
     static unsigned num_threads(){return 1;}
 };
 } // detail
+} // misc
 
-template <typename G_t>
-inline size_t get_missing_edges_count(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
-{
-    size_t missing_edges = 0;
 
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){
-        nIt2 = nIt1;
-        nIt2++;
-        for(; nIt2 != nEnd; nIt2++){
-            if(!boost::edge(*nIt1, *nIt2, G).second){
-                ++missing_edges;
-            }
-        }
-    }
-    return missing_edges;
-}
+namespace misc{ // treedec::misc? hmmm.
 
 template<class G_t, class CFG=detail::fill_config<G_t> >
 class FILL{
@@ -138,9 +125,9 @@ private:
         _vals[pos] = missing_edges;
     }
 public:
-    void reg(const vertex_descriptor& v)
+    void reg(const vertex_descriptor v)
     {
-        size_t missing_edges = get_missing_edges_count(v, _g);
+        size_t missing_edges=treedec::count_missing_edges(v,_g);
         reg(v, missing_edges);
     }
 
@@ -200,6 +187,15 @@ private:
 
 } //namespace misc
 
+namespace noboost{
+
+template<class G_t>
+struct fill_chooser{
+    typedef typename misc::FILL<G_t> type;
+    typedef type fill_type; // transition? don't use.
+};
+
+}
 
 #endif //guard
 

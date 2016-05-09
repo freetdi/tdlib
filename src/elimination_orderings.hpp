@@ -56,6 +56,7 @@
 #include "misc.hpp"
 
 #include "graph.hpp"
+#include "fill.hpp"
 #include "std.hpp"
 
 namespace treedec{
@@ -255,18 +256,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
                 continue;
             }
 
-            unsigned int current_fill = 0;
-
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-            for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(*vIt, G); nIt1 != nEnd; nIt1++){
-                nIt2 = nIt1;
-                nIt2++;
-                for(; nIt2 != nEnd; nIt2++){
-                    if(!boost::edge(*nIt1, *nIt2, G).second){
-                        current_fill++;
-                    }
-                }
-            }
+            unsigned current_fill=treedec::count_missing_edges(*vIt, G);
 
             if(current_fill < min_fill){
                 min_fill = current_fill;
