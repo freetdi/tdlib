@@ -21,5 +21,6 @@ pkginclude_HEADERS = \
   seperator_algorithm.hpp \
   simple_graph_algos.hpp \
   std.hpp \
+  trace.hpp \
   upper_bounds.hpp \
   graph.hpp
