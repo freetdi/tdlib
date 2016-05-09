@@ -90,6 +90,7 @@ public: // queueing
     {
         int n=_degs[d].erase(v);
         (void)n;
+        assert(boost::degree(v, _g) == d);
         assert(n==1);
     }
     void unlink(const vertex_descriptor& v)
@@ -105,6 +106,7 @@ public: // queueing
     }
     void reg(const vertex_descriptor& v, size_t d)
     {
+        assert(boost::degree(v, _g) == d);
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
     }
@@ -201,6 +203,27 @@ private:
 }; // DEGS
 
 } //namespace misc
+
+//register a 1-neighborhood to DEGS
+template<class U, class G_t, class B, class D>
+void redegree(U, G_t &G, B& neighborhood, D& degree)
+{
+    BOOST_AUTO(I, neighborhood.begin());
+    BOOST_AUTO(E, neighborhood.end());
+
+    for(; I != E ; ++I){
+        size_t deg = boost::degree(*I, G);
+        degree.reg(*I, deg);
+    }
+}
+
+template<class G_t, class D>
+void unlink_1_neighbourhood(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G, D &degs){
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; ++nIt){
+        degs.unlink(*nIt);
+    }
+}
 
 
 #endif // guard

@@ -60,24 +60,6 @@
 
 namespace treedec{
 
-#ifndef REDEGREE
-#define REDEGREE
-
-//register a 1-neigborhood to DEGS
-template<class U, class G_t, class B, class D>
-void redegree(U, G_t &G, B& neighborhood, D& degree)
-{
-    BOOST_AUTO(I, neighborhood.begin());
-    BOOST_AUTO(E, neighborhood.end());
-
-    for(; I != E ; ++I){
-        size_t deg = boost::degree(*I, G);
-        degree.reg(*I, deg);
-    }
-}
-
-#endif
-
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
 void refill(U, G_t &G, B& range, F& fill)

@@ -138,9 +138,11 @@ bool validate_connectivity(T_t &T){
             if(*it1 == *it2){
                 //There are coded vertices, that are not connected in T.
                 return false;
-            }else if(*it1 < *it2){
+            }
+            else if(*it1 < *it2){
                 it1++;
-            }else{
+            }
+            else{
                 it2++;
             }
         }

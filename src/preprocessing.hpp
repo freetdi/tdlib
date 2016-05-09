@@ -133,6 +133,7 @@ bool Twig(G_t &G, std::vector<boost::tuple<
             boost::clear_vertex(*vIt, G);
 
             low = (low > 1)? low : 1;
+
             return true;
         }
     }
@@ -166,6 +167,7 @@ bool Series(G_t &G, std::vector<boost::tuple<
             boost::clear_vertex(*vIt, G);
 
             low = (low > 2)? low : 2;
+
             return true;
         }
     }
@@ -211,6 +213,7 @@ bool Triangle(G_t &G, std::vector<boost::tuple<
                 boost::clear_vertex(*vIt, G);
 
                 low = (low > 3)? low : 3;
+
                 return true;
             }
         }
@@ -328,6 +331,28 @@ bool Cube(G_t &G, std::vector<boost::tuple<
         Nc[1] = *(++boost::adjacent_vertices(c, G).first);
         Nc[2] = *(++(++boost::adjacent_vertices(c, G).first));
 
+        if(Na[0] == x){
+            Na[0] = Na[2];
+        }
+        else if(Na[1] == x){
+            Na[1] = Na[2];
+        }
+        else{}
+        if(Nb[0] == x){
+            Nb[0] = Nb[2];
+        }
+        else if(Na[1] == x){
+            Nb[1] = Nb[2];
+        }
+        else{}
+        if(Nc[0] == x){
+            Nc[0] = Nc[2];
+        }
+        else if(Nc[1] == x){
+            Nc[1] = Nc[2];
+        }
+        else{}
+
         noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(a, G), G);
         noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(b, G), G);
         noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(c, G), G);
@@ -337,7 +362,7 @@ bool Cube(G_t &G, std::vector<boost::tuple<
             continue;
         }
 
-        typename boost::graph_traits<G_t>::vertex_descriptor u,v,w;
+        typename boost::graph_traits<G_t>::vertex_descriptor u, v, w;
 
         if(Na[0] == Nb[0]){      u = Na[0]; v = Na[1]; w = Nb[1]; }
         else if(Na[0] == Nb[1]){ u = Na[0]; v = Na[1]; w = Nb[0]; }
@@ -394,6 +419,7 @@ bool Cube(G_t &G, std::vector<boost::tuple<
             boost::add_edge(w, x, G);
 
             low = (low > 3)? low : 3;
+
             return true;
         }
     }
