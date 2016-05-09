@@ -163,7 +163,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
             bags_i = &bags[i];
         }
 
-        noboost::make_clique_and_hijack(c, G, (void*)NULL, *bags_i);
+        *bags_i = MOVE(make_clique_and_detach(c, G));
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
@@ -518,7 +518,7 @@ void _minDegree_ordering(G_t G,
             return;
         }
 
-        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
+        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G, (graph_callback<G_t>*)NULL);
 
         elim_ordering[i++] = min_vertex;
         visited[noboost::get_pos(min_vertex, G)] = true;

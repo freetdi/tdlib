@@ -42,6 +42,8 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "degree.hpp"
+#include "std.hpp"
+#include "trace.hpp"
 
 // OUCH
 //#include "fill.hpp"
@@ -88,6 +90,28 @@ struct vertex_callback{
     virtual void operator()(vertex_descriptor)=0;
 };
 
+template<typename G_t>
+struct edge_callback{
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    virtual ~edge_callback(){};
+    virtual void operator()(edge_descriptor)=0;
+};
+
+}
+
+namespace treedec{
+template<typename G_t>
+struct graph_callback{ // fixme: union of the above?
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    virtual ~graph_callback(){};
+    virtual void operator()(edge_descriptor)=0;
+    virtual void operator()(vertex_descriptor)=0;
+};
+} //treedec
+
+namespace noboost{
+
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
 //before dg will drop.
@@ -133,17 +157,37 @@ inline void contract_edge(vertex_iterator_G v,
     }
 }
 
-template<typename nIter_t, typename G_t>
-void make_clique(nIter_t nIter, G_t &G)
+// turn vertex range into clique.
+// call cb on newly created edges and incident vertices.
+template<typename B, typename E, typename G_t>
+void make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 {
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    for(boost::tie(nIt1, nEnd) = nIter; nIt1 != nEnd; nIt1++){
+    typedef typename treedec::graph_callback<G_t> CB;
+    B nIt2;
+    for(; nIt1 != nEnd; nIt1++){
+        CB* vcb=NULL;
         nIt2 = nIt1;
         nIt2++;
         for(; nIt2 != nEnd; nIt2++){
-            boost::add_edge(*nIt1, *nIt2, G);
+            BOOST_AUTO(ep, boost::add_edge(*nIt1, *nIt2, G));
+            if(ep.second && cb){
+                vcb = cb;
+                (*cb)(ep.first);
+            }
+        }
+        if(vcb){
+            (*vcb)(*nIt1);
         }
     }
+}
+
+// convenience wrapper (boost-style iterator pair)
+template<typename nIter_t, typename G_t>
+void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+{ untested();
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
+    boost::tie(nIt1, nEnd) = nIter;
+    make_clique(nIt1, nEnd, G, cb);
 }
 
 template<typename B_t, typename nIter_t, typename G_t>
@@ -361,20 +405,29 @@ struct deg_chooser{
 
 
 
+// put neighbors of c into bag
+// isolate c in g
+// return bag
+// optionally: pass pointer to bag for storage.
 template<class G>
-// detach_
-void hijack_neighborhood(
+typename noboost::outedge_set<G>::type detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename noboost::outedge_set<G>::type& bag)
+        G& g, typename noboost::outedge_set<G>::type* bag=NULL)
 {
-//    typename noboost::outedge_set<G>::type bag;
+    typedef typename noboost::outedge_set<G>::type bagtype;
+    bagtype localbag;
+    if(bag){untested();
+    }else{ untested();
+        bag = &localbag;
+    }
     typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
             nIt1 != nEnd; nIt1++){ // untested();
-        bag.insert(noboost::get_vd(g, *nIt1));
+        bag->insert(noboost::get_vd(g, *nIt1));
     }
     boost::clear_vertex(c, g);
+    return *bag;
 }
 
 
@@ -403,20 +456,49 @@ inline size_t count_missing_edges(
 }
 } // treedec
 
+namespace treedec{
+
+    // TODO: cleanup
+using noboost::outedge_set;
+using noboost::detach_neighborhood;
+
+// collect neighbors of c into bag
+// remove c from graph
+// turn subgraph induced by bag into clique.
+//
+// optionally:
+// - call back on each newly created edge, and on each vertex incident to such
+//   edge.
+// - provide memory through bag pointer.
+//
+template<class G>
+typename outedge_set<G>::type make_clique_and_detach(
+        typename boost::graph_traits<G>::vertex_descriptor c,
+        G& g,
+        treedec::graph_callback<G>* cb=NULL,
+        typename outedge_set<G>::type* bag=NULL)
+{ untested();
+    typename outedge_set<G>::type rbag(MOVE(detach_neighborhood(c, g, bag)));
+    noboost::make_clique(rbag.begin(), rbag.end(), g, cb);
+    return rbag;
+}
+}//treedec
+
 namespace noboost {
-template<class G, class CB>
+template<class G>
 void make_clique_and_hijack(
         typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g, CB* cb, typename outedge_set<G>::type& bag)
-{ itested();
+        G& g, treedec::graph_callback<G>* cb, typename outedge_set<G>::type& bag)
+{ untested();
     if(cb){incomplete();
         // probably unneeded now.
     }
-    noboost::make_clique(boost::adjacent_vertices(c, g), g);
-    return hijack_neighborhood(c, g, bag);
+    hijack_neighborhood(c, g, bag);
+    noboost::make_clique(bag.begin(), bag.end(), g, cb);
 }
 
 } // noboost
+
 
 
 #endif //TD_NOBOOST_H
