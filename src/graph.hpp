@@ -184,7 +184,7 @@ void make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 // convenience wrapper (boost-style iterator pair)
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{ untested();
+{ itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
     boost::tie(nIt1, nEnd) = nIter;
     make_clique(nIt1, nEnd, G, cb);
@@ -403,6 +403,10 @@ struct deg_chooser{
     typedef type degs_type; // transition? don't use.
 };
 
+} // namespace noboost
+
+
+namespace treedec{
 
 
 // put neighbors of c into bag
@@ -412,29 +416,10 @@ struct deg_chooser{
 template<class G>
 typename noboost::outedge_set<G>::type detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename noboost::outedge_set<G>::type* bag=NULL)
-{
-    typedef typename noboost::outedge_set<G>::type bagtype;
-    bagtype localbag;
-    if(bag){untested();
-    }else{ untested();
-        bag = &localbag;
-    }
-    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-    // inefficient.
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
-            nIt1 != nEnd; nIt1++){ // untested();
-        bag->insert(noboost::get_vd(g, *nIt1));
-    }
-    boost::clear_vertex(c, g);
-    return *bag;
-}
+        G& g, typename noboost::outedge_set<G>::type* bag=NULL);
 
 
-} // namespace noboost
 
-
-namespace treedec{
 
 template <typename G_t>
 inline size_t count_missing_edges(
@@ -460,10 +445,9 @@ namespace treedec{
 
     // TODO: cleanup
 using noboost::outedge_set;
-using noboost::detach_neighborhood;
 
 // collect neighbors of c into bag
-// remove c from graph
+// remove c from graph (i.e. isolate).
 // turn subgraph induced by bag into clique.
 //
 // optionally:
@@ -500,6 +484,57 @@ void make_clique_and_hijack(
 } // noboost
 
 
+namespace treedec{
+namespace detail{
+
+    // iterate over edges adjacent to both v and s
+    // implementation: iterate outedges(v), skip non-outedges(s).
+    template<class G>
+    class shared_adj_iter : public boost::graph_traits<G>::adjacency_iterator {
+    public:
+        typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
+        typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+        shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
+                        vertex_descriptor s, G const& g)
+            : adjacency_iterator(v), _ve(ve), _s(s), _g(g)
+        { }
+
+        shared_adj_iter& operator++(){
+            adjacency_iterator::operator++();
+            skip();
+            return *this;
+        }
+    private:
+        void skip()
+        { untested();
+            while(true){ untested();
+                if(adjacency_iterator::operator==(_ve)){
+                    return;
+                }else if(!boost::edge(**this, _s, _g)){
+                    adjacency_iterator::operator++();
+                }
+            }
+        }
+        adjacency_iterator _ve;
+        vertex_descriptor _s;
+        G const& _g;
+    };
+
+}// detail
+
+template<class G>
+std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
+    common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
+                     typename boost::graph_traits<G>::vertex_descriptor w,
+                     const G& g)
+{ incomplete();
+    BOOST_AUTO(p, boost::adjacent_vertices(v, g));
+    typedef typename detail::shared_adj_iter<G> Iter;
+    return std::make_pair(Iter(p.first, p.second, w, g),
+                          Iter(p.second, p.second, w, g));
+}
+
+} // treedec
 
 #endif //TD_NOBOOST_H
 

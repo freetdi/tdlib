@@ -51,6 +51,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
+#include "trace.hpp"
 #include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
@@ -101,6 +102,38 @@ std::pair<typename boost::graph_traits<G_t>::vertex_descriptor,unsigned>
     }
     return std::make_pair(vertex_descriptor(),-1);
 }
+
+namespace detail{
+// update vertices adjacent to neighbors that have just been connected.
+// outedgee to center node has ideally been removed already.
+template<typename G_t>
+struct fill_update_cb : public graph_callback<G_t>{
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename noboost::fill_chooser<G_t>::type fill_type;
+
+    fill_update_cb(fill_type* d, G_t*g) :
+        _fill(d), G(g){}
+
+    void operator()(vertex_descriptor v)
+    { incomplete();
+        // q_eval(v);
+    }
+    void operator()(edge_descriptor edg)
+    {
+        // e has just been inserted.
+        BOOST_AUTO(cni, common_out_edges(boost::source(edg, *G), boost::target(edg, *G), *G));
+        BOOST_AUTO(i, cni.first);
+        BOOST_AUTO(e, cni.second);
+        for(; i!=e; ++i){
+            _fill->q_decrement(*i);
+        }
+    }
+private:
+    fill_type*_fill;
+    G_t* G;
+};
+}// detail
 
 namespace impl {
 
@@ -328,7 +361,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T=NULL)
 template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
 #endif
-{
+{ untested();
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
@@ -348,12 +381,14 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
     }
 
     fill_type fill(G);
+    detail::fill_update_cb<G_t> cb(&fill, &G);
 
     unsigned int i = 0;
     unsigned int min_fill = -1;
     unsigned int upper_bound = 0; // computed, if T
 
     vertex_descriptor v;
+
 
     while(boost::num_edges(G) > 0){
         //Search a vertex v such that least edges are missing for making the
@@ -395,7 +430,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
             bags_i = &bags[i];
         }
 
-        noboost::make_clique_and_hijack(v, G, (void*)NULL, *bags_i);
+        *bags_i = MOVE(make_clique_and_detach(v, G, &cb, bags_i));
 
         if(!T){
             bags_i->clear();

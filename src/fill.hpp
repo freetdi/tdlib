@@ -144,6 +144,12 @@ public:
         size_t missing_edges=treedec::count_missing_edges(v,_g);
         reg(v, missing_edges);
     }
+    void q_decrement(const vertex_descriptor v)
+    { incomplete();
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        unlink(v, _vals[pos]);
+        reg(v, --_vals[pos]);
+    }
 
 public: // picking
     // vertex_descriptor pick(unsigned fill)
