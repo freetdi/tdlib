@@ -468,21 +468,6 @@ typename outedge_set<G>::type make_clique_and_detach(
 }
 }//treedec
 
-namespace noboost {
-template<class G>
-void make_clique_and_hijack(
-        typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g, treedec::graph_callback<G>* cb, typename outedge_set<G>::type& bag)
-{ untested();
-    if(cb){incomplete();
-        // probably unneeded now.
-    }
-    hijack_neighborhood(c, g, bag);
-    noboost::make_clique(bag.begin(), bag.end(), g, cb);
-}
-
-} // noboost
-
 
 namespace treedec{
 namespace detail{
@@ -508,9 +493,9 @@ namespace detail{
         void skip()
         { untested();
             while(true){ untested();
-                if(adjacency_iterator::operator==(_ve)){
+                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){
                     return;
-                }else if(!boost::edge(**this, _s, _g)){
+                }else if(!boost::edge(**this, _s, _g).second){
                     adjacency_iterator::operator++();
                 }
             }
@@ -527,7 +512,7 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
     common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
-{ incomplete();
+{ untested();
     BOOST_AUTO(p, boost::adjacent_vertices(v, g));
     typedef typename detail::shared_adj_iter<G> Iter;
     return std::make_pair(Iter(p.first, p.second, w, g),

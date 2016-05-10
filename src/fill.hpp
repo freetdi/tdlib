@@ -145,7 +145,8 @@ public:
         reg(v, missing_edges);
     }
     void q_decrement(const vertex_descriptor v)
-    { incomplete();
+    { itested();
+//        inefficient
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         unlink(v, _vals[pos]);
         reg(v, --_vals[pos]);
