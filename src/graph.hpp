@@ -160,25 +160,36 @@ inline void contract_edge(vertex_iterator_G v,
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
 template<typename B, typename E, typename G_t>
-void make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 {
     typedef typename treedec::graph_callback<G_t> CB;
+    size_t counter=0;
     B nIt2;
-    for(; nIt1 != nEnd; nIt1++){
-        CB* vcb=NULL;
+    for(; nIt1!=nEnd; ++nIt1){
+#if 1
+        if(cb){
+            (*cb)(*nIt1); // hmm
+        }
+#endif
         nIt2 = nIt1;
         nIt2++;
         for(; nIt2 != nEnd; nIt2++){
+
             BOOST_AUTO(ep, boost::add_edge(*nIt1, *nIt2, G));
-            if(ep.second && cb){
-                vcb = cb;
-                (*cb)(ep.first);
+            if(ep.second){ untested();
+               ++counter;
+
+               if(cb){
+#if 0 // doesn't work. removing center...?
+            (*cb)(*nIt1); // hmm
+            (*cb)(*nIt2); // hmm
+#endif
+                   (*cb)(ep.first);
+               }
             }
         }
-        if(vcb){
-            (*vcb)(*nIt1);
-        }
     }
+    return counter;
 }
 
 // convenience wrapper (boost-style iterator pair)
@@ -190,10 +201,11 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     make_clique(nIt1, nEnd, G, cb);
 }
 
+// FIXME: wrong name, unused?
 template<typename B_t, typename nIter_t, typename G_t>
-// copy_
+// void copy_vertex_range
 void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
-{
+{ untested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){
         B.insert(*nIt);
@@ -414,13 +426,12 @@ namespace treedec{
 // return bag
 // optionally: pass pointer to bag for storage.
 template<class G>
-typename noboost::outedge_set<G>::type detach_neighborhood(
+inline void detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename noboost::outedge_set<G>::type* bag=NULL);
+        G& g, typename noboost::outedge_set<G>::type& bag);
 
 
-
-
+// count number of edges missing in 1-neighborhood of v
 template <typename G_t>
 inline size_t count_missing_edges(
         const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
@@ -456,15 +467,14 @@ using noboost::outedge_set;
 // - provide memory through bag pointer.
 //
 template<class G>
-typename outedge_set<G>::type make_clique_and_detach(
+size_t /*G::edge_index_type?*/ make_clique_and_detach(
         typename boost::graph_traits<G>::vertex_descriptor c,
         G& g,
-        treedec::graph_callback<G>* cb=NULL,
-        typename outedge_set<G>::type* bag=NULL)
-{ untested();
-    typename outedge_set<G>::type rbag(MOVE(detach_neighborhood(c, g, bag)));
-    noboost::make_clique(rbag.begin(), rbag.end(), g, cb);
-    return rbag;
+        typename outedge_set<G>::type& bag,
+        treedec::graph_callback<G>* cb=NULL)
+{
+    detach_neighborhood(c, g, bag);
+    return noboost::make_clique(bag.begin(), bag.end(), g, cb);
 }
 }//treedec
 
@@ -482,21 +492,32 @@ namespace detail{
         shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
                         vertex_descriptor s, G const& g)
             : adjacency_iterator(v), _ve(ve), _s(s), _g(g)
-        { }
+        {
+            skip();
+        }
+        shared_adj_iter(const shared_adj_iter& p)
+            : adjacency_iterator(p), _ve(p._ve), _s(p._s), _g(p._g)
+        {
+        }
 
-        shared_adj_iter& operator++(){
+        shared_adj_iter& operator++(){ untested();
+            assert(_ve!=adjacency_iterator(*this));
+            assert(adjacency_iterator(*this)!=_ve);
             adjacency_iterator::operator++();
             skip();
+
             return *this;
         }
     private:
         void skip()
-        { untested();
-            while(true){ untested();
-                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){
+        {
+            while(true){
+                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){ untested();
                     return;
-                }else if(!boost::edge(**this, _s, _g).second){
+                }else if(!boost::edge(**this, _s, _g).second){ untested();
                     adjacency_iterator::operator++();
+                }else{ untested();
+                    return;
                 }
             }
         }
@@ -512,7 +533,7 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
     common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
-{ untested();
+{ itested();
     BOOST_AUTO(p, boost::adjacent_vertices(v, g));
     typedef typename detail::shared_adj_iter<G> Iter;
     return std::make_pair(Iter(p.first, p.second, w, g),

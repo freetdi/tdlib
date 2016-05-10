@@ -112,26 +112,33 @@ struct fill_update_cb : public graph_callback<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename noboost::fill_chooser<G_t>::type fill_type;
 
-    fill_update_cb(fill_type* d, G_t*g) :
+    fill_update_cb(fill_type* d, G_t const& g) :
         _fill(d), G(g){}
 
     void operator()(vertex_descriptor v)
-    { incomplete();
-        // q_eval(v);
+    {
+        _fill->q_eval(v);
     }
     void operator()(edge_descriptor edg)
     {
+        assert(boost::source(edg, G) < boost::target(edg, G));
         // e has just been inserted.
-        BOOST_AUTO(cni, common_out_edges(boost::source(edg, *G), boost::target(edg, *G), *G));
+        BOOST_AUTO(cni, common_out_edges(boost::source(edg, G), boost::target(edg, G), G));
         BOOST_AUTO(i, cni.first);
         BOOST_AUTO(e, cni.second);
-        for(; i!=e; ++i){
+        for(; i!=e; ++i){ untested();
+            assert(*i != boost::source(edg, G));
+            assert(*i != boost::target(edg, G));
+//            no. maybe theres only half an edge.
+//            assert(boost::edge(boost::source(edg, G), *i, G).second);
+//            assert(boost::edge(boost::target(edg, G), *i, G).second);
+
             _fill->q_decrement(*i);
         }
     }
 private:
-    fill_type*_fill;
-    G_t* G;
+    fill_type* _fill;
+    G_t const& G;
 };
 }// detail
 
@@ -196,7 +203,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
             bags_i = &bags[i];
         }
 
-        *bags_i = MOVE(make_clique_and_detach(c, G));
+        make_clique_and_detach(c, G, *bags_i);
 #ifndef NDEBUG // safety net.
         noboost::check(G);
 #endif
@@ -361,10 +368,9 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T=NULL)
 template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
 #endif
-{ untested();
+{
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename noboost::fill_chooser<G_t>::type fill_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     std::vector<bag_type> bags;
@@ -381,77 +387,56 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
     }
 
     fill_type fill(G);
-    detail::fill_update_cb<G_t> cb(&fill, &G);
+    detail::fill_update_cb<G_t> cb(&fill, G);
 
     unsigned int i = 0;
     unsigned int min_fill = -1;
     unsigned int upper_bound = 0; // computed, if T
 
     vertex_descriptor v;
-
+    size_t newedges;
 
     while(boost::num_edges(G) > 0){
-        //Search a vertex v such that least edges are missing for making the
+        //Find a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
-        if(min_fill){
-            boost::tie(v, min_fill) = fill.pick_min(0);
-            fill.unlink(v, min_fill);
-        }
+        //
+        boost::tie(v, min_fill) = fill.pick_min(0, -1, true);
+        assert(noboost::is_valid(v,G));
+        BOOST_AUTO(deg, boost::degree(v, G));
 
-        //Unlink the 2-neighbourhood of v
-        adjacency_iterator I, E;
-//        fill.unlink(v); later.
-        for(boost::tie(I, E) = boost::adjacent_vertices(v, G); I != E; ++I){
-            vertex_descriptor w = *I;
-
-            // neighbors likely need updating...
-            if(refill_q.insert(w).second){
-                fill.unlink(w);
-            }else{
-                // already queued/unlinked.
-            }
-
-            adjacency_iterator I2, E2;
-            for(boost::tie(I2, E2) = boost::adjacent_vertices(*I, G); I2!=E2; ++I2){
-                w = *I2;
-                //if(w > *I){
-                //}
-                if(w==v){ itested();
-                    // don't reinsert center.
-                }else if(refill_q.insert(w).second){
-                    fill.unlink(w);
-                }else{
-                    // already queued/unlinked.
-                }
-            }
-        }
+//        std::cerr << boost::num_edges(G) << " " << min_fill << " deg " << deg<< "\n";
 
         if(T){
+            assert(i<bags.size());
             bags_i = &bags[i];
+            elim_vertices[i] = noboost::get_vd(G, v);
+        }else{untested();
         }
 
-        *bags_i = MOVE(make_clique_and_detach(v, G, &cb, bags_i));
+        assert(!bags_i->size());
+        newedges = make_clique_and_detach(v, G, *bags_i, &cb);
+
+        if(newedges == min_fill){
+        }else{ untested();
+            assert(false); // for now.
+            // something is terribly wrong.
+            // or some extra-heuristics is active
+        }
 
         if(!T){
             bags_i->clear();
         }
 
         if(T){
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-                bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
-            }
-            elim_vertices[i] = noboost::get_vd(G, v);
-        }
-        else if(boost::degree(v, G) > upper_bound){
-            upper_bound = boost::degree(v, G);
+          //   typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+          //   for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
+          //       bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
+          //   }
+        } else if(deg > upper_bound){ untested();
+            upper_bound = deg;
         }
 
-        boost::clear_vertex(v, G);
-
-        boost::tie(v, min_fill) = refill(NULL, G, refill_q, fill);
-        // refill_q.clear();
-
+        assert(boost::degree(v, G)==0);
         ++i; // number of nodes in tree decomposition tree
     }
 

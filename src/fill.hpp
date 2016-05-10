@@ -106,11 +106,18 @@ public: // construct
     FILL(const G_t& g): _g(g)
     {
         _vals.resize(boost::num_vertices(g));
+#ifndef NDEBUG
+        for(auto& v:_vals){ itested();
+            v=-1;
+        }
+#endif
      //   CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
-            if(boost::degree(*vIt, g) > 0){ //skip isolated vertices
+            if(boost::degree(*vIt, g)){
                 reg(*vIt);
+            }else{ itested();
+                //skip isolated vertices
             }
         }
     }
@@ -118,12 +125,18 @@ public: // construct
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t f)
     {
+        assert(f!=-1);
         int n=_fill.erase(std::make_pair(f,v));
         (void)n;
         assert(n==1);
+#ifndef NDEBUG
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        _vals[pos]=-1;
+#endif
     }
     void unlink(const vertex_descriptor& v)
     {
+        assert(noboost::is_valid(v,_g));
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         unlink(v, _vals[pos]);
     }
@@ -131,11 +144,13 @@ public: // queueing
 public:
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
+        assert(noboost::is_valid(v,_g));
         bool n=_fill.insert(std::make_pair(missing_edges,v)).second;
         assert(n);
         (void)n;
 
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        assert(_vals[pos]==-1);
         _vals[pos] = missing_edges;
     }
 public:
@@ -145,11 +160,35 @@ public:
         reg(v, missing_edges);
     }
     void q_decrement(const vertex_descriptor v)
-    { itested();
-//        inefficient
+    {
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        if(_vals[pos]==-1){
+            // queued for (later) eval.
+            // don't touch.
+            return;
+        }else if(_vals[pos]==0){
+            // this can happen.
+            // but we are done...
+            return;
+        }
+        assert(_vals[pos]);
+        size_t missing_edges = _vals[pos]-1;
         unlink(v, _vals[pos]);
-        reg(v, --_vals[pos]);
+//        _vals[pos]=-1; // ?!
+        assert(_vals[pos]==-1);
+        if(missing_edges==0){
+        }
+        reg(v, missing_edges);
+    }
+    void q_eval(const vertex_descriptor v)
+    {
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        if(_vals[pos]!=-1){
+            unlink(v, _vals[pos]);
+            _vals[pos] = -1;
+            _eval_queue.push_back(v);
+        }else{ itested();
+        }
     }
 
 public: // picking
@@ -158,18 +197,44 @@ public: // picking
     //     return *_fill[fill].begin();
     // }
     // pick a minimum fill vertex within fill range [lower, upper]
-    std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0, unsigned upper=-1) const
+    std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0, unsigned upper=-1) /*BUG:const*/
     {
+        typename eq_t::const_iterator qi = _eval_queue.begin();
+        typename eq_t::const_iterator qe = _eval_queue.end();
+        for(; qi!=qe; ++qi){ untested();
+            unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *qi);
+            assert(_vals[pos] == -1); (void)pos;
+
+            size_t missing_edges=treedec::count_missing_edges(*qi,_g);
+            if(!missing_edges){
+                // shortcut? not yet.
+            }
+//            std::cerr << "new " << missing_edges << "\n";
+            reg(*qi, missing_edges);
+        }
+        _eval_queue.clear();
+        assert(!_fill.empty());
+
         assert(lower==0); // for now.
 
         BOOST_AUTO(b, _fill.begin());
+        assert(noboost::is_valid(b->second, _g));
+
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), b->second);
+        assert(_vals[pos]!=-1); (void)pos;
+        assert(_vals[pos]==b->first);
+
         return std::make_pair(b->second, b->first);
     }
     std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower, unsigned upper, bool erase)
     {
-        vertex_descriptor p = pick_min(lower,upper);
-        if(erase){ untested();
-            unlink(p.first,p.second);
+        BOOST_AUTO(p, pick_min(lower,upper));
+        assert(noboost::is_valid(p.first, _g));
+        if(erase){
+            unlink(p.first, p.second);
+            unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), p.first);
+            _vals[pos]=-1; // avoid requeueing...
+        }else{ untested();
         }
         return p;
     }
@@ -209,6 +274,10 @@ private:
 //private: // later.
     container_type _fill;
     std::vector<int> _vals;
+
+//    mutable std::set<vertex_descriptor> _eval_queue;
+    typedef std::vector<vertex_descriptor> eq_t;
+    mutable eq_t _eval_queue;
 }; // FILL
 
 } //namespace misc

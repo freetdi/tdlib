@@ -462,24 +462,17 @@ void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std:
 
 //TODO: not here.
 template<class G>
-typename noboost::outedge_set<G>::type detach_neighborhood(
+inline void detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename noboost::outedge_set<G>::type* bag/*=NULL*/)
+        G& g, typename noboost::outedge_set<G>::type& bag)
 {
-    typedef typename noboost::outedge_set<G>::type bagtype;
-    bagtype localbag;
-    if(bag){untested();
-    }else{ untested();
-        bag = &localbag;
-    }
     typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
             nIt1 != nEnd; nIt1++){ // untested();
-        bag->insert(noboost::get_vd(g, *nIt1));
+        bag.insert(noboost::get_vd(g, *nIt1));
     }
     boost::clear_vertex(c, g);
-    return *bag;
 }
 } // namespace treedec
 
