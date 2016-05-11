@@ -72,3 +72,24 @@
 #define trace4(s,x,y,z,w) USE(s);USE(x);USE(y);USE(z);USE(w)
 #define trace5(s,x,y,z,w,u) USE(s);USE(x);USE(y);USE(z);USE(w);USE(u)
 #endif
+
+#ifndef TRACE_H
+#define TRACE_H
+# ifndef NDEBUG
+template <class C>
+inline bool contains(C const& c, typename C::value_type const& v)
+{ untested();
+	return(c.find(v) != c.end());
+}
+template <class X>
+inline bool contains(std::vector<X> const& c, X const& v)
+{
+	typedef typename std::vector<X>::const_iterator it;
+
+	for(it i=c.begin(); i!=c.end(); ++i){
+		if(v == *i) return true;
+	}
+	return false;
+}
+# endif
+#endif

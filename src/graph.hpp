@@ -176,7 +176,7 @@ size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>*
         for(; nIt2 != nEnd; nIt2++){
 
             BOOST_AUTO(ep, boost::add_edge(*nIt1, *nIt2, G));
-            if(ep.second){ untested();
+            if(ep.second){
                ++counter;
 
                if(cb){
@@ -500,7 +500,7 @@ namespace detail{
         {
         }
 
-        shared_adj_iter& operator++(){ untested();
+        shared_adj_iter& operator++(){
             assert(_ve!=adjacency_iterator(*this));
             assert(adjacency_iterator(*this)!=_ve);
             adjacency_iterator::operator++();
@@ -512,11 +512,11 @@ namespace detail{
         void skip()
         {
             while(true){
-                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){ untested();
+                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){
                     return;
-                }else if(!boost::edge(**this, _s, _g).second){ untested();
+                }else if(!boost::edge(**this, _s, _g).second){
                     adjacency_iterator::operator++();
-                }else{ untested();
+                }else{
                     return;
                 }
             }

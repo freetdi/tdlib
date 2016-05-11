@@ -126,13 +126,14 @@ struct fill_update_cb : public graph_callback<G_t>{
         BOOST_AUTO(cni, common_out_edges(boost::source(edg, G), boost::target(edg, G), G));
         BOOST_AUTO(i, cni.first);
         BOOST_AUTO(e, cni.second);
-        for(; i!=e; ++i){ untested();
+        for(; i!=e; ++i){
             assert(*i != boost::source(edg, G));
             assert(*i != boost::target(edg, G));
 //            no. maybe theres only half an edge.
 //            assert(boost::edge(boost::source(edg, G), *i, G).second);
 //            assert(boost::edge(boost::target(edg, G), *i, G).second);
 
+            // BUG: *i might be within 1-neighborhood.
             _fill->q_decrement(*i);
         }
     }
@@ -357,8 +358,6 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
     }
 }
 
-//#define DEBUGA
-
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
 #if __cplusplus >= 201103L
@@ -400,7 +399,9 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         //Find a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
         //
+        fill.check();
         boost::tie(v, min_fill) = fill.pick_min(0, -1, true);
+        fill.check();
         assert(noboost::is_valid(v,G));
         BOOST_AUTO(deg, boost::degree(v, G));
 
@@ -413,8 +414,14 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         }else{untested();
         }
 
+        assert(count_missing_edges(v,G) == min_fill);
+        fill.q_neighbors(v, min_fill);
+        assert(count_missing_edges(v,G) == min_fill);
+
         assert(!bags_i->size());
         newedges = make_clique_and_detach(v, G, *bags_i, &cb);
+
+        fill.unmark_neighbours(*bags_i);
 
         if(newedges == min_fill){
         }else{ untested();
