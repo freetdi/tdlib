@@ -29,6 +29,12 @@
 // unsigned int get_adhesion(T_t T)
 // void make_small(T_t &T)
 // void glue_decompositions(T_t &T1, T_t &T2)
+// void glue_bag(typename noboost::treedec_traits<T_t>::bag_type &bag,
+//               typename noboost::treedec_traits<T_t>::vd_type preprocessed_node, T_t &T)
+// void glue_bags(std::vector< boost::tuple<
+//            typename noboost::treedec_traits<T_t>::vd_type,
+//            typename noboost::treedec_traits<T_t>::bag_type
+//           > > &bags, T_t &T
 //
 
 #ifndef TD_MISC
@@ -323,44 +329,6 @@ void make_small(T_t &T){
     }
 }
 
-//Glues a single bag with the current tree decomposition.
-template <class bagtype, typename T_t>
-void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node;
-
-    typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(std::includes(noboost::bag(*vIt, T).begin(),
-                         noboost::bag(*vIt, T).end(),
-                         bag.begin(), bag.end()))
-        {
-            if(noboost::bag(*vIt, T).find(elim_vertex) != noboost::bag(*vIt, T).end()){
-                return;
-            }
-
-            t_dec_node = boost::add_vertex(T);
-            noboost::bag(t_dec_node, T) = MOVE(bag);
-            bag.clear();
-            noboost::bag(t_dec_node, T).insert(elim_vertex);
-            boost::add_edge(*vIt, t_dec_node, T);
-            return;
-        }
-    }
-
-    if(boost::num_vertices(T) > 0){
-        boost::tie(vIt, vEnd) = boost::vertices(T);
-    }
-
-    t_dec_node = boost::add_vertex(T);
-    noboost::bag(t_dec_node, T) = MOVE(bag);
-    bag.clear();
-    noboost::bag(t_dec_node, T).insert(elim_vertex);
-
-    if(boost::num_vertices(T) > 1){
-        boost::add_edge(*vIt, t_dec_node, T);
-    }
-}
-
 //glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
 template <typename T_t>
 void glue_decompositions(T_t &T1, T_t &T2){
@@ -390,6 +358,58 @@ void glue_decompositions(T_t &T1, T_t &T2){
     boost::tie(tIt, tEnd) = boost::vertices(T1);
 
     boost::add_edge(*tIt, idxMap[0], T1);
+}
+
+//Glues a single bag with the current tree decomposition T according to subset relation.
+template<typename T_t>
+void glue_bag(
+        typename noboost::treedec_traits<T_t>::bag_type &bag,
+        typename noboost::treedec_traits<T_t>::vd_type elim_vertex,
+        T_t &T)
+{
+    typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
+
+    for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
+        if(std::includes(noboost::bag(*vIt, T).begin(),
+                         noboost::bag(*vIt, T).end(),
+                         bag.begin(), bag.end()))
+        {
+            if(noboost::bag(*vIt, T).find(elim_vertex) != noboost::bag(*vIt, T).end()){
+                return;
+            }
+            bag.insert(elim_vertex);
+            typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
+            noboost::bag(t_dec_node, T) = MOVE(bag);
+
+            boost::add_edge(*vIt, t_dec_node, T);
+            return;
+        }
+    }
+
+    //Case for a disconnected graph.
+    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
+    bag.insert(elim_vertex);
+    noboost::bag(t_dec_node, T) = MOVE(bag);
+
+    if(boost::num_vertices(T) > 1){
+        boost::tie(vIt, vEnd) = boost::vertices(T);
+        boost::add_edge(*vIt, t_dec_node, T);
+    }
+}
+
+//Glues bags with the current tree decomposition.
+template<typename T_t>
+void glue_bags(std::vector< boost::tuple<
+        typename noboost::treedec_traits<T_t>::vd_type,
+        typename noboost::treedec_traits<T_t>::bag_type
+             > > &bags, T_t &T)
+{
+    for(unsigned int i = bags.size(); i > 0; i--){
+        typename noboost::treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
+        typename noboost::treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
+
+        glue_bag(second, first, T);
+    }
 }
 
 

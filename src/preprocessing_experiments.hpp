@@ -43,7 +43,6 @@ These functions are most likely to be interesting for outside use:
 
    -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags)
    -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
-   -void preprocessing_glue_bags(std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, T_t &T)
 */
 
 #ifndef TD_PREPROCESSING_EXP
@@ -59,6 +58,8 @@ These functions are most likely to be interesting for outside use:
 namespace treedec{
 
 namespace exp{
+
+namespace impl{
 
 /* (Islet,) Twig and Series rules. */
 template <typename G_t, typename DEGS>
@@ -392,7 +393,7 @@ bool AlmostSimplicial(G_t &G,
             if(missingEdgesCount == 1){
                 //cand2 has to be the special neighbour.
                 specialNeighbour = cand2;
-                }
+            }
             else{
                 //cand1 has to be the special neighbour.
                 specialNeighbour = cand1;
@@ -422,7 +423,6 @@ bool AlmostSimplicial(G_t &G,
         }
         else if(low < deg_v-1){
             low = deg_v-1;
-
             return true;
         }
         else{
@@ -432,49 +432,10 @@ bool AlmostSimplicial(G_t &G,
     return false;
 }
 
-//Glues a single bag with the current tree decomposition T according to subset relation.
-template<typename T_t>
-void glue_bag_preprocessing(
-        typename noboost::treedec_traits<T_t>::bag_type &bag,
-        typename noboost::treedec_traits<T_t>::vd_type preprocessed_node,
-        T_t &T)
-{
-    if(boost::num_vertices(T) == 0){
-        bag.insert(preprocessed_node);
-        typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-        noboost::bag(t_dec_node, T) = MOVE(bag);
-
-        return;
-    }
-
-    typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
-
-    for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(std::includes(noboost::bag(*vIt, T).begin(),
-                         noboost::bag(*vIt, T).end(),
-                         bag.begin(), bag.end()))
-        {
-            bag.insert(preprocessed_node);
-            typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            noboost::bag(t_dec_node, T) = MOVE(bag);
-
-            boost::add_edge(*vIt, t_dec_node, T);
-            return;
-        }
-    }
-
-    //Case for a disconnected graph.
-    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-    bag.insert(preprocessed_node);
-    noboost::bag(t_dec_node, T) = MOVE(bag);
-    boost::tie(vIt, vEnd) = boost::vertices(T);
-    boost::add_edge(*vIt, t_dec_node, T);
-}
-
 //Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
 //this version stores the resulting bags in a vector and does not call further algorithms.
 template <typename G_t>
-void _preprocessing(G_t &G, std::vector< boost::tuple<
+void preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
          > > &bags, int &low)
@@ -571,13 +532,16 @@ void _preprocessing(G_t &G, std::vector< boost::tuple<
     }
 }
 
+} //namespace impl
+
+
 template <typename G_t>
 void preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
              > > &bags, int &low)
 {
-    _preprocessing(G, bags, low);
+    impl::preprocessing(G, bags, low);
 }
 
 template <typename G_t>
@@ -590,20 +554,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     preprocessing(G, bags, low);
 }
 
-//Glues bags with the current tree decomposition.
-template<typename T_t>
-void preprocessing_glue_bags(std::vector< boost::tuple<
-        typename noboost::treedec_traits<T_t>::vd_type,
-        typename noboost::treedec_traits<T_t>::bag_type
-             > > &bags, T_t &T)
-{
-    for(unsigned int i = bags.size(); i > 0; i--){
-        typename noboost::treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
-        typename noboost::treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
 
-        glue_bag_preprocessing(second, first, T);
-    }
-}
 
 } //namespace exp
 

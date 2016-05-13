@@ -213,9 +213,9 @@ void minDegree_decomp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    Islet(G, bags);
+    impl::Islet(G, bags);
     impl::minDegree_decomp(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -439,9 +439,9 @@ void fillIn_decomp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    treedec::Islet(G, bags);
+    impl::Islet(G, bags);
     impl::fillIn_decomp(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 //Construct a tree decomposition from the elimination ordering obtained by the
@@ -456,9 +456,9 @@ void fillIn_decomp_exp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    treedec::Islet(G, bags);
+    impl::Islet(G, bags);
     impl::fillIn_decomp2(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -588,6 +588,7 @@ void fillIn_ordering(G_t &G,
         boost::clear_vertex(min_vertex, G);
     }
 }
+
 } //detail
 
 //Computes an elimination ordering according to fillIn heuristic.
