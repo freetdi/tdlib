@@ -84,6 +84,16 @@ void Islet(G_t &G, std::vector<boost::tuple<
     }
 }
 
+template <typename G_t>
+void Islet(G_t &G, std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > &bags)
+{
+    int low = -1;
+    Islet(G, bags, low);
+}
+
 //Checks if there exists a degree-1-vertex.
 template <typename G_t>
 bool Twig(G_t &G, std::vector<boost::tuple<
