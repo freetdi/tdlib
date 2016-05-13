@@ -62,24 +62,6 @@
 
 namespace treedec{
 
-#ifndef REDEGREE
-#define REDEGREE
-
-//register a 1-neigborhood to DEGS
-template<class U, class G_t, class B, class D>
-void redegree(U, G_t &G, B& neighborhood, D& degree)
-{
-    BOOST_AUTO(I, neighborhood.begin());
-    BOOST_AUTO(E, neighborhood.end());
-
-    for(; I != E ; ++I){
-        size_t deg = boost::degree(*I, G);
-        degree.reg(*I, deg);
-    }
-}
-
-#endif
-
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
 std::pair<typename boost::graph_traits<G_t>::vertex_descriptor,unsigned>
@@ -273,9 +255,9 @@ void minDegree_decomp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    Islet(G, bags);
+    impl::Islet(G, bags);
     impl::minDegree_decomp(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -483,9 +465,9 @@ void fillIn_decomp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    treedec::Islet(G, bags);
+    impl::Islet(G, bags);
     impl::fillIn_decomp(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 //Construct a tree decomposition from the elimination ordering obtained by the
@@ -500,9 +482,9 @@ void fillIn_decomp_exp(G_t &G, T_t &T){
     std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
                               typename noboost::treedec_traits<T_t>::bag_type> > bags;
 
-    treedec::Islet(G, bags);
+    impl::Islet(G, bags);
     impl::fillIn_decomp2(G, &T);
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -632,6 +614,7 @@ void fillIn_ordering(G_t &G,
         boost::clear_vertex(min_vertex, G);
     }
 }
+
 } //detail
 
 //Computes an elimination ordering according to fillIn heuristic.
