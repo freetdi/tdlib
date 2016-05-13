@@ -76,7 +76,7 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
     noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
     unlink_1_neighbourhood(v, G, degs);
     degs.unlink(v);
-    unsigned int deg = noboost::eliminate_vertex(v, G);
+    int deg = (int)noboost::eliminate_vertex(v, G);
     redegree(NULL, G, bag, degs);
 
     bags.push_back(
@@ -404,19 +404,30 @@ bool AlmostSimplicial(G_t &G,
     DOUBLE_BREAK:
 
     if(isAlmostSimplicial){
-        bag_type bag;
-        noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
-        vd_type vd = noboost::get_vd(G, v);
+        int deg_v = (int)boost::degree(v, G);
 
-        bags.push_back(boost::tuple<vd_type, bag_type>(vd, bag));
+        if(deg_v <= low){
+            bag_type bag;
+            noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
+            vd_type vd = noboost::get_vd(G, v);
 
-        unlink_1_neighbourhood(v, G, degs);
-        degs.unlink(v);
-        noboost::eliminate_vertex(v, G);
-        redegree(NULL, G, bag, degs);
+            bags.push_back(boost::tuple<vd_type, bag_type>(vd, bag));
 
-        low = (low > (int)bag.size())? low : (int)bag.size();
-        return true;
+            unlink_1_neighbourhood(v, G, degs);
+            degs.unlink(v);
+            noboost::eliminate_vertex(v, G);
+            redegree(NULL, G, bag, degs);
+
+            return true;
+        }
+        else if(low < deg_v-1){
+            low = deg_v-1;
+
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     return false;
 }
@@ -535,6 +546,9 @@ void _preprocessing(G_t &G, std::vector< boost::tuple<
         }
         else{
             ARBITRARY_DEGREE:
+
+            low = (low >= 4)? low : 4;
+
             for(unsigned int i = min_ntd; i < num_vert; ++i){
                 for(typename std::unordered_set<vertex_descriptor>::iterator it
                                = degs[i].begin(); it != degs[i].end(); ++it)

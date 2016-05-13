@@ -83,30 +83,6 @@ void Islet(G_t &G, std::vector<boost::tuple<
     }
 }
 
-//Checks if there exists a degree-0-vertex.
-template <typename G_t>
-void Islet(G_t &G, std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
-         > > &bags)
-{
-    typedef typename noboost::treedec_chooser<G_t>::type T_t;
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::degree(*vIt, G) == 0){
-            typename noboost::treedec_traits<T_t>::vd_type vd=noboost::get_vd(G, *vIt);
-            typename noboost::treedec_traits<T_t>::bag_type emptybag;
-
-            bags.push_back(
-                    boost::tuple<
-                    typename noboost::treedec_traits<T_t>::vd_type,
-                    typename noboost::treedec_traits<T_t>::bag_type
-                    >(vd, emptybag));
-        }
-    }
-}
-
 //Checks if there exists a degree-1-vertex.
 template <typename G_t>
 bool Twig(G_t &G, std::vector<boost::tuple<
@@ -549,28 +525,34 @@ bool AlmostSimplicial(G_t &G, std::vector<boost::tuple<
         DOUBLE_BREAK:
 
         if(isAlmostSimplicial){
-            //Adding the edges, if specialNeighbourFound is true, N is a clique and *vIt is a simplicial vertex.
-            if(specialNeighbourFound){
-                for(unsigned int i = 0; i < N.size(); i++){
-                    if(N[i] != specialNeighbour){
-                        boost::add_edge(specialNeighbour, N[i], G);
+            int deg_v = (int)boost::degree(*vIt, G);
+            if(deg_v <= low){
+                //Adding the edges, if specialNeighbourFound is true, N is a clique and *vIt is a simplicial vertex.
+                if(specialNeighbourFound){
+                    for(unsigned int i = 0; i < N.size(); i++){
+                        if(N[i] != specialNeighbour){
+                            boost::add_edge(specialNeighbour, N[i], G);
+                        }
                     }
                 }
+
+                typename noboost::treedec_traits<T_t>::bag_type bag;
+                noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(*vIt, G), G);
+
+                vd_type vd=noboost::get_vd(G, *vIt);
+                bags.push_back(
+                    boost::tuple<vd_type,
+                    typename noboost::treedec_traits<T_t>::bag_type
+                    >(vd, bag));
+
+                boost::clear_vertex(*vIt, G);
+
+                return true;
             }
-
-            typename noboost::treedec_traits<T_t>::bag_type bag;
-            noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(*vIt, G), G);
-
-            vd_type vd=noboost::get_vd(G, *vIt);
-            bags.push_back(
-                boost::tuple<vd_type,
-                typename noboost::treedec_traits<T_t>::bag_type
-                >(vd, bag));
-
-            boost::clear_vertex(*vIt, G);
-
-            low = (low > (int)bag.size())? low : (int)bag.size();
-            return true;
+            else{
+                low = deg_v-1;
+                continue;
+            }
         }
     }
     return false;
@@ -624,13 +606,20 @@ void _preprocessing(G_t &G, std::vector< boost::tuple<
          > > &bags, int &low)
 {
     if(Twig(G, bags, low) || Series(G, bags, low) || Triangle(G, bags, low)
-    || Buddy(G, bags, low) || Cube(G, bags, low) || Simplicial(G, bags, low)
-    || AlmostSimplicial(G, bags, low)){
-
+    || Buddy(G, bags, low) || Cube(G, bags, low))
+    {
         _preprocessing(G, bags, low);
     }
-    else if(boost::num_edges(G) != 0){
-        low = (low > 4)? low : 4;
+    else{
+        if(boost::num_edges(G) == 0){
+            return;
+        }
+        else{
+            low = (low > 4)? low : 4;
+            if(Simplicial(G, bags, low) || AlmostSimplicial(G, bags, low)){
+                _preprocessing(G, bags, low);
+            }
+        }
     }
 }
 
@@ -640,7 +629,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
               > > &bags, int &low)
 {
-    Islet(G, bags);
+    Islet(G, bags, low);
     _preprocessing(G, bags, low);
 }
 
