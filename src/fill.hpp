@@ -29,7 +29,8 @@
 # include <unordered_set>
 #endif
 
-static bool lazy_init=true;
+static bool const lazy_init=true;
+static bool const catch_zeroes_in_decrement=true;
 
 // temporary.
 #ifndef untested
@@ -95,20 +96,16 @@ public: // construct
     {
         _init = true;
         _vals.resize(boost::num_vertices(g));
-        for(auto& v:_vals){ itested();
-            v.value = 0;
-            v.queued = false;
-            v.neighbour = false;
-        }
      //   CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         bool foundzero=false;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *vIt);
+            (void) pos;
             if(boost::degree(*vIt, g)){
                 size_t missing_edges=-1;
 
-                if(foundzero){ untested();
+                if(foundzero){
                     q_eval(*vIt); //later.
                     assert(_vals[pos]==-1);
                     assert(contains(_eval_queue, *vIt));
@@ -178,29 +175,30 @@ public:
     void q_decrement(const vertex_descriptor v)
     {
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
-        if(_vals[pos].neighbour){ untested();
+        if(_vals[pos].is_neighbour()){
             // it's a neighbour. don't touch.
             return;
-        }else if(_vals[pos]==-1){ itested();
+        }else if(_vals[pos]==-1){ untested();
             // unknown. don't touch.
             assert(_vals[pos].queued);
             assert(contains(_eval_queue, v));
             return;
-        }else{untested();
+        }else{
             // getting here, because v is a common neighbor of a new edge.
             // and not a neighbor...
             assert(_vals[pos].value>0);
             q_eval(v, _vals[pos].value-1);
 
-            if(_vals[pos].value==0){ untested();
+            if(catch_zeroes_in_decrement &&_vals[pos].value==0){
+                // stash for fill, in bucket #0
                 reg(v, 0);
+                // extra hack: leave in queue, but mark unqueued.
+                // (it's not possible to remove from queue)
                 _vals[pos].queued = false;
             }
-//TODO: what if missing_edges==0?
 
             assert(contains(_eval_queue, v));
             return;
-
         }
     }
 
@@ -210,67 +208,61 @@ public:
     void q_eval(const vertex_descriptor v, int def=-1)
     {
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
-        unsigned deg = boost::degree(v, _g);
         assert(def>=-1);
 
-        //std::cerr << _init << "q_eval " << pos << " val: " << _vals[pos].value
-                  //<< " def " << def << " deg " << deg << "\n";
-
-        if(_vals[pos].queued){
-            assert(_init || contains(_eval_queue, v));
-        }
-
-        if(def==-1 && _vals[pos].value==-1){ untested();
+        if(def==-1 && _vals[pos].is_unknown()){
             assert(_init || contains(_eval_queue, v));
             return;
-        }else if(!_vals[pos].queued){ untested();
+        }else if(!_vals[pos].queued){
             unlink(v, _vals[pos].value);
             _eval_queue.push_back(v);
             _vals[pos].queued = true;
             assert(contains(_eval_queue, v));
-        }else{ untested();
+        }else{
             // hmm queued w/default already, update default...
             assert(contains(_eval_queue, v));
         }
         _vals[pos].value = def;
     }
 
-public: // optimize.
-
+public: // O(1) neighbor stuff.
     // for n \in neigbors(c):
     //   |X| = deg(n)-deg(c)
     //   queue new_fill(n) = old_fill(n) - old_fill(c) - |X|
     // (override in case n is incdent to a newly inserted edge)
-    void q_neighbors(vertex_descriptor c, size_t cfill)
+    void mark_neighbors(vertex_descriptor c, size_t cfill)
     {
         unsigned int posc = boost::get(boost::get(boost::vertex_index, _g), c);
+        (void) posc;
         BOOST_AUTO(degc, boost::degree(c, _g));
         typename boost::graph_traits<G_t>::adjacency_iterator n, nEnd;
 
         boost::tie(n, nEnd) = boost::adjacent_vertices(c, _g);
         for(; n!=nEnd; ++n){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *n);
-            long old_fill=_vals[pos].value;
-            assert(!_vals[pos].neighbour);
-            _vals[pos].neighbour = true;
+            _vals[pos].set_neighbour();
 
-            if(_vals[pos].value==-1){ untested();
+            if(_vals[pos].is_unknown()){
                 // neighbor fill unknown. leave it like that.
+                assert(_vals[pos].queued);
                 assert(contains(_eval_queue, *n));
                 continue;
             }
-
+            long old_fill=_vals[pos].value;
             assert(old_fill>=0);
-            // unlink(*n);
+
             BOOST_AUTO(degn, boost::degree(*n, _g));
             if(degn>=degc){
                 long X = degn - degc;
                 long new_fill = old_fill - cfill - X;
-                if(new_fill < 0){ untested();
-                    new_fill = -1;
+                if(new_fill < 0){ itested();
+                    // new fill is wrong.
+                    // there must be edges to fill adjacent to n...
+                    q_eval(*n);
+                }else{
+                    q_eval(*n, new_fill);
                 }
-                q_eval(*n, new_fill);
-            }else{ untested();
+            }else{
                 q_eval(*n);
             }
         }
@@ -283,7 +275,7 @@ public: // optimize.
         typename N::const_iterator e=neighs.end();
         for(; i!=e; ++i){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *i);
-            _vals[pos].neighbour = false;
+            _vals[pos].unset_neighbour();
         }
     }
 
@@ -334,17 +326,17 @@ public: // picking
         while(!_eval_queue.empty()){
             vertex_descriptor v=_eval_queue.back();
             _eval_queue.pop_back();
-            unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
-            size_t missing_edges = _vals[pos].value;
+            unsigned pos = boost::get(boost::get(boost::vertex_index, _g), v);
+            unsigned missing_edges = _vals[pos].value;
 
-            if(!_vals[pos].queued){ untested();
+            if(!_vals[pos].queued){
                 // taken out of queue, because fill==0.
                 assert(missing_edges==0);
                 // ignore
                 continue;
             }
 
-            if(missing_edges == -1){
+            if(missing_edges == -1u){
                 // unknown...
                 missing_edges = treedec::count_missing_edges(v, _g);
             }else{
@@ -360,7 +352,7 @@ public: // picking
             reg(v, missing_edges);
         }
 #endif
-        }else{ untested();
+        }else{
             // no need to process q. it's already there
         }
 
@@ -380,7 +372,7 @@ public: // picking
         if(erase){
             unlink(p.first, p.second);
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), p.first);
-            _vals[pos].value = 0;
+            _vals[pos].set_value(0);
             assert(!_vals[pos].queued);
         }else{ untested();
         }
@@ -420,13 +412,43 @@ public:
 #endif
 
 private:
-    typedef struct{
+    class status_t{
+    public:
+        status_t() : value(0), queued(false), _n(false) {}
+    public:
         size_t value; // fill value, -1==unknown.
         bool queued; // it is not in a bucket right now.
                      // !queued means it's in bucket _fill[value].
-        bool neighbour; // it's a neighbour of the vertex currently processed
+        void set_neighbour()
+        {
+            assert(!_n);
+            _n=true;
+        }
+        void unset_neighbour()
+        {
+            _n=false;
+        }
+        bool is_neighbour() const
+        {
+            return(_n);
+        }
+        bool is_unknown() const
+        {
+            return(value==(size_t)-1);
+        }
+        size_t get_value() const
+        {
+            assert(!is_unknown());
+            return value;
+        }
+        void set_value(size_t v)
+        {
+            value = v;
+        }
         bool operator==(size_t v) const{return value==v;}
-    } status_t;
+    private:
+        bool _n; // it's a neighbour of the vertex currently processed
+    };
 private:
 
     bool _init; // initializing.

@@ -405,8 +405,6 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         assert(noboost::is_valid(v,G));
         BOOST_AUTO(deg, boost::degree(v, G));
 
-//        std::cerr << boost::num_edges(G) << " " << min_fill << " deg " << deg<< "\n";
-
         if(T){
             assert(i<bags.size());
             bags_i = &bags[i];
@@ -414,9 +412,7 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         }else{untested();
         }
 
-        assert(count_missing_edges(v,G) == min_fill);
-        fill.q_neighbors(v, min_fill);
-        assert(count_missing_edges(v,G) == min_fill);
+        fill.mark_neighbors(v, min_fill);
 
         assert(!bags_i->size());
         newedges = make_clique_and_detach(v, G, *bags_i, &cb);

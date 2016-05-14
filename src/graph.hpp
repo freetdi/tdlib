@@ -162,7 +162,6 @@ inline void contract_edge(vertex_iterator_G v,
 template<typename B, typename E, typename G_t>
 size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 {
-    typedef typename treedec::graph_callback<G_t> CB;
     size_t counter=0;
     B nIt2;
     for(; nIt1!=nEnd; ++nIt1){
