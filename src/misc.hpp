@@ -373,7 +373,7 @@ void make_thick(T_t &T){
         NEXT_ITER1: ;
     }
 
-    //Adjacent bags B1, B2 must fulfill |(B1 v B2)| = maxwidth-1.
+    //Adjacent bags B1, B2 must fulfill |(B1 ^ B2)| = maxwidth-1.
     while(modified){
         modified = false;
 
