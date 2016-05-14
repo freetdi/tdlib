@@ -361,6 +361,7 @@ void glue_decompositions(T_t &T1, T_t &T2){
 }
 
 //Glues a single bag with the current tree decomposition T according to subset relation.
+//Version used for preprocessing.
 template<typename T_t>
 void glue_bag(
         typename noboost::treedec_traits<T_t>::bag_type &bag,
@@ -395,6 +396,45 @@ void glue_bag(
         boost::tie(vIt, vEnd) = boost::vertices(T);
         boost::add_edge(*vIt, t_dec_node, T);
     }
+}
+
+template <typename T_t>
+void glue_two_bags(T_t &T,
+      typename noboost::treedec_traits<T_t>::bag_type &bag1,
+      typename noboost::treedec_traits<T_t>::bag_type &bag2)
+{
+    typename boost::graph_traits<T_t>::vertex_iterator vIt1, vIt2, vEnd;
+    typename boost::graph_traits<T_t>::vertex_descriptor b1, b2;
+
+    for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
+        if(noboost::bag(*vIt1, T) == bag1){
+            b1 = *vIt1;
+            break;
+        }
+    }
+
+    for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
+        if(noboost::bag(*vIt2, T) == bag2){
+            b2 = *vIt2;
+            break;
+        }
+    }
+
+    if(vIt1 != vEnd && vIt2 != vEnd){
+        return;
+    }
+
+    if(vIt1 == vEnd){
+        b1 = boost::add_vertex(T);
+        noboost::bag(b1, T) = bag1;
+    }
+
+    if(vIt2 == vEnd){
+        b2 = boost::add_vertex(T);
+        noboost::bag(b2, T) = bag2;
+    }
+
+    boost::add_edge(b1, b2, T);
 }
 
 //Glues bags with the current tree decomposition.
