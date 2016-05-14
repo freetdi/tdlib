@@ -321,6 +321,30 @@ void make_small(T_t &T){
     }
 }
 
+template <typename T_t>
+void make_thick(T_t &T){
+    unsigned int maxsize = (unsigned int) treedec::get_width(T)+1;
+
+    while(true){
+        bool modified = false;
+
+        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+            if((int)noboost::bag(*tIt, T).size() == maxsize){
+                typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
+                    typename noboost::treedec_traits<T_t>::bag_type::iterator bIt = noboost::bag(*tIt, T).begin();
+                    while((int)noboost::bag(*nIt, T).size() < maxsize){
+                        noboost::bag(*nIt, T).insert(*(bIt++));
+                        modified = true;
+                    }
+                }
+            }
+        }
+    }
+    std::cout << "done" << std::endl;
+}
+
 //Glues a single bag with the current tree decomposition.
 template <class bagtype, typename T_t>
 void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
