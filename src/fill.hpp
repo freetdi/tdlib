@@ -178,7 +178,7 @@ public:
         if(_vals[pos].is_neighbour()){
             // it's a neighbour. don't touch.
             return;
-        }else if(_vals[pos]==-1){ untested();
+        }else if(_vals[pos].is_unknown()){ untested();
             // unknown. don't touch.
             assert(_vals[pos].queued);
             assert(contains(_eval_queue, v));
@@ -290,23 +290,22 @@ public: // picking
         BOOST_AUTO(fp, _fill.begin());
         if(_fill.empty() || fp->first){
 
-#if 0 // slightly slower...
+#if 1 // slightly slower...
         typename eq_t::const_iterator qi = _eval_queue.begin();
         typename eq_t::const_iterator qe = _eval_queue.end();
-        for(; qi!=qe; ++qi){ untested();
+        assert(qe!=qi || !_fill.empty());
+        for(; qi!=qe; ++qi){ itested();
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *qi);
             size_t missing_edges = _vals[pos].value;
 
-            if(!_vals[pos].queued){ untested();
+            if(!_vals[pos].queued){ itested();
                 // taken out of queue, because fill==0.
                 assert(missing_edges==0);
                 // ignore
                 continue;
-            }else if(_vals[pos]==0) { untested();
-
             }
 
-            if(missing_edges == -1){
+            if(_vals[pos].is_unknown()){
                 // unknown...
                 missing_edges = treedec::count_missing_edges(*qi, _g);
             }else{
