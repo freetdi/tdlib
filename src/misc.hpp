@@ -43,6 +43,7 @@
 #endif
 
 #include <stack>
+#include <queue>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
@@ -61,11 +62,9 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
     std::vector<bool> visited(boost::num_vertices(T), false);
 
-    visited[t] = true;
-
     for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end;
         boost::tie(e, e_end)=boost::in_edges(t, T)){
-        if(!visited[t]){
+        if(!visited[boost::source(*e, T)]){
             t = boost::source(*e, T);
             visited[t] = true;
         }
@@ -407,6 +406,174 @@ void make_thick(T_t &T){
         NEXT_ITER2: ;
     }
 }
+
+namespace detail{
+
+//Converts a tree decomposition to a binary tree decomposition (all vertices have degree <= 2).
+//Complexity: Linear in the number of vertices of T.
+template <class T_t>
+void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, std::vector<bool> &visited){
+    typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
+    typename boost::graph_traits<T_t>::vertex_descriptor c0, c1;
+
+    unsigned int cnt = 0;
+    visited[t] = true;
+
+    for(boost::tie(c, c_end) = boost::adjacent_vertices(t, T); c != c_end; c++){
+        if(!visited[*c]){ cnt++; };
+    }
+
+    boost::tie(c, c_end) = boost::adjacent_vertices(t, T);
+
+    switch(cnt){
+        case 0:
+            return;
+        case 1:
+            while(visited[*c]){ c++; }
+            make_binary(T, *c, visited);
+            return;
+        case 2:
+            break;
+        default:
+            while(visited[*c]){ c++; }
+            c0 = *c++;
+            while(visited[*c]){ c++; }
+            c1 = *c;
+
+            typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
+            boost::add_edge(d, c0, T);
+            boost::add_edge(d, c1, T);
+
+            boost::remove_edge(t, c0, T);
+            boost::remove_edge(t, c1, T);
+
+            noboost::bag(d, T) = noboost::bag(t, T);
+            boost::add_edge(t, d, T);
+
+            detail::make_binary(T, t, visited);
+            return;
+    }
+
+    while(visited[*c]){ c++; }
+    c0 = *c++;
+    while(visited[*c]){ c++; }
+    c1 = *c;
+
+    detail::make_binary(T, c0, visited);
+
+    if(noboost::bag(t, T) != noboost::bag(c0, T)){
+        typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
+        boost::add_edge(d, c0, T);
+        boost::add_edge(t, d, T);
+        boost::remove_edge(t, c0, T);
+        noboost::bag(d, T) = noboost::bag(t, T);
+    }
+
+    detail::make_binary(T, c1, visited);
+
+    if(noboost::bag(t, T) != noboost::bag(c1, T)){
+        typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
+        boost::add_edge(d, c1, T);
+        boost::add_edge(t, d, T);
+        boost::remove_edge(t, c1, T);
+        noboost::bag(d, T) = noboost::bag(t, T);
+    }
+}
+
+} //namespace detail
+
+template <typename T_t>
+void make_binary(T_t &T){
+    std::vector<bool> visited(boost::num_vertices(T), false);
+    detail::make_binary(T, *boost::vertices(T).first, visited);
+}
+
+namespace detail{
+
+template <typename T_t>
+unsigned int get_depth(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, std::vector<bool> &visited)
+{
+    visited[t] = true;
+    unsigned int depth = 0;
+    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t, T); nIt != nEnd; nIt++){
+        if(!visited[*nIt]){
+            unsigned int depth_branch = get_depth(T, *nIt, visited)+1;
+            depth = (depth_branch > depth)? depth_branch : depth;
+        }
+    }
+
+    return depth;
+}
+
+//suboptimal.. O(n^2) and not O(n)
+template <typename T_t>
+typename boost::graph_traits<T_t>::vertex_descriptor find_balanced_root(T_t &T){
+    if(boost::num_vertices(T) <= 2){
+        return *boost::vertices(T).first;
+    }
+
+    typename boost::graph_traits<T_t>::vertex_descriptor root;
+
+    unsigned int min_depth = UINT_MAX;
+    for(unsigned int t = 0; t < boost::num_vertices(T); t++){
+        std::vector<bool> visited(boost::num_vertices(T), false);
+        unsigned int depth = get_depth(T, t, visited);
+
+        if(depth < min_depth){
+            min_depth = depth;
+            root = t;
+        }
+    }
+
+    return root;
+}
+
+//Complexity: O(|V(T)|)
+template <typename T_undir_t, typename T_dir_t>
+void make_rooted(T_undir_t &T, T_dir_t &T_,
+                 typename boost::graph_traits<T_undir_t>::vertex_descriptor t,
+                 std::vector<bool> &visited)
+{
+    visited[t] = true;
+    typename boost::graph_traits<T_undir_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t, T); nIt != nEnd; nIt++){
+        if(!visited[*nIt]){
+            boost::add_edge(t, *nIt, T_);
+            make_rooted(T, T_, *nIt, visited);
+        }
+    }
+}
+
+template <typename T_undir_t, typename T_dir_t>
+void make_rooted(T_undir_t &T, T_dir_t &T_,
+                 typename boost::graph_traits<T_undir_t>::vertex_descriptor t)
+{
+    for(unsigned int i = 0; i < boost::num_vertices(T); i++){
+        typename boost::graph_traits<T_undir_t>::vertex_descriptor new_vertex = boost::add_vertex(T_);
+        noboost::bag(new_vertex, T_) = noboost::bag(i, T);
+    }
+
+    std::vector<bool> visited(boost::num_vertices(T), false);
+    make_rooted(T, T_, t, visited);
+}
+
+} //namespace detail
+
+template <typename T_undir_t, typename T_dir_t>
+void make_rooted(T_undir_t &T, T_dir_t &T_, bool balanced = false)
+{
+    typename boost::graph_traits<T_undir_t>::vertex_descriptor t;
+    if(balanced){
+        t = detail::find_balanced_root(T);
+    }
+    else{
+        t = *boost::vertices(T).first;
+    }
+
+    detail::make_rooted(T, T_, t);
+}
+
 
 //Glues a single bag with the current tree decomposition.
 template <class bagtype, typename T_t>
