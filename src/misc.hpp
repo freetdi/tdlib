@@ -714,22 +714,21 @@ void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std:
 
 #endif //TD_SUBSETS
 
-} // namespace treedec
-
-namespace noboost { // MOVE
-template<class G, class CB>
-void make_clique_and_hijack(
-        typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g, CB* cb, typename outedge_set<G>::type& bag)
-{ itested();
-    if(cb){incomplete();
-        // probably unneeded now.
+//TODO: not here.
+template<class G>
+inline void detach_neighborhood(
+        typename boost::graph_traits<G>::vertex_descriptor& c,
+        G& g, typename noboost::outedge_set<G>::type& bag)
+{
+    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
+            nIt1 != nEnd; nIt1++){ // untested();
+        bag.insert(noboost::get_vd(g, *nIt1));
     }
-    noboost::make_clique(boost::adjacent_vertices(c, g), g);
-    return hijack_neighborhood(c, g, bag);
+    boost::clear_vertex(c, g);
 }
-
-} // noboost
+} // namespace treedec
 
 #endif //TD_MISC
 
