@@ -200,13 +200,13 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     make_clique(nIt1, nEnd, G, cb);
 }
 
-// FIXME: wrong name, unused?
+// FIXME: wrong name, used in preprocessing.
 template<typename B_t, typename nIter_t, typename G_t>
 // void copy_vertex_range
 void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
-{ untested();
+{ itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){untested();
+    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){itested();
         B.insert(*nIt);
     }
 }
