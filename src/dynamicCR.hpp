@@ -88,8 +88,6 @@ static void get_robber_component(
     }
 }
 
-//#define DEBUGD
-
 //Checks if comp(G\X, y) = comp(G\ (X ^ X'), y) := R and X' ^ R != emptyset.
 template <typename G_t>
 bool is_monotone_dynamicCR(G_t &G,
@@ -130,45 +128,14 @@ bool is_monotone_dynamicCR(G_t &G,
         if((oldR.size() == 0 && std::includes(X_prime.begin(), X_prime.end(), R1.begin(), R1.end()))
          || std::includes(oldR.begin(), oldR.end(), R1.begin(), R1.end()))
         {
-#ifdef DEBUGD
-    std::cout << "IS_MONOTONE" << std::endl;
-
-            std::cout << "R(G\\X): ";
-            for(std::set<unsigned int>::iterator z = R1.begin(); z != R1.end(); z++){
-                std::cout << G[*z].id << " ";
-            } std::cout << std::endl;
-#endif
-#ifdef DEBUGD
-            std::cout << "robber components (X^X'): " << std::endl;
-            for(unsigned int l = 0; l < Rcomps2.size(); l++){ std::cout << "comp_" << l << ": ";
-                for(std::set<unsigned int>::iterator z = Rcomps2[l].begin(); z != Rcomps2[l].end(); z++){
-                    std::cout << G[*z].id << " ";
-                } std::cout << std::endl;
-            }
-#endif
-#ifdef DEBUGD
-            std::cout << "R(G\\(X^X')): ";
-            for(std::set<unsigned int>::iterator z = R2.begin(); z != R2.end(); z++){
-                std::cout << G[*z].id << " ";
-            } std::cout << std::endl;
-#endif
-
-
             std::set_union(R1.begin(), R1.end(), X_prime.begin(), X_prime.end(), std::inserter(newR, newR.begin()));
-#ifdef DEBUGD
-            std::cout << "newR: ";
-            for(std::set<unsigned int>::iterator z = newR.begin(); z != newR.end(); z++){
-                std::cout << G[*z].id << " ";
-            } std::cout << std::endl;
-#endif
+
             return true;
         }
     }
 
     return false;
 }
-
-//#define DEBUGC
 
 template <typename G_t, typename W_t>
 bool make_layer(G_t &G, W_t &W,
@@ -201,7 +168,6 @@ bool make_layer(G_t &G, W_t &W,
                 //if a turn X -> X' is monotone, save the index of the entry in the layer below for computing a tree decomposition
                 //at the end
 
-
                 bag_type inters;
                 std::set_intersection(subs[i].begin(), subs[i].end(), 
                                       W[idx-1][j].get<3>().begin(), W[idx-1][j].get<3>().end(), std::inserter(inters, inters.begin()));
@@ -209,25 +175,6 @@ bool make_layer(G_t &G, W_t &W,
                 if(!inters.empty()){ continue; }
 
                 if(is_monotone_dynamicCR(G, subs[i], W[idx-1][j].get<0>(), W[idx-1][j].get<1>(), newR, Rcomps)){
-                    #ifdef DEBUGC
-                        std::cout << "forbidden: ";
-                        for(std::set<unsigned int>::iterator z = inters.begin(); z != inters.end(); z++){
-                            std::cout << G[*z].id << " ";
-                        } std::cout << std::endl;
-                        std::cout << "robber components (X): " << std::endl;
-                        for(unsigned int l = 0; l < Rcomps.size(); l++){ std::cout << "comp_" << l << ": ";
-                            for(std::set<unsigned int>::iterator z = Rcomps[l].begin(); z != Rcomps[l].end(); z++){
-                                std::cout << G[*z].id << " ";
-                            } std::cout << std::endl;
-                        }
-                        std::cout << "X -> X': ";
-                        for(std::set<unsigned int>::iterator z = subs[i].begin(); z != subs[i].end(); z++){
-                            std::cout << G[*z].id << " ";
-                        } std::cout << " -> ";
-                        for(std::set<unsigned int>::iterator z = W[idx-1][j].get<0>().begin(); z != W[idx-1][j].get<0>().end(); z++){
-                            std::cout << G[*z].id << " ";
-                        } std::cout << std::endl;
-                    #endif
                     indices.push_back(j);
                     std::set_difference(W[idx-1][j].get<0>().begin(), W[idx-1][j].get<0>().end(), subs[i].begin(), subs[i].end(),
                                         std::inserter(forbidden, forbidden.begin()));
@@ -261,14 +208,11 @@ bool make_layer(G_t &G, W_t &W,
     return false;
 }
 
-//follows the "pointers" stored in the third entry of W[layer][i] recursively
+//Follows the "pointers" stored in the third entry of W[layer][i] recursively.
 template <typename T_t, typename W_t, typename G_t>
-//W_t = std::vector<std::vector<boost::tuple<std::set<unsigned int>, std::set<unsigned int>, std::vector<unsigned int> > > >
 void make_tree_decomposition(T_t &T, W_t &W, typename noboost::treedec_traits<T_t>::bag_type &R,
                              unsigned int layer, unsigned int idx, G_t &G)
 {
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
-
     for(unsigned int i = 0; i < W[layer][idx].get<2>().size(); i++){
         if(std::includes(R.begin(), R.end(),
            W[layer-1][W[layer][idx].get<2>()[i]].get<0>().begin(),
@@ -279,24 +223,6 @@ void make_tree_decomposition(T_t &T, W_t &W, typename noboost::treedec_traits<T_
 
         R.insert(W[layer-1][W[layer][idx].get<2>()[i]].get<0>().begin(), W[layer-1][W[layer][idx].get<2>()[i]].get<0>().end());
 
-
-#ifdef DEBUGC
-        std::cout << "glue ";
-        for(std::set<unsigned int>::iterator z = W[layer][idx].get<0>().begin(); z != W[layer][idx].get<0>().end(); z++){
-            std::cout << G[*z].id << " ";
-        } std::cout << " -> ";
-        for(std::set<unsigned int>::iterator z = W[layer-1][W[layer][idx].get<2>()[i]].get<0>().begin();
-            z != W[layer-1][W[layer][idx].get<2>()[i]].get<0>().end(); z++)
-        {
-            std::cout << G[*z].id << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "R: ";
-        for(std::set<unsigned int>::iterator z = R.begin(); z != R.end(); z++){
-            std::cout << G[*z].id << " ";
-        } std::cout << std::endl;
-#endif
-
         glue_two_bags(T, W[layer][idx].get<0>(), W[layer-1][W[layer][idx].get<2>()[i]].get<0>());
         make_tree_decomposition(T, W, R, layer-1, W[layer][idx].get<2>()[i], G);
     }
@@ -304,7 +230,6 @@ void make_tree_decomposition(T_t &T, W_t &W, typename noboost::treedec_traits<T_
 
 template <typename G_t, typename T_t>
 void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
-    typedef typename noboost::treedec_traits<T_t>::bag_type::value_type value_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
 
     bag_type vertices;
@@ -327,7 +252,6 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
                     std::vector<unsigned int>, bag_type> > > W(1);
 
     for(unsigned int k = (unsigned int)lb; k < vertices.size(); k++){
-        std::cout << "k= " << k << std::endl;
         for(unsigned int i = 0; i < vertices.size(); i++){
             if(make_layer(G, W, vertices, k, i)){
                 typename noboost::treedec_traits<T_t>::bag_type R;
