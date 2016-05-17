@@ -108,13 +108,14 @@ struct fill_update_cb : public graph_callback<G_t>{
         BOOST_AUTO(cni, common_out_edges(boost::source(edg, G), boost::target(edg, G), G));
         BOOST_AUTO(i, cni.first);
         BOOST_AUTO(e, cni.second);
-        for(; i!=e; ++i){ untested();
+        for(; i!=e; ++i){
             assert(*i != boost::source(edg, G));
             assert(*i != boost::target(edg, G));
 //            no. maybe theres only half an edge.
 //            assert(boost::edge(boost::source(edg, G), *i, G).second);
 //            assert(boost::edge(boost::target(edg, G), *i, G).second);
 
+            // BUG: *i might be within 1-neighborhood.
             _fill->q_decrement(*i);
         }
     }
@@ -273,84 +274,6 @@ template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 #endif
 {
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type> bags;
-    std::vector<typename noboost::treedec_traits<T_t>::bag_type::value_type> elim_vertices;
-    typename boost::graph_traits<G_t>::vertices_size_type nv=boost::num_vertices(G);
-    unsigned upper_bound=0;
-
-    if(T){
-        bags.resize(nv);
-        elim_vertices.resize(nv);
-    }
-
-    unsigned int i = 0;
-    while(boost::num_edges(G) > 0){
-        //Search a vertex v such that least edges are missing for making the
-        //neighbourhood of v a clique.
-
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        boost::tie(vIt, vEnd) = boost::vertices(G);
-        typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt;
-
-        unsigned int min_fill = UINT_MAX;
-        for(; vIt != vEnd; vIt++){
-            if(boost::degree(*vIt, G) == 0){
-                continue;
-            }
-
-            unsigned current_fill=treedec::count_missing_edges(*vIt, G);
-
-            if(current_fill < min_fill){
-                min_fill = current_fill;
-                min_vertex = *vIt;
-                if(current_fill == 0){
-                    break;
-                }
-            }
-        }
-
-        if(T){
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, G); nIt != nEnd; nIt++){
-                bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
-            }
-        }
-        else if(boost::degree(min_vertex, G) > upper_bound){
-            upper_bound = boost::degree(min_vertex, G);
-        }
-
-        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G); //replace this with make_clique_and_hijack?!
-
-        if(T){
-            elim_vertices[i++] = min_vertex;
-        }
-
-        boost::clear_vertex(min_vertex, G);
-    }
-
-    if(T){
-        for(; i > 0; i--){
-            treedec::glue_bag(bags[i-1], elim_vertices[i-1], *T);
-        }
-        return 0;
-    }
-    else{
-        return upper_bound;
-    }
-}
-
-//#define DEBUGA
-
-//Construct a tree decomposition from the elimination ordering obtained by the
-//fill-in heuristic. Ignores isolated vertices.
-#if __cplusplus >= 201103L
-template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
-size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T=NULL)
-#else
-template <typename G_t, typename T_t>
-size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
-#endif
-{
     typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename noboost::fill_chooser<G_t>::type fill_type;
@@ -382,11 +305,11 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         //Find a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
         //
+        fill.check();
         boost::tie(v, min_fill) = fill.pick_min(0, -1, true);
+        fill.check();
         assert(noboost::is_valid(v,G));
         BOOST_AUTO(deg, boost::degree(v, G));
-
-//        std::cerr << boost::num_edges(G) << " " << min_fill << " deg " << deg<< "\n";
 
         if(T){
             assert(i<bags.size());
@@ -395,8 +318,12 @@ size_t /*FIXME*/ fillIn_decomp2(G_t &G, T_t *T)
         }else{untested();
         }
 
+        fill.mark_neighbors(v, min_fill);
+
         assert(!bags_i->size());
         newedges = make_clique_and_detach(v, G, *bags_i, &cb);
+
+        fill.unmark_neighbours(*bags_i);
 
         if(newedges == min_fill){
         }else{ untested();
@@ -441,15 +368,6 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G)
 }
 #endif
 
-#if __cplusplus < 201103L
-template <typename G_t>
-size_t /*FIXME*/ fillIn_decomp2(G_t &G)
-{ untested();
-    return fillIn_decomp2(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
-}
-#endif
-
-
 } //namespace impl
 
 
@@ -470,21 +388,11 @@ void fillIn_decomp(G_t &G, T_t &T){
     treedec::glue_bags(bags, T);
 }
 
-//Construct a tree decomposition from the elimination ordering obtained by the
-//fill-in heuristic.
+// transition, remove.
 template <typename G_t, typename T_t>
-void fillIn_decomp_exp(G_t &G, T_t &T){
-    if(boost::num_vertices(G) == 0){
-        boost::add_vertex(T);
-        return;
-    }
-
-    std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
-                              typename noboost::treedec_traits<T_t>::bag_type> > bags;
-
-    treedec::impl::Islet(G, bags);
-    impl::fillIn_decomp2(G, &T);
-    treedec::glue_bags(bags, T);
+void fillIn_decomp_exp(G_t &G, T_t &T)
+{
+    return fillIn_decomp(G, T);
 }
 
 
