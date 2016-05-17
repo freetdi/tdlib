@@ -303,8 +303,8 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
     for(; nIt1 != nEnd; nIt1++){itested();
         unsigned int cnt_common = 0;
-        auto ci = common_out_edges(*nIt1, min_vertex, G).first;
-        auto ce = common_out_edges(*nIt1, min_vertex, G).second;
+        BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
+        BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);
         for(; ci!=ce; ++ci){
             cnt_common++;
         }
