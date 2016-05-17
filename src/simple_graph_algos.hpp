@@ -107,9 +107,8 @@ void induced_subgraph(G_t &H, G_t &G,
 }
 
 //Version for set<descriptor>.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G,
-                      typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+template <typename G_t, class S_t>
+void induced_subgraph(G_t &H, G_t &G, S_t const& X,
                       typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
@@ -128,7 +127,7 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
         unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
         unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){

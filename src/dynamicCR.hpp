@@ -235,7 +235,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1)){
+    if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1u)){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             noboost::bag(t, T).insert(*vIt);
