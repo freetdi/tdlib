@@ -232,32 +232,18 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     return min_vertex;
 }
 
+} //noboost
+
+namespace treedec{ //
+
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
-   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex, const G_t &G)
-{untested();
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
-    typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
+           const G_t &G);
 
-    unsigned int min_common = UINT_MAX;
+} // treedec
 
-    for(; nIt1 != nEnd; nIt1++){untested();
-        unsigned int cnt_common = 0;
-        nIt2 = boost::adjacent_vertices(min_vertex, G).first;
-        for(; nIt2 != nEnd; nIt2++){untested();
-            if(boost::edge(*nIt1, *nIt2, G).second){untested();
-                cnt_common++;
-            }
-        }
-        if(cnt_common < min_common){untested();
-            w = *nIt1;
-            min_common = cnt_common;
-        }
-    }
-
-    return w;
-}
+namespace noboost{
 
 template<typename G_t>
 unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){untested();
@@ -488,9 +474,11 @@ namespace detail{ //
     public:
         typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-        shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
+        shared_adj_iter(vertex_descriptor v,
                         vertex_descriptor s, G const& g)
-            : adjacency_iterator(v), _ve(ve), _s(s), _g(g)
+            : adjacency_iterator(boost::adjacent_vertices(v, g).first),
+              _ve(boost::adjacent_vertices(v, g).second),
+              _s(s), _g(g)
         {untested();
             skip();
         }
@@ -529,14 +517,13 @@ namespace detail{ //
 
 template<class G>
 std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
-    common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
+    inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
 { itested();
-    BOOST_AUTO(p, boost::adjacent_vertices(v, g));
     typedef typename detail::shared_adj_iter<G> Iter;
-    return std::make_pair(Iter(p.first, p.second, w, g),
-                          Iter(p.second, p.second, w, g));
+    return std::make_pair(Iter(v, w, g),
+                          Iter(v, w, g));
 }
 
 } // treedec

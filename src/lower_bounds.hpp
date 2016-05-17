@@ -611,7 +611,7 @@ int deltaC_least_c(G_t &G)
 
         //least-c heuristic: search the neighbour of min_vertex such that
         //contracting {min_vertex, w} removes the least edges
-        vertex_descriptor w = noboost::get_least_common_vertex(min_vertex, G);
+        vertex_descriptor w = get_least_common_vertex(min_vertex, G);
 
         degs.unlink(w);
         degs.unlink(min_vertex);
@@ -789,7 +789,7 @@ int LBNC_deltaD(const G_t &G){
                 = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
             typename boost::graph_traits<G_t>::vertex_descriptor w =
-                          noboost::get_least_common_vertex(min_vertex, H);
+                          get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -838,7 +838,7 @@ int LBNC_deltaC(G_t &G){
                  = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
             typename boost::graph_traits<G_t>::vertex_descriptor w =
-                    noboost::get_least_common_vertex(min_vertex, H);
+                    get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -999,7 +999,7 @@ int LBPC_deltaD(const G_t &G){
                   = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
             typename boost::graph_traits<G_t>::vertex_descriptor w =
-                   noboost::get_least_common_vertex(min_vertex, H);
+                   get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -1052,7 +1052,7 @@ int LBPC_deltaC(G_t &G){
                 = noboost::get_min_degree_vertex(H, true); //ignore isolated vertices
 
             typename boost::graph_traits<G_t>::vertex_descriptor w =
-                       noboost::get_least_common_vertex(min_vertex, H);
+                       get_least_common_vertex(min_vertex, H);
 
             noboost::contract_edge(min_vertex, w, H, false);
 
@@ -1137,7 +1137,7 @@ int MCSC(G_t& G)
         max = (result.first > max)? result.first : max;
         typename boost::graph_traits<G_t>::vertex_descriptor v = result.second;
 
-        typename boost::graph_traits<G_t>::vertex_descriptor w = noboost::get_least_common_vertex(v, G);
+        typename boost::graph_traits<G_t>::vertex_descriptor w = get_least_common_vertex(v, G);
 
         noboost::contract_edge(w, v, G);
     }

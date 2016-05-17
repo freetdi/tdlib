@@ -77,7 +77,7 @@ void PP_MD(G_t &G, T_t &T, int &low){
     if(boost::num_edges(G) > 0){
         impl::minDegree_decomp(G, &T);
     }
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 //Recursively applies preprocessing rules and glues corresponding bags with current tree decomposition
@@ -98,7 +98,7 @@ void PP_FI(G_t &G, T_t &T, int &low){
     if(boost::num_edges(G) > 0){
         treedec::impl::fillIn_decomp(G, &T);
     }
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -134,7 +134,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         treedec::ordering_to_treedec(G, new_elim_ordering, T, true); //true = ignore isolated vertices
     }
 
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 //This version applies the fillIn-heuristic followed by triangulation minimization on the input graph.
@@ -172,7 +172,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
     treedec::preprocessing(G, bags, low);
 
     if(boost::num_edges(G) == 0){
-        treedec::preprocessing_glue_bags(bags, T);
+        treedec::glue_bags(bags, T);
         return;
     }
 
@@ -209,7 +209,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
         treedec::glue_decompositions(T, T_);
     }
 
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
 
 
@@ -231,7 +231,7 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     treedec::preprocessing(G, bags, low);
 
     if(boost::num_edges(G) == 0){
-        treedec::preprocessing_glue_bags(bags, T);
+        treedec::glue_bags(bags, T);
         if(low <= k){
             return true;
         }
@@ -277,7 +277,6 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     return true;
 }
 
-/*
 template <typename G_t, typename T_t>
 void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     //preprocessing
@@ -289,7 +288,7 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) == 0){
-        treedec::preprocessing_glue_bags(bags, T);
+        treedec::glue_bags(bags, T);
         return;
     }
 
@@ -302,36 +301,33 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     if(components.size() == 1){
         treedec::CR_dynamic_decomp(G, T, lb);
 
-        treedec::preprocessing_glue_bags(bags, T);
+        treedec::glue_bags(bags, T);
         return;
     }
 
     typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
 
     for(unsigned int i = 0; i < components.size(); i++){
-        //ignore isolated vertices
-        if(components[i].size() == 1)
+        //Ignore isolated vertices (already included in 'bags').
+        if(components[i].size() == 1){
             continue;
+        }
 
         G_t G_;
-        induced_subgraph(G_, G, components[i]);
-
-        //reorder ids
-        std::vector<unsigned int> id_map;
-        treedec::reorder_ids_graph(G_, id_map);
-
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+        treedec::induced_subgraph(G_, G, components[i], vdMap);
         T_t T_;
 
         treedec::CR_dynamic_decomp(G_, T_, lb);
 
-        treedec::reorder_ids_decomposition(T_, id_map);
+        treedec::apply_map_on_treedec(T_, G_, vdMap);
 
         treedec::glue_decompositions(T, T_);
     }
 
-    treedec::preprocessing_glue_bags(bags, T);
+    treedec::glue_bags(bags, T);
 }
-*/
+
 
 template <typename G_t, typename T_t>
 void exact_decomposition_chordal(G_t &G, T_t &T){
@@ -401,13 +397,11 @@ void PP_FI_TM(G_t &G, T_t &T){
     PP_FI_TM(G, T, low);
 }
 
-/*
 template <typename G_t, typename T_t>
 void exact_decomposition_dynamic(G_t &G, T_t &T){
     int lb = -1;
     exact_decomposition_dynamic(G, T, lb);
 }
-*/
 
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T){

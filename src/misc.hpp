@@ -29,6 +29,12 @@
 // unsigned int get_adhesion(T_t T)
 // void make_small(T_t &T)
 // void glue_decompositions(T_t &T1, T_t &T2)
+// void glue_bag(typename noboost::treedec_traits<T_t>::bag_type &bag,
+//               typename noboost::treedec_traits<T_t>::vd_type preprocessed_node, T_t &T)
+// void glue_bags(std::vector< boost::tuple<
+//            typename noboost::treedec_traits<T_t>::vd_type,
+//            typename noboost::treedec_traits<T_t>::bag_type
+//           > > &bags, T_t &T
 //
 
 #ifndef TD_MISC
@@ -137,9 +143,11 @@ bool validate_connectivity(T_t &T){
             if(*it1 == *it2){
                 //There are coded vertices, that are not connected in T.
                 return false;
-            }else if(*it1 < *it2){
+            }
+            else if(*it1 < *it2){
                 it1++;
-            }else{
+            }
+            else{
                 it2++;
             }
         }
@@ -319,6 +327,39 @@ void make_small(T_t &T){
         }
     }
 }
+
+
+//glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
+template <typename T_t>
+void glue_decompositions(T_t &T1, T_t &T2){
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+
+    //Copy T2 to T1 and add an edge from root to an arbitrary vertex of T2.
+    std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> idxMap(boost::num_vertices(T2));
+    std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
+    unsigned int id = 0;
+    for(boost::tie(tIt, tEnd) = boost::vertices(T2); tIt != tEnd; tIt++){
+        idxMap[id] = boost::add_vertex(T1);
+        vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id));
+        noboost::bag(idxMap[id++], T1) = noboost::bag(*tIt, T2);
+    }
+
+    typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(T2); eIt != eEnd; eIt++){
+        typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
+        v = vertex_map.find(boost::source(*eIt, T2));
+        w = vertex_map.find(boost::target(*eIt, T2));
+
+        boost::add_edge(idxMap[v->second], idxMap[w->second], T1);
+    }
+
+    typename boost::graph_traits<T_t>::vertex_iterator tIt2, tEnd2;
+
+    boost::tie(tIt, tEnd) = boost::vertices(T1);
+
+    boost::add_edge(*tIt, idxMap[0], T1);
+}
+
 
 template <typename T_t>
 void make_thick(T_t &T){
@@ -574,13 +615,16 @@ void make_rooted(T_undir_t &T, T_dir_t &T_, bool balanced = false)
     detail::make_rooted(T, T_, t);
 }
 
-
-//Glues a single bag with the current tree decomposition.
-template <class bagtype, typename T_t>
-void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node;
-
+//Glues a single bag with the current tree decomposition T according to subset relation.
+//Version used for preprocessing.
+template<typename T_t>
+void glue_bag(
+        typename noboost::treedec_traits<T_t>::bag_type &bag,
+        typename noboost::treedec_traits<T_t>::vd_type elim_vertex,
+        T_t &T)
+{
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
+
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         if(std::includes(noboost::bag(*vIt, T).begin(),
                          noboost::bag(*vIt, T).end(),
@@ -589,59 +633,78 @@ void glue_bag(bagtype &bag, typename bagtype::value_type elim_vertex, T_t &T){
             if(noboost::bag(*vIt, T).find(elim_vertex) != noboost::bag(*vIt, T).end()){
                 return;
             }
-
-            t_dec_node = boost::add_vertex(T);
+            bag.insert(elim_vertex);
+            typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
             noboost::bag(t_dec_node, T) = MOVE(bag);
-            bag.clear();
-            noboost::bag(t_dec_node, T).insert(elim_vertex);
+
             boost::add_edge(*vIt, t_dec_node, T);
             return;
         }
     }
 
-    if(boost::num_vertices(T) > 0){
-        boost::tie(vIt, vEnd) = boost::vertices(T);
-    }
-
-    t_dec_node = boost::add_vertex(T);
+    //Case for a disconnected graph.
+    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
+    bag.insert(elim_vertex);
     noboost::bag(t_dec_node, T) = MOVE(bag);
-    bag.clear();
-    noboost::bag(t_dec_node, T).insert(elim_vertex);
 
     if(boost::num_vertices(T) > 1){
+        boost::tie(vIt, vEnd) = boost::vertices(T);
         boost::add_edge(*vIt, t_dec_node, T);
     }
 }
 
-//glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
 template <typename T_t>
-void glue_decompositions(T_t &T1, T_t &T2){
-    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+void glue_two_bags(T_t &T,
+      typename noboost::treedec_traits<T_t>::bag_type &bag1,
+      typename noboost::treedec_traits<T_t>::bag_type &bag2)
+{
+    typename boost::graph_traits<T_t>::vertex_iterator vIt1, vIt2, vEnd;
+    typename boost::graph_traits<T_t>::vertex_descriptor b1, b2;
 
-    //Copy T2 to T1 and add an edge from root to an arbitrary vertex of T2.
-    std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> idxMap(boost::num_vertices(T2));
-    std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
-    unsigned int id = 0;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T2); tIt != tEnd; tIt++){
-        idxMap[id] = boost::add_vertex(T1);
-        vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id));
-        noboost::bag(idxMap[id++], T1) = noboost::bag(*tIt, T2);
+    for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
+        if(noboost::bag(*vIt1, T) == bag1){
+            b1 = *vIt1;
+            break;
+        }
     }
 
-    typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(T2); eIt != eEnd; eIt++){
-        typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
-        v = vertex_map.find(boost::source(*eIt, T2));
-        w = vertex_map.find(boost::target(*eIt, T2));
-
-        boost::add_edge(idxMap[v->second], idxMap[w->second], T1);
+    for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
+        if(noboost::bag(*vIt2, T) == bag2){
+            b2 = *vIt2;
+            break;
+        }
     }
 
-    typename boost::graph_traits<T_t>::vertex_iterator tIt2, tEnd2;
+    if(vIt1 != vEnd && vIt2 != vEnd){
+        return;
+    }
 
-    boost::tie(tIt, tEnd) = boost::vertices(T1);
+    if(vIt1 == vEnd){
+        b1 = boost::add_vertex(T);
+        noboost::bag(b1, T) = bag1;
+    }
 
-    boost::add_edge(*tIt, idxMap[0], T1);
+    if(vIt2 == vEnd){
+        b2 = boost::add_vertex(T);
+        noboost::bag(b2, T) = bag2;
+    }
+
+    boost::add_edge(b1, b2, T);
+}
+
+//Glues bags with the current tree decomposition.
+template<typename T_t>
+void glue_bags(std::vector< boost::tuple<
+        typename noboost::treedec_traits<T_t>::vd_type,
+        typename noboost::treedec_traits<T_t>::bag_type
+             > > &bags, T_t &T)
+{
+    for(unsigned int i = bags.size(); i > 0; i--){
+        typename noboost::treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
+        typename noboost::treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
+
+        glue_bag(second, first, T);
+    }
 }
 
 
