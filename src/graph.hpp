@@ -474,9 +474,11 @@ namespace detail{ //
     public:
         typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-        shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
+        shared_adj_iter(vertex_descriptor v,
                         vertex_descriptor s, G const& g)
-            : adjacency_iterator(v), _ve(ve), _s(s), _g(g)
+            : adjacency_iterator(boost::adjacent_vertices(v, g).first),
+              _ve(boost::adjacent_vertices(v, g).second),
+              _s(s), _g(g)
         {untested();
             skip();
         }
@@ -519,10 +521,9 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
 { itested();
-    BOOST_AUTO(p, boost::adjacent_vertices(v, g));
     typedef typename detail::shared_adj_iter<G> Iter;
-    return std::make_pair(Iter(p.first, p.second, w, g),
-                          Iter(p.second, p.second, w, g));
+    return std::make_pair(Iter(v, w, g),
+                          Iter(v, w, g));
 }
 
 } // treedec
