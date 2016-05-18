@@ -142,8 +142,9 @@ bool make_layer(G_t &G, W_t &W,
          typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &vertices,
          unsigned int k, unsigned int idx)
 {
-    typedef typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type bag_type;
-    typedef typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::value_type value_type;
+    typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    typedef typename noboost::treedec_traits<T_t>::bag_type::value_type value_type;
 
     W.resize(idx+1);
 
@@ -151,7 +152,8 @@ bool make_layer(G_t &G, W_t &W,
     std::vector<bag_type> subs; //all possible X
     subsets(vertices, vertices.size(), k, 0, sub, subs);
 
-    //in the last layer (idx == 0), we just insert all subsets, without computing anything (the robber is catched)
+    //in the last layer (idx == 0), we just insert all subsets, without
+    //computing anything (the robber is caught)
     if(idx != 0){
         for(unsigned int i = 0; i <  subs.size(); i++){
             std::vector<unsigned int> indices;
@@ -165,14 +167,17 @@ bool make_layer(G_t &G, W_t &W,
 
             //search for all X', such that a turn is strict monotone
             for(unsigned int j = 0; j < W[idx-1].size(); j++){
-                //if a turn X -> X' is monotone, save the index of the entry in the layer below for computing a tree decomposition
-                //at the end
+                //if a turn X -> X' is monotone, save the index of the entry in
+                //the layer below for computing a tree decomposition at the end
 
+                // FIXME: don't create intersection. stop at first common elt.
                 bag_type inters;
                 std::set_intersection(subs[i].begin(), subs[i].end(), 
                                       W[idx-1][j].get<3>().begin(), W[idx-1][j].get<3>().end(), std::inserter(inters, inters.begin()));
 
-                if(!inters.empty()){ continue; }
+                if(!inters.empty()){
+                    continue;
+                }
 
                 if(is_monotone_dynamicCR(G, subs[i], W[idx-1][j].get<0>(), W[idx-1][j].get<1>(), newR, Rcomps)){
                     indices.push_back(j);
@@ -197,10 +202,13 @@ bool make_layer(G_t &G, W_t &W,
         }
     }
 
-    //We catched the robber(y in X). To cut down memory usage, we save the empty robber space instead of all possible y in X (or just X).
-    //With this modification, we additionally have to check "if(|R|== 0 && X' includes newR)" for monotonicity in is_monotone_dynamicCR
+    //We caught the robber(y in X). To cut down memory usage, we save the empty
+    //robber space instead of all possible y in X (or just X). With this
+    //modification, we additionally have to check "if(|R|== 0 && X' includes
+    //newR)" for monotonicity in is_monotone_dynamicCR
 
-    //todo: copy the whole "graph" in W displaced by one layer, such we would not compute monotone turns several times
+    //TODO: copy the whole "graph" in W displaced by one layer, such we would
+    //not compute monotone turns several times
     for(unsigned int i = 0; i < subs.size(); i++){
         W[idx].push_back(boost::tuple<bag_type, bag_type, std::vector<unsigned int>, bag_type>
                   (subs[i], bag_type(), std::vector<unsigned int>(), bag_type()));
@@ -235,7 +243,10 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    if(boost::num_vertices(G) <= 1 || 2*boost::num_edges(G) == boost::num_vertices(G)*(boost::num_vertices(G)-1u)){
+    typename boost::graph_traits<G_t>::vertices_size_type nv=boost::num_vertices(G);
+    typename boost::graph_traits<G_t>::edges_size_type ne=boost::num_edges(G);
+
+    if( nv<=1 || 2*ne==nv*(nv-1u) ){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             noboost::bag(t, T).insert(*vIt);
