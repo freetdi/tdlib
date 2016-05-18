@@ -75,29 +75,37 @@ void induced_subgraph_omit_edges(G_t &H, G_t &G,
     }
 }
 
-//Version for bags.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G,
-                      typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
-                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+// todo: prototype in graph.hpp
+template <typename H_t, typename G_t, class S_t, class M_t>
+void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
+    assert(boost::num_vertices(H)==0);
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
+    typedef typename boost::graph_traits<H_t>::vertex_iterator H_vertex_iterator;
+    std::vector<G_vertex_descriptor> internal_map(boost::num_vertices(G));
     std::vector<bool> disabled(boost::num_vertices(G), true);
-    vdMap.resize(X.size());
+    if(vdMap){
+        vdMap->resize(X.size());
+    }
+    H = MOVE(G_t(X.size()));
+    H_vertex_iterator h=boost::vertices(H).first;
+    size_t pos2=0;
 
-    for(typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::iterator sIt
-         = X.begin(); sIt != X.end(); sIt++)
-    {
+    for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
        unsigned int pos1 = noboost::get_pos(*sIt, G);
-       internal_map[pos1] = boost::add_vertex(H);
+       internal_map[pos1] = *h;
+       ++h;
        disabled[pos1] = false;
 
-       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
-       vdMap[pos2] = *sIt;
+       if(vdMap){
+           (*vdMap)[pos2] = *sIt;
+           ++pos2;
+       }
     }
+    assert(h==boost::vertices(H).second);
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
         unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
         unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){
@@ -106,29 +114,35 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 }
 
-//Version for set<descriptor>.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G,
-                      typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+// paste subgraph of G induced by X into H.
+// store map V(H) -> X \subset V(G) in vdMap.
+//
+// FIXME: misleading name. paste_induced_subgraph?
+template <typename G_t, class S_t, class M_t>
+void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
+    if(boost::num_vertices(H)==0){
+        return copy_induced_subgraph(H, G, X, vdMap);
+    }
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
     std::vector<bool> disabled(boost::num_vertices(G), true);
-    vdMap.resize(X.size());
+    if(vdMap){
+        vdMap->resize(X.size());
+    }
 
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-         = X.begin(); sIt != X.end(); sIt++)
-    {
+    for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
        unsigned int pos1 = noboost::get_pos(*sIt, G);
        internal_map[pos1] = boost::add_vertex(H);
        disabled[pos1] = false;
 
-       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
-       vdMap[pos2] = *sIt;
+       if(vdMap){
+           unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
+           (*vdMap)[pos2] = *sIt;
+       }
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
         unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
         unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){
@@ -137,30 +151,17 @@ void induced_subgraph(G_t &H, G_t &G,
     }
 }
 
-//Version for bags.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G,
-                      typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X)
+template <typename G_t, class S_t, class M_t>
+void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t& vdMap)
 {
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
+    return induced_subgraph(H, G, X, &vdMap);
+}
 
-    for(typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::iterator sIt
-         = X.begin(); sIt != X.end(); sIt++)
-    {
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
-       internal_map[pos1] = boost::add_vertex(H);
-       disabled[pos1] = false;
-    }
-
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
-        if(!disabled[spos] && !disabled[dpos]){
-            boost::add_edge(internal_map[spos], internal_map[dpos], H);
-        }
-    }
+// same, but without vdMap
+template <typename G_t, class S_t, class M_t>
+void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
+{
+    return induced_subgraph(H, G, X, NULL);
 }
 
 template <typename G_t>
@@ -303,8 +304,8 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
     for(; nIt1 != nEnd; nIt1++){itested();
         unsigned int cnt_common = 0;
-        auto ci = common_out_edges(*nIt1, min_vertex, G).first;
-        auto ce = common_out_edges(*nIt1, min_vertex, G).second;
+        BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
+        BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);
         for(; ci!=ce; ++ci){
             cnt_common++;
         }

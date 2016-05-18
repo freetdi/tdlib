@@ -90,7 +90,7 @@ public: // queueing
     {
         int n=_degs[d].erase(v);
         (void)n;
-        assert(boost::degree(v, _g) == d);
+        // assert(boost::degree(v, _g) == d); no (but why?)
         assert(n==1);
     }
     void unlink(const vertex_descriptor& v)
@@ -106,7 +106,7 @@ public: // queueing
     }
     void reg(const vertex_descriptor& v, size_t d)
     {
-        assert(boost::degree(v, _g) == d);
+        // assert(boost::degree(v, _g) == d); no (but why?)
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
     }

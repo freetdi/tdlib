@@ -753,10 +753,10 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
 #define TD_SUBSETS
 
 //Collects all subsets of 'X' of size 'k' and stores it in 'subs'.
-template <typename T>
-void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std::vector<std::set<T> > &subs){
+template <typename S>
+void subsets(S &X, int size, int k, int idx, std::vector<typename S::value_type> &sub, std::vector<S> &subs){
     if(k==0){
-        typename std::set<T> subS;
+        S subS;
         for(unsigned int i = 0; i < sub.size(); i++){
             subS.insert(sub[i]);
         }
@@ -765,7 +765,7 @@ void subsets(std::set<T> &X, int size, int k, int idx, std::vector<T> &sub, std:
     }
 
     int i = idx;
-    typename std::set<T>::iterator sIt = X.begin();
+    typename S::iterator sIt = X.begin();
     std::advance(sIt, i);
     for(; i<size;i++){
         sub.push_back(*sIt);

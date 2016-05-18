@@ -125,7 +125,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         G_t H(G);
         treedec::fillIn_ordering(G, old_elim_ordering, true); //true = ignore isolated vertices
         G = H; // reset
-#ifndef NDEBUG
+#ifdef MORE_DEBUG
         for( auto i : old_elim_ordering){
             assert(noboost::is_valid(i,G));
         }
