@@ -108,7 +108,7 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
 //    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
+    assign_neighbours(bag, v, G);
     unlink_1_neighbourhood(v, G, degs);
     degs.unlink(v);
 
@@ -142,7 +142,7 @@ bool Triangle(G_t &G,
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
+    assign_neighbours(bag, v, G);
 
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N(3);
     N[0] = *(boost::adjacent_vertices(v, G).first);
@@ -189,8 +189,8 @@ bool Buddy(G_t &G,
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
 
     typename noboost::treedec_traits<T_t>::bag_type N1, N2;
-    noboost::fetch_neighbourhood(N1, boost::adjacent_vertices(v, G), G);
-    noboost::fetch_neighbourhood(N2, boost::adjacent_vertices(w, G), G);
+    assign_neighbours(N1, v, G);
+    assign_neighbours(N2, w, G);
 
     if(N1 == N2){
         unlink_1_neighbourhood(v, G, degs);
@@ -240,8 +240,6 @@ bool Cube(G_t &G,
         return false;
     }
 
-    typename noboost::treedec_traits<T_t>::bag_type bag;
-
     Na[0] = *(boost::adjacent_vertices(a, G).first);
     Na[1] = *(++boost::adjacent_vertices(a, G).first);
     Na[2] = *(++(++boost::adjacent_vertices(a, G).first));
@@ -274,9 +272,8 @@ bool Cube(G_t &G,
     }
     else{}
 
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(a, G), G);
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(b, G), G);
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(c, G), G);
+    typename noboost::treedec_traits<T_t>::bag_type bag;
+    assign_neighbours(bag, a, b, c, G);
 
     if(bag.size() != 4){
         return false;
@@ -372,7 +369,7 @@ bool Simplicial(G_t &G,
 
     if(isClique){
         bag_type bag;
-        noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
+        assign_neighbours(bag, v, G);
 
         vd_type vd = noboost::get_vd(G, v);
         bags.push_back(boost::tuple<vd_type, bag_type>(vd, bag));
@@ -453,7 +450,7 @@ bool AlmostSimplicial(G_t &G,
 
         if(deg_v <= low){
             bag_type bag;
-            noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
+            assign_neighbours(bag, v, G);
             vd_type vd = noboost::get_vd(G, v);
 
             bags.push_back(boost::tuple<vd_type, bag_type>(vd, bag));

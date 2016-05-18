@@ -589,11 +589,11 @@ void _ordering_to_treedec(G_t &G,
         return;
     }
 
+
+    // looks like make_clique_and_detach?!
     typename noboost::treedec_traits<T_t>::bag_type bag;
-    noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(elimination_ordering[idx], G), G);
-
+    assign_neighbours(bag, elimination_ordering[idx], G);
     noboost::make_clique(boost::adjacent_vertices(elimination_ordering[idx], G), G);
-
     boost::clear_vertex(elimination_ordering[idx], G);
 
     treedec::_ordering_to_treedec(G, elimination_ordering, T, idx+1, ignore_isolated_vertices);

@@ -203,6 +203,53 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     make_clique(nIt1, nEnd, G, cb);
 }
 
+// insert the neighbors of v in G into B
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, G_t const &G)
+{ itested();
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
+    for(; nIt!=nEnd; ++nIt){itested();
+        B.insert(*nIt);
+    }
+}
+
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, V_t w, G_t const &G)
+{
+    insert_neighbours(B, v, G);
+    insert_neighbours(B, w, G);
+}
+
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
+{ untested();
+    insert_neighbours(B, v, w, G);
+    insert_neighbours(B, x, G);
+}
+
+// insert the neighbors of v in G into B
+// B starts empty.
+// equivalent to B = outedge_set(v, G) where applicable
+template<typename B_t, typename V_t, typename G_t>
+void assign_neighbours(B_t &B, V_t v, G_t const &G)
+{
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
+    for(; nIt!=nEnd; ++nIt){itested();
+        B.insert(B.end(), *nIt);
+    }
+}
+
+// insert neighbors of both vertices, after clearing B
+template<typename B_t, typename V_t, typename G_t>
+void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
+{
+    B.clear();
+    insert_neighbours(B, v, w, G);
+    insert_neighbours(B, x, G);
+}
+
 } //treedec
 
 namespace noboost{
@@ -224,9 +271,11 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     treedec::make_clique(nIt1, nEnd, G, cb);
 }
 
+#if 0
 // FIXME: wrong name, used in preprocessing.
+// FIXME: does not use G...
 template<typename B_t, typename nIter_t, typename G_t>
-// void copy_vertex_range
+// void paste_vertex_range
 void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
 { itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -235,6 +284,7 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
         B.insert(*nIt);
     }
 }
+#endif
 
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
