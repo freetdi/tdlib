@@ -122,19 +122,19 @@ void contract_edge(vertex_descriptor_G v,
                    G &g,
                    bool /*erase*/=false,
                    vertex_callback<vertex_descriptor_G>* cb=NULL)
-{ untested();
+{
     adjacency_iterator_G I, E;
-    for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){untested();
+    for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
         assert(boost::edge(v, *I, g).second);
-        if(*I != target){untested();
+        if(*I != target){
             bool added=boost::add_edge(target, *I, g).second;
-            if(added){untested();
+            if(added){
                 //rebasing edge from I-v to I-target.
-            }else if(cb){untested();
+            }else if(cb){
                 //did not add, degree will drop by one.
                 (*cb)(*I);
             }
-        }else{untested();
+        }else{
         }
     }
 
@@ -204,9 +204,10 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 template<typename B_t, typename nIter_t, typename G_t>
 // void copy_vertex_range
 void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
-{ untested();
+{ itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){untested();
+    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){itested();
+        // FIXME: hint?
         B.insert(*nIt);
     }
 }
@@ -284,7 +285,7 @@ inline void make_degree_sequence(const G_t &G,
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
 template<typename G_t>
-inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){untested();
+inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){itested();
     return boost::get(boost::get(boost::vertex_index, G), v);
 }
 
@@ -292,7 +293,7 @@ inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_desc
 // (transitional interface)
 template<typename G>
 inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
-{untested();
+{
     // works with "TD_graph_t" (augmented adj_list)
     //return g[v].id;
     return v;
@@ -366,11 +367,11 @@ struct tmpbaghack{ //
 template<class T_t, class V>
 struct tmpbaghack<bag, T_t, V>{ //
     static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v)
-    {untested();
+    {itested();
         return t[v].bag;
     }
     static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v)
-    {untested();
+    {itested();
         return t[v].bag;
     }
 };
@@ -457,7 +458,7 @@ size_t /*G::edge_index_type?*/ make_clique_and_detach(
         G& g,
         typename outedge_set<G>::type& bag,
         treedec::graph_callback<G>* cb=NULL)
-{untested();
+{
     detach_neighborhood(c, g, bag);
     return noboost::make_clique(bag.begin(), bag.end(), g, cb);
 }
@@ -479,7 +480,7 @@ namespace detail{ //
                         vertex_descriptor s, G const& g)
             : adjacency_iterator(v), _ve(ve),
               _s(s), _g(g)
-        {untested();
+        {
             skip();
         }
         shared_adj_iter(vertex_descriptor v,
@@ -492,10 +493,10 @@ namespace detail{ //
         }
         shared_adj_iter(const shared_adj_iter& p)
             : adjacency_iterator(p), _ve(p._ve), _s(p._s), _g(p._g)
-        {untested();
+        {
         }
     public: //ops
-        shared_adj_iter& operator++(){untested();
+        shared_adj_iter& operator++(){
             assert(_ve!=adjacency_iterator(*this));
             assert(adjacency_iterator(*this)!=_ve);
             adjacency_iterator::operator++();
@@ -505,13 +506,13 @@ namespace detail{ //
         }
     private:
         void skip()
-        {untested();
-            while(true){untested();
-                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){untested();
+        {
+            while(true){
+                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){
                     return;
-                }else if(!boost::edge(**this, _s, _g).second){untested();
+                }else if(!boost::edge(**this, _s, _g).second){
                     adjacency_iterator::operator++();
-                }else{untested();
+                }else{
                     return;
                 }
             }

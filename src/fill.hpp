@@ -164,7 +164,7 @@ public:
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         _vals[pos].value = missing_edges;
         _vals[pos].queued = false;
-        assert(_vals[pos].value!=-1 || _init);
+        assert(!_vals[pos].is_unknown() || _init);
     }
 public:
     void reg(const vertex_descriptor v)
