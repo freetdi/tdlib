@@ -85,6 +85,16 @@ void Islet(G_t &G, std::vector<boost::tuple<
     }
 }
 
+template <typename G_t>
+void Islet(G_t &G, std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > &bags)
+{
+    int low = -1;
+    Islet(G, bags, low);
+}
+
 /* (Islet,) Twig and Series rules. */
 template <typename G_t, typename DEGS>
 void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G,
