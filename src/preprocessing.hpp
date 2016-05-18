@@ -59,6 +59,32 @@ namespace treedec{
 
 namespace impl{
 
+// Check if there exists a degree-0-vertex.
+template <typename G_t>
+void Islet(G_t &G, std::vector<boost::tuple<
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+         > > &bags, int &low)
+{
+    typedef typename noboost::treedec_chooser<G_t>::type T_t;
+    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::degree(*vIt, G) == 0){
+            typename noboost::treedec_traits<T_t>::vd_type vd=noboost::get_vd(G, *vIt);
+            typename noboost::treedec_traits<T_t>::bag_type emptybag;
+
+            bags.push_back(
+                    boost::tuple<vd_type,
+                    typename noboost::treedec_traits<T_t>::bag_type
+                    >(vd, emptybag));
+
+            low = (low > 0)? low : 0;
+        }
+    }
+}
+
 /* (Islet,) Twig and Series rules. */
 template <typename G_t, typename DEGS>
 void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G,
