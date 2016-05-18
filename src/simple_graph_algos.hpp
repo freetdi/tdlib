@@ -75,49 +75,21 @@ void induced_subgraph_omit_edges(G_t &H, G_t &G,
     }
 }
 
-//Version for bags.
-template <typename G_t>
-void induced_subgraph(G_t &H, G_t &G,
-                      typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
-                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+// copy subgraph of G induced by X into H.
+// store map V(H) -> X \subset V(G) in vdMap.
+//
+// TODO: often H starts empty.
+//       this case can be simpler.
+//
+// FIXME: misleading name. copy_induced_subgraph?
+template <typename G_t, class S_t, class M_t>
+void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t& vdMap)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
     std::vector<bool> disabled(boost::num_vertices(G), true);
     vdMap.resize(X.size());
 
-    for(typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type::iterator sIt
-         = X.begin(); sIt != X.end(); sIt++)
-    {
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
-       internal_map[pos1] = boost::add_vertex(H);
-       disabled[pos1] = false;
-
-       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
-       vdMap[pos2] = *sIt;
-    }
-
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
-        if(!disabled[spos] && !disabled[dpos]){
-            boost::add_edge(internal_map[spos], internal_map[dpos], H);
-        }
-    }
-}
-
-//Version for set<descriptor>.
-template <typename G_t, class S_t>
-void induced_subgraph(G_t &H, G_t &G, S_t const& X,
-                      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
-{
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
-    vdMap.resize(X.size());
-
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-         = X.begin(); sIt != X.end(); sIt++)
-    {
+    for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
        unsigned int pos1 = noboost::get_pos(*sIt, G);
        internal_map[pos1] = boost::add_vertex(H);
        disabled[pos1] = false;
@@ -136,7 +108,7 @@ void induced_subgraph(G_t &H, G_t &G, S_t const& X,
     }
 }
 
-//Version for bags.
+// same, but without vdMap
 template <typename G_t>
 void induced_subgraph(G_t &H, G_t &G,
                       typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X)
