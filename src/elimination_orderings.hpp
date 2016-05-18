@@ -561,7 +561,12 @@ int get_width_of_elimination_ordering(G_t &G,
     int width = -1;
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
-        unsigned int deg = noboost::eliminate_vertex(elimination_ordering[i], G);
+        unsigned deg=boost::degree(elimination_ordering[i], G);
+
+        eliminate_vertex(elimination_ordering[i], G);
+        typename outedge_set<G_t>::type xbag;
+        treedec::make_clique_and_detach(elimination_ordering[i], G, xbag);
+        xbag.clear(); // provide interface with clear included? (not urgent)
 
         width = (width > (int)deg)? width : (int)deg;
     }

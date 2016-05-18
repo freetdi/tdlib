@@ -157,6 +157,9 @@ inline void contract_edge(vertex_iterator_G v,
     }
 }
 
+} // noboost
+
+namespace treedec{
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
 // returns the number of newly created edges.
@@ -192,13 +195,33 @@ size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>*
     return counter;
 }
 
-// convenience wrapper (boost-style iterator pair)
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 { itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
     boost::tie(nIt1, nEnd) = nIter;
     make_clique(nIt1, nEnd, G, cb);
+}
+
+} //treedec
+
+namespace noboost{
+
+//transitional wrapper. don't use.
+template<typename B, typename E, typename G_t>
+size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+{
+    return treedec::make_clique(nIt1, nEnd, G, cb);
+}
+
+// convenience wrapper (boost-style iterator pair)
+// transitional. do not use
+template<typename nIter_t, typename G_t>
+void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+{ itested();
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
+    boost::tie(nIt1, nEnd) = nIter;
+    treedec::make_clique(nIt1, nEnd, G, cb);
 }
 
 // FIXME: wrong name, used in preprocessing.
@@ -247,14 +270,17 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
 namespace noboost{
 
+#if 0 // unused (hopefully)
 // FIXME: it's make_clique.
 template<typename G_t>
-unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){untested();
+unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G)
+{ unreachable(); // bogus function.
     noboost::make_clique(boost::adjacent_vertices(v, G), G);
     unsigned int deg = boost::degree(v, G);
     boost::clear_vertex(v, G);
-    return deg;
+    return deg; // does not make sense. the caller already knows the degree.
 }
+#endif
 
 template <typename G_t>
 inline void make_degree_sequence(const G_t &G,
@@ -454,11 +480,10 @@ using noboost::outedge_set;
 //   edge.
 // - provide memory through bag pointer.
 //
-template<class G>
+template<class G, class B>
 size_t /*G::edge_index_type?*/ make_clique_and_detach(
         typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g,
-        typename outedge_set<G>::type& bag,
+        G& g, B& bag,
         treedec::graph_callback<G>* cb=NULL)
 {
     detach_neighborhood(c, g, bag);

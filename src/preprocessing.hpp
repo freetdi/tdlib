@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2016
+// Felix Salfelder 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -104,13 +105,19 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
          > > &bags, int &low, DEGS &degs)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
-
+//    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
     noboost::fetch_neighbourhood(bag, boost::adjacent_vertices(v, G), G);
     unlink_1_neighbourhood(v, G, degs);
     degs.unlink(v);
-    int deg = (int)noboost::eliminate_vertex(v, G);
+
+    unsigned deg = boost::degree(v, G);
+    typename outedge_set<G_t>::type xbag;
+    treedec::make_clique_and_detach(v, G, xbag);
+    xbag.clear(); // provide interface with clear included? (not urgent)
+    assert(!boost::degree(v, G));
+
     redegree(NULL, G, bag, degs);
 
     bags.push_back(
@@ -119,7 +126,7 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
               typename noboost::treedec_traits<T_t>::bag_type
              >(v, bag));
 
-    low = (low > deg)? low : deg;
+    low = (low > (int)deg)? low : deg;
 }
 
 //Applies the Triangle rule if applicable (checks if there exists a degree-3-vertex,
@@ -148,7 +155,9 @@ bool Triangle(G_t &G,
     {
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v, 3);
-        noboost::eliminate_vertex(v, G);
+        typename outedge_set<G_t>::type xbag;
+        treedec::make_clique_and_detach(v, G, xbag);
+        xbag.clear(); // provide interface with clear included? (not urgent)
         redegree(NULL, G, bag, degs);
 
         bags.push_back(
@@ -370,7 +379,9 @@ bool Simplicial(G_t &G,
 
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v);
-        noboost::eliminate_vertex(v, G);
+        typename outedge_set<G_t>::type xbag;
+        treedec::make_clique_and_detach(v, G, xbag);
+        xbag.clear(); // provide interface with clear included? (not urgent)
         redegree(NULL, G, bag, degs);
 
         low = (low > (int)bag.size())? low : (int)bag.size();
@@ -449,7 +460,9 @@ bool AlmostSimplicial(G_t &G,
 
             unlink_1_neighbourhood(v, G, degs);
             degs.unlink(v);
-            noboost::eliminate_vertex(v, G);
+            typename outedge_set<G_t>::type xbag;
+            treedec::make_clique_and_detach(v, G, xbag);
+            xbag.clear(); // provide interface with clear included? (not urgent)
             redegree(NULL, G, bag, degs);
 
             return true;
