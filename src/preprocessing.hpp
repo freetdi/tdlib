@@ -94,7 +94,6 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
          > > &bags, int &low, DEGS &degs)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
-    typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
 
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
@@ -388,7 +387,7 @@ bool AlmostSimplicial(G_t &G,
     bool isAlmostSimplicial = true;
     bool specialNeighbourFound = false;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    typename boost::graph_traits<G_t>::vertex_descriptor cand1, cand2, specialNeighbour;
+    vertex_descriptor cand1, cand2, specialNeighbour;
     unsigned int missingEdgesCount;
 
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; ++nIt1){
@@ -504,16 +503,15 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         }
         //degree 3-rules
         else if(min_ntd == 3){
-            for(typename std::unordered_set<vertex_descriptor>::iterator it1
-                               = degs[3].begin(); it1 != degs[3].end(); ++it1)
-            {
+            BOOST_AUTO(it1, degs[3].begin());
+            for(; it1!=degs[3].end(); ++it1){
                 //Triangle
                 if(Triangle(G, *it1, bags, low, degs)){
                     reduction_complete = false;
                     goto NEXT_ITER;
                 }
                 //Buddy
-                typename std::unordered_set<vertex_descriptor>::iterator it2 = it1;
+                BOOST_AUTO(it2, it1);
                 it2++;
                 for(; it2 != degs[3].end(); ++it2){
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
@@ -535,9 +533,8 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             low = (low >= 4)? low : 4;
 
             for(unsigned int i = min_ntd; i < num_vert; ++i){
-                for(typename std::unordered_set<vertex_descriptor>::iterator it
-                               = degs[i].begin(); it != degs[i].end(); ++it)
-                {
+                BOOST_AUTO(it, degs[i].begin());
+                for(; it != degs[i].end(); ++it){
                     if(Simplicial(G, *it, bags, low, degs)){
                         reduction_complete = false;
                         goto NEXT_ITER;
