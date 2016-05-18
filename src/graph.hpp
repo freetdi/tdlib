@@ -159,6 +159,7 @@ inline void contract_edge(vertex_iterator_G v,
 
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
+// returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
 size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 {itested();
@@ -246,6 +247,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
 namespace noboost{
 
+// FIXME: it's make_clique.
 template<typename G_t>
 unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){untested();
     noboost::make_clique(boost::adjacent_vertices(v, G), G);

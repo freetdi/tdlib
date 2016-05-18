@@ -478,17 +478,20 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     typedef typename noboost::deg_chooser<G_t>::type degs_type;
     typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
-    bag_type bag_i;
-    bag_type* bags_i=&bag_i;
+
+    // incomplete?
+    //bag_type bag_i;
+    //bag_type* bags_i=&bag_i;
 
     degs_type degs(G);
+    const degs_type& cdegs(degs);
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
 
     //Islet rule
-    if(!degs[0].empty()){
+    if(!cdegs[0].empty()){
         bag_type emptybag;
-        BOOST_AUTO(I, degs[0].begin());
-        BOOST_AUTO(E, degs[0].end());
+        BOOST_AUTO(I, cdegs[0].begin());
+        BOOST_AUTO(E, cdegs[0].end());
         for(; I != E; I++){
             bags.push_back(boost::tuple<vd_type, bag_type>(*I, emptybag));
         }
@@ -513,8 +516,8 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         }
         //degree 3-rules
         else if(min_ntd == 3){
-            BOOST_AUTO(it1, degs[3].begin());
-            for(; it1!=degs[3].end(); ++it1){
+            BOOST_AUTO(it1, cdegs[3].begin());
+            for(; it1!=cdegs[3].end(); ++it1){
                 //Triangle
                 if(Triangle(G, *it1, bags, low, degs)){
                     reduction_complete = false;
@@ -523,14 +526,14 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
                 //Buddy
                 BOOST_AUTO(it2, it1);
                 it2++;
-                for(; it2 != degs[3].end(); ++it2){
+                for(; it2 != cdegs[3].end(); ++it2){
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
                         reduction_complete = false;
                         goto NEXT_ITER;
                     }
                 }
                 //Cube
-                if(degs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
+                if(cdegs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
                     reduction_complete = false;
                     goto NEXT_ITER;
                 }
@@ -543,8 +546,8 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             low = (low >= 4)? low : 4;
 
             for(unsigned int i = min_ntd; i < num_vert; ++i){
-                BOOST_AUTO(it, degs[i].begin());
-                for(; it != degs[i].end(); ++it){
+                BOOST_AUTO(it, cdegs[i].begin());
+                for(; it != cdegs[i].end(); ++it){
                     if(Simplicial(G, *it, bags, low, degs)){
                         reduction_complete = false;
                         goto NEXT_ITER;
