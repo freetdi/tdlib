@@ -198,7 +198,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
         degs.unlink(c, min_ntd);
 
         if(T){
-            elim_vertices[i] = noboost::get_vd(G, c);
+            elim_vertices[i] = get_vd(G, c);
         }
         else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
@@ -314,7 +314,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
         if(T){
             assert(i<bags.size());
             bags_i = &bags[i];
-            elim_vertices[i] = noboost::get_vd(G, v);
+            elim_vertices[i] = get_vd(G, v);
         }else{untested();
         }
 
