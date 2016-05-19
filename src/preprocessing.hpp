@@ -120,11 +120,7 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
 
     redegree(NULL, G, bag, degs);
 
-    bags.push_back(
-             boost::tuple<
-              typename noboost::treedec_traits<T_t>::vd_type,
-              typename noboost::treedec_traits<T_t>::bag_type
-             >(v, bag));
+    bags.push_back(boost::make_tuple(v, bag));
 
     low = (low > (int)deg)? low : deg;
 }
@@ -145,9 +141,10 @@ bool Triangle(G_t &G,
     assign_neighbours(bag, v, G);
 
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N(3);
-    N[0] = *(boost::adjacent_vertices(v, G).first);
-    N[1] = *(++boost::adjacent_vertices(v, G).first);
-    N[2] = *(++(++boost::adjacent_vertices(v, G).first));
+    BOOST_AUTO(f, boost::adjacent_vertices(v, G).first);
+    N[0] = *f;
+    N[1] = *(++f);
+    N[2] = *(++f);
 
     if(boost::edge(N[0], N[1], G).second
     || boost::edge(N[0], N[2], G).second
@@ -160,11 +157,7 @@ bool Triangle(G_t &G,
         xbag.clear(); // provide interface with clear included? (not urgent)
         redegree(NULL, G, bag, degs);
 
-        bags.push_back(
-           boost::tuple<
-        typename noboost::treedec_traits<T_t>::vd_type,
-        typename noboost::treedec_traits<T_t>::bag_type
-         >(v, bag));
+        bags.push_back( boost::make_tuple(v, bag));
 
         low = (low > 3)? low : 3;
         return true;
@@ -289,7 +282,7 @@ bool Cube(G_t &G,
 
     if((Nc[0] == v && Nc[1] == w) || (Nc[1] == v && Nc[0] == w)){
         bag.clear();
-        vd_type vdx  =noboost::get_vd(G, x);
+        vd_type vdx = noboost::get_vd(G, x);
         vd_type vda = noboost::get_vd(G, a);
         vd_type vdb = noboost::get_vd(G, b);
         vd_type vdc = noboost::get_vd(G, c);
@@ -298,15 +291,15 @@ bool Cube(G_t &G,
         vd_type vdw = noboost::get_vd(G, w);
 
         bag.insert(vdu); bag.insert(vdv); bag.insert(vdx);
-        bags.push_back(boost::tuple<vd_type, bag_type>(vda, bag));
+        bags.push_back(boost::make_tuple(vda, bag));
         bag.clear();
 
         bag.insert(vdw); bag.insert(vdv); bag.insert(vdx);
-        bags.push_back(boost::tuple<vd_type, bag_type>(vdc, bag));
+        bags.push_back(boost::make_tuple(vdc, bag));
         bag.clear();
 
         bag.insert(vdw); bag.insert(vdu); bag.insert(vdx);
-        bags.push_back(boost::tuple<vd_type, bag_type>(vdb, bag));
+        bags.push_back(boost::make_tuple(vdb, bag));
 
         degs.unlink(a, 3);
         degs.unlink(b, 3);
@@ -372,7 +365,7 @@ bool Simplicial(G_t &G,
         assign_neighbours(bag, v, G);
 
         vd_type vd = noboost::get_vd(G, v);
-        bags.push_back(boost::tuple<vd_type, bag_type>(vd, bag));
+        bags.push_back(boost::make_tuple(vd, bag));
 
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v);
