@@ -184,8 +184,9 @@ bool Buddy(G_t &G,
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v, 3);
         degs.unlink(w, 3);
-        noboost::make_clique(boost::adjacent_vertices(v, G), G);
-        boost::clear_vertex(v, G);
+        typename outedge_set<G_t>::type xbag;
+        treedec::make_clique_and_detach(v, G, xbag);
+        xbag.clear(); // provide interface with clear included? (not urgent)
         boost::clear_vertex(w, G);
         redegree(NULL, G, N1, degs);
 
@@ -306,10 +307,11 @@ bool Cube(G_t &G,
         boost::clear_vertex(b, G);
         boost::clear_vertex(c, G);
 
+        /// TODO: make_clique?
         boost::add_edge(u, v, G);
         boost::add_edge(u, w, G);
-        boost::add_edge(v, w, G);
         boost::add_edge(u, x, G);
+        boost::add_edge(v, w, G);
         boost::add_edge(v, x, G);
         boost::add_edge(w, x, G);
 
