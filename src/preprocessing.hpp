@@ -377,6 +377,7 @@ bool AlmostSimplicial(G_t &G,
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
 
     bool isAlmostSimplicial = true;
@@ -423,9 +424,11 @@ bool AlmostSimplicial(G_t &G,
     DOUBLE_BREAK:
 
     if(isAlmostSimplicial){
-        int deg_v = (int)boost::degree(v, G);
+        vertices_size_type deg_v = boost::degree(v, G);
+        assert(deg_v);
+        assert(low>=0);
 
-        if(deg_v <= low){
+        if(deg_v <= (vertices_size_type)low){
             vd_type vd = noboost::get_vd(G, v);
 
             unlink_1_neighbourhood(v, G, degs);
@@ -437,7 +440,7 @@ bool AlmostSimplicial(G_t &G,
 
             return true;
         }
-        else if(low < deg_v-1){
+        else if(vertices_size_type(low) < deg_v-1u){
             low = deg_v-1;
             return true;
         }
@@ -471,11 +474,10 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
 
     //Islet rule
     if(!cdegs[0].empty()){
-        bag_type emptybag;
         BOOST_AUTO(I, cdegs[0].begin());
         BOOST_AUTO(E, cdegs[0].end());
         for(; I != E; I++){
-            bags.push_back(boost::make_tuple(*I, MOVE(emptybag)));
+            bags.push_back(boost::make_tuple(*I, bag_type()));
         }
         low = (low > 0)? low : 0;
     }
