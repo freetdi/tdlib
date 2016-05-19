@@ -463,7 +463,7 @@ private:
 
 } //namespace misc
 
-namespace noboost{
+namespace treedec{
 
 template<class G_t>
 struct fill_chooser{
@@ -471,6 +471,12 @@ struct fill_chooser{
     typedef type fill_type; // transition? don't use.
 };
 
+}
+
+//transition
+namespace noboost{
+    // FIXME: use graph_traits
+    using treedec::fill_chooser;
 }
 
 #endif //guard
