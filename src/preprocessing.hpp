@@ -75,7 +75,7 @@ void Islet(G_t &G, std::vector<boost::tuple<
             typename noboost::treedec_traits<T_t>::vd_type vd=noboost::get_vd(G, *vIt);
             typename noboost::treedec_traits<T_t>::bag_type emptybag;
 
-            bags.push_back(boost::make_tuple(vd, emptybag));
+            bags.push_back(boost::make_tuple(vd, MOVE(emptybag)));
 
             low = (low > 0)? low : 0;
         }
@@ -276,15 +276,15 @@ bool Cube(G_t &G,
         vd_type vdw = noboost::get_vd(G, w);
 
         bag.insert(vdu); bag.insert(vdv); bag.insert(vdx);
-        bags.push_back(boost::make_tuple(vda, bag));
+        bags.push_back(boost::make_tuple(vda, MOVE(bag)));
         bag.clear();
 
         bag.insert(vdw); bag.insert(vdv); bag.insert(vdx);
-        bags.push_back(boost::make_tuple(vdc, bag));
+        bags.push_back(boost::make_tuple(vdc, MOVE(bag)));
         bag.clear();
 
         bag.insert(vdw); bag.insert(vdu); bag.insert(vdx);
-        bags.push_back(boost::make_tuple(vdb, bag));
+        bags.push_back(boost::make_tuple(vdb, MOVE(bag)));
 
         degs.unlink(a, 3);
         degs.unlink(b, 3);
@@ -347,20 +347,19 @@ bool Simplicial(G_t &G,
     DOUBLE_BREAK:
 
     if(isClique){
-        bag_type bag;
-        assign_neighbours(bag, v, G);
-
-        vd_type vd = noboost::get_vd(G, v);
-        bags.push_back(boost::make_tuple(vd, bag));
+        vd_type vd = get_vd(G, v);
 
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v);
-        typename outedge_set<G_t>::type xbag;
+        bag_type xbag;
         treedec::make_clique_and_detach(v, G, xbag);
-        xbag.clear(); // provide interface with clear included? (not urgent)
-        redegree(NULL, G, bag, degs);
+        redegree(NULL, G, xbag, degs);
 
-        low = (low > (int)bag.size())? low : (int)bag.size();
+        if (unsigned(low) > xbag.size()){
+            low = xbag.size();
+        }
+
+        bags.push_back(boost::make_tuple(vd, MOVE(xbag)));
         return true;
     }
     return false;
@@ -429,7 +428,6 @@ bool AlmostSimplicial(G_t &G,
         if(deg_v <= low){
             vd_type vd = noboost::get_vd(G, v);
 
-
             unlink_1_neighbourhood(v, G, degs);
             degs.unlink(v);
             typename outedge_set<G_t>::type xbag;
@@ -477,7 +475,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         BOOST_AUTO(I, cdegs[0].begin());
         BOOST_AUTO(E, cdegs[0].end());
         for(; I != E; I++){
-            bags.push_back(boost::make_tuple(*I, emptybag));
+            bags.push_back(boost::make_tuple(*I, MOVE(emptybag)));
         }
         low = (low > 0)? low : 0;
     }
