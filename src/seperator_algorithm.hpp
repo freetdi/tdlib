@@ -132,7 +132,7 @@ bool nearly_balanced_seperator(G_t &G,
 
             for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
                     = X_Y.begin(); sIt != X_Y.end(); sIt++){
-                unsigned int pos = noboost::get_pos(*sIt, G);
+                unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = true;
             }
 
@@ -160,17 +160,17 @@ bool nearly_balanced_seperator(G_t &G,
 
 //Glues the 'bag' with 'glueBag' in the current tree decomposition 'T'.
 template <typename T_t>
-void sep_glue_bag(typename noboost::treedec_traits<T_t>::bag_type &bag,
-                  typename noboost::treedec_traits<T_t>::bag_type &glueBag, T_t &T){
+void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
+                  typename treedec_traits<T_t>::bag_type &glueBag, T_t &T){
     if(boost::num_vertices(T) == 0){
         boost::add_vertex(T);
     }
 
     typename boost::graph_traits<T_t>::vertex_iterator vertexIt, vertexEnd;
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
-        if(noboost::bag(*vertexIt, T) == glueBag){
+        if(bag(*vertexIt, T) == glueBag){
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            noboost::bag(t_dec_node, T) = bag;
+            bag(t_dec_node, T) = b;
             boost::add_edge(t_dec_node, *vertexIt, T);
             return;
         }
@@ -195,7 +195,7 @@ bool sep_decomp(G_t &G, T_t &T,
         return true;
     }
 
-    typename noboost::treedec_traits<T_t>::bag_type B1, B2;
+    typename treedec_traits<T_t>::bag_type B1, B2;
     treedec::map_descriptors_to_bags<G_t>(parent, B2);
 
     //Trivial decomposition
@@ -219,7 +219,7 @@ bool sep_decomp(G_t &G, T_t &T,
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
                 = S.begin(); sIt != S.end(); sIt++) {
-            unsigned int pos = noboost::get_pos(*sIt, G);
+            unsigned int pos = get_pos(*sIt, G);
             disabled[pos] = true;
         }
 
@@ -246,7 +246,7 @@ bool sep_decomp(G_t &G, T_t &T,
             std::vector<bool> disabled_(boost::num_vertices(G), true);
             for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
                     = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
-                unsigned int pos = noboost::get_pos(*sIt, G);
+                unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
             }
 

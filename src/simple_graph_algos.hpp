@@ -46,18 +46,18 @@ void induced_subgraph_omit_edges(G_t &H, G_t &G,
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
          = X.begin(); sIt != X.end(); sIt++)
     {
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
+       unsigned int pos1 = get_pos(*sIt, G);
        internal_map[pos1] = boost::add_vertex(H);
        disabled[pos1] = false;
 
-       unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
+       unsigned int pos2 = get_pos(internal_map[pos1], H);
        vdMap[pos2] = *sIt;
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
+        unsigned int spos=get_pos(boost::source(*eIt, G), G);
+        unsigned int dpos=get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){
             bool omit = false;
             for(unsigned int i = 0; i < edges.size(); i++){
@@ -92,7 +92,7 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
     size_t pos2=0;
 
     for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
+       unsigned int pos1 = get_pos(*sIt, G);
        internal_map[pos1] = *h;
        ++h;
        disabled[pos1] = false;
@@ -106,8 +106,8 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
+        unsigned int spos=get_pos(boost::source(*eIt, G), G);
+        unsigned int dpos=get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){
             boost::add_edge(internal_map[spos], internal_map[dpos], H);
         }
@@ -131,20 +131,20 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
     }
 
     for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
-       unsigned int pos1 = noboost::get_pos(*sIt, G);
+       unsigned int pos1 = get_pos(*sIt, G);
        internal_map[pos1] = boost::add_vertex(H);
        disabled[pos1] = false;
 
        if(vdMap){
-           unsigned int pos2 = noboost::get_pos(internal_map[pos1], H);
+           unsigned int pos2 = get_pos(internal_map[pos1], H);
            (*vdMap)[pos2] = *sIt;
        }
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
-        unsigned int spos=noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=noboost::get_pos(boost::target(*eIt, G), G);
+        unsigned int spos=get_pos(boost::source(*eIt, G), G);
+        unsigned int dpos=get_pos(boost::target(*eIt, G), G);
         if(!disabled[spos] && !disabled[dpos]){
             boost::add_edge(internal_map[spos], internal_map[dpos], H);
         }
@@ -187,7 +187,7 @@ void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-           unsigned int pos = noboost::get_pos(*nIt, G);
+           unsigned int pos = get_pos(*nIt, G);
            if(!disabled[pos] && X.find(*nIt) == X.end()){
                S_X.insert(*nIt);
            }
@@ -202,11 +202,11 @@ void t_search_components(G_t &G,
         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
         int comp_idx)
 {
-    unsigned int pos = noboost::get_pos(vertex, G);
+    unsigned int pos = get_pos(vertex, G);
     visited[pos] = true;
     typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vertex, G); nIt != nEnd; nIt++){
-        unsigned int npos = noboost::get_pos(*nIt, G);
+        unsigned int npos = get_pos(*nIt, G);
         if(!visited[npos]){
             components[comp_idx].insert(*nIt);
             t_search_components(G, *nIt, visited, components, comp_idx);
@@ -223,7 +223,7 @@ void get_components_provided_map(G_t &G,
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;
@@ -238,14 +238,14 @@ template <typename G_t>
 void t_search_components(G_t &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
         std::vector<bool> &visited,
-        std::vector<typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type> &components,
+        std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &components,
         int comp_idx)
 {
-    unsigned int pos = noboost::get_pos(vertex, G);
+    unsigned int pos = get_pos(vertex, G);
     visited[pos] = true;
     typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vertex, G); nIt != nEnd; nIt++){
-        unsigned int npos = noboost::get_pos(*nIt, G);
+        unsigned int npos = get_pos(*nIt, G);
         if(!visited[npos]){
             components[comp_idx].insert(*nIt);
             t_search_components(G, *nIt, visited, components, comp_idx);
@@ -255,13 +255,13 @@ void t_search_components(G_t &G,
 
 template <typename G_t>
 void get_components_provided_map(G_t &G,
-             std::vector<typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type> &components,
+             std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &components,
              std::vector<bool> &visited){
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;
@@ -280,7 +280,7 @@ void get_components(G_t &G,
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;
