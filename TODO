@@ -1,6 +1,6 @@
 - cleanup interfaces
-- TD_ prefixe reparieren
-- rearrange noboost
+- remove TD_ prefixed files
+- remove noboost namespace
 - release 1.0
 - merge experimental elim_order quirks
 - clean up networkflow (directed graph? parallel?)
