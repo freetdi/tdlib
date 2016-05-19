@@ -104,19 +104,17 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
 //    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
-//    assign_neighbours(bag, v, G);
     unlink_1_neighbourhood(v, G, degs);
     degs.unlink(v);
 
     unsigned deg = boost::degree(v, G);
     typename outedge_set<G_t>::type xbag;
     treedec::make_clique_and_detach(v, G, xbag);
- //   xbag.clear(); // provide interface with clear included? (not urgent)
     assert(!boost::degree(v, G));
 
     redegree(NULL, G, xbag, degs);
 
-    bags.push_back(boost::make_tuple(v, xbag));
+    bags.push_back(boost::make_tuple(v, MOVE(xbag)));
 
     low = (low > (int)deg)? low : deg;
 }
@@ -132,9 +130,6 @@ bool Triangle(G_t &G,
               > > &bags, int &low, DEGS &degs)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
-    typename noboost::treedec_traits<T_t>::bag_type bag;
-
-    assign_neighbours(bag, v, G);
 
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N(3);
     BOOST_AUTO(f, boost::adjacent_vertices(v, G).first);
@@ -150,10 +145,9 @@ bool Triangle(G_t &G,
         degs.unlink(v, 3);
         typename outedge_set<G_t>::type xbag;
         treedec::make_clique_and_detach(v, G, xbag);
-        xbag.clear(); // provide interface with clear included? (not urgent)
-        redegree(NULL, G, bag, degs);
+        redegree(NULL, G, xbag, degs);
 
-        bags.push_back( boost::make_tuple(v, bag));
+        bags.push_back( boost::make_tuple(v, MOVE(xbag)));
 
         low = (low > 3)? low : 3;
         return true;
@@ -180,6 +174,7 @@ bool Buddy(G_t &G,
     assign_neighbours(N1, v, G);
     assign_neighbours(N2, w, G);
 
+    // FIXME: proper twincheck.
     if(N1 == N2){
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v, 3);
@@ -193,8 +188,8 @@ bool Buddy(G_t &G,
         vd_type vd1 = noboost::get_vd(G, v);
         vd_type vd2 = noboost::get_vd(G, w);
 
-        bags.push_back(boost::make_tuple(vd1, N1));
-        bags.push_back(boost::make_tuple(vd2, N2));
+        bags.push_back(boost::make_tuple(vd1, MOVE(N1)));
+        bags.push_back(boost::make_tuple(vd2, MOVE(N2)));
 
         low = (low > 3)? low : 3;
         return true;
@@ -438,18 +433,15 @@ bool AlmostSimplicial(G_t &G,
         int deg_v = (int)boost::degree(v, G);
 
         if(deg_v <= low){
-            bag_type bag;
-            assign_neighbours(bag, v, G);
             vd_type vd = noboost::get_vd(G, v);
 
-            bags.push_back(boost::make_tuple(vd, bag));
 
             unlink_1_neighbourhood(v, G, degs);
             degs.unlink(v);
             typename outedge_set<G_t>::type xbag;
             treedec::make_clique_and_detach(v, G, xbag);
-            xbag.clear(); // provide interface with clear included? (not urgent)
-            redegree(NULL, G, bag, degs);
+            redegree(NULL, G, xbag, degs);
+            bags.push_back(boost::make_tuple(vd, MOVE(xbag)));
 
             return true;
         }
