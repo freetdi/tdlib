@@ -104,19 +104,19 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
 //    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
-    assign_neighbours(bag, v, G);
+//    assign_neighbours(bag, v, G);
     unlink_1_neighbourhood(v, G, degs);
     degs.unlink(v);
 
     unsigned deg = boost::degree(v, G);
     typename outedge_set<G_t>::type xbag;
     treedec::make_clique_and_detach(v, G, xbag);
-    xbag.clear(); // provide interface with clear included? (not urgent)
+ //   xbag.clear(); // provide interface with clear included? (not urgent)
     assert(!boost::degree(v, G));
 
-    redegree(NULL, G, bag, degs);
+    redegree(NULL, G, xbag, degs);
 
-    bags.push_back(boost::make_tuple(v, bag));
+    bags.push_back(boost::make_tuple(v, xbag));
 
     low = (low > (int)deg)? low : deg;
 }
