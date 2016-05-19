@@ -201,6 +201,17 @@ bool Buddy(G_t &G,
     return false;
 }
 
+template<class T>
+inline void rearrange_cube(T* N, T x)
+{
+    if(N[0] == x){
+        N[0] = N[2];
+    }else if(N[1] == x){
+        N[1] = N[2];
+    }else{
+    }
+}
+
 //Applies the Cube rule if applicable.
 template <typename G_t, typename DEGS>
 bool Cube(G_t &G,
@@ -244,27 +255,9 @@ bool Cube(G_t &G,
     f = boost::adjacent_vertices(c, G).first;
     Nc[0] = *f; Nc[1] = *(++f); Nc[2] = *(++f);
 
-    if(Na[0] == x){
-        Na[0] = Na[2];
-    }
-    else if(Na[1] == x){
-        Na[1] = Na[2];
-    }
-    else{}
-    if(Nb[0] == x){
-        Nb[0] = Nb[2];
-    }
-    else if(Na[1] == x){
-        Nb[1] = Nb[2];
-    }
-    else{}
-    if(Nc[0] == x){
-        Nc[0] = Nc[2];
-    }
-    else if(Nc[1] == x){
-        Nc[1] = Nc[2];
-    }
-    else{}
+    rearrange_cube(Na, x);
+    rearrange_cube(Nb, x);
+    rearrange_cube(Nc, x);
 
     typename noboost::treedec_traits<T_t>::bag_type bag;
     assign_neighbours(bag, a, b, c, G);
