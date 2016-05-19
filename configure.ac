@@ -9,6 +9,23 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([])
 LT_INIT()
 
+# debugging
+AC_MSG_CHECKING([if debug code should be compiled in])
+AC_ARG_ENABLE([debug],
+[AS_HELP_STRING([--enable-debug],[Enable building of debug code. [[default: disabled]]])],
+[
+if test "X$enable_debug" = "Xno" ; then
+   AC_MSG_RESULT([no])
+else
+   AC_MSG_RESULT([yes])
+   enable_debug=yes
+fi
+],
+[
+   AC_MSG_RESULT([no])
+   enable_debug=no
+])
+
 # Checks for programs.
 AC_PROG_CXX
 
@@ -78,8 +95,22 @@ AC_C_INLINE
 
 # Checks for library functions.
 
+if test "$enable_debug" = "yes" ; then
+	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
+else
+	CPPFLAGS="$CPPFLAGS -DNDEBUG"
+fi
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 
 AC_OUTPUT
+
+AC_MSG_RESULT([
+** Configuration summary for $PACKAGE $VERSION:
+
+   prefix:     $prefix
+   python:     $python
+   CPPFLAGS:   $CPPFLAGS
+])
