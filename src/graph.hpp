@@ -586,6 +586,20 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
                           Iter(p.second, p.second, w, g));
 }
 
+// check if two vertices have the same neighborhood.
+// return false if not.
+template<class G_t>
+bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
+                 typename boost::graph_traits<G_t>::vertex_descriptor w,
+                 const G_t& G)
+{ itested();
+    typename outedge_set<G_t>::type N1, N2;
+    assign_neighbours(N1, v, G);
+    assign_neighbours(N2, w, G);
+
+    return(N1==N2);
+}
+
 } // treedec
 
 

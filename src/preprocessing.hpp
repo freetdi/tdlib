@@ -129,8 +129,6 @@ bool Triangle(G_t &G,
                 typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
               > > &bags, int &low, DEGS &degs)
 {
-    typedef typename noboost::treedec_chooser<G_t>::type T_t;
-
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N(3);
     BOOST_AUTO(f, boost::adjacent_vertices(v, G).first);
     N[0] = *f;
@@ -170,26 +168,23 @@ bool Buddy(G_t &G,
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
 
-    typename noboost::treedec_traits<T_t>::bag_type N1, N2;
-    assign_neighbours(N1, v, G);
-    assign_neighbours(N2, w, G);
 
-    // FIXME: proper twincheck.
-    if(N1 == N2){
+    if(check_twins(v,w,G)){
+        typename noboost::treedec_traits<T_t>::bag_type N1, N2;
+        assign_neighbours(N1, v, G);
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v, 3);
         degs.unlink(w, 3);
         typename outedge_set<G_t>::type xbag;
         treedec::make_clique_and_detach(v, G, xbag);
-        xbag.clear(); // provide interface with clear included? (not urgent)
         boost::clear_vertex(w, G);
-        redegree(NULL, G, N1, degs);
+        redegree(NULL, G, xbag, degs);
 
-        vd_type vd1 = noboost::get_vd(G, v);
-        vd_type vd2 = noboost::get_vd(G, w);
+        vd_type vd1 = get_vd(G, v);
+        vd_type vd2 = get_vd(G, w);
 
-        bags.push_back(boost::make_tuple(vd1, MOVE(N1)));
-        bags.push_back(boost::make_tuple(vd2, MOVE(N2)));
+        bags.push_back(boost::make_tuple(vd1, xbag));
+        bags.push_back(boost::make_tuple(vd2, MOVE(xbag)));
 
         low = (low > 3)? low : 3;
         return true;
@@ -384,7 +379,6 @@ bool AlmostSimplicial(G_t &G,
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
 
     bool isAlmostSimplicial = true;
     bool specialNeighbourFound = false;
