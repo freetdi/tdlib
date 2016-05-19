@@ -32,11 +32,11 @@
  *
  * template<class G>
  * void detach_neighborhood(typename boost::graph_traits<G>::vertex_descriptor& c,
- *    G& g, typename noboost::outedge_set<G>::type& bag)
+ *    G& g, typename outedge_set<G>::type& bag)
  */
 
-#ifndef TD_NOBOOST_H
-#define TD_NOBOOST_H
+#ifndef TD_GRAPH_H
+#define TD_GRAPH_H
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -56,7 +56,7 @@ struct bag{ //
 };
 #endif
 
-namespace noboost{ //
+namespace treedec{ //
 #if 0 // later, need c++11
     template<typename G>
     using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
@@ -97,9 +97,6 @@ struct edge_callback{ //
     virtual void operator()(edge_descriptor)=0;
 };
 
-}
-
-namespace treedec{ //
 template<typename G_t>
 struct graph_callback{ // fixme: union of the above?
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
@@ -108,9 +105,6 @@ struct graph_callback{ // fixme: union of the above?
     virtual void operator()(edge_descriptor)=0;
     virtual void operator()(vertex_descriptor)=0;
 };
-} //treedec
-
-namespace noboost{ //
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
@@ -153,7 +147,7 @@ inline void contract_edge(vertex_iterator_G v,
 { untested();
     contract_edge(*v, into, g, erase, cb);
     if(erase){untested();
-        noboost::remove_vertex(v, g);
+        remove_vertex(v, g);
     }
 }
 
@@ -250,10 +244,7 @@ void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
     insert_neighbours(B, x, G);
 }
 
-} //treedec
-
-namespace noboost{
-
+#if 0 // unneeded wrappers
 //transitional wrapper. don't use.
 template<typename B, typename E, typename G_t>
 size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
@@ -270,6 +261,7 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     boost::tie(nIt1, nEnd) = nIter;
     treedec::make_clique(nIt1, nEnd, G, cb);
 }
+#endif
 
 #if 0
 // FIXME: wrong name, used in preprocessing.
@@ -286,6 +278,7 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
 }
 #endif
 
+// FIXME: is this required?!
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_min_degree_vertex(const G_t &G, bool ignore_isolated_vertices=false)
@@ -307,18 +300,10 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     return min_vertex;
 }
 
-} //noboost
-
-namespace treedec{ //
-
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G);
-
-} // treedec
-
-namespace noboost{
 
 #if 0 // unused (hopefully)
 // FIXME: it's make_clique.
@@ -332,6 +317,7 @@ unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descript
 }
 #endif
 
+// FIXME: what does this do?
 template <typename G_t>
 inline void make_degree_sequence(const G_t &G,
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence)
@@ -392,6 +378,7 @@ struct outedge_set{ //
 };
 
 // kludge for balu
+// TODO: move to graph_traits?!
 template<class G>
 struct treedec_chooser{ //
     typedef unsigned value_type;
@@ -473,17 +460,12 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
+// FIXME: move to graph_traits
 template<class G_t>
 struct deg_chooser{ //
     typedef typename misc::DEGS<G_t> type;
     typedef type degs_type; // transition? don't use.
 };
-
-} // namespace noboost
-
-
-namespace treedec{ //
-
 
 // put neighbors of c into bag
 // isolate c in g
@@ -492,7 +474,7 @@ namespace treedec{ //
 template<class G>
 inline void detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename noboost::outedge_set<G>::type& bag);
+        G& g, typename outedge_set<G>::type& bag);
 
 
 // count number of edges missing in 1-neighborhood of v
@@ -514,12 +496,6 @@ inline size_t count_missing_edges(
     }
     return missing_edges;
 }
-} // treedec
-
-namespace treedec{ //
-
-    // TODO: cleanup
-using noboost::outedge_set;
 
 // collect neighbors of c into bag
 // remove c from graph (i.e. isolate).
@@ -537,12 +513,9 @@ size_t /*G::edge_index_type?*/ make_clique_and_detach(
         treedec::graph_callback<G>* cb=NULL)
 {
     detach_neighborhood(c, g, bag);
-    return noboost::make_clique(bag.begin(), bag.end(), g, cb);
+    return make_clique(bag.begin(), bag.end(), g, cb);
 }
-}//treedec
 
-
-namespace treedec{ //
 namespace detail{ //
 
     // iterate over edges adjacent to both v and s
@@ -615,6 +588,28 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
 
 } // treedec
 
-#endif //TD_NOBOOST_H
 
+// transition
+namespace noboost{
+    using treedec::bag;
+    using treedec::check;
+    using treedec::deg_chooser;
+    using treedec::contract_edge;
+    using treedec::edge_callback;
+//    using treedec::eliminate_vertex;
+//    using treedec::fetch_neighbourhood; // obsolete?
+    using treedec::get_min_degree_vertex;
+    using treedec::get_pos;
+    using treedec::get_vd;
+    using treedec::is_valid;
+    using treedec::make_clique;
+    using treedec::make_degree_sequence;
+    using treedec::outedge_set;
+    using treedec::remove_vertex;
+    using treedec::treedec_traits;
+    using treedec::treedec_chooser;
+    using treedec::vertex_callback;
+} // noboost
+
+#endif // guard
 // vim:ts=8:sw=4:et

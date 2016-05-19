@@ -92,7 +92,7 @@ template<typename G_t>
 struct fill_update_cb : public graph_callback<G_t>{
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename noboost::fill_chooser<G_t>::type fill_type;
+    typedef typename fill_chooser<G_t>::type fill_type;
 
     fill_update_cb(fill_type* d, G_t const& g) :
         _fill(d), G(g){}
@@ -130,18 +130,18 @@ namespace impl {
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 #if __cplusplus >= 201103L
-template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
 size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T=NULL)
 #else
 template <typename G_t, typename T_t>
 size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 #endif
 {
-    typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
+    typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
-    typedef typename noboost::deg_chooser<G_t>::type degs_type;
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    typedef typename deg_chooser<G_t>::type degs_type;
+    typedef typename treedec_traits<T_t>::bag_type bag_type;
     std::vector<bag_type> bags;
     bag_type bag_i;
     bag_type* bags_i=&bag_i;
@@ -157,7 +157,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
     degs_type degs(G);
 
 #ifndef NDEBUG
-    noboost::check(G);
+    check(G);
 #endif
 
     unsigned int i = 0;
@@ -188,7 +188,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 
         make_clique_and_detach(c, G, *bags_i);
 #ifndef NDEBUG // safety net.
-        noboost::check(G);
+        check(G);
 #endif
         redegree(NULL, G, *bags_i, degs);
         if(!T){
@@ -198,7 +198,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
         degs.unlink(c, min_ntd);
 
         if(T){
-            elim_vertices[i] = noboost::get_vd(G, c);
+            elim_vertices[i] = get_vd(G, c);
         }
         else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
@@ -225,7 +225,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 
     if(T){
         for(; i > 0; i--){
-            typename noboost::treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
+            typename treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
             glue_bag(bags[i-1], e, *T);
         }
         return 0;
@@ -238,7 +238,7 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 template <typename G_t>
 size_t /*FIXME*/ minDegree_decomp(G_t &G)
 {
-    return minDegree_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
+    return minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }
 #endif
 
@@ -253,8 +253,8 @@ void minDegree_decomp(G_t &G, T_t &T){
         return;
     }
 
-    std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
-                              typename noboost::treedec_traits<T_t>::bag_type> > bags;
+    std::vector< boost::tuple<typename treedec_traits<T_t>::bag_type::value_type,
+                              typename treedec_traits<T_t>::bag_type> > bags;
 
     treedec::impl::Islet(G, bags);
     impl::minDegree_decomp(G, &T);
@@ -267,17 +267,17 @@ namespace impl{
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
 #if __cplusplus >= 201103L
-template <typename G_t, typename T_t=typename noboost::treedec_chooser<G_t>::type>
+template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
 size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T=NULL)
 #else
 template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 #endif
 {
-    typedef typename noboost::treedec_chooser<G_t>::value_type my_vd;
+    typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename noboost::fill_chooser<G_t>::type fill_type;
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    typedef typename fill_chooser<G_t>::type fill_type;
+    typedef typename treedec_traits<T_t>::bag_type bag_type;
     std::vector<bag_type> bags;
     bag_type bag_i;
     bag_type* bags_i = &bag_i;
@@ -308,13 +308,13 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
         fill.check();
         boost::tie(v, min_fill) = fill.pick_min(0, -1, true);
         fill.check();
-        assert(noboost::is_valid(v,G));
+        assert(is_valid(v,G));
         BOOST_AUTO(deg, boost::degree(v, G));
 
         if(T){
             assert(i<bags.size());
             bags_i = &bags[i];
-            elim_vertices[i] = noboost::get_vd(G, v);
+            elim_vertices[i] = get_vd(G, v);
         }else{untested();
         }
 
@@ -339,7 +339,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
         if(T){
           //   typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
           //   for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-          //       bags[i].insert((typename noboost::treedec_traits<T_t>::bag_type::value_type) *nIt);
+          //       bags[i].insert((typename treedec_traits<T_t>::bag_type::value_type) *nIt);
           //   }
         } else if(deg > upper_bound){ untested();
             upper_bound = deg;
@@ -364,7 +364,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 template <typename G_t>
 size_t /*FIXME*/ fillIn_decomp(G_t &G)
 { untested();
-    return fillIn_decomp(G, (typename noboost::treedec_chooser<G_t>::type*)NULL);
+    return fillIn_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }
 #endif
 
@@ -380,8 +380,8 @@ void fillIn_decomp(G_t &G, T_t &T){
         return;
     }
 
-    std::vector< boost::tuple<typename noboost::treedec_traits<T_t>::bag_type::value_type,
-                              typename noboost::treedec_traits<T_t>::bag_type> > bags;
+    std::vector< boost::tuple<typename treedec_traits<T_t>::bag_type::value_type,
+                              typename treedec_traits<T_t>::bag_type> > bags;
 
     treedec::impl::Islet(G, bags);
     impl::fillIn_decomp(G, &T);
@@ -412,7 +412,7 @@ void _minDegree_ordering(G_t G,
 
         unsigned int min_degree = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int pos = noboost::get_pos(*vIt, G);
+            unsigned int pos = get_pos(*vIt, G);
             if(visited[pos]){
                 continue;
             }
@@ -428,10 +428,10 @@ void _minDegree_ordering(G_t G,
             return;
         }
 
-        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G, (graph_callback<G_t>*)NULL);
+        make_clique(boost::adjacent_vertices(min_vertex, G), G, (graph_callback<G_t>*)NULL);
 
         elim_ordering[i++] = min_vertex;
-        visited[noboost::get_pos(min_vertex, G)] = true;
+        visited[get_pos(min_vertex, G)] = true;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -451,7 +451,7 @@ void minDegree_ordering(G_t& G,
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             if(boost::degree(*vIt, G) == 0){
-                unsigned int pos = noboost::get_pos(*vIt, G);
+                unsigned int pos = get_pos(*vIt, G);
                 visited[pos] = true;
             }
             else{ n_++; }
@@ -484,7 +484,7 @@ void fillIn_ordering(G_t &G,
 
         unsigned int min_fill = UINT_MAX;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int pos = noboost::get_pos(*vIt, G);
+            unsigned int pos = get_pos(*vIt, G);
             if(visited[pos]){
                 continue;
             }
@@ -514,10 +514,10 @@ void fillIn_ordering(G_t &G,
             return;
         }
 
-        noboost::make_clique(boost::adjacent_vertices(min_vertex, G), G);
+        make_clique(boost::adjacent_vertices(min_vertex, G), G);
 
         elim_ordering[i++] = min_vertex;
-        visited[noboost::get_pos(min_vertex, G)] = true;
+        visited[get_pos(min_vertex, G)] = true;
 
         boost::clear_vertex(min_vertex, G);
     }
@@ -539,7 +539,7 @@ void fillIn_ordering(G_t& G,
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             if(boost::degree(*vIt, G) == 0){
-                unsigned int pos = noboost::get_pos(*vIt, G);
+                unsigned int pos = get_pos(*vIt, G);
                 visited[pos] = true;
             }
             else{ n_++; }
@@ -589,11 +589,10 @@ void _ordering_to_treedec(G_t &G,
         return;
     }
 
-
     // looks like make_clique_and_detach?!
     typename noboost::treedec_traits<T_t>::bag_type bag;
     assign_neighbours(bag, elimination_ordering[idx], G);
-    noboost::make_clique(boost::adjacent_vertices(elimination_ordering[idx], G), G);
+    make_clique(boost::adjacent_vertices(elimination_ordering[idx], G), G);
     boost::clear_vertex(elimination_ordering[idx], G);
 
     treedec::_ordering_to_treedec(G, elimination_ordering, T, idx+1, ignore_isolated_vertices);
@@ -624,7 +623,7 @@ void _treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::degree(*tIt, T) <= 1 && !noboost::bag(*tIt, T).empty()){
+        if(boost::degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -636,33 +635,33 @@ void _treedec_to_ordering(T_t &T,
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(leaf, T);
         parent = *nIt;
 
-        typename noboost::treedec_traits<T_t>::bag_type difference;
+        typename treedec_traits<T_t>::bag_type difference;
 
         if(boost::degree(leaf, T) == 1){
-            if(!std::includes(noboost::bag(parent, T).begin(),
-                              noboost::bag(parent, T).end(),
-                              noboost::bag(leaf, T).begin(),
-                              noboost::bag(leaf, T).end()))
+            if(!std::includes(bag(parent, T).begin(),
+                              bag(parent, T).end(),
+                              bag(leaf, T).begin(),
+                              bag(leaf, T).end()))
             {
-                std::set_difference(noboost::bag(leaf, T).begin(),
-                                    noboost::bag(leaf, T).end(),
-                                    noboost::bag(parent, T).begin(),
-                                    noboost::bag(parent, T).end(),
+                std::set_difference(bag(leaf, T).begin(),
+                                    bag(leaf, T).end(),
+                                    bag(parent, T).begin(),
+                                    bag(parent, T).end(),
                                     std::inserter(difference, difference.begin()));
             }
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = MOVE(noboost::bag(leaf, T));
+            difference = MOVE(bag(leaf, T));
         }
 
-        for(typename noboost::treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();
+        for(typename treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();
             sIt != difference.end(); sIt++)
         {
             elimination_ordering.push_back(*sIt);
         }
 
-        noboost::bag(leaf, T).clear();
+        bag(leaf, T).clear();
 
         _treedec_to_ordering<G_t, T_t>(T, elimination_ordering);
     }
@@ -698,7 +697,7 @@ void make_filled_graph(G_t &G,
         C[i].insert(elim_ordering[i]);
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){
-            unsigned int /*fixme*/ pos = noboost::get_pos(*nIt, G);
+            unsigned int /*fixme*/ pos = get_pos(*nIt, G);
             if(!visited[pos]){
                 C[i].insert(*nIt);
             }
@@ -720,7 +719,7 @@ void make_filled_graph(G_t &G,
             }
         }
 
-        unsigned int pos = noboost::get_pos(elim_ordering[i], G);
+        unsigned int pos = get_pos(elim_ordering[i], G);
         visited[pos] = true;
     }
 }
@@ -739,7 +738,7 @@ void LEX_M_fill_in(G_t &G,
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         label[pos] = 1.0;
         alpha_inv[i++] = false;
         visited[pos] = false;
@@ -751,7 +750,7 @@ void LEX_M_fill_in(G_t &G,
         typename boost::graph_traits<G_t>::vertex_descriptor v = *vIt;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int pos = noboost::get_pos(*vIt, G);
+            unsigned int pos = get_pos(*vIt, G);
             if(!alpha_inv[pos]){
                 if(label[pos] > max){
                     max = (unsigned int) label[pos];
@@ -759,7 +758,7 @@ void LEX_M_fill_in(G_t &G,
                 }
             }
         }
-        unsigned int pos = noboost::get_pos(v, G);
+        unsigned int pos = get_pos(v, G);
         visited[pos] = true;
         alpha_inv[pos] = true;
 
@@ -775,7 +774,7 @@ void LEX_M_fill_in(G_t &G,
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-            unsigned int posn = noboost::get_pos(*nIt, G);
+            unsigned int posn = get_pos(*nIt, G);
             if(!alpha_inv[posn]){
                 reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
@@ -789,7 +788,7 @@ void LEX_M_fill_in(G_t &G,
 
                 reached_i[j].pop_back();
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){
-                    unsigned int posn = noboost::get_pos(*nIt, G);
+                    unsigned int posn = get_pos(*nIt, G);
                     if(visited[posn]){
                         continue;
                     }
@@ -831,7 +830,7 @@ void LEX_M_minimal_ordering(G_t &G,
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         label[pos] = 1.0;
         alpha_inv[i++] = 0;
         visited[pos] = false;
@@ -843,7 +842,7 @@ void LEX_M_minimal_ordering(G_t &G,
         typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
         unsigned int max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            unsigned int pos = noboost::get_pos(*vIt, G);
+            unsigned int pos = get_pos(*vIt, G);
             if(!alpha_inv[pos]){
                 if((unsigned int)label[pos] > max){
                     max = (unsigned int) label[pos];
@@ -851,7 +850,7 @@ void LEX_M_minimal_ordering(G_t &G,
                 }
             }
         }
-        unsigned int posv = noboost::get_pos(v, G);
+        unsigned int posv = get_pos(v, G);
         visited[posv] = true;
         alpha[i] = v;
         alpha_inv[posv] = true;
@@ -868,7 +867,7 @@ void LEX_M_minimal_ordering(G_t &G,
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-            unsigned int posn = noboost::get_pos(*nIt, G);
+            unsigned int posn = get_pos(*nIt, G);
             if(!alpha_inv[posn]){
                 reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
@@ -882,7 +881,7 @@ void LEX_M_minimal_ordering(G_t &G,
 
                 reached_i[j].pop_back();
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){
-                    unsigned int posn = noboost::get_pos(*nIt, G);
+                    unsigned int posn = get_pos(*nIt, G);
                     if(visited[posn]){
                         continue;
                     }

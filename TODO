@@ -1,11 +1,9 @@
 - cleanup interfaces
-- TD_ prefixe reparieren
-- rearrange noboost
+- remove TD_ prefixed files
+- remove noboost namespace
 - release 1.0
 - merge experimental elim_order quirks
 - clean up networkflow (directed graph? parallel?)
 - provide meta heuristic for treewidth
-- rewrite preprocessing
 - rewrite dynamicCR
-- use DEGS style data base for fillIn algorithms
 - parallelize exact_cutset?
