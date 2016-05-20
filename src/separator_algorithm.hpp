@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2015
+// Felix Salfelder 2016
 //
 // (c) 2014-2015 Goethe-Universität Frankfurt
 //
@@ -30,7 +31,7 @@
 //
 // These function is most likely to be interesting for outside use:
 //
-// void seperator_algorithm(G_t &G, T_t &T)
+// void separator_algorithm(G_t &G, T_t &T)
 //
 //
 // For more information, see:
@@ -43,8 +44,8 @@
 //
 //
 
-#ifndef TD_SEPERATOR_ALGORITHM
-#define TD_SEPERATOR_ALGORITHM
+#ifndef TD_SEPARATOR_ALGORITHM
+#define TD_SEPARATOR_ALGORITHM
 
 #include <set>
 #include <vector>
@@ -88,6 +89,7 @@ template <typename T>
 void superset(T &X, T &V, unsigned int size){
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
+        assert(sIt!=V.end());
         X.insert(*(sIt++));
     }
 }
@@ -178,14 +180,16 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 }
 
 //The main procedure of the seperator algorithm.
-template <typename G_t, typename T_t>
+// return true if finished (note to self: what does it mean?)
+template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
 bool sep_decomp(G_t &G, T_t &T,
-                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
-                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &parent,
-                typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &vertices,
-                std::vector<bool> &disabled, unsigned int k)
+        W_t &W, // a vertex set
+        P_t &parent, // a vertex set
+        V_t &vertices, // a vertex set
+        std::vector<bool> &disabled, unsigned int k)
 {
-    //tw(G) > k - one could replace this with a better lower bound (see TD_lower_bounds.hpp).
+    typedef typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> vertex_set;
+    //tw(G) > k - one could replace this with a better lower bound (see lower_bounds.hpp).
     if(boost::num_edges(G) > k*boost::num_vertices(G)){
         return false;
     }
@@ -205,17 +209,17 @@ bool sep_decomp(G_t &G, T_t &T,
         return true;
     }
 
-    //Choose a superset of W of size 3k + 1.
+    //Turn W into a superset of W of size 3k + 1.
     treedec::superset(W, vertices, 3*k + 1);
 
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
+    vertex_set S;
 
     //If a nearly balanced seperator S of W' exists, proceed with the graphs
     //induced by the resulting components and the seperator recursively, add a
     //bag containing the union of W and S to the decomposition,
     //connected with the bag, created in the 'parent-call' of the procedure.
     if(treedec::nearly_balanced_seperator(G, W, S, disabled, k)){
-        std::vector<typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
+        std::vector<vertex_set> C;
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
                 = S.begin(); sIt != S.end(); sIt++) {
@@ -270,7 +274,7 @@ void separator_algorithm(G_t &G, T_t &T){
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        vertices.insert(*vIt);
+        vertices.insert(vertices.end(), *vIt);
     }
 
     while(!finished){

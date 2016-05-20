@@ -125,13 +125,13 @@ bool is_improvement_bag(G_t &H,
 /* MinimalSeperatingVertexSet(MSVS)-algorithm
  *
  * Tries to find a minimal seperator S in a graph H, that
- *    (1) containes the induced subgraph of a maximum-sized bag B(t) of T,
+ *    (1) contains the induced subgraph of a maximum-sized bag B(t) of T,
  *    (2) has an edge {x,y}, if {x,y} is a subset of B(t') for some neighbour t' of t in T.
  * If no seperator can be found for none of the maximum-sized bags, the algorithm stops. Otherwise,
  * the tree decomposition T is refined according to S.
  *
  * Warning: This function is not tested with directed treedecompositions
- *           (and probable computes an invalid treedecomposition. It should
+ *           (and probably computes an invalid treedecomposition. It should
  *            be possible to fix this by re-rooting the resulting treedecomposition).
  */
 template <typename G_t, typename T_t>
