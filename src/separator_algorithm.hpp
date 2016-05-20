@@ -94,6 +94,32 @@ void superset(T &X, T &V, unsigned int size){
     }
 }
 
+// (proof of concept, generalize later)
+// return true, if every element of W is
+// an element of S xor an element of X
+// aka intersect(W, S) == W \setminus X
+template<class W_t, class S_t, class X_t>
+inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
+{
+    typename S_t::const_iterator s=S.begin();
+
+    for(typename W_t::const_iterator w=W.begin(); w!=W.end(); ++w){
+        if(S.find(*w) != S.end()){
+            if(X.find(*w) != X.end()){ untested();
+                return false;
+            }else{
+            }
+        }else{
+            if(X.find(*w) == X.end()){ untested();
+                return false;
+            }else{
+            }
+        }
+    }
+
+    return true;
+}
+
 //Find a nearly balanced seperator S of W by doing an extended
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
@@ -124,14 +150,11 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             }
 
             std::vector<bool> disabled_(disabled);
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> sX, sY, X_Y, Z;
+            vertex_set sX, sY, X_Y;
 
             std::set_union(subsX[i].begin(), subsX[i].end(),
                            subsY[i][j].begin(), subsY[i][j].end(),
                            std::inserter(X_Y, X_Y.begin()));
-
-            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                std::inserter(Z, Z.begin()));
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
             treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
@@ -144,21 +167,42 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             }
 
             //Z must be a subset of S.
+            // Z=W\X_Y
+#ifndef NDEBUG
+            vertex_set Z;
+            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                                std::inserter(Z, Z.begin()));
+#endif
+#if 0 // do we need Z?
             sX.insert(Z.begin(), Z.end());
             sY.insert(Z.begin(), Z.end());
+#else // does this work?
+
+            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                                std::inserter(sX, sX.begin()));
+            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                                std::inserter(sY, sY.begin()));
+#endif
 
             //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
             if(!treedec::seperate_vertices(G, disabled_, sX, sY, S, k+1)){
                 continue;
             }
 
-            //S now is a sX-sY-seperator. Check if S holds the remaining property of a nearly balanced seperator.
+            //S now is a sX-sY-seperator. Check if S holds the remaining
+            //property of a nearly balanced seperator.
+#ifndef NDEBUG
             typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> isS_W;
             std::set_intersection(S.begin(), S.end(), W.begin(), W.end(),
                                   std::inserter(isS_W, isS_W.begin()));
+#endif
 
-            if(isS_W == Z){
+            // if  ( S \intersect W == W \ X_Y )
+            if(this_intersection_thing(W,S,X_Y)){
+                assert(isS_W == Z);
                 return true;
+            }else{ untested();
+                assert(isS_W != Z);
             }
         }
     }
@@ -239,7 +283,7 @@ bool sep_decomp(G_t &G, T_t &T,
 
         treedec::get_components_provided_map(G, C, disabled);
 
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> union_W_S;
+        vertex_set union_W_S;
         std::set_union(W.begin(), W.end(), S.begin(), S.end(), std::inserter(union_W_S, union_W_S.begin()));
 
         //Create a bag (W' v S) and connect it with the bag containing parent.
@@ -247,7 +291,7 @@ bool sep_decomp(G_t &G, T_t &T,
         treedec::sep_glue_bag(B1, B2, T);
 
         for(unsigned int i = 0; i < C.size(); i++){
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> union_C_i_S, is_C_i_W, newW;
+            vertex_set union_C_i_S, is_C_i_W, newW;
             std::set_union(C[i].begin(), C[i].end(), S.begin(), S.end(),
                            std::inserter(union_C_i_S, union_C_i_S.begin()));
 
@@ -277,7 +321,11 @@ bool sep_decomp(G_t &G, T_t &T,
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
 //graph could be decomposed.
 template <typename G_t, typename T_t>
-void separator_algorithm(G_t &G, T_t &T){
+void separator_algorithm(G_t &G, T_t &T)
+{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename std::set<vertex_descriptor> vertex_set;
+
     unsigned int k = 0;
     bool finished = false;
 
@@ -289,7 +337,7 @@ void separator_algorithm(G_t &G, T_t &T){
 
     while(!finished){
         std::vector<bool> disabled(boost::num_vertices(G), false);
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> emptySet, parent;
+        vertex_set emptySet, parent;
         finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, k);
         k++;
 

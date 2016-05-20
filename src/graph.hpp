@@ -210,7 +210,7 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_min_degree_vertex(const G_t &G, bool ignore_isolated_vertices=false)
-{untested();
+{
     unsigned int min_degree = UINT_MAX;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
