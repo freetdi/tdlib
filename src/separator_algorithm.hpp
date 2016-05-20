@@ -164,8 +164,7 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
             treedec::get_neighbourhood(G, disabled_, subsY[i][j], sY);
 
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-                    = X_Y.begin(); sIt != X_Y.end(); sIt++){
+            for(typename vertex_set::const_iterator sIt=X_Y.begin(); sIt!=X_Y.end(); ++sIt){
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = true;
             }

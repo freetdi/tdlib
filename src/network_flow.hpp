@@ -107,8 +107,8 @@ template <typename G_t>
 std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
     make_digraph(G_t const &G, std::vector<bool> const &disabled, digraph_t &diG,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y)
 {
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -277,8 +277,8 @@ static bool t_search_disjoint_ways(
 
 template <typename G_t>
 bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
         unsigned int k)
 {
@@ -377,8 +377,8 @@ bool seperate_vertices(
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
 template <typename G_t>
 void seperate_vertices(G_t &G, std::vector<bool> &disabled,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S)
 {
     seperate_vertices(G, disabled, X, Y, S, UINT_MAX);
