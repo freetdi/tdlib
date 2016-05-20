@@ -295,6 +295,8 @@ inline bool is_valid(const vertex_descriptor_G& v, const G& g)
     return true;
 }
 
+// namespace deprecate { (not yet)
+// TODO: use graph_traits. see below
 template<class G>
 struct outedge_set{ //
     typedef std::set<unsigned> type;
@@ -302,12 +304,20 @@ struct outedge_set{ //
 };
 
 // kludge for balu
-// TODO: move to graph_traits?!
+// TODO: use graph_traits. see below
 template<class G>
 struct treedec_chooser{ //
     typedef unsigned value_type;
     typedef std::set<unsigned> bag_type;
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
+};
+// } deprecate
+
+// this makes some sense...
+template<class G_t>
+struct graph_traits{ //
+    typedef typename treedec_chooser<G_t>::type treedec_type;
+    typedef typename outedge_set<G_t>::type outedge_set_type;
 };
 
 namespace detail{ //

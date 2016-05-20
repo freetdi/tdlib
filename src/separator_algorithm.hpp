@@ -94,18 +94,23 @@ void superset(T &X, T &V, unsigned int size){
     }
 }
 
-//Finds a nearly balanced seperator S of W by doing an extended
+//Find a nearly balanced seperator S of W by doing an extended
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
-template <typename G_t>
-bool nearly_balanced_seperator(G_t &G,
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
-    typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-    std::vector<bool> &disabled, unsigned int k)
+template <typename G_t, typename W_t, typename S_t>
+bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
+    std::vector<bool> const &disabled, unsigned int k)
 {
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> sub;
-    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > subsX;
-    std::vector<std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > > subsY;
+    typedef typename graph_traits<G_t>::treedec_type T_t;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename std::set<vertex_descriptor> vertex_set;
+    typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
+                                                           // vertex_descriptor
+    typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
+
+    std::vector<vertex_descriptor> sub;
+    std::vector<vertex_set> subsX;
+    std::vector<std::vector<vertex_set> > subsY;
 
     treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
 
