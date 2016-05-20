@@ -36,8 +36,8 @@
  - void exact_decomposition_cutset_decision(G_t &G, T_t &T, int k)
  - void exact_decomposition_dynamic(G_t &G, T_t &T)
  - void exact_decomposition_dynamic(G_t &G, T_t &T, int low)
- - void seperator_algorithm_MSVS(G_t &G, T_t &T)
- - void seperator_algorithm_TM(G_t &G, T_t &T)
+ - void separator_algorithm_MSVS(G_t &G, T_t &T)
+ - void separator_algorithm_TM(G_t &G, T_t &T)
  - void MSVS_trivial(G_t &G, T_t &T)
 */
 
@@ -54,7 +54,7 @@
 #include "postprocessing.hpp"
 #include "dynamicCR.hpp"
 #include "exact_cutset.hpp"
-#include "seperator_algorithm.hpp"
+#include "separator_algorithm.hpp"
 #include "misc.hpp"
 
 namespace treedec{
@@ -342,24 +342,24 @@ void exact_decomposition_chordal(G_t &G, T_t &T){
 }
 
 template <typename G_t, typename T_t>
-void seperator_algorithm_MSVS(G_t &G, T_t &T){
+void separator_algorithm_MSVS(G_t &G, T_t &T){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
     }
 
-    treedec::seperator_algorithm(G, T);
+    treedec::separator_algorithm(G, T);
     treedec::MSVS(G, T);
 }
 
 template <typename G_t, typename T_t>
-void seperator_algorithm_TM(G_t &G, T_t &T){
+void separator_algorithm_TM(G_t &G, T_t &T){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
     }
 
-    treedec::seperator_algorithm(G, T);
+    treedec::separator_algorithm(G, T);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
     treedec::treedec_to_ordering<G_t, T_t>(T, old_elim_ordering);
