@@ -708,6 +708,8 @@ void glue_bags(std::vector< boost::tuple<
 }
 
 
+namespace detail{
+
 template <typename G_t>
 void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
                      std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_,
@@ -723,8 +725,9 @@ void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descript
 }
 
 template <typename G_t>
-void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-                             typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &B)
+void map_descriptors_to_bags(
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &S,
+        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &B)
 {
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
                   S.begin(); sIt != S.end(); sIt++)
@@ -733,6 +736,11 @@ void map_descriptors_to_bags(std::set<typename boost::graph_traits<G_t>::vertex_
         B.insert(vd);
     }
 }
+} // detail
+
+// transition
+using detail::map_descriptors;
+using detail::map_descriptors_to_bags;
 
 template <typename G_t, typename T_t>
 void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap){

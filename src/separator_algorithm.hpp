@@ -184,11 +184,16 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
 bool sep_decomp(G_t &G, T_t &T,
         W_t &W, // a vertex set
-        P_t &parent, // a vertex set
+        P_t const &parent, // a vertex set
         V_t &vertices, // a vertex set
         std::vector<bool> &disabled, unsigned int k)
 {
-    typedef typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> vertex_set;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename std::set<vertex_descriptor> vertex_set;
+    typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
+                                                           // vertex_descriptor
+    typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
+
     //tw(G) > k - one could replace this with a better lower bound (see lower_bounds.hpp).
     if(boost::num_edges(G) > k*boost::num_vertices(G)){
         return false;
@@ -218,7 +223,7 @@ bool sep_decomp(G_t &G, T_t &T,
     //induced by the resulting components and the seperator recursively, add a
     //bag containing the union of W and S to the decomposition,
     //connected with the bag, created in the 'parent-call' of the procedure.
-    if(treedec::nearly_balanced_seperator(G, W, S, disabled, k)){
+    if(nearly_balanced_seperator(G, W, S, disabled, k)){
         std::vector<vertex_set> C;
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
@@ -248,14 +253,14 @@ bool sep_decomp(G_t &G, T_t &T,
                            std::inserter(newW, newW.begin()));
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
-            for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+            for(typename vertex_set::iterator sIt
                     = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
             }
 
             //Reject if no seperator can be found in one of the ongoing recursive calls.
-            if(!treedec::sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, k)){
+            if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, k)){
                 return false;
             }
         }
@@ -280,7 +285,7 @@ void separator_algorithm(G_t &G, T_t &T){
     while(!finished){
         std::vector<bool> disabled(boost::num_vertices(G), false);
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> emptySet, parent;
-        finished = treedec::sep_decomp(G, T, emptySet, parent, vertices, disabled, k);
+        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, k);
         k++;
 
         if(!finished){
