@@ -102,18 +102,22 @@ template<class W_t, class S_t, class X_t>
 inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
 {
     typename S_t::const_iterator s=S.begin();
+    typename X_t::const_iterator x=X.begin();
 
     for(typename W_t::const_iterator w=W.begin(); w!=W.end(); ++w){
-        if(S.find(*w) != S.end()){
-            if(X.find(*w) != X.end()){ untested();
-                return false;
-            }else{
-            }
-        }else{
-            if(X.find(*w) == X.end()){ untested();
-                return false;
-            }else{
-            }
+
+        while(*s<*w && s!=S.end()){
+            ++s;
+        }
+        bool inS=s!=S.end() && *s==*w;
+
+        while(*x<*w && x!=X.end()){
+            ++x;
+        }
+        bool inX=x!=X.end() && *x==*w;
+
+        if(inX==inS){ untested();
+            return false;
         }
     }
 
