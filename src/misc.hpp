@@ -768,33 +768,41 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
 #ifndef TD_SUBSETS
 #define TD_SUBSETS
 
-//Collects all subsets of 'X' of size 'k' and stores it in 'subs'.
-//FIXME: what does "size" do?
-template <typename S>
-void subsets(S const &X, int size, int k, int idx,
-        std::vector<S> &subs,
+//Collect all subsets of [i,e) of size 'k' and store in 'subs'.
+//pass "sub" to use custom stack space.
+template <typename S, typename O>
+void subsets(S i, S e, int k, O &subs,
         std::vector<typename S::value_type> *sub=NULL)
 {
     if(!sub){
         sub = new std::vector<typename S::value_type>();
     }
-    if(k==0){ untested();
-        S subS;
+    if(k==0){
+        typename O::value_type subS;
         // check: is sub already ordered?!
         subS.insert(sub->begin(), sub->end());
         subs.push_back(subS);
         return;
     }
 
-    int i = idx;
-    typename S::iterator sIt = X.begin();
-    std::advance(sIt, i);
-    for(; i<size;i++){
-        sub->push_back(*sIt);
-        subsets(X, size, k-1, i+1, subs, sub);
+    for(; i!=e;){
+        sub->push_back(*i);
+        ++i;
+        subsets(i, e, k-1, subs, sub);
         sub->pop_back();
-        sIt++;
     }
+}
+
+// wrapper...
+template <typename S>
+void subsets(S const &X, int size, int k, int idx,
+        std::vector<S> &subs,
+        std::vector<typename S::value_type> *sub=NULL)
+{
+    assert(idx==0);
+    assert(unsigned(size)==X.size());
+
+    return subsets(X.begin(), X.end(), k, subs, sub);
 }
 
 //wrapper. don't use.
@@ -802,10 +810,11 @@ template <typename S>
 void subsets(S const &X, int size, int k, int idx,
         std::vector<typename S::value_type> &sub,
         std::vector<S> &subs)
-{ untested();
+{
     assert(!sub.size());
     return subsets(X, size, k, idx, subs, &sub);
 }
+
 
 #endif //TD_SUBSETS
 
