@@ -80,12 +80,13 @@ void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card
     for(unsigned int i = min_card; i <=max_card; i++){
         subsets(X, X.size(), i, 0, sub, subsX);
     }
-    for(unsigned int i = 0; i < subsX.size(); i++){
+    BOOST_AUTO(I, subsX.begin());
+    for(; I!=subsX.end(); ++I){
         X_t difference;
 
         // compute the complement of subsX[i] wrt X
         std::set_difference(X.begin(), X.end(),
-                            subsX[i].begin(), subsX[i].end(),
+                            I->begin(), I->end(),
                        std::inserter(difference, difference.begin()));
 
         unsigned int maximum =
@@ -164,11 +165,12 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
 
     // TODO: don't visit a combination twice.
     for(unsigned int i = 0; i < subsX.size(); i++){
-        for(unsigned int j = 0; j < subsY[i].size(); j++){
+        BOOST_AUTO(J, subsY[i].begin());
+        for(; J!=subsY[i].end(); ++J){
             S.clear();
 
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
-            if(treedec::is_edge_between_sets(G, subsX[i], subsY[i][j])){
+            if(treedec::is_edge_between_sets(G, subsX[i], *J)){
                 continue;
             }
 
@@ -176,12 +178,12 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             vertex_set sX, sY, X_Y;
 
             std::set_union(subsX[i].begin(), subsX[i].end(),
-                           subsY[i][j].begin(), subsY[i][j].end(),
+                           J->begin(), J->end(),
                            std::inserter(X_Y, X_Y.begin()));
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
             treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
-            treedec::get_neighbourhood(G, disabled_, subsY[i][j], sY);
+            treedec::get_neighbourhood(G, disabled_, *J, sY);
 
             for(typename vertex_set::const_iterator sIt=X_Y.begin(); sIt!=X_Y.end(); ++sIt){
                 unsigned int pos = get_pos(*sIt, G);
