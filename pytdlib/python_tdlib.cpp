@@ -310,7 +310,7 @@ int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::
     return 0;
 }
 
-/*
+
 int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
 {
@@ -327,8 +327,6 @@ int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<u
 
     return treedec::get_width(T);
 }
-
-*/
 
 
 /* APPOXIMATIVE TREE DECOMPOSITIONS */
@@ -496,7 +494,7 @@ void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, 
     }
 }
 
-/*
+
 void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                   std::vector<unsigned int> &DS)
@@ -518,7 +516,7 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
         DS[i++] = *sIt;
     }
 }
-*/
+
 
 void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,

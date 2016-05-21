@@ -558,6 +558,48 @@ def exact_decomposition_cutset_decision(V, E, k):
 
     return rtn
 
+def exact_decomposition_dynamic(V, E, lb=-1):
+    """
+    Computes a tree decomposition of exact width, iff the given lower bound 
+    is not greater than the treewidth of the input graph. Otherwise
+    a tree decomposition of a width than matches the given lower bound
+    will be computed.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - lb : a lower bound to the treewidth of (V_G, E_G),
+           e.g. computed by lower_bound (default: '-1')
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.exact_decomposition_dynamic(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    cdef int c_lb = lb 
+
+    gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb)
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
 
 ##############################################################
 ############ APPROXIMATIVE ALGORITHMS ########################
@@ -900,6 +942,45 @@ def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
         py_VC.append(pyVCi)
 
     return py_VC
+
+
+def min_dominating_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+    """
+    Computes a minimal dominating set based on a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUTS:
+
+    - DS : a list of vertices of a minimal dominating set
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T, DS
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS)
+
+    py_DS = []
+    cdef i;
+    for i in range(0, len(DS)):
+        py_DS.append(DS[i])
+
+    return py_DS
 
 
 def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
