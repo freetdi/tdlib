@@ -78,7 +78,7 @@ void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card
 {
     assert(!sub.size());
     for(unsigned int i = min_card; i <=max_card; i++){
-        subsets(X, X.size(), i, 0, sub, subsX);
+        subsets(X, X.size(), i, 0, subsX, &sub);
     }
     BOOST_AUTO(I, subsX.begin());
     for(; I!=subsX.end(); ++I){
@@ -164,20 +164,27 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
     treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
 
     // TODO: don't visit a combination twice.
-    for(unsigned int i = 0; i < subsX.size(); i++){
+    unsigned i=-1u; // FIXME: unnecessary.
+    BOOST_AUTO(I, subsX.begin());
+    for(; I != subsX.end(); ++I){
+        ++i;
         BOOST_AUTO(J, subsY[i].begin());
         for(; J!=subsY[i].end(); ++J){
             S.clear();
 
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
-            if(treedec::is_edge_between_sets(G, subsX[i], *J)){
+            //
+            // FIXME: skip J much earlier!
+            if(treedec::is_edge_between_sets(G, *I, *J)){
                 continue;
             }
 
             std::vector<bool> disabled_(disabled);
             vertex_set sX, sY, X_Y;
 
-            std::set_union(subsX[i].begin(), subsX[i].end(),
+            // TODO. don't instanciate X_Y. just iterate.
+            // (do we need ordered iterator?)
+            std::set_union(I->begin(), I->end(),
                            J->begin(), J->end(),
                            std::inserter(X_Y, X_Y.begin()));
 
@@ -185,7 +192,8 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
             treedec::get_neighbourhood(G, disabled_, *J, sY);
 
-            for(typename vertex_set::const_iterator sIt=X_Y.begin(); sIt!=X_Y.end(); ++sIt){
+            typename vertex_set::const_iterator sIt=X_Y.begin();
+            for(; sIt!=X_Y.end(); ++sIt){
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = true;
             }
@@ -209,6 +217,7 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
 #endif
 
             //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
+            // network_flow here.
             if(!treedec::seperate_vertices(G, disabled_, sX, sY, S, k+1)){
                 continue;
             }
