@@ -527,42 +527,6 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
 
 /* MIN DOMINATING SET */
 
-/*
-template <typename G_t>
-bool is_dominating_set(G_t &G, std::set<unsigned int> &bag, const std::set<unsigned int> &set){
-    for(std::set<unsigned int>::iterator sIt = bag.begin(); sIt != bag.end(); sIt++){
-        if(set.find(*sIt) == set.end()){
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            bool hit = false;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
-                if(set.find(*nIt) != set.end()){
-                    hit = true;
-                    break;
-                }
-            }
-            if(!hit){
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-
-template <typename G_t>
-bool is_dominated(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor new_vertex,
-                  const std::set<unsigned int> &set)
-{
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(new_vertex, G); nIt != nEnd; nIt++){
-        if(set.find(*nIt) != set.end()){
-            return true;
-        }
-    }
-    return false;
-}
-*/
-
 namespace detail{
 
 static void all_k_colorings(unsigned int n, unsigned int k,
@@ -624,8 +588,6 @@ unsigned int pow(unsigned int b, unsigned int n){
     return res;
 }
 
-#define DEBUG
-
 template <typename G_t, typename T_t>
 unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
           std::vector<std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > > > &results,
@@ -641,7 +603,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
         treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
-        if(node_type == treedec::nice::LEAF){ std::cout << "LEAF" << std::endl;
+        if(node_type == treedec::nice::LEAF){
             //(1)
             unsigned int leaf = *(noboost::bag(cur, T).begin());
             unsigned int pos = noboost::get_pos(leaf, G);
@@ -652,7 +614,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 results[cur][result] = boost::make_tuple((i == 2) ? 1 : (i == 1) ? 0 : -1, std::vector<int>(), std::vector<int>());
             }
         }
-        else if(node_type == treedec::nice::INTRODUCE){ std::cout << "INTRODUCE" << std::endl;
+        else if(node_type == treedec::nice::INTRODUCE){
             typename boost::graph_traits<T_t>::vertex_descriptor child =
                                          *(boost::adjacent_vertices(cur, T).first);
 
@@ -709,11 +671,10 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 }
                 else{
                     results[cur][result] = boost::tuple<int, std::vector<int>, std::vector<int> >
-                                                 (results[child][result2].get<0>()+1, it->first, std::vector<int>());
+                                                 (results[child][result2].get<0>()+1, result2, std::vector<int>());
                 }
 
             }
-
 
             //(5): Add the coloring C' formed by coloring according to C and coloring x as not known yet.
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it =
@@ -724,7 +685,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 results[cur][result] = boost::make_tuple(results[child][it->first].get<0>(), it->first, std::vector<int>()); 
             }
         }
-        else if(node_type == treedec::nice::FORGET){ std::cout << "FORGET" << std::endl;
+        else if(node_type == treedec::nice::FORGET){
             typename boost::graph_traits<T_t>::vertex_descriptor child =
                                              *(boost::adjacent_vertices(cur, T).first);
 
@@ -739,30 +700,32 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 if(it->first[pos] == 2){
                     int val1 = it->second.get<0>();
                     std::vector<int> result(it->first);
+
+                    std::vector<int> choice1(result);
                     result[pos] = 0;
+                    std::vector<int> choice2(result);
+
                     int val2 = results[child][result].get<0>();
                     result[pos] = -1;
 
-                    int newval = -2;
-
                     if(val1 == -1){
-                        newval = val2;
+                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>()); 
                     }
                     else if(val2 == -1){
-                        newval = val1;
+                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>()); 
                     }
                     else if(val1 < val2){
-                        newval = val1;
+                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>()); 
                     }
                     else{
-                        newval = val2;
+                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>()); 
                     }
 
-                    results[cur][result] = boost::make_tuple(newval, it->first, std::vector<int>()); 
+                    
                 }
             }
         }
-        else if(node_type == treedec::nice::JOIN){ std::cout << "JOIN" << std::endl;
+        else if(node_type == treedec::nice::JOIN){
             typename boost::graph_traits<T_t>::vertex_descriptor child1 =
                                          *(boost::adjacent_vertices(cur, T).first);
 
@@ -816,6 +779,18 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 //(6)
                 for(unsigned int g = 0; g < colorings2.size(); g++){
                     for(unsigned int h = 0; h < colorings2.size(); h++){
+                        //colorings[i][l] == 0 -> colorings2[g][l] == 0 or colorings2[h][l] == 0
+                        bool invalid = false;
+                        for(unsigned int l = 0; l < colorings2[g].size(); l++){
+                            if(colorings[i][l] == 0 && colorings2[g][l] != 0 && colorings2[h][l] != 0){
+                                invalid = true;
+                                break;
+                            }
+                        }
+                        if(invalid){
+                            continue;
+                        }
+
                         int val_g = results[child1][colorings2[g]].get<0>();
                         int val_h = results[child2][colorings2[h]].get<0>();
 
@@ -833,71 +808,28 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                                                  (minimum, colorings2[min_g], colorings2[min_h]);
             }
         }
-
-        //begin remove this
-        std::cout << "bag: ";
-        for(typename noboost::treedec_traits<T_t>::bag_type::iterator bIt = noboost::bag(cur, T).begin(); bIt != noboost::bag(cur, T).end(); bIt++){
-            std::cout << G[*bIt].id << " ";
-        } std::cout << std::endl;
-
-        for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it
-                     = results[cur].begin(); it != results[cur].end(); it++)
-        {
-            std::cout << "entry: " << std::endl;
-            for(unsigned int j = 0; j < it->first.size(); j++){
-                std::cout << it->first[j] << " ";
-            } std::cout <<  " (" << it->second.get<0>() << ")" << std::endl;
-
-            if(it->second.get<1>().size() > 0){ std::cout << "lchild: " << std::endl << "   ";}
-            for(unsigned int j = 0; j < it->second.get<1>().size(); j++){
-                std::cout << it->second.get<1>()[j] << " ";
-            } std::cout << std::endl;
-
-            if(it->second.get<2>().size() > 0){ std::cout << "rchild: " << std::endl << "   ";}
-            for(unsigned int j = 0; j < it->second.get<2>().size(); j++){
-                std::cout << it->second.get<2>()[j] << " ";
-            } std::cout << std::endl;
-        } std::cout << std::endl;
-        //end remove this
     }
+
 
     typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
     return (unsigned int) results[root].begin()->second.get<0>();
 }
 
-#define DEBUG
 
 template <typename G_t, typename T_t>
 void top_down_computation_min_dominating_set(G_t &G, T_t &T,
-                                  typename boost::graph_traits<T_t>::vertex_descriptor cur,
-                                  std::vector<std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > > > &results,
-                                  unsigned int val,
-                                  typename noboost::treedec_traits<T_t>::bag_type &global_result,
-                                  std::vector<int> &domset,
-                                  std::vector<int> &have_to_take,
-                                  typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> &inv_map)
+              typename boost::graph_traits<T_t>::vertex_descriptor cur,
+              std::vector<std::map<std::vector<int>,
+                                   boost::tuple<int, std::vector<int>, std::vector<int> > > > &results,
+              typename noboost::treedec_traits<T_t>::bag_type &global_result,
+              std::vector<int> &have_to_take)
 {
     treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
-#ifdef DEBUG
-    std::cout << std::endl;
-        std::cout << "bag: ";
-        for(typename noboost::treedec_traits<T_t>::bag_type::iterator bIt = noboost::bag(cur, T).begin(); bIt != noboost::bag(cur, T).end(); bIt++){
-            std::cout << G[*bIt].id << " ";
-        } std::cout << std::endl;
-
-    std::cout << "val: " << val << std::endl;
-#endif
-
     if(node_type == treedec::nice::LEAF){
-        std::cout << "LEAF" << std::endl;
         //Nothing to do.
     }
     else if(node_type == treedec::nice::INTRODUCE){
-#ifdef DEBUG
-        std::cout << "INTRODUCE" << std::endl;
-#endif
-        //Nothing to do.
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                  *(boost::adjacent_vertices(cur, T).first);
 
@@ -906,19 +838,11 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
 
         unsigned int pos = noboost::get_pos(introduced_vertex, G);
 
-#ifdef DEBUG
-        std::cout << "introduced_vertex: " << G[introduced_vertex].id << std::endl;
-#endif
-
-        int newval = results[cur][have_to_take].get<0>();
         std::vector<int> next_htt(results[cur][have_to_take].get<1>());
 
-        top_down_computation_min_dominating_set(G, T, child, results, newval, global_result, domset, next_htt, inv_map);
+        top_down_computation_min_dominating_set(G, T, child, results, global_result, next_htt);
     }
     else if(node_type == treedec::nice::FORGET){
-#ifdef DEBUG
-        std::cout << "FORGET" << std::endl;
-#endif
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                  *(boost::adjacent_vertices(cur, T).first);
 
@@ -927,26 +851,16 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
 
         unsigned int pos = noboost::get_pos(forgotten_vertex, G);
 
-#ifdef DEBUG
-        std::cout << "forgotten_vertex: " << G[forgotten_vertex].id << std::endl;
-        std::cout << "pos: " << pos << std::endl;
-#endif
-
-        int newval = results[cur][have_to_take].get<0>();
         std::vector<int> htt(results[cur][have_to_take].get<1>());
         int assignment = htt[pos];
-
-        std::cout << "assignment: " << assignment << std::endl;
 
         if(assignment == 2){
             global_result.insert(forgotten_vertex);
         }
 
-        top_down_computation_min_dominating_set(G, T, child, results, newval, global_result, domset, htt, inv_map);
+        top_down_computation_min_dominating_set(G, T, child, results, global_result, htt);
     }
     else if(node_type == treedec::nice::JOIN){
-        std::cout << "JOIN" << std::endl;
-
         typename boost::graph_traits<T_t>::vertex_descriptor lchild =
                                    *(boost::adjacent_vertices(cur, T).first);
         typename boost::graph_traits<T_t>::vertex_descriptor rchild =
@@ -955,48 +869,38 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         std::vector<int> htt1(results[cur][have_to_take].get<1>());
         std::vector<int> htt2(results[cur][have_to_take].get<2>());
 
-        int newval1 = results[lchild][htt1].get<0>();
-        int newval2 = results[lchild][htt2].get<0>();
-
-        top_down_computation_min_dominating_set(G, T, lchild, results, newval1, global_result, domset, htt1, inv_map);
-        top_down_computation_min_dominating_set(G, T, rchild, results, newval2, global_result, domset, htt2, inv_map);
+        top_down_computation_min_dominating_set(G, T, lchild, results, global_result, htt1);
+        top_down_computation_min_dominating_set(G, T, rchild, results, global_result, htt2);
     }
 }
 
 } //namespace detail
 
+
 template <typename G_t, typename T_t>
 unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
                   typename noboost::treedec_traits<T_t>::bag_type &global_result)
 {
-
-    //begin remove this
     typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int pos = noboost::get_pos(*vIt, G);
         inv_map[pos] = *vIt;
     }
-    //end remove this
 
     std::vector<std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > > > results(boost::num_vertices(T));
 
     unsigned int min = treedec::app::detail::bottom_up_computation_dominating_set(G, T, results, inv_map);
 
-    std::cout << "-----TOP DOWN-----" << std::endl;
-
     if(min > 0){
         std::vector<int> domset(boost::num_vertices(G), -1);
         typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
         std::vector<int> have_to_take(boost::num_vertices(G), -1);
-        treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, min, global_result, domset, have_to_take, inv_map);
+        treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, global_result, have_to_take);
     }
-
-    std::cout << "min: " << min << std::endl;
 
     return (unsigned int) min;
 }
-
 
 
 /* MIN COLORING */
