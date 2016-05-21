@@ -82,8 +82,31 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     return t;
 }
 
+// TODO: duplicate (see sethack.h)
+// FIXME: ad-hoc. will fail on unordered sets without warning.
+template<class S, class T>
+inline bool set_intersect(const S& s, const T& t)
+{
+    typename S::const_iterator it1 = s.begin();
+    typename T::const_iterator it2 = t.begin();
+
+    for(; it1!=s.end() && it2!=t.end();){
+        if(*it1 == *it2){
+            return true;
+        }
+        else if(*it1 < *it2){
+            it1++;
+        }
+        else{
+            it2++;
+        }
+    }
+    return false;
+}
+
 template <typename T_t>
-void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
+void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S)
+{
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
 
     std::vector<bool> visited(boost::num_vertices(T), false);
@@ -134,26 +157,11 @@ bool validate_connectivity(T_t &T){
             }
         }
 
-        //Test if forgotten and noboost::bag(cur, T) have an entry in common.
-        typedef typename noboost::treedec_traits<T_t>::bag_type::const_iterator const_iterator;
-        const_iterator it1 = forgotten.begin();
-        const_iterator it2 = noboost::bag(cur, T).begin();
-
-        for(; it1 != forgotten.end() && it2 != noboost::bag(cur, T).end(); ){
-            if(*it1 == *it2){
-                //There are coded vertices, that are not connected in T.
-                return false;
-            }
-            else if(*it1 < *it2){
-                it1++;
-            }
-            else{
-                it2++;
-            }
-        }
-
-        if(S.empty()){
+        if(set_intersect(forgotten, noboost::bag(cur, T))){ untested();
+            return false;
+        }else if(S.empty()){
             return true;
+        }else{
         }
 
         std::set_difference(noboost::bag(cur, T).begin(),
@@ -761,9 +769,14 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
 #define TD_SUBSETS
 
 //Collects all subsets of 'X' of size 'k' and stores it in 'subs'.
+//FIXME: what does "sub" do?
+//FIXME: what does k==0 do?
 template <typename S>
-void subsets(S &X, int size, int k, int idx, std::vector<typename S::value_type> &sub, std::vector<S> &subs){
-    if(k==0){
+void subsets(S const &X, int size, int k, int idx,
+        std::vector<typename S::value_type> &sub, std::vector<S> &subs)
+{
+    if(k==0){ untested();
+        // huh, what is happening here?
         S subS;
         for(unsigned int i = 0; i < sub.size(); i++){
             subS.insert(sub[i]);

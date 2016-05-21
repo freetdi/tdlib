@@ -164,13 +164,14 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
     return induced_subgraph(H, G, X, NULL);
 }
 
-template <typename G_t>
-bool is_edge_between_sets(G_t &G,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
+// TODO: different containers?
+// remark: efficient if X and Y intersect?
+//         (maybe not supposed to)
+template <typename G_t, typename vertex_set>
+bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1 = X.begin(); sIt1 != X.end(); sIt1++){
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt2 = Y.begin(); sIt2 != Y.end(); sIt2++){
+    for(typename vertex_set::const_iterator sIt1 = X.begin(); sIt1 != X.end(); sIt1++){
+        for(typename vertex_set::const_iterator sIt2 = Y.begin(); sIt2 != Y.end(); sIt2++){
             if(boost::edge(*sIt1, *sIt2, G).second){
                 return true;
             }

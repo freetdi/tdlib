@@ -57,18 +57,33 @@
 
 namespace treedec{
 
-//Collects all pairs of disjoint subsets of 'X' of size 'min_card' up to
+//copies all pairs of disjoint subsets of 'X' of size 'min_card' up to
 //'max_card' and stores it in 'subsX' and 'subsY'.
-template <typename T>
-void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_card,
-                      std::vector<T> &sub, std::vector<std::set<T> > &subsX,
-                      std::vector<std::vector<std::set<T> > > &subsY)
+//
+// outcome
+// subsX: all the subsets s of X with min_card <= size(s) <= max_card
+// for some i:
+// subsX[i] a set
+// subsY[i]: all the subsets of X\subsX[i], sized respectively.
+// for some j:
+// subsY[i][j]: a set equal to subsX[n] for some n (recheck).
+//
+// could subsY use elements in subsX?
+// TODO: use deques?
+template <typename X_t>
+void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card,
+                      std::vector<typename X_t::value_type> &sub, // internal use?
+                      std::vector<X_t> &subsX,
+                      std::vector<std::vector<X_t> > &subsY)
 {
+    assert(!sub.size());
     for(unsigned int i = min_card; i <=max_card; i++){
         subsets(X, X.size(), i, 0, sub, subsX);
     }
     for(unsigned int i = 0; i < subsX.size(); i++){
-        std::set<T> difference;
+        X_t difference;
+
+        // compute the complement of subsX[i] wrt X
         std::set_difference(X.begin(), X.end(),
                             subsX[i].begin(), subsX[i].end(),
                        std::inserter(difference, difference.begin()));
@@ -76,12 +91,14 @@ void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_ca
         unsigned int maximum =
              (difference.size() > max_card)? max_card : difference.size();
 
-        std::vector<std::set<T> > subsXY;
+        std::vector<X_t> subsXY;
         for(unsigned int t = 1; t <= maximum; t++){
+            assert(!sub.size());
             subsets(difference, difference.size(), t, 0, sub, subsXY);
         }
         subsY.push_back(subsXY);
     }
+    assert(!sub.size());
 }
 
 //Collects some vertices of 'V' in 'X' until |X| = size.
@@ -138,12 +155,14 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
 
-    std::vector<vertex_descriptor> sub;
+    std::vector<vertex_descriptor> sub; // what is this?!
     std::vector<vertex_set> subsX;
     std::vector<std::vector<vertex_set> > subsY;
 
+    // TODO: use iterators (can boost do this?)
     treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
 
+    // TODO: don't visit a combination twice.
     for(unsigned int i = 0; i < subsX.size(); i++){
         for(unsigned int j = 0; j < subsY[i].size(); j++){
             S.clear();
