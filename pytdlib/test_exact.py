@@ -27,7 +27,6 @@ class TestTdLib_exact(unittest.TestCase):
         self.assertEqual(E, [0, 1, 2, 3, 3, 1])
         self.assertEqual(tw, 4)
 
-    """
     def test_exact_decomposition_dynamic(self):
         V, E, tw = tdlib.exact_decomposition_dynamic(V_P6, E_P6)
         self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
@@ -38,7 +37,6 @@ class TestTdLib_exact(unittest.TestCase):
         self.assertEqual(V, [[0, 1, 2, 3, 4]])
         self.assertEqual(E, [])
         self.assertEqual(tw, 4)
-    """
 
     def test_random_valid_treedecomposition(self):
         status_list = list()
