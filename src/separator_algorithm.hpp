@@ -169,6 +169,10 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
     for(; I != subsX.end(); ++I){
         ++i;
         BOOST_AUTO(J, subsY[i].begin());
+
+        // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
+        // for( J : othersets )
+
         for(; J!=subsY[i].end(); ++J){
             S.clear();
 
