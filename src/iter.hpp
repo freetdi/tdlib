@@ -117,7 +117,7 @@ public: // ops
             _t.back()=_e;
          }
       }else if(_t.size()<=_u){ untested();
-         auto back=_t.back();
+         BOOST_AUTO(back,_t.back());
          ++back;
          if(back!=_e){ untested();
             if(_t.size()==_u){ untested();
@@ -133,7 +133,7 @@ public: // ops
             ++_t.back();
          }else{ untested();
             _t.pop_back();
-            auto back2=_t.back();
+            BOOST_AUTO(back2, _t.back());
             ++back2;
             if(back2!=_e){ untested();
                ++_t.back();
@@ -158,7 +158,7 @@ public: // ops
          if(!_t.size()){ untested();
             _t.push_back(_i);
          }else{ untested();
-            auto back=_t.back();
+            BOOST_AUTO(back, _t.back());
             if(back==_e){ untested();
                break;
             }else{ untested();
@@ -189,7 +189,16 @@ private: // state
    /*const*/ T _e;
    /*const*/ size_t _l;
    /*const*/ size_t _u;
-};
+}; // subsets_iter
+
+template<class A>
+std::pair<subsets_iter<A>, subsets_iter<A> >
+    make_subsets_iter(A const& a, A const& b, unsigned l, unsigned u)
+{
+   return std::make_pair(
+		 subsets_iter<A>(a,b,l,u),
+		 subsets_iter<A>(b,b));
+}
 
 #if 0
 template<class G>

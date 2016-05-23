@@ -167,12 +167,12 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 // TODO: different containers?
 // remark: efficient if X and Y intersect?
 //         (maybe not supposed to)
-template <typename G_t, typename vertex_set>
-bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
+template <typename G_t, typename vertex_set, typename i2>
+bool is_edge_between_sets(G_t &G, vertex_set const& X, i2 Yit, i2 Yend)
 {
     for(typename vertex_set::const_iterator sIt1 = X.begin(); sIt1 != X.end(); sIt1++){
-        for(typename vertex_set::const_iterator sIt2 = Y.begin(); sIt2 != Y.end(); sIt2++){
-            if(boost::edge(*sIt1, *sIt2, G).second){
+        for(; Yit!=Yend; ++Yit){
+            if(boost::edge(*sIt1, *Yit, G).second){
                 return true;
             }
         }
@@ -180,24 +180,42 @@ bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
     return false;
 }
 
-template <typename G_t>
-void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
-             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+// wrapper, use begin()/end()
+template <typename G_t, typename vertex_set>
+bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
+{
+    return is_edge_between_sets(G, X, Y.begin(), Y.end());
+}
+
+template <typename G_t, typename It>
+inline void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
+             It Xit, It Xend,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
+    for(;Xit!=Xend; ++Xit){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*Xit, G); nIt != nEnd; nIt++){
            unsigned int pos = get_pos(*nIt, G);
-
-           // this is implied by the caller (and inefficient to check here.)
-           assert(X.find(*nIt) == X.end() || disabled[pos]);
 
            if(!disabled[pos]){
                S_X.insert(*nIt);
            }
         }
     }
+}
+
+// wrapper
+// vertex into S_X if
+//  - it is adjacent to a vertex in X
+//  - if it is not disabled (by position)
+//  - if it is not an element of X
+//
+template <typename G_t>
+inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
+             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
+{
+    return get_neighbourhood(G, disabled, X.begin(), X.end(), S_X);
 }
 
 template <typename G_t>

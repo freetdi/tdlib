@@ -54,6 +54,7 @@
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "graph.hpp"
+#include "iter.hpp"
 
 namespace treedec{
 
@@ -161,25 +162,41 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
     std::vector<std::vector<vertex_set> > subsY;
 
     // TODO: use iterators (can boost do this?)
-    treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
+    // treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
+    for(unsigned int i = 1; i <=2*k; i++){
+        subsets(W, W.size(), i, 0, subsX, &sub);
+    }
+
+    std::vector<vertex_descriptor> difference;
 
     // TODO: don't visit a combination twice.
     unsigned i=-1u; // FIXME: unnecessary.
     BOOST_AUTO(I, subsX.begin());
     for(; I != subsX.end(); ++I){
         ++i;
-        BOOST_AUTO(J, subsY[i].begin());
 
         // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
         // for( J : othersets )
+        //
+        difference.resize(0);
 
-        for(; J!=subsY[i].end(); ++J){
+        // compute the complement of subsX[i] wrt W
+        std::set_difference(W.begin(), W.end(), (*I).begin(), (*I).end(),
+                       std::inserter(difference, difference.begin()));
+
+        BOOST_AUTO(P, make_subsets_iter(
+                    difference.begin(), difference.end(), 1, 2*k));
+
+        BOOST_AUTO(J, P.first);
+        BOOST_AUTO(e, difference.end());
+
+        for(; J!=e; ++J){
             S.clear();
 
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
             //
             // FIXME: skip J much earlier!
-            if(treedec::is_edge_between_sets(G, *I, *J)){
+            if(treedec::is_edge_between_sets(G, *I, (*J).first, (*J).second)){
                 continue;
             }
 
@@ -189,7 +206,7 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             // TODO. don't instanciate X_Y. just iterate.
             // (do we need ordered iterator?)
             std::set_union(I->begin(), I->end(),
-                           J->begin(), J->end(),
+                           (*J).first, (*J).second,
                            std::inserter(X_Y, X_Y.begin()));
 
             typename vertex_set::const_iterator sIt=X_Y.begin();
@@ -200,7 +217,7 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
             treedec::get_neighbourhood(G, disabled_, *I, sX);
-            treedec::get_neighbourhood(G, disabled_, *J, sY);
+            treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
 
             //Z must be a subset of S.
             // Z=W\X_Y
