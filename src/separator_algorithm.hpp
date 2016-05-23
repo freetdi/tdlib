@@ -172,7 +172,11 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
 
     std::vector<vertex_descriptor> difference;
 
-    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, 2*k));
+
+for(unsigned s=1; s<=2*k; ++s)
+{ // HACKLOOP
+
+    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, s));
     BOOST_AUTO(I, P.first);
 
     // TODO: don't visit a combination twice.
@@ -275,6 +279,7 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
             }
         }
     }
+} // HACKLOOP
     return false;
 }
 
@@ -375,7 +380,7 @@ bool sep_decomp(G_t &G, T_t &T,
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
             for(typename vertex_set::iterator sIt
-                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
+                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) { untested();
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
             }
@@ -407,7 +412,7 @@ void separator_algorithm(G_t &G, T_t &T)
         vertices.insert(vertices.end(), *vIt);
     }
 
-    while(!finished){
+    while(!finished){ untested();
         std::vector<bool> disabled(boost::num_vertices(G), false);
         vertex_set emptySet, parent;
         finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, k);
