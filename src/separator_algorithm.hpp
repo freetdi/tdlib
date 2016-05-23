@@ -180,7 +180,7 @@ for(unsigned s=1; s<=2*k; ++s)
     BOOST_AUTO(I, P.first);
 
     // TODO: don't visit a combination twice.
-    for(; I!=W.end(); ++I){ untested();
+    for(; I!=W.end(); ++I){
 
 
         BOOST_AUTO(ti, (*I).first);
@@ -207,16 +207,16 @@ for(unsigned s=1; s<=2*k; ++s)
         BOOST_AUTO(J, P.first);
         BOOST_AUTO(e, difference.end());
 
-        for(; J!=e; ++J){ untested();
+        for(; J!=e; ++J){
             S.clear();
 
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
             //
             // FIXME: skip J much earlier!
             if(treedec::is_edge_between_sets(G,
-                        (*I).first, (*I).second, (*J).first, (*J).second)){ untested();
+                        (*I).first, (*I).second, (*J).first, (*J).second)){
                 continue;
-            }else{untested();
+            }else{
             }
 
             std::vector<bool> disabled_(disabled);
@@ -331,13 +331,13 @@ bool sep_decomp(G_t &G, T_t &T,
     treedec::map_descriptors_to_bags<G_t>(parent, B2);
 
     //Trivial decomposition
-    if(vertices.size() < 4*k + 2){ untested();
+    if(vertices.size() < 4*k + 2){
         treedec::map_descriptors_to_bags<G_t>(vertices, B1);
         treedec::sep_glue_bag(B1, B2, T);
         return true;
     }else if(k==0){ untested();
-    }else if(k==1){ untested();
-    }else{ untested();
+    }else if(k==1){
+    }else{
     }
 
     //Turn W into a superset of W of size 3k + 1.
@@ -380,7 +380,7 @@ bool sep_decomp(G_t &G, T_t &T,
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
             for(typename vertex_set::iterator sIt
-                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) { untested();
+                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
             }
@@ -412,7 +412,7 @@ void separator_algorithm(G_t &G, T_t &T)
         vertices.insert(vertices.end(), *vIt);
     }
 
-    while(!finished){ untested();
+    while(!finished){
         std::vector<bool> disabled(boost::num_vertices(G), false);
         vertex_set emptySet, parent;
         finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, k);

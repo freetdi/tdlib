@@ -58,11 +58,11 @@ public: // types
 public: // construct
    subsets_iter(const subsets_iter& p)
        : _t(p._t),_i(p._i), _e(p._e), _l(p._l), _u(p._u)
-   { untested();
+   {
    }
    subsets_iter(T i, T e, size_t min=0, size_t max=-1)
        : _i(i), _e(e), _l(min), _u(max)
-   { untested();
+   {
       assert(_l<=_u);
 
       fill();
@@ -88,7 +88,7 @@ public: // ops
       if(!_t.size()){ untested();
          // BUG?
          return false;
-      }else if(_t.size()){ untested();
+      }else if(_t.size()){
          return *_t.begin() == other;
       }else{ untested();
          untested();
@@ -96,7 +96,7 @@ public: // ops
       }
    }
    bool operator!=(const T& other)
-   { untested();
+   {
       return !operator==(other);
    }
    bool operator==(const subsets_iter& other)
@@ -116,13 +116,13 @@ public: // ops
          if(_u==0){ untested();
             _t.back()=_e;
          }
-      }else if(_t.size()<=_u){ untested();
+      }else if(_t.size()<=_u){
          BOOST_AUTO(back,_t.back());
          ++back;
-         if(back!=_e){ untested();
-            if(_t.size()==_u){ untested();
+         if(back!=_e){
+            if(_t.size()==_u){
                ++_t.back();
-            }else{ untested();
+            }else{
                _t.push_back(back);
             }
          }else if(_t.back()==_e){
@@ -131,11 +131,11 @@ public: // ops
             unreachable();
          }else if(_t.size()==1){
             ++_t.back();
-         }else{ untested();
+         }else{
             _t.pop_back();
             BOOST_AUTO(back2, _t.back());
             ++back2;
-            if(back2!=_e){ untested();
+            if(back2!=_e){
                ++_t.back();
             }else{ unreachable();
                // carry();
@@ -154,8 +154,8 @@ public: // ops
    }
    void fill()
    {
-      while(_t.size() < _l){ untested();
-         if(!_t.size()){ untested();
+      while(_t.size() < _l){
+         if(!_t.size()){
             _t.push_back(_i);
          }else{ untested();
             BOOST_AUTO(back, _t.back());
