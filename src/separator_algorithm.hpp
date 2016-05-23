@@ -105,11 +105,14 @@ void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card
 
 //Collects some vertices of 'V' in 'X' until |X| = size.
 template <typename T>
-void superset(T &X, T &V, unsigned int size){
+void superset(T &X, T const &V, unsigned int size){
+    assert(V.size()>=size); // might not be possible otherwise
+    assert(X.size()<=size); // will never terminate...
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
         assert(sIt!=V.end());
-        X.insert(*(sIt++));
+        X.insert(*sIt);
+        ++sIt;
     }
 }
 
@@ -157,31 +160,41 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
 
-    std::vector<vertex_descriptor> sub; // what is this?!
-    std::vector<vertex_set> subsX;
-    std::vector<std::vector<vertex_set> > subsY;
+//    std::vector<vertex_descriptor> sub; // what is this?!
+//    std::vector<vertex_set> subsX;
+//    std::vector<std::vector<vertex_set> > subsY;
 
     // TODO: use iterators (can boost do this?)
     // treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
-    for(unsigned int i = 1; i <=2*k; i++){
-        subsets(W, W.size(), i, 0, subsX, &sub);
-    }
+ //    for(unsigned int i = 1; i <=2*k; i++){
+ //        subsets(W, W.size(), i, 0, subsX, &sub);
+ //    }
 
     std::vector<vertex_descriptor> difference;
 
+    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, 2*k));
+    BOOST_AUTO(I, P.first);
+
     // TODO: don't visit a combination twice.
-    unsigned i=-1u; // FIXME: unnecessary.
-    BOOST_AUTO(I, subsX.begin());
-    for(; I != subsX.end(); ++I){
-        ++i;
+    for(; I!=W.end(); ++I){ untested();
+
+
+        BOOST_AUTO(ti, (*I).first);
+        unsigned x=0;
+        for(; ti != (*I).second; ++ti){
+            ++x;
+        }
+        assert(x);
+        assert(x<=2*k);
+
 
         // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
         // for( J : othersets )
         //
         difference.resize(0);
 
-        // compute the complement of subsX[i] wrt W
-        std::set_difference(W.begin(), W.end(), (*I).begin(), (*I).end(),
+        // compute the complement of I wrt W
+        std::set_difference(W.begin(), W.end(), (*I).first, (*I).second,
                        std::inserter(difference, difference.begin()));
 
         BOOST_AUTO(P, make_subsets_iter(
@@ -190,14 +203,16 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
         BOOST_AUTO(J, P.first);
         BOOST_AUTO(e, difference.end());
 
-        for(; J!=e; ++J){
+        for(; J!=e; ++J){ untested();
             S.clear();
 
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
             //
             // FIXME: skip J much earlier!
-            if(treedec::is_edge_between_sets(G, *I, (*J).first, (*J).second)){
+            if(treedec::is_edge_between_sets(G,
+                        (*I).first, (*I).second, (*J).first, (*J).second)){ untested();
                 continue;
+            }else{untested();
             }
 
             std::vector<bool> disabled_(disabled);
@@ -205,18 +220,18 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
 
             // TODO. don't instanciate X_Y. just iterate.
             // (do we need ordered iterator?)
-            std::set_union(I->begin(), I->end(),
+            std::set_union((*I).first, (*I).second,
                            (*J).first, (*J).second,
                            std::inserter(X_Y, X_Y.begin()));
 
             typename vertex_set::const_iterator sIt=X_Y.begin();
-            for(; sIt!=X_Y.end(); ++sIt){
+            for(; sIt!=X_Y.end(); ++sIt){ 
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = true;
             }
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
-            treedec::get_neighbourhood(G, disabled_, *I, sX);
+            treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
             treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
 
             //Z must be a subset of S.
@@ -311,10 +326,13 @@ bool sep_decomp(G_t &G, T_t &T,
     treedec::map_descriptors_to_bags<G_t>(parent, B2);
 
     //Trivial decomposition
-    if(vertices.size() < 4*k + 2){
+    if(vertices.size() < 4*k + 2){ untested();
         treedec::map_descriptors_to_bags<G_t>(vertices, B1);
         treedec::sep_glue_bag(B1, B2, T);
         return true;
+    }else if(k==0){ untested();
+    }else if(k==1){ untested();
+    }else{ untested();
     }
 
     //Turn W into a superset of W of size 3k + 1.
