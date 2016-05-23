@@ -189,7 +189,11 @@ void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
            unsigned int pos = get_pos(*nIt, G);
-           if(!disabled[pos] && X.find(*nIt) == X.end()){
+
+           // this is implied by the caller (and inefficient to check here.)
+           assert(X.find(*nIt) == X.end() || disabled[pos]);
+
+           if(!disabled[pos]){
                S_X.insert(*nIt);
            }
         }

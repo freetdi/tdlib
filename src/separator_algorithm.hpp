@@ -192,15 +192,15 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
                            J->begin(), J->end(),
                            std::inserter(X_Y, X_Y.begin()));
 
-            //Do the extended deepth-first-search on the neighbours of vertices in X and Y
-            treedec::get_neighbourhood(G, disabled_, subsX[i], sX);
-            treedec::get_neighbourhood(G, disabled_, *J, sY);
-
             typename vertex_set::const_iterator sIt=X_Y.begin();
             for(; sIt!=X_Y.end(); ++sIt){
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = true;
             }
+
+            //Do the extended deepth-first-search on the neighbours of vertices in X and Y
+            treedec::get_neighbourhood(G, disabled_, *I, sX);
+            treedec::get_neighbourhood(G, disabled_, *J, sY);
 
             //Z must be a subset of S.
             // Z=W\X_Y
