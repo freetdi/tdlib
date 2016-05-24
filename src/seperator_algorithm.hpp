@@ -85,9 +85,11 @@ void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_ca
 
 //Collects some vertices of 'V' in 'X' until |X| = size.
 template <typename T>
-void superset(T &X, T &V, unsigned int size){
+void superset(T &X, T const &V, unsigned int size){
+    assert(X.size()<=size);
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
+        assert(sIt != V.end());
         X.insert(*(sIt++));
     }
 }
