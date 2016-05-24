@@ -179,7 +179,7 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 
 //The main procedure of the seperator algorithm.
 template <typename G_t, typename T_t>
-bool sep_decomp(G_t &G, T_t &T,
+bool sep_decomp(G_t const&G, T_t &T,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &parent,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &vertices,
@@ -263,7 +263,7 @@ bool sep_decomp(G_t &G, T_t &T,
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
 //graph could be decomposed.
 template <typename G_t, typename T_t>
-void seperator_algorithm(G_t &G, T_t &T){
+void seperator_algorithm(G_t const &G, T_t &T){
     unsigned int k = 0;
     bool finished = false;
 

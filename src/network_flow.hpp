@@ -343,9 +343,9 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
 //exists or not.
 template <typename G_t>
 bool seperate_vertices(
-        G_t &G, std::vector<bool> &disabled,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+        G_t const &G, std::vector<bool> &disabled,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
         unsigned int k)
 {
