@@ -5,7 +5,7 @@
 namespace treedec{
 	// don't use this.
 template <typename G_t, typename T_t>
-void seperator_algorithm(G_t &G, T_t &T){
+void seperator_algorithm(G_t const &G, T_t &T){
     return separator_algorithm(G, T);
 }
 }

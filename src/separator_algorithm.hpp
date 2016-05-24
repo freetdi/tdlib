@@ -150,7 +150,7 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
 template <typename G_t, typename W_t, typename S_t>
-bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
+bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
     std::vector<bool> const &disabled, unsigned int k)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -171,6 +171,9 @@ bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
     std::vector<typename std::vector<vertex_descriptor>::iterator > scratch2;
 //    typename subsets_iter<typename diff_container_t::const_iterator>::scratch_type scratch2;
 #endif
+
+    // vector?!
+    vertex_set sX, sY, X_Y;
 
 for(unsigned s=1; s<=2*k; ++s)
 { // HACKLOOP
@@ -233,7 +236,9 @@ for(unsigned s=1; s<=2*k; ++s)
             }
 
             std::vector<bool> disabled_(disabled);
-            vertex_set sX, sY, X_Y;
+            sX.clear();
+            sY.clear();
+            X_Y.clear();
 
             // TODO. don't instanciate X_Y. just iterate.
             // (do we need ordered iterator?)
@@ -301,7 +306,7 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 //The main procedure of the seperator algorithm.
 // return true if finished (note to self: what does it mean?)
 template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
-bool sep_decomp(G_t &G, T_t &T,
+bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
         P_t const &parent, // a vertex set
         V_t &vertices, // a vertex set
@@ -396,7 +401,7 @@ bool sep_decomp(G_t &G, T_t &T,
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
 //graph could be decomposed.
 template <typename G_t, typename T_t>
-void separator_algorithm(G_t &G, T_t &T)
+void separator_algorithm(G_t const &G, T_t &T)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
