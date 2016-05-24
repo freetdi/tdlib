@@ -27,7 +27,8 @@
 template<class T>
 class subsets_iter{ //
 public: // types
-   typedef typename std::vector<T>::const_iterator base;
+   typedef typename std::vector<T> scratch_type;
+   typedef typename scratch_type::const_iterator base;
    class subset_iter : public std::vector<T>::const_iterator{ //
    public:
       subset_iter(typename std::vector<T>::const_iterator const & i)
@@ -40,6 +41,7 @@ public: // types
       }
       subset_iter(T const & i)
       { untested();
+          _t.push_back(i);
       }
    public: // ops
       typename T::value_type const& operator*()
@@ -54,35 +56,79 @@ public: // types
       { untested();
          return std::vector<T>::const_iterator::operator==(other);
       }
-   };
+   }; // subset_iter
 public: // construct
    subsets_iter(const subsets_iter& p)
-       : _t(p._t),_i(p._i), _e(p._e), _l(p._l), _u(p._u)
+       : _tt(NULL),
+         _t(p._t),
+         _i(p._i), _e(p._e), _l(p._l), _u(p._u)
    {
    }
-   subsets_iter(T i, T e, size_t min=0, size_t max=-1)
-       : _i(i), _e(e), _l(min), _u(max)
+#if __cplusplus >= 201103L
+   subsets_iter(const subsets_iter&& p)
+       : _tt(p._tt),
+         _t(p._t),
+         _i(p._i), _e(p._e), _l(p._l), _u(p._u)
+   { untested();
+       p._tt = NULL;
+   }
+#endif
+   subsets_iter(T i, T e, size_t min=0, size_t max=-1, scratch_type* t=NULL)
+       : _tt(NULL), _t(t?(*t):(*(new scratch_type))),
+         _i(i), _e(e), _l(min), _u(max)
    {
+#if __cplusplus >= 201103L
+      if(t){untested();
+          t->resize(0);
+          // use external scratch
+          _tt = NULL;
+      }else{untested();
+          // own scratch. record it.
+          _tt = &_t;
+      }
+#endif
       assert(_l<=_u);
-
       fill();
    }
+#if 0
    subsets_iter(T e)
        : _e(e), _l(0), _u(-1)
    { untested();
       _t.resize(1);
       _t[0] = e;
    }
-public: // ops
-   void operator=(const T& other)
-   { untested();
-      return base::operator=(other);
-		_i = other._i;
-		_e = other._e;
-		_l = other._l;
-		_u = other._u;
-		_t = other._t;
+#endif
+   ~subsets_iter(){
+      if(_tt){ untested();
+          // own scratch. delete it.
+          delete(&_t);
+      }else{
+      }
    }
+public: // assign
+   subsets_iter& operator=(const subsets_iter& other)
+   { untested();
+      _i = other._i;
+      _e = other._e;
+      _l = other._l;
+      _u = other._u;
+      _t = other._t;
+//      _tt = other._tt;
+
+//      other._tt=NULL;
+      return *this;
+   }
+   subsets_iter& operator=(const T& other)
+   { untested();
+      base::operator=(other);
+      _i = other._i;
+      _e = other._e;
+      _l = other._l;
+      _u = other._u;
+      _t = other._t;
+      return *this;
+   }
+public: // ops
    bool operator==(const T& other)
    {
       if(!_t.size()){ untested();
@@ -100,12 +146,17 @@ public: // ops
       return !operator==(other);
    }
    bool operator==(const subsets_iter& other)
-   { untested();
-      return _i==_e && other._i==other._e;
+   {
+      if(_t.size()){ untested();
+          return _t.size() == other._t.size()
+              && *_t[0]==*other._t[0];
+      }else{ untested();
+          return _i==other._i && _e==other._e;
+      }
    }
    bool operator!=(const subsets_iter& other)
-   { incomplete();
-      return _i!=other._i || _e!=other._e;
+   { untested();
+      return !operator==(other._i);
    }
    subsets_iter operator++()
    {
@@ -184,7 +235,8 @@ private: // detail
    {
    }
 private: // state
-   std::vector<T> _t;
+   mutable scratch_type* _tt;
+   scratch_type& _t;
    T _i;
    /*const*/ T _e;
    /*const*/ size_t _l;
@@ -193,11 +245,12 @@ private: // state
 
 template<class A>
 std::pair<subsets_iter<A>, subsets_iter<A> >
-    make_subsets_iter(A const& a, A const& b, unsigned l, unsigned u)
+    make_subsets_iter(A a, A b, unsigned l, unsigned u,
+          typename subsets_iter<A>::scratch_type* s=NULL)
 {
    return std::make_pair(
-		 subsets_iter<A>(a,b,l,u),
-		 subsets_iter<A>(b,b));
+       subsets_iter<A>(a,b,l,u,s),
+       subsets_iter<A>(b,b));
 }
 
 #if 0
@@ -220,3 +273,5 @@ std::pair<nvsinconwsut_iter<G>, nvsinconwsut_iter<G> >
 #endif
 
 #endif
+
+// vim:ts=8:sw=4:et

@@ -153,44 +153,53 @@ template <typename G_t, typename W_t, typename S_t>
 bool nearly_balanced_seperator(G_t &G, W_t &W, S_t &S,
     std::vector<bool> const &disabled, unsigned int k)
 {
-    typedef typename graph_traits<G_t>::treedec_type T_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
+#if 0 // not yet
+    typedef typename graph_traits<G_t>::treedec_type T_t;
     typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
+#endif
 
-//    std::vector<vertex_descriptor> sub; // what is this?!
-//    std::vector<vertex_set> subsX;
-//    std::vector<std::vector<vertex_set> > subsY;
+    typedef std::vector<vertex_descriptor> diff_container_t;
+    diff_container_t difference;
 
-    // TODO: use iterators (can boost do this?)
-    // treedec::disjoint_subsets(W, 1, 2*k, sub, subsX, subsY);
- //    for(unsigned int i = 1; i <=2*k; i++){
- //        subsets(W, W.size(), i, 0, subsX, &sub);
- //    }
-
-    std::vector<vertex_descriptor> difference;
-
+#if __cplusplus >= 201103L
+//    std::vector<typename W_t::const_iterator> scratch1;
+    typename subsets_iter<typename W_t::const_iterator>::scratch_type scratch1;
+    std::vector<typename std::vector<vertex_descriptor>::iterator > scratch2;
+//    typename subsets_iter<typename diff_container_t::const_iterator>::scratch_type scratch2;
+#endif
 
 for(unsigned s=1; s<=2*k; ++s)
 { // HACKLOOP
 
-    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, s));
+//    subsets_iter<typename W_t::const_iterator>
+    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, s
+#if __cplusplus >= 201103L
+                , &scratch1
+#endif
+                ));
     BOOST_AUTO(I, P.first);
 
     // TODO: don't visit a combination twice.
     for(; I!=W.end(); ++I){
 
-
+#ifndef NDEBUG
         BOOST_AUTO(ti, (*I).first);
         unsigned x=0;
-        for(; ti != (*I).second; ++ti){
+        for(; ti != (*I).second; ++ti){ untested();
             ++x;
         }
+        if(x>2*k || !x){
+            std::cerr << "s " << s << "\n";
+            std::cerr << "W " << W.size() << "\n";
+            std::cerr << x << " " << k << "\n";
+        }
+#endif
         assert(x);
         assert(x<=2*k);
-
 
         // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
         // for( J : othersets )
@@ -198,21 +207,25 @@ for(unsigned s=1; s<=2*k; ++s)
         difference.resize(0);
 
         // compute the complement of I wrt W
+        // FIXME: also remove neighbors of I...
         std::set_difference(W.begin(), W.end(), (*I).first, (*I).second,
                        std::inserter(difference, difference.begin()));
 
-        BOOST_AUTO(P, make_subsets_iter(
-                    difference.begin(), difference.end(), 1, 2*k));
+        BOOST_AUTO(PP, make_subsets_iter(
+                    difference.begin(), difference.end(), 1, 2*k
+#if __cplusplus >= 201103L
+                , &scratch2
+#endif
+                ));
 
-        BOOST_AUTO(J, P.first);
+        BOOST_AUTO(J, PP.first);
         BOOST_AUTO(e, difference.end());
 
         for(; J!=e; ++J){
             S.clear();
-
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
             //
-            // FIXME: skip J much earlier!
+            // FIXME: skip J much earlier?
             if(treedec::is_edge_between_sets(G,
                         (*I).first, (*I).second, (*J).first, (*J).second)){
                 continue;
@@ -240,21 +253,11 @@ for(unsigned s=1; s<=2*k; ++s)
 
             //Z must be a subset of S.
             // Z=W\X_Y
-#ifndef NDEBUG
-            vertex_set Z;
-            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                std::inserter(Z, Z.begin()));
-#endif
-#if 0 // do we need Z?
-            sX.insert(Z.begin(), Z.end());
-            sY.insert(Z.begin(), Z.end());
-#else // does this work?
 
             std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
                                 std::inserter(sX, sX.begin()));
             std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
                                 std::inserter(sY, sY.begin()));
-#endif
 
             //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
             // network_flow here.
@@ -264,18 +267,11 @@ for(unsigned s=1; s<=2*k; ++s)
 
             //S now is a sX-sY-seperator. Check if S holds the remaining
             //property of a nearly balanced seperator.
-#ifndef NDEBUG
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> isS_W;
-            std::set_intersection(S.begin(), S.end(), W.begin(), W.end(),
-                                  std::inserter(isS_W, isS_W.begin()));
-#endif
 
             // if  ( S \intersect W == W \ X_Y )
             if(this_intersection_thing(W,S,X_Y)){
-                assert(isS_W == Z);
                 return true;
             }else{ untested();
-                assert(isS_W != Z);
             }
         }
     }
@@ -313,9 +309,11 @@ bool sep_decomp(G_t &G, T_t &T,
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
+#if 0 // not yet
     typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
+#endif
 
     //tw(G) > k - one could replace this with a better lower bound (see lower_bounds.hpp).
     if(boost::num_edges(G) > k*boost::num_vertices(G)){
