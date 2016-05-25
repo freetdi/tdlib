@@ -168,23 +168,25 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 // remark: efficient if X and Y intersect?
 //         (maybe not supposed to)
 template <typename G_t, typename i1, typename i2>
-bool is_edge_between_sets(G_t &G, i1 Xit, i1 Xend, i2 Yit, i2 Yend)
+std::pair<typename boost::graph_traits<G_t>::edge_descriptor, bool>
+   edge(i1 Xit, i1 Xend, i2 Yit, i2 Yend, G_t const& G)
 {
     for(; Xit!=Xend; ++Xit){
         for(; Yit!=Yend; ++Yit){
-            if(boost::edge(*Xit, *Yit, G).second){
-                return true;
+            BOOST_AUTO(P, boost::edge(*Xit, *Yit, G));
+            if(P.second){
+                return P;
             }
         }
     }
-    return false;
+    return std::make_pair(typename boost::graph_traits<G_t>::edge_descriptor(),false);
 }
 
 // wrapper, use begin()/end()
 template <typename G_t, typename vertex_set>
 bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
 {
-    return is_edge_between_sets(G, X.begin(), X.end(), Y.begin(), Y.end());
+    return edge(G, X.begin(), X.end(), Y.begin(), Y.end()).second;
 }
 
 template <typename G_t, typename It>

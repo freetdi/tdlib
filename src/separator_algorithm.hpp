@@ -166,20 +166,19 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
     diff_container_t difference;
 
 #if __cplusplus >= 201103L
-//    std::vector<typename W_t::const_iterator> scratch1;
     typename subsets_iter<typename W_t::const_iterator>::scratch_type scratch1;
     std::vector<typename std::vector<vertex_descriptor>::iterator > scratch2;
-//    typename subsets_iter<typename diff_container_t::const_iterator>::scratch_type scratch2;
 #endif
 
     // vector?!
     vertex_set sX, sY, X_Y;
 
 for(unsigned s=1; s<=2*k; ++s)
+// for(unsigned s=2*k; s>0; --s)
 { // HACKLOOP
 
 //    subsets_iter<typename W_t::const_iterator>
-    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), 1, s
+    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s
 #if __cplusplus >= 201103L
                 , &scratch1
 #endif
@@ -190,32 +189,39 @@ for(unsigned s=1; s<=2*k; ++s)
     for(; I!=W.end(); ++I){
 
 #ifndef NDEBUG
-        BOOST_AUTO(ti, (*I).first);
-        unsigned x=0;
-        for(; ti != (*I).second; ++ti){ untested();
-            ++x;
-        }
-        if(x>2*k || !x){
-            std::cerr << "s " << s << "\n";
-            std::cerr << "W " << W.size() << "\n";
-            std::cerr << x << " " << k << "\n";
-        }
+        assert(std::includes( (*I).first, (*I).second, (*I).first, (*I).second ));
+        debug_count((*I).first, (*I).second, s);
 #endif
-        assert(x);
-        assert(x<=2*k);
 
         // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
         // for( J : othersets )
         //
         difference.resize(0);
 
-        // compute the complement of I wrt W
-        // FIXME: also remove neighbors of I...
+
+#if 1
+        // N = I \setunion neigh(I)
+        BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
+
+        assert(std::includes( N.first, N.second, N.first, N.second ));
+        assert(std::includes( N.first, N.second, (*I).first, (*I).second ));
+
+        // compute W \ (I v neigh(I))
+        std::set_difference(W.begin(), W.end(), N.first, N.second,
+                       std::inserter(difference, difference.begin()));
+        assert(std::includes(W.begin(), W.end(), difference.begin(), difference.end()));
+#else
+        // compute W \ I
         std::set_difference(W.begin(), W.end(), (*I).first, (*I).second,
                        std::inserter(difference, difference.begin()));
+#endif
+
+for(unsigned Js=1; Js<=2*k; ++Js)
+// for(unsigned s=2*k; s>0; --s)
+{ // inner HACKLOOP
 
         BOOST_AUTO(PP, make_subsets_iter(
-                    difference.begin(), difference.end(), 1, 2*k
+                    difference.begin(), difference.end(), Js, Js
 #if __cplusplus >= 201103L
                 , &scratch2
 #endif
@@ -226,14 +232,17 @@ for(unsigned s=1; s<=2*k; ++s)
 
         for(; J!=e; ++J){
             S.clear();
+#ifndef NDEBUG
             //There cannot exist a X-Y-seperator if there is an edge between X and Y.
-            //
-            // FIXME: skip J much earlier?
-            if(treedec::is_edge_between_sets(G,
-                        (*I).first, (*I).second, (*J).first, (*J).second)){
+            if(edge((*I).first, (*I).second, (*J).first, (*J).second, G).second){
+                // BOOST_AUTO(E, edge((*I).first, (*I).second, (*J).first, (*J).second, G).first);
+                //std::cerr << "stupid " << boost::source(E, G) << " "
+                //                       << boost::target(E, G) << "\n";
+                assert(false); // ruled out above.
                 continue;
             }else{
             }
+#endif
 
             std::vector<bool> disabled_(disabled);
             sX.clear();
@@ -279,6 +288,7 @@ for(unsigned s=1; s<=2*k; ++s)
             }else{ untested();
             }
         }
+} // inner HACKLOOP
     }
 } // HACKLOOP
     return false;
