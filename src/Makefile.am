@@ -9,6 +9,7 @@ pkginclude_HEADERS = \
   dynamicCR.hpp \
   elimination_orderings.hpp \
   exact_cutset.hpp \
+  iter.hpp \
   lower_bounds.hpp \
   misc.hpp \
   network_flow.hpp \
@@ -18,7 +19,7 @@ pkginclude_HEADERS = \
   preprocessing_experiments.hpp \
   preprocessing.hpp \
   random.hpp \
-  seperator_algorithm.hpp \
+  separator_algorithm.hpp \
   simple_graph_algos.hpp \
   std.hpp \
   trace.hpp \
