@@ -499,7 +499,7 @@ void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t,
             noboost::bag(d, T) = noboost::bag(t, T);
             boost::add_edge(t, d, T);
 
-            detail::make_binary(T, t, visited);
+            make_binary(T, t, visited);
             return;
     }
 
@@ -508,7 +508,7 @@ void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t,
     while(visited[*c]){ c++; }
     c1 = *c;
 
-    detail::make_binary(T, c0, visited);
+    make_binary(T, c0, visited);
 
     if(noboost::bag(t, T) != noboost::bag(c0, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
@@ -518,7 +518,7 @@ void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t,
         noboost::bag(d, T) = noboost::bag(t, T);
     }
 
-    detail::make_binary(T, c1, visited);
+    make_binary(T, c1, visited);
 
     if(noboost::bag(t, T) != noboost::bag(c1, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);

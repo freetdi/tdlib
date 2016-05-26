@@ -876,12 +876,16 @@ void k_path_improved_graph(G_t &G, unsigned int k){
                 }
 
                 std::vector<bool> disabled(boost::num_vertices(G), false);
+                unsigned num_dis=0;
                 unsigned int pos1 = get_pos(*vIt1, G);
                 unsigned int pos2 = get_pos(*vIt2, G);
+                assert(pos1!=pos2);
+                if(!disabled[pos1]) ++num_dis;
+                if(!disabled[pos2]) ++num_dis;
                 disabled[pos1] = true;
                 disabled[pos2] = true;
 
-                treedec::seperate_vertices(G, disabled, X, Y, S);
+                treedec::seperate_vertices(G, disabled, num_dis, X, Y, S);
 
                 if(S.size() >= k){
                     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> edge;

@@ -163,9 +163,15 @@ void MSVS(G_t &G, T_t &T){
         //No improvement possible.
         if(boost::num_vertices(H) == 0){ return; }
 
+        std::vector<bool>::const_iterator x=disabled.begin();
+        unsigned num_dis=0;
+        for(; x!=disabled.end(); ++x){
+            if(*x) ++num_dis;
+        }
+
         //Compute a seperating set S.
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S_;
-        treedec::seperate_vertices(H, disabled, X, Y, S_);
+        treedec::seperate_vertices(H, disabled, num_dis, X, Y, S_);
 
         //S consists of vertex descriptors of H. Use vd_map to map these to descriptors of G.
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
