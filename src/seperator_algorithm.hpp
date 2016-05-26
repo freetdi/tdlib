@@ -98,7 +98,7 @@ void superset(T &X, T const &V, unsigned int size){
 //depth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
 template <typename G_t>
-bool nearly_balanced_seperator(G_t &G,
+bool nearly_balanced_seperator(G_t const &G,
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
     std::vector<bool> &disabled, unsigned int k)

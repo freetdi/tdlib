@@ -165,7 +165,7 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 }
 
 template <typename G_t>
-bool is_edge_between_sets(G_t &G,
+bool is_edge_between_sets(G_t const &G,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
 {
