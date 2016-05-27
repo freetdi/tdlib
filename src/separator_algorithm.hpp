@@ -199,8 +199,6 @@ for(unsigned s=1; s<=2*k; ++s)
         //
         difference.resize(0);
 
-
-#if 1
         // N = I \setunion neigh(I)
         BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
 
@@ -211,11 +209,6 @@ for(unsigned s=1; s<=2*k; ++s)
         std::set_difference(W.begin(), W.end(), N.first, N.second,
                        std::inserter(difference, difference.begin()));
         assert(std::includes(W.begin(), W.end(), difference.begin(), difference.end()));
-#else
-        // compute W \ I
-        std::set_difference(W.begin(), W.end(), (*I).first, (*I).second,
-                       std::inserter(difference, difference.begin()));
-#endif
 
 for(unsigned Js=1; Js<=2*k; ++Js)
 // for(unsigned s=2*k; s>0; --s)
@@ -233,17 +226,6 @@ for(unsigned Js=1; Js<=2*k; ++Js)
 
         for(; J!=e; ++J){
             S.clear();
-#ifndef NDEBUG
-            //There cannot exist a X-Y-seperator if there is an edge between X and Y.
-            if(edge((*I).first, (*I).second, (*J).first, (*J).second, G).second){
-                // BOOST_AUTO(E, edge((*I).first, (*I).second, (*J).first, (*J).second, G).first);
-                //std::cerr << "stupid " << boost::source(E, G) << " "
-                //                       << boost::target(E, G) << "\n";
-                assert(false); // ruled out above.
-                continue;
-            }else{
-            }
-#endif
 
             std::vector<bool> disabled_(disabled);
             unsigned num_dis_(num_dis);
@@ -258,7 +240,7 @@ for(unsigned Js=1; Js<=2*k; ++Js)
                            std::inserter(X_Y, X_Y.begin()));
 
             typename vertex_set::const_iterator sIt=X_Y.begin();
-            for(; sIt!=X_Y.end(); ++sIt){ 
+            for(; sIt!=X_Y.end(); ++sIt){
                 unsigned int pos = get_pos(*sIt, G);
                 if(disabled_[pos]){
                 }else{
@@ -319,8 +301,7 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
     }
 }
 
-//The main procedure of the seperator algorithm.
-// return true if finished (note to self: what does it mean?)
+//The main recursive procedure of the seperator algorithm.
 template <typename G_t, typename T_t, class W_t, class P_t, class V_t, typename digraph_t>
 bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
@@ -374,7 +355,7 @@ bool sep_decomp(G_t const &G, T_t &T,
     if(nearly_balanced_seperator(G, W, S, disabled, num_dis, k, dg)){
         std::vector<vertex_set> C;
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+        for(typename std::set<vertex_descriptor>::iterator sIt
                 = S.begin(); sIt != S.end(); sIt++) {
             unsigned int pos = get_pos(*sIt, G);
             assert(!disabled[pos]);

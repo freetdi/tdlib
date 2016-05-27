@@ -321,7 +321,6 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     assert(dg);
     typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     std::vector<vertex_descriptor> idxMap;
     typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
     typedef typename boost::graph_traits<digraph_t>::vertex_iterator divi;
