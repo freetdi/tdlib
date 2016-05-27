@@ -273,8 +273,8 @@ static bool t_search_disjoint_ways(
         }
     }
 
-    //Do a 'normal' depth-first-search, and ensure that no edge, that is contained on some path in P will
-    //be used.
+    //Do a 'normal' depth-first-search, and ensure that no edge, that is
+    //contained on some path in P will be used.
     digraph_t::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, diG); nIt != nEnd; nIt++){
         if(!diG[*nIt].visited && !diG[boost::edge(v, *nIt, diG).first].path){
@@ -311,10 +311,12 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     digraph_t diG;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     std::vector<vertex_descriptor> idxMap;
+    typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
 
     digraph_t::vertex_descriptor source, sink;
     boost::tie(source, sink) =
         detail::make_digraph_with_source_and_sink(G, disabled, num_dis, diG, idxMap, X, Y);
+    std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> dangerous;
 
     //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one
     //for the unavailing try).
@@ -324,10 +326,10 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
             return false;
         }
 
+        dangerous.clear();
         //start extended DFS at source
-        std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> dangerous;
         if(!t_search_disjoint_ways(diG, source, sink, false, source, dangerous, idxMap, G)){
-            for(std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor>::iterator sIt =
+            for(std::set<divd>::iterator sIt =
                   dangerous.begin(); sIt != dangerous.end(); sIt++){
                 diG[*sIt].visited = true;
             }
