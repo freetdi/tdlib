@@ -100,7 +100,6 @@ namespace detail{
 // on edges, the copy step would not be necessary)
 //
 
-namespace detail{
 template <typename G_t>
 std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor,
           typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor>
@@ -124,7 +123,7 @@ std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descri
 
     assert(boost::num_vertices(G)>=num_dis);
     unsigned num_dig_verts = boost::num_vertices(G)+2-num_dis;
-    std::cerr << "digaph verts " << num_dig_verts << "\n";
+//    std::cerr << "digaph verts " << num_dig_verts << "\n";
     digraph_t& diG(*dg);
 
     diG.clear();
@@ -199,6 +198,20 @@ std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descri
 }
 } // detail
 
+namespace impl{
+    template <typename G_t>
+    class disjoint_ways{
+    public:
+        typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
+        typename graph_traits<G_t>::directed_edge_labelled_type dg;
+        typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
+        std::set<divd> dangerous;
+        std::vector<std::vector<unsigned int> > P;
+    };
+} // impl
+
+namespace detail{
+
 //Build the computed disjoint paths by following the edge set of the disjoint
 //paths stored in the edge properties of diG, starting in 'source'.
 //Complexity: O(|V| + k*|E|), where k is the parameter of the function
@@ -212,6 +225,7 @@ static void make_paths(
     adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
 
     unsigned int i = 0;
+    if(i<P.size()) P[i].clear();
     for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(source, diG); nIt1 != nEnd1; nIt1++){
         if(diG[boost::edge(source, *nIt1, diG).first].path){
             typename digraph_t::vertex_descriptor v = *nIt1;
@@ -222,6 +236,7 @@ static void make_paths(
                         v = *nIt2;
                         if(v == sink){
                             i++;
+                            if(i<P.size()) P[i].clear();
                             goto NEXT_ITER;
                         }
                         break;
@@ -316,20 +331,22 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
         unsigned int k,
-        typename graph_traits<G_t>::directed_edge_labelled_type* dg)
+        typename impl::disjoint_ways<G_t>* self)
 {
-    assert(dg);
+    assert(self);
     typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    std::vector<vertex_descriptor> idxMap;
     typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
     typedef typename boost::graph_traits<digraph_t>::vertex_iterator divi;
 
+    std::vector<vertex_descriptor> idxMap;
+
+    digraph_t& diG = self->dg;
+    std::vector<std::vector<unsigned int> > &P = self->P;
+    std::set<divd>& dangerous = self->dangerous;
     vertex_descriptor source, sink;
     boost::tie(source, sink) =
-        detail::make_digraph_with_source_and_sink(G, disabled, num_dis, dg, idxMap, X, Y);
-    std::set<divd> dangerous;
-    digraph_t& diG = *dg;
+        detail::make_digraph_with_source_and_sink(G, disabled, num_dis, &diG, idxMap, X, Y);
 
     //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one
     //for the unavailing try).
@@ -357,23 +374,29 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         }
     }
 
-    std::vector<std::vector<unsigned int> > P(iter);
+    P.resize(iter);
 
     make_paths(diG, source, sink, P);
 
     //Compute a separator by taking the last vertex on each path, that could be
     //reached by a P-alternating walk. If no such separator exists, the first
     //vertex on a path is taken.
-    for(unsigned int i = 0; i < P.size(); i++){
-        for(unsigned int j = P[i].size(); j > 0; j--){
-            if(diG[P[i][j-1]].visited){
-                S.insert(idxMap[P[i][j-1]]);
-                break;
-            }
-            else if(j == 1){
-                S.insert(idxMap[P[i][j-1]]);
+    BOOST_AUTO(Pi, P.begin());
+    for(; Pi!=P.end(); ++Pi){
+        BOOST_AUTO(Pij, Pi->rbegin());
+        for(; Pij!=Pi->rend(); ++Pij){
+            if(diG[(*Pij)].visited){ itested();
+                S.insert(idxMap[(*Pij)]);
+                goto there;
+            }else{ itested();
             }
         }
+        if(Pij==Pi->rend()){
+            S.insert(idxMap[*Pi->begin()]);
+        }else{ untested();
+        }
+there:
+        ;
     }
 
     return true;
@@ -391,9 +414,9 @@ bool seperate_vertices(
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
         unsigned int k,
-        typename graph_traits<G_t>::directed_edge_labelled_type* dg)
+        impl::disjoint_ways<G_t>* dw=NULL)
 {
-    assert(dg);
+    assert(dw);
     //Common neighbours must be contained in a seperator.
     std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(S, S.begin()));
 
@@ -418,7 +441,7 @@ bool seperate_vertices(
         disabled[pos] = true;
     }
 
-    return detail::disjoint_ways(G, disabled, num_dis, X_, Y_, S, k, dg);
+    return detail::disjoint_ways(G, disabled, num_dis, X_, Y_, S, k, dw);
 }
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
@@ -427,18 +450,18 @@ void seperate_vertices(G_t &G, std::vector<bool> &disabled, unsigned num_dis,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-        typename graph_traits<G_t>::directed_edge_labelled_type* dg=NULL)
+        impl::disjoint_ways<G_t>* dw=NULL)
 {
-    typedef typename graph_traits<G_t>::directed_edge_labelled_type dirg_t;
+    typedef impl::disjoint_ways<G_t> dw_t;
     bool own=false;
-    if(!dg){
+    if(!dw){
         own=true;
-        dg=new dirg_t;
+        dw=new dw_t;
     }
-    assert(dg);
-    seperate_vertices(G, disabled, num_dis, X, Y, S, UINT_MAX, dg);
+    assert(dw);
+    seperate_vertices(G, disabled, num_dis, X, Y, S, UINT_MAX, dw);
     if(own){
-        delete dg;
+        delete dw;
     }
 }
 

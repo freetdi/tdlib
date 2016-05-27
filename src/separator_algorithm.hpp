@@ -409,9 +409,9 @@ void separator_algorithm(G_t const &G, T_t &T)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
-    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
 
-    digraph_t dg;
+    typedef impl::disjoint_ways<G_t> dw_t;
+    dw_t dw;
 
     unsigned int k = 0;
     bool finished = false;
@@ -426,7 +426,7 @@ void separator_algorithm(G_t const &G, T_t &T)
         std::vector<bool> disabled(boost::num_vertices(G), false);
         unsigned num_dis=0;
         vertex_set emptySet, parent;
-        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k, &dg);
+        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k, &dw);
         k++;
 
         if(!finished){
