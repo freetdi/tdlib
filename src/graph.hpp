@@ -312,12 +312,29 @@ struct treedec_chooser{ //
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
 };
 // } deprecate
+//
+#ifndef TD_DEFS_NETWORK_FLOW
+#define TD_DEFS_NETWORK_FLOW
+
+struct Vertex_NF{
+    bool visited;
+    int predecessor;
+};
+
+struct Edge_NF{
+    bool path; //true if a path uses the edge
+};
+
+
+#endif
 
 // this makes some sense...
 template<class G_t>
 struct graph_traits{ //
     typedef typename treedec_chooser<G_t>::type treedec_type;
     typedef typename outedge_set<G_t>::type outedge_set_type;
+    typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
+                boost::bidirectionalS, Vertex_NF, Edge_NF> directed_edge_labelled_type;
 };
 
 namespace detail{ //

@@ -71,21 +71,6 @@
 
 namespace treedec{
 
-#ifndef TD_DEFS_NETWORK_FLOW
-#define TD_DEFS_NETWORK_FLOW
-
-struct Vertex_NF{
-    bool visited;
-    int predecessor;
-};
-
-struct Edge_NF{
-    bool path; //true if a path uses the edge
-};
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
-
-#endif
 
 template<class D>
 void check_dis(D dis, size_t num)
@@ -117,13 +102,16 @@ namespace detail{
 
 namespace detail{
 template <typename G_t>
-std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
+std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor,
+          typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor>
     make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
-                 unsigned num_dis, digraph_t &diG,
+                 unsigned num_dis,
+                 typename graph_traits<G_t>::directed_edge_labelled_type* dg,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y)
 {
+    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
@@ -131,9 +119,25 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 
     //G may be a graph with ids not in range [0, |V(G)|). The maximum id of a
     //vertex in G is disabled.size().
-    std::vector<digraph_t::vertex_descriptor> internal_idxMap(disabled.size()+3); //needed for linear copy of the edge set of G
+    std::vector<typename digraph_t::vertex_descriptor> internal_idxMap(disabled.size()+3);
+    //needed for linear copy of the edge set of G
 
-    diG = MOVE(digraph_t(boost::num_vertices(G)+2-num_dis));
+    assert(boost::num_vertices(G)>=num_dis);
+    unsigned num_dig_verts = boost::num_vertices(G)+2-num_dis;
+    std::cerr << "digaph verts " << num_dig_verts << "\n";
+    digraph_t& diG(*dg);
+
+    diG.clear();
+    // no resize?! roll out own resize... later.
+    // boost::resize(num_dig_verts, diG);
+
+    while(boost::num_vertices(diG)<num_dig_verts){
+        boost::add_vertex(diG);
+    }
+    while(boost::num_vertices(diG)>num_dig_verts){
+        // uuh. necessary?
+        boost::remove_vertex(*boost::vertices(diG).first, diG);
+    }
 
     unsigned int j = 0;
     BOOST_AUTO(dv, boost::vertices(diG).first);
@@ -154,31 +158,33 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
         unsigned int tid = noboost::get_pos(boost::target(*eIt, G), G);
         if(!disabled[sid] && !disabled[tid]){
 
-            digraph_t::edge_descriptor e1 =
+            typename digraph_t::edge_descriptor e1 =
                 boost::add_edge(internal_idxMap[sid], internal_idxMap[tid], diG).first;
             diG[e1].path = false;
-            digraph_t::edge_descriptor e2 =
+            typename digraph_t::edge_descriptor e2 =
                 boost::add_edge(internal_idxMap[tid], internal_idxMap[sid], diG).first;
             diG[e2].path = false;
         }
     }
 
-    digraph_t::vertex_descriptor source = *dv;
+    typename digraph_t::vertex_descriptor source = *dv;
     ++dv;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             X.begin(); sIt != X.end(); sIt++){
         unsigned int pos = noboost::get_pos(*sIt, G);
-        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[pos], diG).first;
+        typename digraph_t::edge_descriptor e =
+            boost::add_edge(source, internal_idxMap[pos], diG).first;
         diG[e].path = false;
     }
 
-    digraph_t::vertex_descriptor sink = *dv;
+    typename digraph_t::vertex_descriptor sink = *dv;
     ++dv;
     assert(dv == boost::vertices(diG).second);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
         unsigned int pos = noboost::get_pos(*sIt, G);
-        digraph_t::edge_descriptor e = boost::add_edge(internal_idxMap[pos], sink, diG).first;
+        typename digraph_t::edge_descriptor e =
+            boost::add_edge(internal_idxMap[pos], sink, diG).first;
         diG[e].path = false;
     }
 
@@ -189,7 +195,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
     diG[j].visited = false;
     diG[j].predecessor = -1;
 
-    return std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>(source, sink);
+    return std::make_pair(source, sink);
 }
 } // detail
 
@@ -197,15 +203,18 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 //paths stored in the edge properties of diG, starting in 'source'.
 //Complexity: O(|V| + k*|E|), where k is the parameter of the function
 //'seperate_vertices' or tw(G), if k is not given.
+template<class digraph_t>
 static void make_paths(
         digraph_t const &diG, unsigned int source, unsigned int sink,
         std::vector<std::vector<unsigned int> > &P)
 {
-    boost::graph_traits<digraph_t>::adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
+    typedef typename boost::graph_traits<digraph_t>::adjacency_iterator adjacency_iterator;
+    adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
+
     unsigned int i = 0;
     for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(source, diG); nIt1 != nEnd1; nIt1++){
         if(diG[boost::edge(source, *nIt1, diG).first].path){
-            digraph_t::vertex_descriptor v = *nIt1;
+            typename digraph_t::vertex_descriptor v = *nIt1;
             while(true){
                 for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(v, diG); nIt2 != nEnd2; nIt2++){
                     if(diG[boost::edge(v, *nIt2, diG).first].path){
@@ -234,7 +243,7 @@ static void make_paths(
 //set of W. The symmetric difference will be immediatly by manipulating the
 //edge property of edges, that have been used.  Complexity: O(|V| + |E|) for a
 //complete search.
-template <typename G_t>
+template <typename G_t, typename digraph_t>
 static bool t_search_disjoint_ways(
         digraph_t &diG, unsigned int v, unsigned int sink,
         bool edge_used, unsigned int source,
@@ -275,7 +284,7 @@ static bool t_search_disjoint_ways(
 
     //Do a 'normal' depth-first-search, and ensure that no edge, that is
     //contained on some path in P will be used.
-    digraph_t::adjacency_iterator nIt, nEnd;
+    typename digraph_t::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, diG); nIt != nEnd; nIt++){
         if(!diG[*nIt].visited && !diG[boost::edge(v, *nIt, diG).first].path){
 
@@ -306,17 +315,22 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-        unsigned int k)
+        unsigned int k,
+        typename graph_traits<G_t>::directed_edge_labelled_type* dg)
 {
-    digraph_t diG;
+    assert(dg);
+    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     std::vector<vertex_descriptor> idxMap;
     typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
+    typedef typename boost::graph_traits<digraph_t>::vertex_iterator divi;
 
-    digraph_t::vertex_descriptor source, sink;
+    vertex_descriptor source, sink;
     boost::tie(source, sink) =
-        detail::make_digraph_with_source_and_sink(G, disabled, num_dis, diG, idxMap, X, Y);
-    std::set<typename boost::graph_traits<digraph_t>::vertex_descriptor> dangerous;
+        detail::make_digraph_with_source_and_sink(G, disabled, num_dis, dg, idxMap, X, Y);
+    std::set<divd> dangerous;
+    digraph_t& diG = *dg;
 
     //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one
     //for the unavailing try).
@@ -329,7 +343,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         dangerous.clear();
         //start extended DFS at source
         if(!t_search_disjoint_ways(diG, source, sink, false, source, dangerous, idxMap, G)){
-            for(std::set<divd>::iterator sIt =
+            for(typename std::set<divd>::iterator sIt =
                   dangerous.begin(); sIt != dangerous.end(); sIt++){
                 diG[*sIt].visited = true;
             }
@@ -338,7 +352,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         }
 
         //undo visited
-        digraph_t::vertex_iterator vIt, vEnd;
+        divi vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(diG); vIt != vEnd; vIt++){
             diG[*vIt].visited = false;
         }
@@ -377,8 +391,10 @@ bool seperate_vertices(
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-        unsigned int k)
+        unsigned int k,
+        typename graph_traits<G_t>::directed_edge_labelled_type* dg)
 {
+    assert(dg);
     //Common neighbours must be contained in a seperator.
     std::set_intersection(X.begin(), X.end(), Y.begin(), Y.end(), std::inserter(S, S.begin()));
 
@@ -403,7 +419,7 @@ bool seperate_vertices(
         disabled[pos] = true;
     }
 
-    return detail::disjoint_ways(G, disabled, num_dis, X_, Y_, S, k);
+    return detail::disjoint_ways(G, disabled, num_dis, X_, Y_, S, k, dg);
 }
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
@@ -411,9 +427,20 @@ template <typename G_t>
 void seperate_vertices(G_t &G, std::vector<bool> &disabled, unsigned num_dis,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S)
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+        typename graph_traits<G_t>::directed_edge_labelled_type* dg=NULL)
 {
-    seperate_vertices(G, disabled, num_dis, X, Y, S, UINT_MAX);
+    typedef typename graph_traits<G_t>::directed_edge_labelled_type dirg_t;
+    bool own=false;
+    if(!dg){
+        own=true;
+        dg=new dirg_t;
+    }
+    assert(dg);
+    seperate_vertices(G, disabled, num_dis, X, Y, S, UINT_MAX, dg);
+    if(own){
+        delete dg;
+    }
 }
 
 } //namespace treedec

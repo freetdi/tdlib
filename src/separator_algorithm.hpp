@@ -149,9 +149,10 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
 //Find a nearly balanced seperator S of W by doing an extended
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
-template <typename G_t, typename W_t, typename S_t>
+template <typename G_t, typename W_t, typename S_t, typename digraph_t>
 bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
-    std::vector<bool> const &disabled, unsigned num_dis, unsigned int k)
+    std::vector<bool> const &disabled, unsigned num_dis, unsigned int k,
+    digraph_t* dg)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
@@ -280,7 +281,7 @@ for(unsigned Js=1; Js<=2*k; ++Js)
 
             //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
             // network_flow here.
-            if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1)){
+            if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1, dg)){
                 continue;
             }
 
@@ -320,14 +321,15 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 
 //The main procedure of the seperator algorithm.
 // return true if finished (note to self: what does it mean?)
-template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
+template <typename G_t, typename T_t, class W_t, class P_t, class V_t, typename digraph_t>
 bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
         P_t const &parent, // a vertex set
         V_t &vertices, // a vertex set
         std::vector<bool> &disabled,
         unsigned int& num_dis,
-        unsigned int k)
+        unsigned int k,
+        digraph_t* dg)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
@@ -369,7 +371,7 @@ bool sep_decomp(G_t const &G, T_t &T,
     //induced by the resulting components and the seperator recursively, add a
     //bag containing the union of W and S to the decomposition,
     //connected with the bag, created in the 'parent-call' of the procedure.
-    if(nearly_balanced_seperator(G, W, S, disabled, num_dis, k)){
+    if(nearly_balanced_seperator(G, W, S, disabled, num_dis, k, dg)){
         std::vector<vertex_set> C;
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
@@ -410,7 +412,7 @@ bool sep_decomp(G_t const &G, T_t &T,
             }
 
             //Reject if no seperator can be found in one of the ongoing recursive calls.
-            if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, num_dis_, k)){
+            if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, num_dis_, k, dg)){
                 return false;
             }
         }
@@ -426,6 +428,9 @@ void separator_algorithm(G_t const &G, T_t &T)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
+    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
+
+    digraph_t dg;
 
     unsigned int k = 0;
     bool finished = false;
@@ -440,7 +445,7 @@ void separator_algorithm(G_t const &G, T_t &T)
         std::vector<bool> disabled(boost::num_vertices(G), false);
         unsigned num_dis=0;
         vertex_set emptySet, parent;
-        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k);
+        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k, &dg);
         k++;
 
         if(!finished){
