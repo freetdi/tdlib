@@ -156,6 +156,8 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
+//    typedef typename std::vector<vertex_descriptor> vertex_vector;
+
 #if 0 // not yet
     typedef typename graph_traits<G_t>::treedec_type T_t;
     typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
@@ -171,8 +173,8 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
     std::vector<typename std::vector<vertex_descriptor>::iterator > scratch2;
 #endif
 
-    // vector?!
-    vertex_set sX, sY, X_Y;
+    vertex_set X_Y, sY, sX;
+//    vertex_vector sXv, sYv;
 
 for(unsigned s=1; s<=2*k; ++s)
 // for(unsigned s=2*k; s>0; --s)
@@ -229,8 +231,6 @@ for(unsigned Js=1; Js<=2*k; ++Js)
 
             std::vector<bool> disabled_(disabled);
             unsigned num_dis_(num_dis);
-            sX.clear();
-            sY.clear();
             X_Y.clear();
 
             // TODO. don't instanciate X_Y. just iterate.
@@ -250,8 +250,37 @@ for(unsigned Js=1; Js<=2*k; ++Js)
             }
 
             //Do the extended deepth-first-search on the neighbours of vertices in X and Y
+            sX.clear();
+            sY.clear();
+#if 1
+            {
+                BOOST_AUTO(N, make_neighbourhood_iter((*I).first, (*I).second, G, s));
+                BOOST_AUTO(NI, N.first);
+                for(;NI!=N.second; ++NI){
+                    if(!disabled_[get_pos(*NI, G)]) { untested();
+                        assert(sX.size()==0 || *NI>*sX.rbegin());
+                        sX.insert(sX.end(), *NI);
+                    }
+                }
+            }
+            {
+                BOOST_AUTO(N, make_neighbourhood_iter((*J).first, (*J).second, G, Js));
+                BOOST_AUTO(NI, N.first);
+                for(;NI!=N.second; ++NI){ untested();
+                    if(!disabled_[get_pos(*NI, G)]) { untested();
+                        assert(sY.size()==0 || *NI>*sY.rbegin());
+                        sY.insert(sY.end(), *NI);
+                    }
+                }
+            }
+#endif
+#if 0
             treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
             treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
+#endif
+
+//            assert(sX.size() == sXv.size());
+  //          assert(sY.size() == sYv.size());
 
             //Z must be a subset of S.
             // Z=W\X_Y
@@ -315,6 +344,7 @@ bool sep_decomp(G_t const &G, T_t &T,
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
 #if 0 // not yet
+    typedef typename std::vector<vertex_descriptor> vertex_vector;
     typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?

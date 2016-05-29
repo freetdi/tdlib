@@ -189,10 +189,11 @@ bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
     return edge(G, X.begin(), X.end(), Y.begin(), Y.end()).second;
 }
 
-template <typename G_t, typename It>
+// obsolete?
+template <typename G_t, typename It, typename C>
 inline void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
              It Xit, It Xend,
-             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
+             C& S_X)
 {
     for(;Xit!=Xend; ++Xit){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;

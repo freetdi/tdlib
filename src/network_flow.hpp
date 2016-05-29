@@ -344,7 +344,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     digraph_t& diG = self->dg;
     std::vector<std::vector<unsigned int> > &P = self->P;
     std::set<divd>& dangerous = self->dangerous;
-    vertex_descriptor source, sink;
+    divd source, sink;
     boost::tie(source, sink) =
         detail::make_digraph_with_source_and_sink(G, disabled, num_dis, &diG, idxMap, X, Y);
 
@@ -407,11 +407,11 @@ there:
 //This version immediatly aborts after at most k+1 iterations. The return value
 //indicates, whether a seperator of size at most k
 //exists or not.
-template <typename G_t>
+template <typename G_t, typename S_t>
 bool seperate_vertices(
         G_t const &G, std::vector<bool> &disabled, unsigned &num_dis,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
+        S_t const &X,
+        S_t const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
         unsigned int k,
         impl::disjoint_ways<G_t>* dw=NULL)
