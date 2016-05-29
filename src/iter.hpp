@@ -349,7 +349,7 @@ public: // construct
 
         bool found=false;
 
-        if(_include_base){ untested();
+        if(_include_base){
             _v = *_i;
         }else{ untested();
             A ii(_b);
@@ -371,20 +371,20 @@ public: // construct
             assert(!size || n<size);
             if(!size){ untested();
                 _a.push_back(boost::adjacent_vertices(*ii, g).first);
-            }else{ untested();
+            }else{
                 _a[n] = boost::adjacent_vertices(*ii, g).first;
             }
 
             if(_a[n] == boost::adjacent_vertices(*ii, g).second){ untested();
-            }else if(*(_a[n])<_v){ untested();
+            }else if(*(_a[n])<_v){
                 _v = *_a[n];
                 found = true;
-            }else{ untested();
+            }else{
             }
 
             ++n;
         }
-        if(_include_base){ untested();
+        if(_include_base){
         }else if(!found){ untested();
             _b = _e;
         }
@@ -411,22 +411,22 @@ public: // ops
 
         vertex_descriptor previous = _v;
         bool found = false;
-        if(_include_base){ untested();
+        if(_include_base){
             found = update(_i, _e, previous, _v);
         }else{ untested();
         }
         A ii(_b);
 
         unsigned n=0;
-        for(; ii!=_e; ++ii){ untested();
+        for(; ii!=_e; ++ii){
             BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
             found |= update(_a[n], aend, previous, _v);
             ++n;
         }
 
-        if(!found){ untested();
+        if(!found){
             _b = _e;
-        }else{ untested();
+        }else{
             assert(_v>previous);
         }
 
