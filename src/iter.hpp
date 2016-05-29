@@ -337,60 +337,59 @@ public: // construct
     neighbourhood01_iter() : _v(NULL)
     { untested();
     }
-    neighbourhood01_iter(A b, A e, unsigned size, const G& g)
+    neighbourhood01_iter(A b, A e, unsigned size, const G& g, bool incb)
        : _b(b), _i(b), _e(e),
-         _a(size), _g(g)
+         _a(size), _g(g), _include_base(incb)
     {
         if(b==e){
             assert(size==0);
             return;
         }else{
         }
-        _v = *_i;
+
+        bool found=false;
+
+        if(_include_base){ untested();
+            _v = *_i;
+        }else{ untested();
+            A ii(_b);
+            for(; ii!=_e; ++ii){
+                // just take one.... (inefficient)
+                if(boost::adjacent_vertices(*ii, g).first
+                 !=boost::adjacent_vertices(*ii, g).second){
+                    _v = *boost::adjacent_vertices(*ii, g).first;
+                    found = true;
+                    break;
+                }
+            }
+        }
 
         A ii(_b);
 
         unsigned n=0;
         for(; ii!=_e; ++ii){
-            assert(n<size);
-            _a[n] = boost::adjacent_vertices(*ii, g).first;
-            if(_a[n] == boost::adjacent_vertices(*ii, g).second){
-            }else if(*(_a[n])<_v){
+            assert(!size || n<size);
+            if(!size){ untested();
+                _a.push_back(boost::adjacent_vertices(*ii, g).first);
+            }else{ untested();
+                _a[n] = boost::adjacent_vertices(*ii, g).first;
+            }
+
+            if(_a[n] == boost::adjacent_vertices(*ii, g).second){ untested();
+            }else if(*(_a[n])<_v){ untested();
                 _v = *_a[n];
-            }else{
+                found = true;
+            }else{ untested();
             }
 
             ++n;
         }
-
-        //std::cerr << " smallest found " << _v << "\n";
-    }
-    neighbourhood01_iter(A b, A e, const G& g)
-       : _b(b), _i(b), _e(e),
-         _a(), _g(g)
-    {
-        if(b==e){
-            return;
-        }else{
+        if(_include_base){ untested();
+        }else if(!found){ untested();
+            _b = _e;
         }
-        _v = *_i;
-
-        A ii(_b);
-
-        unsigned n=0;
-        for(; ii!=_e; ++ii){
-            _a.push_back(boost::adjacent_vertices(*ii, g).first);
-            if(_a[n] == boost::adjacent_vertices(*ii, g).second){
-            }else if(*(_a[n])<_v){
-                _v = *_a[n];
-            }else{
-            }
-
-            ++n;
-        }
-
-        //std::cerr << " smallest found " << _v << "\n";
     }
+
     ~neighbourhood01_iter()
     { itested();
     }
@@ -405,30 +404,29 @@ public: // ops
     }
     neighbourhood01_iter& operator++()
     {
- //       std::cerr << " smallest ++ " << _v << "\n";
-
         if(_b==_e){ untested();
             return *this;
         }else{
         }
 
         vertex_descriptor previous = _v;
-        bool found = update(_i, _e, previous, _v);
+        bool found = false;
+        if(_include_base){ untested();
+            found = update(_i, _e, previous, _v);
+        }else{ untested();
+        }
         A ii(_b);
 
         unsigned n=0;
-        for(; ii!=_e; ++ii){
+        for(; ii!=_e; ++ii){ untested();
             BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
             found |= update(_a[n], aend, previous, _v);
-//            std::cerr << " .. ++ " << _v << "\n";
             ++n;
         }
 
-        if(!found){
-            //std::cerr << " atend ++ " << _v << "\n";
+        if(!found){ untested();
             _b = _e;
-        }else{
-            //std::cerr << " not atend ++ " << _v << "\n";
+        }else{ untested();
             assert(_v>previous);
         }
 
@@ -471,6 +469,7 @@ private: // data
     std::vector<adjacency_iterator> _a;
     vertex_descriptor _v;
     G const& _g;
+    bool _include_base;
 };
 } // detail
 
@@ -479,18 +478,21 @@ private: // data
 template<class A, class G>
 std::pair<detail::neighbourhood01_iter<A, G>,
           detail::neighbourhood01_iter<A, G> >
-make_neighbourhood01_iter(A b, A e, G const& g, unsigned size=0)
+inline make_neighbourhood01_iter(A b, A e, G const& g, unsigned size=0,
+        bool include_base=true)
 {
     typedef detail::neighbourhood01_iter<A, G> nIter;
-    if(size){
-        return std::make_pair(
-                nIter(b,e,size,g),
-                nIter(e,e,0,g) );
-    }else{
-        return std::make_pair(
-                nIter(b,e,g),
-                nIter(e,e,0,g) );
-    }
+    return std::make_pair(
+            nIter(b,e,size,g,include_base),
+            nIter(e,e,0,g,include_base) );
+}
+
+template<class A, class G>
+std::pair<detail::neighbourhood01_iter<A, G>,
+          detail::neighbourhood01_iter<A, G> >
+inline make_neighbourhood_iter(A b, A e, G const& g, unsigned size=0)
+{
+    return make_neighbourhood01_iter(b,e,g,size,false);
 }
 
 #endif
