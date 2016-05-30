@@ -334,8 +334,18 @@ struct graph_traits{ //
     typedef typename treedec_chooser<G_t>::type treedec_type;
     typedef typename outedge_set<G_t>::type outedge_set_type;
     typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
-                boost::bidirectionalS, Vertex_NF, Edge_NF> directed_edge_labelled_type;
+                boost::bidirectionalS, Vertex_NF, Edge_NF> directed_overlay;
 };
+
+template <typename G_t>
+std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
+          typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor>
+    make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
+                 unsigned num_dis,
+                 typename graph_traits<G_t>::directed_overlay& dg,
+                 std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y);
 
 namespace detail{ //
 // working around balu and bag

@@ -84,7 +84,6 @@ void check_dis(D dis, size_t num)
 }
 
 
-namespace detail{
 
 //Copies the induced subgraph of G formed by disabled into diG. The graph diG
 //is a digraph, that is for each edge of the induced subgraph we have an edge
@@ -101,16 +100,16 @@ namespace detail{
 //
 
 template <typename G_t>
-std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor,
-          typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descriptor>
+std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
+          typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor>
     make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
                  unsigned num_dis,
-                 typename graph_traits<G_t>::directed_edge_labelled_type* dg,
+                 typename graph_traits<G_t>::directed_overlay& diG,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y)
 {
-    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
+    typedef typename graph_traits<G_t>::directed_overlay digraph_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
 
@@ -124,7 +123,6 @@ std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descri
     assert(boost::num_vertices(G)>=num_dis);
     unsigned num_dig_verts = boost::num_vertices(G)+2-num_dis;
 //    std::cerr << "digaph verts " << num_dig_verts << "\n";
-    digraph_t& diG(*dg);
 
     diG.clear();
     // no resize?! roll out own resize... later.
@@ -196,14 +194,13 @@ std::pair<typename graph_traits<G_t>::directed_edge_labelled_type::vertex_descri
 
     return std::make_pair(source, sink);
 }
-} // detail
 
 namespace impl{
     template <typename G_t>
     class disjoint_ways{
     public:
-        typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
-        typename graph_traits<G_t>::directed_edge_labelled_type dg;
+        typedef typename graph_traits<G_t>::directed_overlay digraph_t;
+        typename graph_traits<G_t>::directed_overlay dg;
         typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
         std::set<divd> dangerous;
         std::vector<std::vector<unsigned int> > P;
@@ -221,19 +218,22 @@ static void make_paths(
         digraph_t const &diG, unsigned int source, unsigned int sink,
         std::vector<std::vector<unsigned int> > &P)
 {
-    typedef typename boost::graph_traits<digraph_t>::adjacency_iterator adjacency_iterator;
-    adjacency_iterator nIt1, nEnd1, nIt2, nEnd2;
+//    typedef typename boost::graph_traits<digraph_t>::adjacency_iterator adjacency_iterator;
+    typedef typename boost::graph_traits<digraph_t>::out_edge_iterator out_edge_iterator;
+    out_edge_iterator nIt1, nEnd1,
+//    adjacency_iterator
+        nIt2, nEnd2;
 
     unsigned int i = 0;
     if(i<P.size()) P[i].clear();
-    for(boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(source, diG); nIt1 != nEnd1; nIt1++){
-        if(diG[boost::edge(source, *nIt1, diG).first].path){
-            typename digraph_t::vertex_descriptor v = *nIt1;
+    for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1 != nEnd1; nIt1++){
+        if(diG[*nIt1].path){
+            typename digraph_t::vertex_descriptor v = boost::target(*nIt1, diG);
             while(true){
-                for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(v, diG); nIt2 != nEnd2; nIt2++){
-                    if(diG[boost::edge(v, *nIt2, diG).first].path){
+                for(boost::tie(nIt2, nEnd2) = boost::out_edges(v, diG); nIt2 != nEnd2; nIt2++){
+                    if(diG[*nIt2].path){
                         P[i].push_back(v);
-                        v = *nIt2;
+                        v = boost::target(*nIt2, diG);
                         if(v == sink){
                             i++;
                             if(i<P.size()) P[i].clear();
@@ -334,7 +334,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         typename impl::disjoint_ways<G_t>* self)
 {
     assert(self);
-    typedef typename graph_traits<G_t>::directed_edge_labelled_type digraph_t;
+    typedef typename graph_traits<G_t>::directed_overlay digraph_t;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
     typedef typename boost::graph_traits<digraph_t>::vertex_iterator divi;
@@ -346,7 +346,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     std::set<divd>& dangerous = self->dangerous;
     divd source, sink;
     boost::tie(source, sink) =
-        detail::make_digraph_with_source_and_sink(G, disabled, num_dis, &diG, idxMap, X, Y);
+        make_digraph_with_source_and_sink(G, disabled, num_dis, diG, idxMap, X, Y);
 
     //Main loop of algorithm. min{k+1, |X|+1} iterations are sufficient (one
     //for the unavailing try).
