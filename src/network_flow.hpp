@@ -302,28 +302,34 @@ static bool t_search_disjoint_ways(
 
     //Do a 'normal' depth-first-search, and ensure that no edge, that is
     //contained on some path in P will be used.
-    typename boost::graph_traits<digraph_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, diG); nIt != nEnd; nIt++){
-        BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, *nIt));
-        BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, boost::edge(v, *nIt, diG).first));
+    typename boost::graph_traits<digraph_t>::out_edge_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::out_edges(v, diG); nIt != nEnd; nIt++){
+        BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, boost::target(*nIt, diG)));
+        BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, *nIt));
         if(!vis && !path){
             BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
-            bool edge_used_ = pre == (int)*nIt;
+            BOOST_AUTO(T, boost::target(*nIt, diG));
+            bool edge_used_ = pre == (int)T;
 
             //Recursivly build the walk
-            if(t_search_disjoint_ways(diG, *nIt, sink, edge_used_, source, dangerous, idxMap, G)){
-                if(v != source && *nIt != sink && diG[boost::edge(*nIt, v, diG).first].path){
-                    BOOST_AUTO(e, boost::edge(*nIt, v, diG).first);
-                    boost::get(&Edge_NF::path, diG, e) = false;
+            if(t_search_disjoint_ways(diG, T, sink, edge_used_, source, dangerous, idxMap, G)){
+                BOOST_AUTO(redge, boost::edge(T, v, diG).first);
+                bool rpath = boost::get(&Edge_NF::path, diG, redge);
+
+                if(v != source && T != sink && rpath){
+                    assert(boost::edge(T, v, diG).second); // it better exists!
+                    boost::get(&Edge_NF::path, diG, redge) = false;
                     pre = -1;
                 }else{
-                    BOOST_AUTO(e, boost::edge(v, *nIt, diG).first);
+                    BOOST_AUTO(e, *nIt);
                     boost::get(&Edge_NF::path, diG, e) = true;
-                    boost::get(&Vertex_NF::predecessor, diG, *nIt) = v;
+                    boost::get(&Vertex_NF::predecessor, diG, T) = v;
                 }
 
                 return true;
             }
+        }else{
+            // no path?
         }
     }
     return false;
