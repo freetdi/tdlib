@@ -143,8 +143,9 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
         if(!disabled[pos]){
             internal_idxMap[pos] = *dv;
             ++dv;
-            diG[j].visited = false;
-            diG[j++].predecessor = -1;
+            boost::get(&Vertex_NF::visited, diG, j) = false;
+            boost::get(&Vertex_NF::predecessor, diG, j) = -1;
+            ++j;
             idxMap.push_back(*vIt);
         }
     }
@@ -157,10 +158,10 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 
             typename digraph_t::edge_descriptor e1 =
                 boost::add_edge(internal_idxMap[sid], internal_idxMap[tid], diG).first;
-            diG[e1].path = false;
+            boost::get(&Edge_NF::path, diG, e1) = false;
             typename digraph_t::edge_descriptor e2 =
                 boost::add_edge(internal_idxMap[tid], internal_idxMap[sid], diG).first;
-            diG[e2].path = false;
+            boost::get(&Edge_NF::path, diG, e2) = false;
         }
     }
 
@@ -171,7 +172,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
         unsigned int pos = noboost::get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(source, internal_idxMap[pos], diG).first;
-        diG[e].path = false;
+        boost::get(&Edge_NF::path, diG, e) = false;
     }
 
     typename digraph_t::vertex_descriptor sink = *dv;
@@ -182,7 +183,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
         unsigned int pos = noboost::get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(internal_idxMap[pos], sink, diG).first;
-        diG[e].path = false;
+        boost::get(&Edge_NF::path, diG, e) = false;
     }
 
     diG[j].visited = false;
@@ -227,11 +228,11 @@ static void make_paths(
     unsigned int i = 0;
     if(i<P.size()) P[i].clear();
     for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1 != nEnd1; nIt1++){
-        if(diG[*nIt1].path){
+        if(boost::get(&Edge_NF::path, diG, *nIt1)){
             typename digraph_t::vertex_descriptor v = boost::target(*nIt1, diG);
             while(true){
                 for(boost::tie(nIt2, nEnd2) = boost::out_edges(v, diG); nIt2 != nEnd2; nIt2++){
-                    if(diG[*nIt2].path){
+                    if(boost::get(&Edge_NF::path, diG, *nIt2)){
                         P[i].push_back(v);
                         v = boost::target(*nIt2, diG);
                         if(v == sink){
@@ -266,8 +267,8 @@ static bool t_search_disjoint_ways(
         std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> const &idxMap,
         G_t const &G)
 {
-    diG[v].visited = true;
-    bool on_a_path = diG[v].predecessor != -1;
+    boost::get(&Vertex_NF::visited, diG, v) = true;
+    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != -1;
 
     //The walk has reached the sink. We can extend the set of disjoint paths by another path.
     if(v == sink){
@@ -278,18 +279,20 @@ static bool t_search_disjoint_ways(
     //predecessor of v on this path in P.  This vertex could be possibly
     //reached by the predecessor of v on the path at a later time.
     if(on_a_path && !edge_used){
-        diG[v].visited = false;
+        boost::get(&Vertex_NF::visited, diG, v) = false;
         dangerous.insert(v);
 
-        if(diG[diG[v].predecessor].visited){
+        BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+        BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, pre));
+        if(vis){
             return false;
-        }
-        else{
+        }else{
             //If a P-alternating walk can be computed by taking this 'reverse edge', P' will not
             //contain {v, w}, where w is the predecessor of v on the path in P that containes v.
-            if(t_search_disjoint_ways(diG, diG[v].predecessor, sink, true, source, dangerous, idxMap, G)){
-                diG[boost::edge(diG[v].predecessor, v, diG).first].path = false;
-                diG[v].predecessor = -1;
+            if(t_search_disjoint_ways(diG, pre, sink, true, source, dangerous, idxMap, G)){
+                BOOST_AUTO(e, boost::edge(pre, v, diG).first);
+                boost::get(&Edge_NF::path, diG, e) = false;
+                pre = -1;
 
                 return true;
             }
@@ -299,21 +302,24 @@ static bool t_search_disjoint_ways(
 
     //Do a 'normal' depth-first-search, and ensure that no edge, that is
     //contained on some path in P will be used.
-    typename digraph_t::adjacency_iterator nIt, nEnd;
+    typename boost::graph_traits<digraph_t>::adjacency_iterator nIt, nEnd;
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, diG); nIt != nEnd; nIt++){
-        if(!diG[*nIt].visited && !diG[boost::edge(v, *nIt, diG).first].path){
-
-            bool edge_used_ = diG[v].predecessor == (int)*nIt;
+        BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, *nIt));
+        BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, boost::edge(v, *nIt, diG).first));
+        if(!vis && !path){
+            BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+            bool edge_used_ = pre == (int)*nIt;
 
             //Recursivly build the walk
             if(t_search_disjoint_ways(diG, *nIt, sink, edge_used_, source, dangerous, idxMap, G)){
                 if(v != source && *nIt != sink && diG[boost::edge(*nIt, v, diG).first].path){
-                    diG[boost::edge(*nIt, v, diG).first].path = false;
-                    diG[v].predecessor = -1;
-                }
-                else{
-                    diG[boost::edge(v, *nIt, diG).first].path = true;
-                    diG[*nIt].predecessor = v;
+                    BOOST_AUTO(e, boost::edge(*nIt, v, diG).first);
+                    boost::get(&Edge_NF::path, diG, e) = false;
+                    pre = -1;
+                }else{
+                    BOOST_AUTO(e, boost::edge(v, *nIt, diG).first);
+                    boost::get(&Edge_NF::path, diG, e) = true;
+                    boost::get(&Vertex_NF::predecessor, diG, *nIt) = v;
                 }
 
                 return true;
@@ -361,7 +367,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         if(!t_search_disjoint_ways(diG, source, sink, false, source, dangerous, idxMap, G)){
             for(typename std::set<divd>::iterator sIt =
                   dangerous.begin(); sIt != dangerous.end(); sIt++){
-                diG[*sIt].visited = true;
+                boost::get(&Vertex_NF::visited, diG, *sIt) = true;
             }
 
             break;
@@ -370,7 +376,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         //undo visited
         divi vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(diG); vIt != vEnd; vIt++){
-            diG[*vIt].visited = false;
+            boost::get(&Vertex_NF::visited, diG, *vIt) = false;
         }
     }
 
@@ -385,8 +391,8 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     for(; Pi!=P.end(); ++Pi){
         BOOST_AUTO(Pij, Pi->rbegin());
         for(; Pij!=Pi->rend(); ++Pij){
-            if(diG[(*Pij)].visited){ itested();
-                S.insert(idxMap[(*Pij)]);
+            if(boost::get(&Vertex_NF::visited, diG, *Pij)){ itested();
+                S.insert(idxMap[*Pij]);
                 goto there;
             }else{ itested();
             }
