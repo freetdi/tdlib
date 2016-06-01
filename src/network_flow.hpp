@@ -105,6 +105,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
                  unsigned num_dis,
                  typename graph_traits<G_t>::directed_overlay& diG,
+                 /* FIXME: use property... */
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y)
@@ -144,7 +145,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
             internal_idxMap[pos] = *dv;
             ++dv;
             boost::get(&Vertex_NF::visited, diG, j) = false;
-            boost::get(&Vertex_NF::predecessor, diG, j) = -1;
+            boost::get(&Vertex_NF::predecessor, diG, j) = j;
             ++j;
             idxMap.push_back(*vIt);
         }
@@ -187,11 +188,11 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     }
 
     diG[j].visited = false;
-    diG[j].predecessor = -1;
+    diG[j].predecessor = j;
 
     j++;
     diG[j].visited = false;
-    diG[j].predecessor = -1;
+    diG[j].predecessor = j;
 
     return std::make_pair(source, sink);
 }
@@ -199,6 +200,9 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 namespace impl{
     template <typename G_t>
     class disjoint_ways{
+    public:
+        // hmm does not work.
+        // disjoint_ways(G_t const& g) : dg(g) {}
     public:
         typedef typename graph_traits<G_t>::directed_overlay digraph_t;
         typename graph_traits<G_t>::directed_overlay dg;
@@ -268,7 +272,7 @@ static bool t_search_disjoint_ways(
         G_t const &G)
 {
     boost::get(&Vertex_NF::visited, diG, v) = true;
-    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != -1;
+    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != v;
 
     //The walk has reached the sink. We can extend the set of disjoint paths by another path.
     if(v == sink){
@@ -292,7 +296,7 @@ static bool t_search_disjoint_ways(
             if(t_search_disjoint_ways(diG, pre, sink, true, source, dangerous, idxMap, G)){
                 BOOST_AUTO(e, boost::edge(pre, v, diG).first);
                 boost::get(&Edge_NF::path, diG, e) = false;
-                pre = -1;
+                pre = v;
 
                 return true;
             }
@@ -319,7 +323,7 @@ static bool t_search_disjoint_ways(
                 if(v != source && T != sink && rpath){
                     assert(boost::edge(T, v, diG).second); // it better exists!
                     boost::get(&Edge_NF::path, diG, redge) = false;
-                    pre = -1;
+                    pre = v;
                 }else{
                     BOOST_AUTO(e, *nIt);
                     boost::get(&Edge_NF::path, diG, e) = true;
