@@ -351,7 +351,7 @@ public: // construct
 
         if(_include_base){
             _v = *_i;
-        }else{ untested();
+        }else{
             A ii(_b);
             for(; ii!=_e; ++ii){
                 // just take one.... (inefficient)
@@ -413,7 +413,7 @@ public: // ops
         bool found = false;
         if(_include_base){
             found = update(_i, _e, previous, _v);
-        }else{ untested();
+        }else{
         }
         A ii(_b);
 

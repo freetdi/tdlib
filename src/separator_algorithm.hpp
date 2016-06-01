@@ -257,7 +257,7 @@ for(unsigned Js=1; Js<=2*k; ++Js)
                 BOOST_AUTO(N, make_neighbourhood_iter((*I).first, (*I).second, G, s));
                 BOOST_AUTO(NI, N.first);
                 for(;NI!=N.second; ++NI){
-                    if(!disabled_[get_pos(*NI, G)]) { untested();
+                    if(!disabled_[get_pos(*NI, G)]) {
                         assert(sX.size()==0 || *NI>*sX.rbegin());
                         sX.insert(sX.end(), *NI);
                     }
@@ -266,8 +266,8 @@ for(unsigned Js=1; Js<=2*k; ++Js)
             {
                 BOOST_AUTO(N, make_neighbourhood_iter((*J).first, (*J).second, G, Js));
                 BOOST_AUTO(NI, N.first);
-                for(;NI!=N.second; ++NI){ untested();
-                    if(!disabled_[get_pos(*NI, G)]) { untested();
+                for(;NI!=N.second; ++NI){
+                    if(!disabled_[get_pos(*NI, G)]) {
                         assert(sY.size()==0 || *NI>*sY.rbegin());
                         sY.insert(sY.end(), *NI);
                     }

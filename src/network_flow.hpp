@@ -231,11 +231,11 @@ static void make_paths(
 
     unsigned int i = 0;
     if(i<P.size()) P[i].clear();
-    for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1 != nEnd1; nIt1++){
+    for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1!=nEnd1; ++nIt1){
         if(boost::get(&Edge_NF::path, diG, *nIt1)){
             typename digraph_t::vertex_descriptor v = boost::target(*nIt1, diG);
             while(true){
-                for(boost::tie(nIt2, nEnd2) = boost::out_edges(v, diG); nIt2 != nEnd2; nIt2++){
+                for(boost::tie(nIt2, nEnd2) = boost::out_edges(v, diG); nIt2!=nEnd2; ++nIt2){
                     if(boost::get(&Edge_NF::path, diG, *nIt2)){
                         P[i].push_back(v);
                         v = boost::target(*nIt2, diG);
@@ -307,7 +307,7 @@ static bool t_search_disjoint_ways(
     //Do a 'normal' depth-first-search, and ensure that no edge, that is
     //contained on some path in P will be used.
     typename boost::graph_traits<digraph_t>::out_edge_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::out_edges(v, diG); nIt != nEnd; nIt++){
+    for(boost::tie(nIt, nEnd)=boost::out_edges(v, diG); nIt!=nEnd; ++nIt){
         BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, boost::target(*nIt, diG)));
         BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, *nIt));
         if(!vis && !path){
