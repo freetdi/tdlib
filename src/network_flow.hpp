@@ -222,28 +222,28 @@ template<class digraph_t>
 static void make_paths(
         digraph_t const &diG, unsigned int source, unsigned int sink,
         std::vector<std::vector<unsigned int> > &P)
-{ untested();
+{
     typedef typename boost::graph_traits<digraph_t>::out_edge_iterator out_edge_iterator;
     out_edge_iterator nIt1, nEnd1, nIt2, nEnd2;
 
     unsigned int i = 0;
-    if(i<P.size()){ untested();
+    if(i<P.size()){
         P[i].clear();
-    }else{untested();
+    }else{
     }
-    for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1!=nEnd1; ++nIt1){ untested();
-        if(boost::get(&Edge_NF::path, diG, *nIt1)){ untested();
+    for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1!=nEnd1; ++nIt1){
+        if(boost::get(&Edge_NF::path, diG, *nIt1)){
             typename digraph_t::vertex_descriptor v = boost::target(*nIt1, diG);
-            while(true){ untested();
+            while(true){
                 for(boost::tie(nIt2, nEnd2) = boost::out_edges(v, diG); nIt2!=nEnd2; ++nIt2){
                     if(boost::get(&Edge_NF::path, diG, *nIt2)){
                         P[i].push_back(v);
                         v = boost::target(*nIt2, diG);
                         if(v == sink){
                             i++;
-                            if(i<P.size()){ untested();
+                            if(i<P.size()){
                                 P[i].clear();
-                            }else{ untested();
+                            }else{
                             }
                             goto NEXT_ITER;
                         }
@@ -253,7 +253,7 @@ static void make_paths(
                 }
             }
             // unreachable
-        }else{ untested();
+        }else{
             // edge source -> v (for some v) but no path....?
         }
         NEXT_ITER:
@@ -314,7 +314,6 @@ static bool t_search_disjoint_ways(
         }
     }
 
-    untested();
     //Do a 'normal' depth-first-search, and ensure that no edge, that is
     //contained on some path in P will be used.
     typename boost::graph_traits<digraph_t>::out_edge_iterator nIt, nEnd;
@@ -419,15 +418,15 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
     for(; Pi!=P.end(); ++Pi){
         BOOST_AUTO(Pij, Pi->rbegin());
         for(; Pij!=Pi->rend(); ++Pij){
-            if(boost::get(&Vertex_NF::visited, diG, *Pij)){ itested();
+            if(boost::get(&Vertex_NF::visited, diG, *Pij)){
                 S.insert(idxMap[*Pij]);
                 goto there;
-            }else{ itested();
+            }else{
             }
         }
         if(Pij==Pi->rend()){
             S.insert(idxMap[*Pi->begin()]);
-        }else{ untested();
+        }else{
         }
 there:
         ;
