@@ -282,7 +282,7 @@ static bool t_search_disjoint_ways(
         boost::get(&Vertex_NF::visited, diG, v) = false;
         dangerous.insert(v);
 
-        BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+        BOOST_AUTO(&pre, boost::get(&Vertex_NF::predecessor, diG, v));
         BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, pre));
         if(vis){
             return false;
@@ -307,7 +307,7 @@ static bool t_search_disjoint_ways(
         BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, *nIt));
         BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, boost::edge(v, *nIt, diG).first));
         if(!vis && !path){
-            BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+            BOOST_AUTO(&pre, boost::get(&Vertex_NF::predecessor, diG, v));
             bool edge_used_ = pre == (int)*nIt;
 
             //Recursivly build the walk
