@@ -296,7 +296,7 @@ static bool t_search_disjoint_ways(
         boost::get(&Vertex_NF::visited, diG, v) = false;
         dangerous.insert(v);
 
-        BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+        BOOST_AUTO(&pre, boost::get(&Vertex_NF::predecessor, diG, v));
         BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, pre));
         if(vis){
             return false;
@@ -321,7 +321,7 @@ static bool t_search_disjoint_ways(
         BOOST_AUTO(vis, boost::get(&Vertex_NF::visited, diG, boost::target(*nIt, diG)));
         BOOST_AUTO(path,boost::get(&Edge_NF::path, diG, *nIt));
         if(!vis && !path){
-            BOOST_AUTO(pre, boost::get(&Vertex_NF::predecessor, diG, v));
+            BOOST_AUTO(&pre, boost::get(&Vertex_NF::predecessor, diG, v));
             BOOST_AUTO(T, boost::target(*nIt, diG));
             assert(v==boost::source(*nIt, diG));
             assert(boost::edge(v, T, diG).second);
