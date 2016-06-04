@@ -40,24 +40,26 @@
 
 namespace treedec{
 
-//Creates a modified induced subgraph of the bag 'bag(t_desc, T)'.
-template <typename G_t, typename T_t>
+//Create a modified induced subgraph of the bag 'noboost::bag(t_desc, T)'.
+template <typename G_t, typename T_t, typename M_t, typename S_t>
 bool is_improvement_bag(G_t &H,
                         std::vector<bool> &disabled,
-                        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y,
+                        S_t &X,
+                        S_t &Y,
                         typename boost::graph_traits<T_t>::vertex_descriptor t_desc,
-                        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap,
-                        G_t &G, T_t &T)
+                        M_t & vdMap,
+                        G_t const &G, T_t &T)
 {
+
     typedef typename boost::graph_traits<G_t> graph_traits;
     typedef typename graph_traits::vertex_iterator vertex_iterator;
     typedef typename graph_traits::adjacency_iterator adjacency_iterator;
     treedec::induced_subgraph(H, G, bag(t_desc, T), vdMap);
     disabled.assign(boost::num_vertices(H), false);
 
-    //Add an additional edge, if a non-edge 'occures' in a bag of an adjacent
+    //Add an additional edge, if a non-edge 'occurs' in a bag of an adjacent
     //vertex t_desc' of t_desc in T.
+    // iterate non_edges(H)?
     vertex_iterator vIt1, vIt2, vEnd;
     for(boost::tie(vIt1, vEnd) = boost::vertices(H); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
@@ -68,8 +70,8 @@ bool is_improvement_bag(G_t &H,
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t_desc, T); nIt != nEnd; nIt++){
                     unsigned int pos1 = get_pos(*vIt1, H);
                     unsigned int pos2 = get_pos(*vIt2, H);
-                    typename treedec_traits<T_t>::bag_type::value_type vd1 = vdMap[pos1];
-                    typename treedec_traits<T_t>::bag_type::value_type vd2 = vdMap[pos2];
+                    typename M_t::value_type vd1 = vdMap[pos1];
+                    typename M_t::value_type vd2 = vdMap[pos2];
 
                     if(bag(*nIt, T).find(vd1) != bag(*nIt, T).end()
                     && bag(*nIt, T).find(vd2) != bag(*nIt, T).end())
@@ -122,12 +124,12 @@ bool is_improvement_bag(G_t &H,
     return true;
 }
 
-/* MinimalSeperatingVertexSet(MSVS)-algorithm
+/* MinimalSeparatingVertexSet(MSVS)-algorithm
  *
- * Tries to find a minimal seperator S in a graph H, that
+ * Tries to find a minimal separator S in a graph H, that
  *    (1) contains the induced subgraph of a maximum-sized bag B(t) of T,
  *    (2) has an edge {x,y}, if {x,y} is a subset of B(t') for some neighbour t' of t in T.
- * If no seperator can be found for none of the maximum-sized bags, the algorithm stops. Otherwise,
+ * If no separator can be found for none of the maximum-sized bags, the algorithm stops. Otherwise,
  * the tree decomposition T is refined according to S.
  *
  * Warning: This function is not tested with directed treedecompositions
@@ -135,22 +137,40 @@ bool is_improvement_bag(G_t &H,
  *            be possible to fix this by re-rooting the resulting treedecomposition).
  */
 template <typename G_t, typename T_t>
-void MSVS(G_t &G, T_t &T){
+void MSVS(G_t const &G, T_t &T)
+{ untested();
+    assert(!is_valid_treedecomposition(G, T));
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
+    typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
+
+    typename std::vector<vertex_descriptor> vdMap_;
+    typename std::vector<vertex_descriptor> vdMap;
+    std::vector<bool> disabled;
+    std::vector<bool> disabled_;
+    unsigned width = treedec::get_width(T);
+    std::set<vertex_descriptor> S_;
+    std::set<vertex_descriptor> S;
+    std::set<vertex_descriptor> X, Y;
+
     while(true){
-        unsigned int width = treedec::get_width(T);
+        width = treedec::get_width(T);
+        std::cerr << width << "\n";
 
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y;
-        std::vector<bool> disabled;
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+        X.clear();
+        Y.clear();
+        disabled.resize(0);
+        disabled_.resize(0);
+        vdMap.resize(0);
 
-        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-        typename boost::graph_traits<T_t>::vertex_descriptor refinement_vertex;
-        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-            if(bag(*tIt, T).size() == width+1){
-                std::vector<bool> disabled_;
-                typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap_;
+        bag_iterator tIt, tEnd;
+        bag_descriptor refinement_vertex;
+        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
+            if(noboost::bag(*tIt, T).size() == width+1){
+                disabled_.resize(0);
+                vdMap_.resize(0);
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){
                     refinement_vertex = *tIt;
                     disabled = MOVE(disabled_);
@@ -160,20 +180,22 @@ void MSVS(G_t &G, T_t &T){
             }
         }
 
-        //No improvement possible.
-        if(boost::num_vertices(H) == 0){ return; }
+        if(boost::num_vertices(H) == 0){
+            //No improvement possible.
+            return;
+        }
 
         //Compute a seperating set S.
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S_;
+        S_.clear();
         treedec::seperate_vertices(H, disabled, X, Y, S_);
 
         //S consists of vertex descriptors of H. Use vd_map to map these to descriptors of G.
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
+        S.clear();
         treedec::map_descriptors(S_, S, H, vdMap);
 
         //Mark the vertices of the seperator as visited (used for computing connected components).
         std::vector<bool> visited(boost::num_vertices(H), false);
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S_.begin(); sIt != S_.end(); sIt++){
+        for(typename std::set<vertex_descriptor>::iterator sIt = S_.begin(); sIt!=S_.end(); ++sIt){
             unsigned int pos = get_pos(*sIt, H);
             visited[pos] = true;
         }
@@ -186,14 +208,15 @@ void MSVS(G_t &G, T_t &T){
         bag(refinement_vertex, T) = MOVE(B);
 
         //Store the connected components of H[V(H)\S] in 'components'.
-        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
+        std::vector<std::set<vertex_descriptor> > components;
         treedec::get_components_provided_map(H, components, visited);
 
         //Store the (neighbours of 'refinement_vertex' in T) in 'oldN'.
         typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
-        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> oldN(boost::degree(refinement_vertex, T));
+        std::vector<bag_descriptor> oldN(boost::degree(refinement_vertex, T));
         unsigned int c = 0;
-        for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_vertex, T); t_nIt != t_nEnd; t_nIt++){
+        for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_vertex, T);
+              t_nIt != t_nEnd; t_nIt++){
             oldN[c++] = *t_nIt;
         }
 
@@ -201,8 +224,8 @@ void MSVS(G_t &G, T_t &T){
 
         //'refinement_vertex' gets |connected_components|-many neighbours, that are new vertices in T.
         //The bag of neighbours i will be (connected_components[i] v S).
-        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > union_S_W_i(components.size());
-        std::vector<typename boost::graph_traits<T_t>::vertex_descriptor> newN(components.size());
+        std::vector<std::set<vertex_descriptor> > union_S_W_i(components.size());
+        std::vector<bag_descriptor> newN(components.size());
         for(unsigned int i = 0; i < components.size(); i++){
             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
             treedec::map_descriptors(components[i], component, H, vdMap);
