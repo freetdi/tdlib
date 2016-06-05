@@ -103,14 +103,6 @@ public: // construct
       assert(_l<=_u);
       fill();
    }
-#if 0
-   subsets_iter(T e)
-       : _e(e), _l(0), _u(-1)
-   { untested();
-      _t.resize(1);
-      _t[0] = e;
-   }
-#endif
    ~subsets_iter(){
       if(_tt){
           // own scratch. delete it.
@@ -126,9 +118,6 @@ public: // assign
       _l = other._l;
       _u = other._u;
       _t = other._t;
-//      _tt = other._tt;
-
-//      other._tt=NULL;
       return *this;
    }
    subsets_iter& operator=(const T& other)
@@ -174,8 +163,7 @@ public: // ops
    {
       if(_t.size()==0){ untested();
          _t.push_back(_i);
-         assert(_i!=_e); // probably not.
-                         // HACK: always push back something...
+         assert(_i!=_e);
          if(_u==0){ untested();
             _t.back()=_e;
          }else{untested();
@@ -208,20 +196,15 @@ public: // ops
             ++back2;
             if(back2!=_e){
                ++_t.back();
-
             }else{ unreachable();
-               // carry();
             }
          }
       }else if(_t.back() != _e){ untested();
-         // assert(_t.size()==_u);
          incomplete();
       }else{ untested();
       }
 
-//      fill();
       assert(_t.size()<=_u || _u==0);
-
       return *this;
    }
    void carry(T end)
@@ -263,8 +246,7 @@ public: // ops
             }else{
                ++back;
                if(back==_e){
-                       _t[0] = _e;
-
+                   _t[0] = _e;
                    break;
                }
                _t.push_back(back);
@@ -301,25 +283,6 @@ std::pair<subsets_iter<A>, subsets_iter<A> >
        subsets_iter<A>(a,b,l,u,s),
        subsets_iter<A>(b,b));
 }
-
-#if 0
-template<class G>
-class nvsinconwsut_iter{
-public: // types
-   typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-public: // construct
-public: // ops
-private: // status
-   std::vector<vertex_descriptor> _base;
-};
-
-template<class G>
-std::pair<nvsinconwsut_iter<G>, nvsinconwsut_iter<G> >
-    nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g)
-{
-   return std::make_pair(nvsinconwsut_iter(*I, 2*k, g), nvsinconwsut_iter());
-}
-#endif
 
 namespace detail{
 // iterate neighbourhood of C, including C
@@ -362,8 +325,6 @@ public: // construct
 
             ++n;
         }
-
-        //std::cerr << " smallest found " << _v << "\n";
     }
     neighbourhood01_iter(A b, A e, const G& g)
        : _b(b), _i(b), _e(e),
@@ -374,9 +335,7 @@ public: // construct
         }else{
         }
         _v = *_i;
-
         A ii(_b);
-
         unsigned n=0;
         for(; ii!=_e; ++ii){
             _a.push_back(boost::adjacent_vertices(*ii, g).first);
@@ -385,11 +344,8 @@ public: // construct
                 _v = *_a[n];
             }else{
             }
-
             ++n;
         }
-
-        //std::cerr << " smallest found " << _v << "\n";
     }
     ~neighbourhood01_iter()
     { itested();
@@ -405,38 +361,28 @@ public: // ops
     }
     neighbourhood01_iter& operator++()
     {
- //       std::cerr << " smallest ++ " << _v << "\n";
-
         if(_b==_e){ untested();
             return *this;
         }else{
         }
-
         vertex_descriptor previous = _v;
         bool found = update(_i, _e, previous, _v);
         A ii(_b);
-
         unsigned n=0;
         for(; ii!=_e; ++ii){
             BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
             found |= update(_a[n], aend, previous, _v);
-//            std::cerr << " .. ++ " << _v << "\n";
             ++n;
         }
-
         if(!found){
-            //std::cerr << " atend ++ " << _v << "\n";
             _b = _e;
         }else{
-            //std::cerr << " not atend ++ " << _v << "\n";
             assert(_v>previous);
         }
-
         return *this;
     }
     const vertex_descriptor& operator*()
     {
-        //std::cerr << "iter deref ++ " << _v << "\n";
         return _v;
     }
 private: // impl
@@ -451,7 +397,6 @@ private: // impl
                 return false;
             }
         }else{
-            //std::cerr << *i << " " << previous << "\n";
             assert(*i>previous);
         }
 
@@ -473,8 +418,6 @@ private: // data
     G const& _g;
 };
 } // detail
-
-
 
 template<class A, class G>
 std::pair<detail::neighbourhood01_iter<A, G>,
