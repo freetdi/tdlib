@@ -22,6 +22,8 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
+
+#include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
