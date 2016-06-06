@@ -58,6 +58,8 @@
 
 namespace treedec{
 
+namespace detail{
+
 //copies all pairs of disjoint subsets of 'X' of size 'min_card' up to
 //'max_card' and stores it in 'subsX' and 'subsY'.
 //
@@ -73,7 +75,7 @@ namespace treedec{
 // TODO: use deques?
 template <typename X_t>
 void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card,
-                      std::vector<typename X_t::value_type> &sub, // internal use? Yes
+                      std::vector<typename X_t::value_type> &sub,
                       std::vector<X_t> &subsX,
                       std::vector<std::vector<X_t> > &subsY)
 {
@@ -144,6 +146,8 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
     return true;
 }
 
+} //namespace detail
+
 //Find a nearly balanced seperator S of W by doing an extended
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
@@ -157,44 +161,48 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
     typedef std::vector<vertex_descriptor> diff_container_t;
     diff_container_t difference;
 
-#if __cplusplus >= 201103L
+    #if __cplusplus >= 201103L
     typename subsets_iter<typename W_t::const_iterator>::scratch_type scratch1;
     std::vector<typename std::vector<vertex_descriptor>::iterator > scratch2;
-#endif
+    #endif
 
-    // vector?
     vertex_set sX, sY, X_Y;
 
     for(unsigned s=1; s<=2*k; ++s){
-        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s
-#if __cplusplus >= 201103L
-                , &scratch1
-#endif
-                ));
+        #if __cplusplus >= 201103L
+        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s, &scratch1));
+        #else
+        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s));
+        #endif
+
         BOOST_AUTO(I, P.first);
 
         // TODO: don't visit a combination twice.
         for(; I!=W.end(); ++I) {
             difference.resize(0);
 
-        // N = I \setunion neigh(I)
+            //N = I \setunion neigh(I)
             BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
 
             assert(std::includes( N.first, N.second, N.first, N.second ));
             assert(std::includes( N.first, N.second, (*I).first, (*I).second ));
 
-            // compute W \ (I v neigh(I))
+            //compute W \ (I v neigh(I))
             std::set_difference(W.begin(), W.end(), N.first, N.second,
                            std::inserter(difference, difference.begin()));
             assert(std::includes(W.begin(), W.end(), difference.begin(), difference.end()));
 
             for(unsigned Js=1; Js<=2*k; ++Js){
+                #if __cplusplus >= 201103L
+                BOOST_AUTO(PP, make_subsets_iter(
+                        difference.begin(), difference.end(), Js, Js, &scratch2
+                                                ));
+                #else
                 BOOST_AUTO(PP, make_subsets_iter(
                         difference.begin(), difference.end(), Js, Js
-#if __cplusplus >= 201103L
-                        , &scratch2
-#endif
-                        ));
+                                                ));
+                #endif
+
                 BOOST_AUTO(J, PP.first);
                 BOOST_AUTO(e, difference.end());
 
@@ -226,7 +234,6 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                     std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
                                         std::inserter(sY, sY.begin()));
 
-                    //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
                     // network_flow here.
                     if(!treedec::seperate_vertices(G, disabled_, sX, sY, S, k+1)){
                         continue;
@@ -234,16 +241,14 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 
                     //S now is a sX-sY-seperator. Check if S holds the remaining
                     //property of a nearly balanced seperator.
-
-                    // if  ( S \intersect W == W \ X_Y )
-                    if(this_intersection_thing(W, S, X_Y)){
+                    //That is: if( S \intersect W == W \ X_Y )
+                    if(detail::this_intersection_thing(W, S, X_Y)){
                         return true;
-                    }else{ untested();
                     }
                 }
-            } // inner loop
+            } //inner loop
         }
-    } // outer loop
+    } //outer loop
     return false;
 }
 
@@ -267,7 +272,6 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 }
 
 //The main procedure of the seperator algorithm.
-// return true if finished (note to self: what does it mean?)
 template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
 bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
@@ -301,13 +305,10 @@ bool sep_decomp(G_t const &G, T_t &T,
         treedec::map_descriptors_to_bags<G_t>(vertices, B1);
         treedec::sep_glue_bag(B1, B2, T);
         return true;
-    }else if(k==0){ untested();
-    }else if(k==1){
-    }else{
     }
 
     //Turn W into a superset of W of size 3k + 1.
-    treedec::superset(W, vertices, 3*k + 1);
+    detail::superset(W, vertices, 3*k + 1);
 
     vertex_set S;
 
@@ -346,7 +347,8 @@ bool sep_decomp(G_t const &G, T_t &T,
 
             std::vector<bool> disabled_(boost::num_vertices(G), true);
             for(typename vertex_set::iterator sIt
-                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++) {
+                    = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++)
+            {
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
             }
