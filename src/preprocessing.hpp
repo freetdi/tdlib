@@ -229,14 +229,7 @@ bool Cube(G_t &G,
         return false;
     }
 
-#ifdef USE_VECTORS_HERE_
     std::vector<vertex_descriptor> Na(3), Nb(3), Nc(3);
-#else // faster?
-    vertex_descriptor N[9];
-    vertex_descriptor* Na=&N[0];
-    vertex_descriptor* Nb=&N[3];
-    vertex_descriptor* Nc=&N[6];
-#endif
 
     f = boost::adjacent_vertices(a, G).first;
     Na[0] = *f; Na[1] = *(++f); Na[2] = *(++f);
@@ -296,7 +289,6 @@ bool Cube(G_t &G,
         boost::clear_vertex(b, G);
         boost::clear_vertex(c, G);
 
-        /// TODO: make_clique?
         boost::add_edge(u, v, G);
         boost::add_edge(u, w, G);
         boost::add_edge(u, x, G);
