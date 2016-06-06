@@ -46,8 +46,8 @@ These functions are most likely to be interesting for outside use:
    -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
 */
 
-#ifndef TD_PREPROCESSING_EXP
-#define TD_PREPROCESSING_EXP
+#ifndef TD_PREPROCESSING
+#define TD_PREPROCESSING
 
 #include <vector>
 #include <set>
@@ -101,7 +101,6 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
          > > &bags, int &low, DEGS &degs)
 {
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
-//    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
     typename noboost::treedec_traits<T_t>::bag_type bag;
 
     unlink_1_neighbourhood(v, G, degs);
@@ -168,8 +167,7 @@ bool Buddy(G_t &G,
     typedef typename noboost::treedec_chooser<G_t>::type T_t;
     typedef typename noboost::treedec_traits<T_t>::vd_type vd_type;
 
-
-    if(check_twins(v,w,G)){
+    if(check_twins(v, w, G)){
         typename noboost::treedec_traits<T_t>::bag_type N1, N2;
         assign_neighbours(N1, v, G);
         unlink_1_neighbourhood(v, G, degs);
@@ -197,10 +195,11 @@ inline void rearrange_cube(T* N, T x)
 {
     if(N[0] == x){
         N[0] = N[2];
-    }else if(N[1] == x){
-        N[1] = N[2];
-    }else{
     }
+    else if(N[1] == x){
+        N[1] = N[2];
+    }
+    else{}
 }
 
 //Applies the Cube rule if applicable.
@@ -464,10 +463,6 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     typedef typename noboost::deg_chooser<G_t>::type degs_type;
     typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
 
-    // incomplete?
-    //bag_type bag_i;
-    //bag_type* bags_i=&bag_i;
-
     degs_type degs(G);
     const degs_type& cdegs(degs);
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
@@ -576,6 +571,6 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
 
 } //namespace treedec
 
-#endif //TD_PREPROCESSING_EXP
+#endif //TD_PREPROCESSING
 
 // vim:ts=8:sw=4:et
