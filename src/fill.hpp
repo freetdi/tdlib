@@ -232,9 +232,10 @@ public: // O(1) neighbor stuff.
     // (override in case n is incdent to a newly inserted edge)
     void mark_neighbors(vertex_descriptor c, size_t cfill)
     {
+        typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
         unsigned int posc = boost::get(boost::get(boost::vertex_index, _g), c);
         (void) posc;
-        BOOST_AUTO(degc, boost::degree(c, _g));
+        vertices_size_type degc=boost::degree(c, _g);
         typename boost::graph_traits<G_t>::adjacency_iterator n, nEnd;
 
         boost::tie(n, nEnd) = boost::adjacent_vertices(c, _g);
@@ -251,7 +252,7 @@ public: // O(1) neighbor stuff.
             long old_fill=_vals[pos].value;
             assert(old_fill>=0);
 
-            BOOST_AUTO(degn, boost::degree(*n, _g));
+            vertices_size_type degn=boost::degree(*n, _g);
             if(degn>=degc){
                 long X = degn - degc;
                 long new_fill = old_fill - cfill - X;

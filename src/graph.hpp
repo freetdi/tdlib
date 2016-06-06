@@ -158,8 +158,11 @@ namespace treedec{
 // call cb on newly created edges and incident vertices.
 // returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
-size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+size_t // hmm
+//typename boost::graph_traits<G_t>::edges_size_type
+make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
 {itested();
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     size_t counter=0;
     B nIt2;
     for(; nIt1!=nEnd; ++nIt1){
@@ -172,7 +175,7 @@ size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>*
         nIt2++;
         for(; nIt2 != nEnd; nIt2++){
 
-            BOOST_AUTO(ep, boost::add_edge(*nIt1, *nIt2, G));
+            std::pair<edge_descriptor, bool> ep=boost::add_edge(*nIt1, *nIt2, G);
             if(ep.second){
                ++counter;
 
@@ -581,7 +584,9 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
                      const G& g)
 { itested();
     typedef typename detail::shared_adj_iter<G> Iter;
-    BOOST_AUTO(p, boost::adjacent_vertices(v, g));
+    typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
+
+    std::pair<adjacency_iterator, adjacency_iterator> p=boost::adjacent_vertices(v, g);
     return std::make_pair(Iter(p.first, p.second, w, g),
                           Iter(p.second, p.second, w, g));
 }
