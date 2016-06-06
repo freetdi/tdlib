@@ -128,8 +128,11 @@ bool Triangle(G_t &G,
                 typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
               > > &bags, int &low, DEGS &degs)
 {
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> N(3);
-    BOOST_AUTO(f, boost::adjacent_vertices(v, G).first);
+    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+
+    std::vector<vertex_descriptor> N(3);
+    adjacency_iterator f=boost::adjacent_vertices(v, G).first;
     N[0] = *f;
     N[1] = *(++f);
     N[2] = *(++f);
@@ -211,16 +214,16 @@ bool Cube(G_t &G,
             typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
            > > &bags, int &low, DEGS &degs)
 {
+    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename treedec_chooser<G_t>::type T_t;
     typedef typename treedec_traits<T_t>::vd_type vd_type;
 
-    typename boost::graph_traits<G_t>::vertex_descriptor x, a, b, c;
+    vertex_descriptor x, a, b, c;
     x = vertex;
 
-    typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
-
-    BOOST_AUTO(f, boost::adjacent_vertices(x, G).first);
+    adjacency_iterator nIt, nEnd;
+    adjacency_iterator f=boost::adjacent_vertices(x, G).first;
     a = *f;
     b = *(++f);
     c = *(++f);
