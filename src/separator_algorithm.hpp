@@ -106,7 +106,7 @@ void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card
 //Collects some vertices of 'V' in 'X' until |X| = size.
 template <typename T>
 void superset(T &X, T const &V, unsigned int size){
-    assert(V.size()>=size); // might not be possible otherwise
+    assert(V.size()>=size); // might not be possible otherwise (cannot happen because of if(vertices.size() < 4*k + 2){return true} before)
     assert(X.size()<=size); // will never terminate...
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
@@ -116,7 +116,6 @@ void superset(T &X, T const &V, unsigned int size){
     }
 }
 
-// (proof of concept, generalize later)
 // return true, if every element of W is
 // an element of S xor an element of X
 // aka intersect(W, S) == W \setminus X
