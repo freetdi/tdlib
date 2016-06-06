@@ -165,7 +165,7 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 }
 
 template <typename G_t>
-bool is_edge_between_sets(G_t &G,
+bool is_edge_between_sets(G_t const &G,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
 {
@@ -180,7 +180,7 @@ bool is_edge_between_sets(G_t &G,
 }
 
 template <typename G_t>
-void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
+void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
 {
@@ -196,7 +196,7 @@ void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
 }
 
 template <typename G_t>
-void t_search_components(G_t &G,
+void t_search_components(G_t const &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
         std::vector<bool> &visited,
         std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
@@ -216,7 +216,7 @@ void t_search_components(G_t &G,
 
 
 template <typename G_t>
-void get_components_provided_map(G_t &G,
+void get_components_provided_map(G_t const &G,
              std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
              std::vector<bool> &visited){
 

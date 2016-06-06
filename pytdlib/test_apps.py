@@ -1,5 +1,6 @@
 import tdlib
 import unittest
+import random
 
 from graphs import *
 
@@ -56,7 +57,6 @@ class TestTdLib_app(unittest.TestCase):
         VC4 = tdlib.min_vertex_cover_with_treedecomposition(V_K5, E_K5, V_T4, E_T4)
         self.assertEqual(len(VC4), 4)
 
-    """
     def test_min_dominating_set_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         DS1 = tdlib.min_dominating_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
@@ -69,7 +69,6 @@ class TestTdLib_app(unittest.TestCase):
         V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
         DS3 = tdlib.min_dominating_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
         self.assertEqual(len(DS3), 5)
-    """
 
     """
     def test_min_feedback_vertex_set_with_treedecomposition(self):

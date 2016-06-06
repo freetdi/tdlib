@@ -32,8 +32,8 @@ cdef extern from "python_tdlib.hpp":
                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     int gc_exact_decomposition_cutset_decision(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T, int k)
-    #int gc_exact_decomposition_dynamic(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                                  vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
+    int gc_exact_decomposition_dynamic(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                                      vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     #int gc_exact_decomposition_branch_and_bound(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
     #                                            vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
 
@@ -77,9 +77,9 @@ cdef extern from "python_tdlib.hpp":
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                     vector[vector[int]] &col)
 
-    #void gc_min_dominating_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                                                   vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-    #                                                   vector[unsigned int] &DS)
+    void gc_min_dominating_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T,
+                                                       vector[unsigned int] &DS)
 
     #void gc_min_feedback_vertex_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
     #                                                   vector[vector[int]] &V_T, vector[unsigned int] &E_T,

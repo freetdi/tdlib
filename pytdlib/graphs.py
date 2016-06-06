@@ -1,3 +1,12 @@
+import cfgs
+
+cfgs_count = 1816
+CFGS = []
+for i in range(0, cfgs_count+1):
+    G = tuple()
+    exec("G = (cfgs.V" + str(i) + ", cfgs.E" + str(i) + ")")
+    CFGS.append(G)
+
 
 #some graphs
 V_P6 = [0,1,2,3,4,5]

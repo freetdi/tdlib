@@ -85,18 +85,20 @@ void disjoint_subsets(std::set<T> &X, unsigned int min_card, unsigned int max_ca
 
 //Collects some vertices of 'V' in 'X' until |X| = size.
 template <typename T>
-void superset(T &X, T &V, unsigned int size){
+void superset(T &X, T const &V, unsigned int size){
+    assert(X.size()<=size);
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
+        assert(sIt != V.end());
         X.insert(*(sIt++));
     }
 }
 
 //Finds a nearly balanced seperator S of W by doing an extended
-//deepth-first-search which finds a minimal X-Y-seperator.
+//depth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
 template <typename G_t>
-bool nearly_balanced_seperator(G_t &G,
+bool nearly_balanced_seperator(G_t const &G,
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
     std::vector<bool> &disabled, unsigned int k)
@@ -179,7 +181,7 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 
 //The main procedure of the seperator algorithm.
 template <typename G_t, typename T_t>
-bool sep_decomp(G_t &G, T_t &T,
+bool sep_decomp(G_t const&G, T_t &T,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &W,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &parent,
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &vertices,
@@ -263,7 +265,7 @@ bool sep_decomp(G_t &G, T_t &T,
 //Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
 //graph could be decomposed.
 template <typename G_t, typename T_t>
-void seperator_algorithm(G_t &G, T_t &T){
+void seperator_algorithm(G_t const &G, T_t &T){
     unsigned int k = 0;
     bool finished = false;
 
