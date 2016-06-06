@@ -1,6 +1,7 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// (c) 2014-2016 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -29,7 +30,6 @@ namespace treedec{
 #include <set>
 
 #include <boost/graph/adjacency_list.hpp>
-
 #include "graph.hpp"
 
 //This function is used in the minimalChordal algorithm.
@@ -164,36 +164,60 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
     return induced_subgraph(H, G, X, NULL);
 }
 
-template <typename G_t>
-bool is_edge_between_sets(G_t const &G,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &Y)
+// TODO: different containers?
+template <typename G_t, typename i1, typename i2>
+std::pair<typename boost::graph_traits<G_t>::edge_descriptor, bool>
+   edge(i1 Xit, i1 Xend, i2 Yit, i2 Yend, G_t const& G)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1 = X.begin(); sIt1 != X.end(); sIt1++){
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt2 = Y.begin(); sIt2 != Y.end(); sIt2++){
-            if(boost::edge(*sIt1, *sIt2, G).second){
-                return true;
+    for(; Xit!=Xend; ++Xit){
+        for(; Yit!=Yend; ++Yit){
+            BOOST_AUTO(P, boost::edge(*Xit, *Yit, G));
+            if(P.second){
+                return P;
             }
         }
     }
-    return false;
+    return std::make_pair(typename boost::graph_traits<G_t>::edge_descriptor(),false);
 }
 
-template <typename G_t>
-void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
-             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
+// wrapper, use begin()/end()
+template <typename G_t, typename vertex_set>
+bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
+{
+    return edge(G, X.begin(), X.end(), Y.begin(), Y.end()).second;
+}
+
+template <typename G_t, typename It>
+inline void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
+             It Xit, It Xend,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = X.begin(); sIt != X.end(); sIt++){
+    for(;Xit!=Xend; ++Xit){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*sIt, G); nIt != nEnd; nIt++){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*Xit, G); nIt != nEnd; nIt++){
            unsigned int pos = get_pos(*nIt, G);
-           if(!disabled[pos] && X.find(*nIt) == X.end()){
+
+           if(!disabled[pos]){
                S_X.insert(*nIt);
            }
         }
     }
 }
+
+// wrapper
+// vertex into S_X if
+//  - it is adjacent to a vertex in X
+//  - if it is not disabled (by position)
+//  - if it is not an element of X
+//
+template <typename G_t>
+inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
+             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
+             std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
+{
+    return get_neighbourhood(G, disabled, X.begin(), X.end(), S_X);
+}
+
 
 template <typename G_t>
 void t_search_components(G_t const &G,

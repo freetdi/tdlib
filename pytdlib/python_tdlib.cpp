@@ -338,13 +338,9 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
     make_tdlib_graph(G, V_G, E_G);
 
     TD_tree_dec_t T;
-
-    treedec::seperator_algorithm(G, T);
-
+    treedec::separator_algorithm(G, T);
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
-
     return treedec::get_width(T);
 }
 
