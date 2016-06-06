@@ -73,7 +73,7 @@ namespace treedec{
 // TODO: use deques?
 template <typename X_t>
 void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card,
-                      std::vector<typename X_t::value_type> &sub, // internal use?
+                      std::vector<typename X_t::value_type> &sub, // internal use? Yes
                       std::vector<X_t> &subsX,
                       std::vector<std::vector<X_t> > &subsY)
 {
@@ -106,7 +106,6 @@ void disjoint_subsets(X_t const &X, unsigned int min_card, unsigned int max_card
 //Collects some vertices of 'V' in 'X' until |X| = size.
 template <typename T>
 void superset(T &X, T const &V, unsigned int size){
-    assert(V.size()>=size); // might not be possible otherwise (cannot happen because of if(vertices.size() < 4*k + 2){return true} before)
     assert(X.size()<=size); // will never terminate...
     typename T::iterator sIt = V.begin();
     while(X.size() != size){
