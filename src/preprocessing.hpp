@@ -229,7 +229,10 @@ bool Cube(G_t &G,
         return false;
     }
 
-    std::vector<vertex_descriptor> Na(3), Nb(3), Nc(3);
+    vertex_descriptor N[9];
+    vertex_descriptor* Na=&N[0];
+    vertex_descriptor* Nb=&N[3];
+    vertex_descriptor* Nc=&N[6];
 
     f = boost::adjacent_vertices(a, G).first;
     Na[0] = *f; Na[1] = *(++f); Na[2] = *(++f);
