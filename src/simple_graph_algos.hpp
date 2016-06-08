@@ -1,6 +1,7 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// (c) 2014-2016 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -29,7 +30,6 @@ namespace treedec{
 #include <set>
 
 #include <boost/graph/adjacency_list.hpp>
-
 #include "graph.hpp"
 
 //This function is used in the minimalChordal algorithm.
@@ -165,8 +165,6 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 }
 
 // TODO: different containers?
-// remark: efficient if X and Y intersect?
-//         (maybe not supposed to)
 template <typename G_t, typename i1, typename i2>
 std::pair<typename boost::graph_traits<G_t>::edge_descriptor, bool>
    edge(i1 Xit, i1 Xend, i2 Yit, i2 Yend, G_t const& G)
@@ -220,6 +218,7 @@ inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
 {
     return get_neighbourhood(G, disabled, X.begin(), X.end(), S_X);
 }
+
 
 template <typename G_t>
 void t_search_components(G_t const &G,

@@ -561,7 +561,12 @@ int get_width_of_elimination_ordering(G_t &G,
     int width = -1;
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
-        unsigned int deg = eliminate_vertex(elimination_ordering[i], G);
+        unsigned deg=boost::degree(elimination_ordering[i], G);
+
+        eliminate_vertex(elimination_ordering[i], G);
+        typename outedge_set<G_t>::type xbag;
+        treedec::make_clique_and_detach(elimination_ordering[i], G, xbag);
+        xbag.clear(); // provide interface with clear included? (not urgent)
 
         width = (width > (int)deg)? width : (int)deg;
     }
@@ -584,11 +589,10 @@ void _ordering_to_treedec(G_t &G,
         return;
     }
 
-    typename treedec_traits<T_t>::bag_type bag;
-    fetch_neighbourhood(bag, boost::adjacent_vertices(elimination_ordering[idx], G), G);
-
+    // looks like make_clique_and_detach?!
+    typename noboost::treedec_traits<T_t>::bag_type bag;
+    assign_neighbours(bag, elimination_ordering[idx], G);
     make_clique(boost::adjacent_vertices(elimination_ordering[idx], G), G);
-
     boost::clear_vertex(elimination_ordering[idx], G);
 
     treedec::_ordering_to_treedec(G, elimination_ordering, T, idx+1, ignore_isolated_vertices);

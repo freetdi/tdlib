@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([tdlib], [0.8.3], [larisch@informatik.uni-frankfurt.de])
+AC_INIT([tdlib], [0.8.4], [larisch@informatik.uni-frankfurt.de])
 AC_CONFIG_SRCDIR([src/TD_misc.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AC_CONFIG_HEADERS([config.h])
@@ -85,9 +85,6 @@ AS_IF([test x"$PYTHON" != x], [
 	[AC_MSG_ERROR(please install python headers matching $PYTHON)])
 ])
 ])
-
-AC_CHECK_HEADER([cliquer/cliquer.h],
-                [CPPFLAGS="$CPPFLAGS -DHAVE_CLIQUER -fpermissive"],)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

@@ -151,11 +151,18 @@ inline void contract_edge(vertex_iterator_G v,
     }
 }
 
+} // noboost
+
+namespace treedec{
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
+// returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
-size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+size_t // hmm
+//typename boost::graph_traits<G_t>::edges_size_type
+make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
 {itested();
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     size_t counter=0;
     B nIt2;
     for(; nIt1!=nEnd; ++nIt1){
@@ -168,7 +175,7 @@ size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>*
         nIt2++;
         for(; nIt2 != nEnd; nIt2++){
 
-            BOOST_AUTO(ep, boost::add_edge(*nIt1, *nIt2, G));
+            std::pair<edge_descriptor, bool> ep=boost::add_edge(*nIt1, *nIt2, G);
             if(ep.second){
                ++counter;
 
@@ -185,7 +192,6 @@ size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>*
     return counter;
 }
 
-// convenience wrapper (boost-style iterator pair)
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 { itested();
@@ -194,9 +200,77 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
     make_clique(nIt1, nEnd, G, cb);
 }
 
-// FIXME: wrong name, unused?
+// insert the neighbors of v in G into B
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, G_t const &G)
+{ itested();
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
+    for(; nIt!=nEnd; ++nIt){itested();
+        B.insert(*nIt);
+    }
+}
+
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, V_t w, G_t const &G)
+{
+    insert_neighbours(B, v, G);
+    insert_neighbours(B, w, G);
+}
+
+template<typename B_t, typename V_t, typename G_t>
+void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
+{ untested();
+    insert_neighbours(B, v, w, G);
+    insert_neighbours(B, x, G);
+}
+
+// insert the neighbors of v in G into B
+// B starts empty.
+// equivalent to B = outedge_set(v, G) where applicable
+template<typename B_t, typename V_t, typename G_t>
+void assign_neighbours(B_t &B, V_t v, G_t const &G)
+{
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
+    for(; nIt!=nEnd; ++nIt){itested();
+        B.insert(B.end(), *nIt);
+    }
+}
+
+// insert neighbors of both vertices, after clearing B
+template<typename B_t, typename V_t, typename G_t>
+void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
+{
+    B.clear();
+    insert_neighbours(B, v, w, G);
+    insert_neighbours(B, x, G);
+}
+
+#if 0 // unneeded wrappers
+//transitional wrapper. don't use.
+template<typename B, typename E, typename G_t>
+size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+{
+    return treedec::make_clique(nIt1, nEnd, G, cb);
+}
+
+// convenience wrapper (boost-style iterator pair)
+// transitional. do not use
+template<typename nIter_t, typename G_t>
+void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
+{ itested();
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
+    boost::tie(nIt1, nEnd) = nIter;
+    treedec::make_clique(nIt1, nEnd, G, cb);
+}
+#endif
+
+#if 0
+// FIXME: wrong name, used in preprocessing.
+// FIXME: does not use G...
 template<typename B_t, typename nIter_t, typename G_t>
-// void copy_vertex_range
+// void paste_vertex_range
 void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
 { itested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -205,6 +279,7 @@ void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
         B.insert(*nIt);
     }
 }
+#endif
 
 // FIXME: is this required?!
 template <typename G_t>
@@ -233,13 +308,17 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G);
 
+#if 0 // unused (hopefully)
+// FIXME: it's make_clique.
 template<typename G_t>
-unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G){untested();
-    treedec::make_clique(boost::adjacent_vertices(v, G), G);
+unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G)
+{ unreachable(); // bogus function.
+    noboost::make_clique(boost::adjacent_vertices(v, G), G);
     unsigned int deg = boost::degree(v, G);
     boost::clear_vertex(v, G);
-    return deg;
+    return deg; // does not make sense. the caller already knows the degree.
 }
+#endif
 
 // FIXME: what does this do?
 template <typename G_t>
@@ -467,11 +546,10 @@ inline size_t count_missing_edges(
 //   edge.
 // - provide memory through bag pointer.
 //
-template<class G>
+template<class G, class B>
 size_t /*G::edge_index_type?*/ make_clique_and_detach(
         typename boost::graph_traits<G>::vertex_descriptor c,
-        G& g,
-        typename outedge_set<G>::type& bag,
+        G& g, B& bag,
         treedec::graph_callback<G>* cb=NULL)
 {
     detach_neighborhood(c, g, bag);
@@ -543,9 +621,25 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
                      const G& g)
 { itested();
     typedef typename detail::shared_adj_iter<G> Iter;
-    BOOST_AUTO(p, boost::adjacent_vertices(v, g));
+    typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
+
+    std::pair<adjacency_iterator, adjacency_iterator> p=boost::adjacent_vertices(v, g);
     return std::make_pair(Iter(p.first, p.second, w, g),
                           Iter(p.second, p.second, w, g));
+}
+
+// check if two vertices have the same neighborhood.
+// return false if not.
+template<class G_t>
+bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
+                 typename boost::graph_traits<G_t>::vertex_descriptor w,
+                 const G_t& G)
+{ itested();
+    typename outedge_set<G_t>::type N1, N2;
+    assign_neighbours(N1, v, G);
+    assign_neighbours(N2, w, G);
+
+    return(N1==N2);
 }
 
 } // treedec
@@ -558,8 +652,8 @@ namespace noboost{
     using treedec::deg_chooser;
     using treedec::contract_edge;
     using treedec::edge_callback;
-    using treedec::eliminate_vertex;
-    using treedec::fetch_neighbourhood; // obsolete?
+//    using treedec::eliminate_vertex;
+//    using treedec::fetch_neighbourhood; // obsolete?
     using treedec::get_min_degree_vertex;
     using treedec::get_pos;
     using treedec::get_vd;
