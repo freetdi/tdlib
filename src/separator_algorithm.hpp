@@ -176,138 +176,137 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
     vertex_set X_Y, sY, sX;
 //    vertex_vector sXv, sYv;
 
-for(unsigned s=1; s<=2*k; ++s)
-// for(unsigned s=2*k; s>0; --s)
-{ // HACKLOOP
+    for(unsigned s=1; s<=2*k; ++s)
+    { // HACKLOOP
 
-//    subsets_iter<typename W_t::const_iterator>
-    BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s
+        //    subsets_iter<typename W_t::const_iterator>
+        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s
 #if __cplusplus >= 201103L
-                , &scratch1
+                    , &scratch1
 #endif
-                ));
-    BOOST_AUTO(I, P.first);
+                    ));
+        BOOST_AUTO(I, P.first);
 
-    // TODO: don't visit a combination twice.
-    for(; I!=W.end(); ++I){
+        // TODO: don't visit a combination twice.
+        for(; I!=W.end(); ++I){
 
 #ifndef NDEBUG
-        assert(std::includes( (*I).first, (*I).second, (*I).first, (*I).second ));
-        debug_count((*I).first, (*I).second, s);
+            assert(std::includes( (*I).first, (*I).second, (*I).first, (*I).second ));
+            debug_count((*I).first, (*I).second, s);
 #endif
 
-        // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
-        // for( J : othersets )
-        //
-        difference.resize(0);
+            // othersets=nonempty_vertex_sets_in_complement_of_neighborhood_with_size_up_to(*I, 2*k, g);
+            // for( J : othersets )
+            //
+            difference.resize(0);
 
-        // N = I \setunion neigh(I)
-        BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
+            // N = I \setunion neigh(I)
+            BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
 
-        assert(std::includes( N.first, N.second, N.first, N.second ));
-        assert(std::includes( N.first, N.second, (*I).first, (*I).second ));
+            assert(std::includes( N.first, N.second, N.first, N.second ));
+            assert(std::includes( N.first, N.second, (*I).first, (*I).second ));
 
-        // compute W \ (I v neigh(I))
-        std::set_difference(W.begin(), W.end(), N.first, N.second,
-                       std::inserter(difference, difference.begin()));
-        assert(std::includes(W.begin(), W.end(), difference.begin(), difference.end()));
+            // compute W \ (I v neigh(I))
+            std::set_difference(W.begin(), W.end(), N.first, N.second,
+                    std::inserter(difference, difference.begin()));
+            assert(std::includes(W.begin(), W.end(), difference.begin(), difference.end()));
 
-for(unsigned Js=1; Js<=2*k; ++Js)
-// for(unsigned s=2*k; s>0; --s)
-{ // inner HACKLOOP
+            for(unsigned Js=1; Js<=2*k; ++Js)
+                // for(unsigned s=2*k; s>0; --s)
+            { // inner HACKLOOP
 
-        BOOST_AUTO(PP, make_subsets_iter(
-                    difference.begin(), difference.end(), Js, Js
+                BOOST_AUTO(PP, make_subsets_iter(
+                            difference.begin(), difference.end(), Js, Js
 #if __cplusplus >= 201103L
-                , &scratch2
+                            , &scratch2
 #endif
-                ));
+                            ));
 
-        BOOST_AUTO(J, PP.first);
-        BOOST_AUTO(e, difference.end());
+                BOOST_AUTO(J, PP.first);
+                BOOST_AUTO(e, difference.end());
 
-        for(; J!=e; ++J){
-            S.clear();
+                for(; J!=e; ++J){
+                    S.clear();
 
-            std::vector<bool> disabled_(disabled);
-            unsigned num_dis_(num_dis);
-            X_Y.clear();
+                    std::vector<bool> disabled_(disabled);
+                    unsigned num_dis_(num_dis);
+                    X_Y.clear();
 
-            // TODO. don't instanciate X_Y. just iterate.
-            // (do we need ordered iterator?)
-            std::set_union((*I).first, (*I).second,
-                           (*J).first, (*J).second,
-                           std::inserter(X_Y, X_Y.begin()));
+                    // TODO. don't instanciate X_Y. just iterate.
+                    // (do we need ordered iterator?)
+                    std::set_union((*I).first, (*I).second,
+                            (*J).first, (*J).second,
+                            std::inserter(X_Y, X_Y.begin()));
 
-            typename vertex_set::const_iterator sIt=X_Y.begin();
-            for(; sIt!=X_Y.end(); ++sIt){
-                unsigned int pos = get_pos(*sIt, G);
-                if(disabled_[pos]){
-                }else{
-                    ++num_dis_;
-                }
-                disabled_[pos] = true;
-            }
+                    typename vertex_set::const_iterator sIt=X_Y.begin();
+                    for(; sIt!=X_Y.end(); ++sIt){
+                        unsigned int pos = get_pos(*sIt, G);
+                        if(disabled_[pos]){
+                        }else{
+                            ++num_dis_;
+                        }
+                        disabled_[pos] = true;
+                    }
 
-            //Do the extended deepth-first-search on the neighbours of vertices in X and Y
-            sX.clear();
-            sY.clear();
+                    //Do the extended deepth-first-search on the neighbours of vertices in X and Y
+                    sX.clear();
+                    sY.clear();
 #if 1
-            {
-                BOOST_AUTO(N, make_neighbourhood_iter((*I).first, (*I).second, G, s));
-                BOOST_AUTO(NI, N.first);
-                for(;NI!=N.second; ++NI){
-                    if(!disabled_[get_pos(*NI, G)]) {
-                        assert(sX.size()==0 || *NI>*sX.rbegin());
-                        sX.insert(sX.end(), *NI);
+                    {
+                        BOOST_AUTO(N, make_neighbourhood_iter((*I).first, (*I).second, G, s));
+                        BOOST_AUTO(NI, N.first);
+                        for(;NI!=N.second; ++NI){
+                            if(!disabled_[get_pos(*NI, G)]) {
+                                assert(sX.size()==0 || *NI>*sX.rbegin());
+                                sX.insert(sX.end(), *NI);
+                            }
+                        }
                     }
-                }
-            }
-            {
-                BOOST_AUTO(N, make_neighbourhood_iter((*J).first, (*J).second, G, Js));
-                BOOST_AUTO(NI, N.first);
-                for(;NI!=N.second; ++NI){
-                    if(!disabled_[get_pos(*NI, G)]) {
-                        assert(sY.size()==0 || *NI>*sY.rbegin());
-                        sY.insert(sY.end(), *NI);
+                    {
+                        BOOST_AUTO(N, make_neighbourhood_iter((*J).first, (*J).second, G, Js));
+                        BOOST_AUTO(NI, N.first);
+                        for(;NI!=N.second; ++NI){
+                            if(!disabled_[get_pos(*NI, G)]) {
+                                assert(sY.size()==0 || *NI>*sY.rbegin());
+                                sY.insert(sY.end(), *NI);
+                            }
+                        }
                     }
-                }
-            }
 #endif
 #if 0
-            treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
-            treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
+                    treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
+                    treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
 #endif
 
-//            assert(sX.size() == sXv.size());
-  //          assert(sY.size() == sYv.size());
+                    //            assert(sX.size() == sXv.size());
+                    //          assert(sY.size() == sYv.size());
 
-            //Z must be a subset of S.
-            // Z=W\X_Y
+                    //Z must be a subset of S.
+                    // Z=W\X_Y
 
-            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                std::inserter(sX, sX.begin()));
-            std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                std::inserter(sY, sY.begin()));
+                    std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                            std::inserter(sX, sX.begin()));
+                    std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
+                            std::inserter(sY, sY.begin()));
 
-            //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
-            // network_flow here.
-            if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1, dg)){
-                continue;
-            }
+                    //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
+                    // network_flow here.
+                    if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1, dg)){
+                        continue;
+                    }
 
-            //S now is a sX-sY-seperator. Check if S holds the remaining
-            //property of a nearly balanced seperator.
+                    //S now is a sX-sY-seperator. Check if S holds the remaining
+                    //property of a nearly balanced seperator.
 
-            // if  ( S \intersect W == W \ X_Y )
-            if(this_intersection_thing(W,S,X_Y)){
-                return true;
-            }else{
-            }
+                    // if  ( S \intersect W == W \ X_Y )
+                    if(this_intersection_thing(W,S,X_Y)){
+                        return true;
+                    }else{
+                    }
+                }
+            } // inner HACKLOOP
         }
-} // inner HACKLOOP
-    }
-} // HACKLOOP
+    } // HACKLOOP
     return false;
 }
 
