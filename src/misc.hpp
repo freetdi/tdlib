@@ -627,7 +627,7 @@ void make_rooted(T_undir_t &T, T_dir_t &T_, bool balanced = false)
 //Version used for preprocessing.
 template<typename T_t>
 void glue_bag(
-        typename treedec_traits<T_t>::bag_type &bag,
+        typename treedec_traits<T_t>::bag_type &b,
         typename treedec_traits<T_t>::vd_type elim_vertex,
         T_t &T)
 {
@@ -636,14 +636,14 @@ void glue_bag(
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         if(std::includes(bag(*vIt, T).begin(),
                          bag(*vIt, T).end(),
-                         bag.begin(), bag.end()))
+                         b.begin(), b.end()))
         {
             if(bag(*vIt, T).find(elim_vertex) != bag(*vIt, T).end()){
                 return;
             }
-            bag.insert(elim_vertex);
+            b.insert(elim_vertex);
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            bag(t_dec_node, T) = MOVE(bag);
+            bag(t_dec_node, T) = MOVE(b);
 
             boost::add_edge(*vIt, t_dec_node, T);
             return;
@@ -652,8 +652,8 @@ void glue_bag(
 
     //Case for a disconnected graph.
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-    bag.insert(elim_vertex);
-    bag(t_dec_node, T) = MOVE(bag);
+    b.insert(elim_vertex);
+    bag(t_dec_node, T) = MOVE(b);
 
     if(boost::num_vertices(T) > 1){
         boost::tie(vIt, vEnd) = boost::vertices(T);
