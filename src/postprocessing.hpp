@@ -155,7 +155,6 @@ void MSVS(G_t const &G, T_t &T)
 
     while(true){
         width = treedec::get_width(T);
-        std::cerr << width << "\n";
 
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
