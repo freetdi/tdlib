@@ -5,6 +5,11 @@ from graphs import *
 
 class TestTdLib_exact(unittest.TestCase):
     def test_exact_decomposition_cutset(self):
+        N, M, tw = tdlib.exact_decomposition_cutset(V_Grid_5_5, E_Grid_5_5)
+        status = tdlib.is_valid_treedecomposition(V_Grid_5_5, E_Grid_5_5, N, M, message=True)
+        self.assertEqual(status, 0)
+        self.assertEqual(tw, 5)
+
         V, E, tw = tdlib.exact_decomposition_cutset(V_P6, E_P6)
         self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
@@ -67,3 +72,5 @@ class TestTdLib_exact(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+# vim:ts=4:sw=4:et
