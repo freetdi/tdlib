@@ -473,7 +473,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             bags.push_back(boost::make_tuple(*I, bag_type()));
         }
         low = (low > 0)? low : 0;
-    }else{untested();
+    }else{
     }
 
     unsigned min_ntd = 1;

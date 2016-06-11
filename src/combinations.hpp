@@ -158,12 +158,12 @@ void FI_TM(G_t &G, T_t &T){
 
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
-{ untested();
+{
     trace1("exact_decomposition_cutset", lb);
     if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
-    }else{ untested();
+    }else{
     }
 
     //Preprocessing.
@@ -178,20 +178,20 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     if(boost::num_edges(G) == 0){ untested();
         treedec::glue_bags(bags, T);
         return;
-    }else{ untested();
+    }else{
     }
 
     //Lower bound on the treewidth of the reduced instance of G.
     G_t H(G);
     int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
-    if(low > lb){ untested();
+    if(low > lb){
         lb = low;
     }else{untested();
     }
     if(lb_deltaC > lb){ untested();
         lb = lb_deltaC;
-    }else{untested();
+    }else{
     }
     trace1("excut comb", lb);
 
@@ -203,11 +203,11 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
 
     typename components_t::iterator i = components.begin();
-    for(; i!=components.end(); ++i){ untested();
+    for(; i!=components.end(); ++i){
         //Ignore isolated vertices (already included in 'bags').
-        if(i->size() == 1){ untested();
+        if(i->size() == 1){
             continue;
-        }else{ untested();
+        }else{
         }
 
         G_t G_;
@@ -215,7 +215,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
         treedec::induced_subgraph(G_, G, *i, vdMap);
         T_t T_;
 
-        while(!treedec::exact_cutset(G_, T_, lb)){ untested();
+        while(!treedec::exact_cutset(G_, T_, lb)){
             lb++;
         }
 
