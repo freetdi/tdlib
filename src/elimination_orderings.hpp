@@ -273,7 +273,7 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T=NULL)
 template <typename G_t, typename T_t>
 size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 #endif
-{
+{ untested();
     typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename fill_chooser<G_t>::type fill_type;

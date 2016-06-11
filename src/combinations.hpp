@@ -118,7 +118,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
 
-    if(boost::num_edges(G) > 0){
+    if(boost::num_edges(G) > 0){ untested();
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
 
@@ -132,6 +132,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 #endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
         treedec::ordering_to_treedec(G, new_elim_ordering, T, true); //true = ignore isolated vertices
+    }else{ untested();
     }
 
     treedec::glue_bags(bags, T);
@@ -156,10 +157,13 @@ void FI_TM(G_t &G, T_t &T){
 
 
 template <typename G_t, typename T_t>
-void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
-    if(boost::num_vertices(G) == 0){
+void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
+{ untested();
+    trace1("exact_decomposition_cutset", lb);
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
+    }else{ untested();
     }
 
     //Preprocessing.
@@ -171,36 +175,47 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb){
          > > bags;
     treedec::preprocessing(G, bags, low);
 
-    if(boost::num_edges(G) == 0){
+    if(boost::num_edges(G) == 0){ untested();
         treedec::glue_bags(bags, T);
         return;
+    }else{ untested();
     }
 
     //Lower bound on the treewidth of the reduced instance of G.
     G_t H(G);
     int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
-    lb = (low > lb)? low : lb;
-    lb = (lb_deltaC > lb)? lb_deltaC : lb;
+    if(low > lb){ untested();
+        lb = low;
+    }else{untested();
+    }
+    if(lb_deltaC > lb){ untested();
+        lb = lb_deltaC;
+    }else{untested();
+    }
+    trace1("excut comb", lb);
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.
-    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
+    typedef std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components_t;
+    components_t components;
     treedec::get_components(G, components);
 
     typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
 
-    for(unsigned int i = 0; i < components.size(); i++){
+    typename components_t::iterator i = components.begin();
+    for(; i!=components.end(); ++i){ untested();
         //Ignore isolated vertices (already included in 'bags').
-        if(components[i].size() == 1){
+        if(i->size() == 1){ untested();
             continue;
+        }else{ untested();
         }
 
         G_t G_;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
-        treedec::induced_subgraph(G_, G, components[i], vdMap);
+        treedec::induced_subgraph(G_, G, *i, vdMap);
         T_t T_;
 
-        while(!treedec::exact_cutset(G_, T_, lb)){
+        while(!treedec::exact_cutset(G_, T_, lb)){ untested();
             lb++;
         }
 
