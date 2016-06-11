@@ -102,7 +102,7 @@ bool explore_cutsets(G_t &G,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
         cut_ext.insert(candidates[i]);
 
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = MOVE(component);
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = component;
         component_red.erase(candidates[i]);
 
 
