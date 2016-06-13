@@ -1,9 +1,5 @@
 - cleanup interfaces
 - remove TD_ prefixed files
-- remove noboost namespace
 - release 1.0
-- merge experimental elim_order quirks
-- clean up networkflow (directed graph? parallel?)
 - provide meta heuristic for treewidth
-- rewrite dynamicCR
 - parallelize exact_cutset?
