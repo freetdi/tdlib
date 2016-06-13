@@ -47,7 +47,7 @@ unsigned int branching_operator(typename boost::graph_traits<BB_t>::vertex_descr
 
                 G_t G_;
                 boost::copy_graph(BBT[v].graph, G_);
-                unsigned int w = noboost::eliminate_vertex(i, G_); //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub after this command.
+                unsigned int w = eliminate_vertex(i, G_); //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub after this command.
                 w = (w < BBT[v].eo_width) ? BBT[v].eo_width : w;
 
                 if(w > ub){

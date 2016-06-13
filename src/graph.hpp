@@ -313,7 +313,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 template<typename G_t>
 unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G)
 { unreachable(); // bogus function.
-    noboost::make_clique(boost::adjacent_vertices(v, G), G);
+    make_clique(boost::adjacent_vertices(v, G), G);
     unsigned int deg = boost::degree(v, G);
     boost::clear_vertex(v, G);
     return deg; // does not make sense. the caller already knows the degree.

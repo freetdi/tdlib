@@ -69,8 +69,8 @@ void PP_MD(G_t &G, T_t &T, int &low){
     }
 
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
     treedec::preprocessing(G, bags, low);
@@ -90,8 +90,8 @@ void PP_FI(G_t &G, T_t &T, int &low){
     }
 
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
     treedec::preprocessing(G, bags, low);
@@ -112,8 +112,8 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     }
 
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
     treedec::preprocessing(G, bags, low);
@@ -127,7 +127,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         G = H; // reset
 #ifdef MORE_DEBUG
         for( auto i : old_elim_ordering){
-            assert(noboost::is_valid(i,G));
+            assert(is_valid(i,G));
         }
 #endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
@@ -170,8 +170,8 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     int low = -1;
 
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
     treedec::preprocessing(G, bags, low);
 
@@ -240,8 +240,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     int low = -1;
 
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
     treedec::preprocessing(G, bags, low);
 
@@ -297,8 +297,8 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     //preprocessing
     int low = -1;
     std::vector<boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
     treedec::preprocessing(G, bags, low);

@@ -59,7 +59,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor logApproximation(G_t &G, T_
         std::set<unsigned int> bag;
         treedec::descriptor_bag_to_id_bag(G, bag, union_Z_W);
         typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-        noboost::bag(T, t_dec_node) = bag;
+        bag(T, t_dec_node) = bag;
 
         return t_dec_node;
     }
@@ -98,7 +98,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor logApproximation(G_t &G, T_
     typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
     std::set<unsigned int> root_bag;
     treedec::descriptor_bag_to_id_bag(G, root_bag, union_W_S_S_);
-    noboost::bag(T, t_dec_node) = root_bag;
+    bag(T, t_dec_node) = root_bag;
 
     //let G_1,...,G_|C| be the connected components of G[Z v W - (S v S')]
     //call logApproximation with Z = Zi and W = (Wi v S v S_)

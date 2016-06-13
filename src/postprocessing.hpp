@@ -40,7 +40,7 @@
 
 namespace treedec{
 
-//Create a modified induced subgraph of the bag 'noboost::bag(t_desc, T)'.
+//Create a modified induced subgraph of the bag 'bag(t_desc, T)'.
 template <typename G_t, typename T_t, typename M_t, typename S_t>
 bool is_improvement_bag(G_t &H,
                         std::vector<bool> &disabled,
@@ -167,7 +167,7 @@ void MSVS(G_t const &G, T_t &T)
         bag_iterator tIt, tEnd;
         bag_descriptor refinement_vertex;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
-            if(noboost::bag(*tIt, T).size() == width+1){
+            if(bag(*tIt, T).size() == width+1){
                 disabled_.resize(0);
                 vdMap_.resize(0);
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){

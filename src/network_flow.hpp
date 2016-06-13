@@ -119,7 +119,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 
     unsigned int j = 0;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         if(!disabled[pos]){
             internal_idxMap[pos] = boost::add_vertex(diG);
             diG[j].visited = false;
@@ -130,8 +130,8 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int sid = noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int tid = noboost::get_pos(boost::target(*eIt, G), G);
+        unsigned int sid = get_pos(boost::source(*eIt, G), G);
+        unsigned int tid = get_pos(boost::target(*eIt, G), G);
         if(!disabled[sid] && !disabled[tid]){
 
             digraph_t::edge_descriptor e1 =
@@ -146,7 +146,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
     digraph_t::vertex_descriptor source = boost::add_vertex(diG);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             X.begin(); sIt != X.end(); sIt++){
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[pos], diG).first;
         diG[e].path = false;
     }
@@ -154,7 +154,7 @@ std::pair<digraph_t::vertex_descriptor, digraph_t::vertex_descriptor>
     digraph_t::vertex_descriptor sink = boost::add_vertex(diG);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         digraph_t::edge_descriptor e = boost::add_edge(internal_idxMap[pos], sink, diG).first;
         diG[e].path = false;
     }
@@ -367,7 +367,7 @@ bool seperate_vertices(
     //disables/deletes the vertices in the intersection of X and Y.
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
           S.begin(); sIt != S.end(); sIt++){
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         disabled[pos] = true;
     }
 
