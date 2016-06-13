@@ -182,7 +182,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
             difference.resize(0);
 
             //N = I \setunion neigh(I)
-            BOOST_AUTO(N, make_neighbourhood01_iter((*I).first, (*I).second, G, s));
+            BOOST_AUTO(N, make_neighbourhood01_range((*I).first, (*I).second, G, s));
 
             assert(std::includes( N.first, N.second, N.first, N.second ));
             assert(std::includes( N.first, N.second, (*I).first, (*I).second ));

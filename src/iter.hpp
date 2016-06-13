@@ -419,10 +419,11 @@ private: // data
 };
 } // detail
 
+// iterate trough [b, e) and it's neighbors within G
 template<class A, class G>
 std::pair<detail::neighbourhood01_iter<A, G>,
           detail::neighbourhood01_iter<A, G> >
-make_neighbourhood01_iter(A b, A e, G const& g, unsigned size=0)
+make_neighbourhood01_range(A b, A e, G const& g, unsigned size=0)
 {
     typedef detail::neighbourhood01_iter<A, G> nIter;
     if(size){
