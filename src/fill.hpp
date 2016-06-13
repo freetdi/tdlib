@@ -364,7 +364,7 @@ public: // picking
         assert(noboost::is_valid(b->second, _g));
 
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), b->second);
-        assert(_vals[pos].value!=-1); (void)pos;
+        assert(!_vals[pos].is_unknown()); (void)pos;
         assert(_vals[pos]==b->first);
 
         BOOST_AUTO(p, std::make_pair(b->second, b->first));
