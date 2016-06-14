@@ -466,7 +466,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
 
     //Islet rule
-    if(!cdegs[0].empty()){ untested();
+    if(!cdegs[0].empty()){
         BOOST_AUTO(I, cdegs[0].begin());
         BOOST_AUTO(E, cdegs[0].end());
         for(; I != E; I++){

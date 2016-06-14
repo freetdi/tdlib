@@ -321,14 +321,14 @@ template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G)
-{itested();
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
     typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
 
     unsigned int min_common = UINT_MAX;
 
-    for(; nIt1 != nEnd; nIt1++){itested();
+    for(; nIt1 != nEnd; nIt1++){
         unsigned int cnt_common = 0;
         BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
         BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);

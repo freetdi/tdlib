@@ -118,7 +118,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
 
-    if(boost::num_edges(G) > 0){ untested();
+    if(boost::num_edges(G) > 0){
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
 
@@ -132,7 +132,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 #endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
         treedec::ordering_to_treedec(G, new_elim_ordering, T, true); //true = ignore isolated vertices
-    }else{ untested();
+    }else{
     }
 
     treedec::glue_bags(bags, T);
@@ -175,7 +175,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
          > > bags;
     treedec::preprocessing(G, bags, low);
 
-    if(boost::num_edges(G) == 0){ untested();
+    if(boost::num_edges(G) == 0){
         treedec::glue_bags(bags, T);
         return;
     }else{
@@ -189,7 +189,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
         lb = low;
     }else{untested();
     }
-    if(lb_deltaC > lb){ untested();
+    if(lb_deltaC > lb){
         lb = lb_deltaC;
     }else{
     }
