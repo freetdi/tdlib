@@ -138,7 +138,7 @@ bool is_improvement_bag(G_t &H,
  */
 template <typename G_t, typename T_t>
 void MSVS(G_t const &G, T_t &T)
-{ untested();
+{
     assert(!is_valid_treedecomposition(G, T));
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;

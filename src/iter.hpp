@@ -132,7 +132,7 @@ public: // assign
    }
 public: // ops
    bool operator==(const T& other)
-   { itested();
+   {
       if(!_t.size()){ untested();
          // BUG?
          return false;
@@ -348,7 +348,7 @@ public: // construct
         }
     }
     ~neighbourhood01_iter()
-    { itested();
+    {
     }
 public: // ops
     bool operator!=(const neighbourhood01_iter& p) const
