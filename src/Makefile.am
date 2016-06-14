@@ -1,7 +1,6 @@
 
 pkginclude_HEADERS = \
   applications.hpp \
-  branch_and_bound.hpp \
   branch_decomposition.hpp \
   combinations.hpp \
   degree.hpp \
