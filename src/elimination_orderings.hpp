@@ -131,10 +131,12 @@ namespace impl {
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 #if __cplusplus >= 201103L
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
-size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T=NULL)
+typename boost::graph_traits<G_t>::vertices_size_type
+   minDegree_decomp(G_t &G, T_t *T=NULL)
 #else
 template <typename G_t, typename T_t>
-size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
+typename boost::graph_traits<G_t>::vertices_size_type
+   minDegree_decomp(G_t &G, T_t *T)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -236,7 +238,8 @@ size_t /*FIXME*/ minDegree_decomp(G_t &G, T_t *T)
 
 #if __cplusplus < 201103L
 template <typename G_t>
-size_t /*FIXME*/ minDegree_decomp(G_t &G)
+typename boost::graph_traits<G_t>::vertices_size_type
+   minDegree_decomp(G_t &G)
 {
     return minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }
@@ -266,12 +269,15 @@ namespace impl{
 
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
+//return the treewidth.
 #if __cplusplus >= 201103L
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
-size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T=NULL)
+typename boost::graph_traits<G_t>::vertices_size_type
+   fillIn_decomp(G_t &G, T_t *T=NULL)
 #else
 template <typename G_t, typename T_t>
-size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
+typename boost::graph_traits<G_t>::vertices_size_type
+   fillIn_decomp(G_t &G, T_t *T)
 #endif
 { untested();
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -362,7 +368,8 @@ size_t /*FIXME*/ fillIn_decomp(G_t &G, T_t *T)
 
 #if __cplusplus < 201103L
 template <typename G_t>
-size_t /*FIXME*/ fillIn_decomp(G_t &G)
+typename boost::graph_traits<G_t>::vertices_size_type
+   fillIn_decomp(G_t &G)
 { untested();
     return fillIn_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }

@@ -41,14 +41,6 @@
 #ifndef TD_MISC
 #define TD_MISC
 
-// here (for now)
-#ifndef unreachable
-#define unreachable()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
-
 #include <stack>
 #include <queue>
 
@@ -58,6 +50,7 @@
 #include "graph.hpp"
 #include "simple_graph_algos.hpp"
 #include "std.hpp"
+#include "trace.hpp"
 
 namespace treedec{
 
@@ -84,8 +77,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     return t;
 }
 
-// TODO: duplicate (see sethack.h)
-// FIXME: ad-hoc. will fail on unordered sets without warning.
+// TODO: deduplicate (see sethack.h)
+// be careful: will fail on unordered sets without warning.
 template<class S, class T>
 inline bool set_intersect(const S& s, const T& t)
 {
