@@ -18,31 +18,22 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-//
-//
-// These function is most likely to be interesting for outside use:
-//
-// void separator_algorithm(G_t &G, T_t &T)
-//
-//
-// For more information, see:
-//
-//   J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in Theoretical Computer Science. an EATCS Series).
-//   Springer-Verlag New York, Inc., Secaucus, NJ, USA.
-//
-//   Bruce A. Reed. 1992. Finding approximate separators and computing tree width quickly. In Proceedings of the twenty-fourth
-//   annual ACM symposium on Theory of computing (STOC '92). ACM, New York, NY, USA, 221-228.
-//
-//
+
+/*
+ * These function is most likely to be interesting for outside use:
+ *
+ * - void separator_algorithm(G_t &G, T_t &T)
+ *
+ *
+ * For more information, see:
+ *
+ *   J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in Theoretical Computer Science. an EATCS Series).
+ *   Springer-Verlag New York, Inc., Secaucus, NJ, USA.
+ *
+ *   Bruce A. Reed. 1992. Finding approximate separators and computing tree width quickly. In Proceedings of the twenty-fourth
+ *   annual ACM symposium on Theory of computing (STOC '92). ACM, New York, NY, USA, 221-228.
+ *
+ */
 
 #ifndef TD_SEPARATOR_ALGORITHM
 #define TD_SEPARATOR_ALGORITHM

@@ -18,9 +18,11 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute the connected components of a graph,
-// vertex/edge deletion and other simple operations on graphs.
-//
+
+/*
+ * Offers functionality to compute the connected components of a graph,
+ * vertex/edge deletion and other simple operations on graphs.
+ */
 
 #ifndef TD_SIMPLE_GRAPH_ALGOS
 #define TD_SIMPLE_GRAPH_ALGOS

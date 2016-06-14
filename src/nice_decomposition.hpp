@@ -17,13 +17,15 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Nice tree decomposition-related stuff.
-//
-//
-// These functions are most likely to be interesting for outside use:
-//
-// void nicify(T_t &T)
-//
+
+/*
+ * Nice tree decomposition-related stuff.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void nicify(T_t &T)
+ *
+ */
 
 #ifndef TD_NICE_DECOMPOSITION
 #define TD_NICE_DECOMPOSITION

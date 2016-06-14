@@ -17,26 +17,16 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-//
-//
 
 /*
-  These functions are most likely to be interesting for outside use:
-
-- void CR_dynamic_decomp(G_t &G, T_t &T, int lb)
-- void CR_dynamic_decomp(G_t &G, T_t &T)
-*/
+ * Offers functionality to compute a tree decomposition of exact width.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void CR_dynamic_decomp(G_t &G, T_t &T, int lb)
+ * - void CR_dynamic_decomp(G_t &G, T_t &T)
+ *
+ */
 
 #ifndef TD_DYNAMICCR
 #define TD_DYNAMICCR

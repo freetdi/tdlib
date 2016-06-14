@@ -19,14 +19,15 @@
 //
 
 /*
- Offers functionality to possibly reduce the width of a tree decomposition of a given graph.
-
- These functions are most likely to be interesting for outside use:
-
- - void MSVS(G_t &G, T_t &T)
- - void minimalChordal(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
-                              std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
-*/
+ * Offers functionality to possibly reduce the width of a tree decomposition of a given graph.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void MSVS(G_t &G, T_t &T)
+ * - void minimalChordal(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
+ *                              std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
+ *
+ */
 
 #ifndef TD_POSTPROCESSING
 #define TD_POSTPROCESSING

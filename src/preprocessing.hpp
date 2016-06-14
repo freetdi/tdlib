@@ -18,33 +18,25 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to preprocess a graph, such that after
-// the repeated application of reduction rules, which in case the
-// input graph has tree-width at most 3 allow us to determine it's tree-width exactly
-// and in addition compute the corresponding tree decomposition. If the tree-width
-// is larger, the reduction rules return a possibly smaller instance of the same
-// tree-width as the original graph, a 'partial' tree decomposition and a lower bound
-// with respect to tree-width, such that
-// further algorithms can be applied to the resulting graph.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> graph_t;
-//
-//
+
 
 /*
-These functions are most likely to be interesting for outside use:
-
-   -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags)
-   -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
-*/
+ * Offers functionality to preprocess a graph, such that after
+ * the repeated application of reduction rules, which in case the
+ * input graph has tree-width at most 3 allow us to determine it's tree-width exactly
+ * and in addition compute the corresponding tree decomposition. If the tree-width
+ * is larger, the reduction rules return a possibly smaller instance of the same
+ * tree-width as the original graph, a 'partial' tree decomposition and a lower bound
+ * with respect to tree-width, such that
+ * further algorithms can be applied to the resulting graph.
+ *
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags)
+ * -void preprocessing(G_t &G, std::vector<boost::tuple<unsigned int, std::set<unsigned int> > > &bags, int &lb)
+ *
+ */
 
 #ifndef TD_PREPROCESSING
 #define TD_PREPROCESSING
@@ -138,8 +130,8 @@ bool Triangle(G_t &G,
     N[2] = *(++f);
 
     if(boost::edge(N[0], N[1], G).second
-    || boost::edge(N[0], N[2], G).second
-    || boost::edge(N[1], N[2], G).second)
+     || boost::edge(N[0], N[2], G).second
+     || boost::edge(N[1], N[2], G).second)
     {
         unlink_1_neighbourhood(v, G, degs);
         degs.unlink(v, 3);

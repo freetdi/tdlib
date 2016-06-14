@@ -18,28 +18,28 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute tree decompositions of graphs
-// according to various heuristic, and functions which convert
-// tree decompositions to elimination orderings and vice versa.
-// Also the LEX-M algorithm is included in this header
-//
-//
 
 /*
- These functions are most likely to be interesting for outside use:
-
- - void minDegree_decomp(G_t &G, T_t &T)
- - void fillIn_decomp(G_t &G, T_t &T)
- - void minDegree_ordering(G_t &G,
-         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
- - void fillIn_ordering(G_t& G,
-         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
- - void ordering_to_treedec(G_t &G,
-         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T)
- - void treedec_to_ordering<G_t, T_t>(T_t &T,
-         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering)
- - void LEX_M_minimal_ordering(G_t &G,
-         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+ * Offers functionality to compute tree decompositions of graphs
+ * according to various heuristic, and functions which convert
+ * tree decompositions to elimination orderings and vice versa.
+ * Also the LEX-M algorithm is included in this header
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void minDegree_decomp(G_t &G, T_t &T)
+ * - void fillIn_decomp(G_t &G, T_t &T)
+ * - void minDegree_ordering(G_t &G,
+ *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+ * - void fillIn_ordering(G_t& G,
+ *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+ * - void ordering_to_treedec(G_t &G,
+ *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering, T_t &T)
+ * - void treedec_to_ordering<G_t, T_t>(T_t &T,
+ *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering)
+ * - void LEX_M_minimal_ordering(G_t &G,
+ *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
+ *
 */
 
 #ifndef TD_ELIMINATION_ORDERING
@@ -388,14 +388,6 @@ void fillIn_decomp(G_t &G, T_t &T){
     treedec::glue_bags(bags, T);
 }
 
-// transition, remove.
-template <typename G_t, typename T_t>
-void fillIn_decomp_exp(G_t &G, T_t &T)
-{
-    return fillIn_decomp(G, T);
-}
-
-
 //Compute an elimination ordering according to the minDegree heuristic
 //(version used for postprocessing algorithms).
 // TODO use impl::minDegree (how?)
@@ -466,6 +458,7 @@ void minDegree_ordering(G_t& G,
 
 
 namespace detail{
+
 //Compute an elimination ordering according to fillIn heuristic (version used
 //for postprocessing algorithms).
 template<typename G_t>

@@ -17,31 +17,16 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// Vertices of the input graph have to provide the attribute 'id', e.g.:
-//
-// struct Vertex
-// {
-//  unsigned int id;
-// };
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
-//
-//
-//
-// These functions are most likely to be interesting for outside use:
-//
-// void exact_cutset(G_t &G, T_t &T, int lb)
-// void exact_cutset(G_t &G, T_t &T)
-//
+
+/*
+ * Offers functionality to compute a tree decomposition of exact width.
+ *
+ * Provides following functions:
+ *
+ * - void exact_cutset(G_t &G, T_t &T, int lb)
+ * - void exact_cutset(G_t &G, T_t &T)
+ *
+ */
 
 #ifndef TD_EXACT_CUTSET
 #define TD_EXACT_CUTSET
