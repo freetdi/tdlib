@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "graph.hpp"
+#include "trace.hpp"
 
 #if __cplusplus >= 201103L
 # include <unordered_set>
@@ -31,18 +32,6 @@
 
 static bool const lazy_init=true;
 static bool const catch_zeroes_in_decrement=true;
-
-// temporary.
-#ifndef untested
-#define untested()
-#endif
-#ifndef itested
-#define itested()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
-
 
 namespace misc {
 

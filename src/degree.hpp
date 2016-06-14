@@ -31,16 +31,7 @@
 # include <unordered_set>
 #endif
 
-// temporary.
-#ifndef untested
-#define untested()
-#endif
-#ifndef itested
-#define itested()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
+#include "trace.hpp"
 
 namespace misc {
 

@@ -40,14 +40,6 @@
 #ifndef TD_MISC
 #define TD_MISC
 
-// here (for now)
-#ifndef unreachable
-#define unreachable()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
-
 #include <stack>
 #include <queue>
 
@@ -57,6 +49,7 @@
 #include "graph.hpp"
 #include "simple_graph_algos.hpp"
 #include "std.hpp"
+#include "trace.hpp"
 
 namespace treedec{
 
