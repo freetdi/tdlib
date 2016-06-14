@@ -82,8 +82,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     return t;
 }
 
-// TODO: duplicate (see sethack.h)
-// FIXME: ad-hoc. will fail on unordered sets without warning.
+// TODO: deduplicate (see sethack.h)
+// be careful: will fail on unordered sets without warning.
 template<class S, class T>
 inline bool set_intersect(const S& s, const T& t)
 {

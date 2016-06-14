@@ -47,7 +47,6 @@ static bool const catch_zeroes_in_decrement=true;
 namespace misc {
 
 namespace detail {
-// FIXME: not here
 template<class G>
 struct fill_config{
     typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
@@ -56,8 +55,8 @@ struct fill_config{
 #else
     typedef std::unordered_set<vd_type> bag_type;
 #endif
-    // typedef stx::btree_set<vd_type> bag_type;
-    static void alloc_init(size_t){
+    static void alloc_init(size_t)
+    {
     }
     static unsigned num_threads(){return 1;}
 };
@@ -469,14 +468,12 @@ namespace treedec{
 template<class G_t>
 struct fill_chooser{
     typedef typename misc::FILL<G_t> type;
-    typedef type fill_type; // transition? don't use.
 };
 
 }
 
-//transition
+//transition, don't use.
 namespace noboost{
-    // FIXME: use graph_traits
     using treedec::fill_chooser;
 }
 

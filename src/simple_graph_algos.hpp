@@ -117,7 +117,7 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 // paste subgraph of G induced by X into H.
 // store map V(H) -> X \subset V(G) in vdMap.
 //
-// FIXME: misleading name. paste_induced_subgraph?
+// TODO: misleading name. paste_induced_subgraph?
 template <typename G_t, class S_t, class M_t>
 void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
