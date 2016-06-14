@@ -170,7 +170,7 @@ bool make_layer(G_t &G, W_t &W,
                 //if a turn X -> X' is monotone, save the index of the entry in
                 //the layer below for computing a tree decomposition at the end
 
-                // FIXME: don't create intersection. stop at first common elt.
+                // inefficient: don't create intersection. stop at first common elt.
                 bag_type inters;
                 std::set_intersection(subs[i].begin(), subs[i].end(), 
                                       W[idx-1][j].get<3>().begin(), W[idx-1][j].get<3>().end(), std::inserter(inters, inters.begin()));
