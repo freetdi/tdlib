@@ -444,9 +444,9 @@ inline make_neighbourhood01_range(A b, A e, G const& g, unsigned size=0,
 template<class A, class G>
 std::pair<detail::neighbourhood01_iter<A, G>,
           detail::neighbourhood01_iter<A, G> >
-inline make_neighbourhood_iter(A b, A e, G const& g, unsigned size=0)
+inline make_neighbourhood_range(A b, A e, G const& g, unsigned size=0)
 {
-    return make_neighbourhood01_iter(b,e,g,size,false);
+    return make_neighbourhood01_range(b,e,g,size,false);
 }
 
 #endif

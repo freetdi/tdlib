@@ -226,7 +226,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                     sY.clear();
 #if 1
                     {
-                        BOOST_AUTO(N, make_neighbourhood_iter((*I).first, (*I).second, G, s));
+                        BOOST_AUTO(N, make_neighbourhood_range((*I).first, (*I).second, G, s));
                         BOOST_AUTO(NI, N.first);
                         for(;NI!=N.second; ++NI){
                             if(!disabled_[get_pos(*NI, G)]) {
@@ -236,7 +236,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                         }
                     }
                     {
-                        BOOST_AUTO(N, make_neighbourhood_iter((*J).first, (*J).second, G, Js));
+                        BOOST_AUTO(N, make_neighbourhood_range((*J).first, (*J).second, G, Js));
                         BOOST_AUTO(NI, N.first);
                         for(;NI!=N.second; ++NI){
                             if(!disabled_[get_pos(*NI, G)]) {
