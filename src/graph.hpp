@@ -109,7 +109,7 @@ struct graph_callback{ // fixme: union of the above?
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
 //before dg will drop.
-// FIXME: pass edge or edge iterator.
+// TODO: pass edge or edge iterator.
 template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
@@ -161,7 +161,7 @@ template<typename B, typename E, typename G_t>
 size_t // hmm
 //typename boost::graph_traits<G_t>::edges_size_type
 make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
-{itested();
+{
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     size_t counter=0;
     B nIt2;
@@ -194,7 +194,7 @@ make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NU
 
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{ itested();
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
     boost::tie(nIt1, nEnd) = nIter;
     make_clique(nIt1, nEnd, G, cb);
@@ -203,10 +203,10 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 // insert the neighbors of v in G into B
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, G_t const &G)
-{ itested();
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
-    for(; nIt!=nEnd; ++nIt){itested();
+    for(; nIt!=nEnd; ++nIt){
         B.insert(*nIt);
     }
 }
@@ -233,7 +233,7 @@ void assign_neighbours(B_t &B, V_t v, G_t const &G)
 {
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
-    for(; nIt!=nEnd; ++nIt){itested();
+    for(; nIt!=nEnd; ++nIt){
         B.insert(B.end(), *nIt);
     }
 }
@@ -247,41 +247,7 @@ void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
     insert_neighbours(B, x, G);
 }
 
-#if 0 // unneeded wrappers
-//transitional wrapper. don't use.
-template<typename B, typename E, typename G_t>
-size_t /*hmm*/ make_clique(B nIt1, E nEnd, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{
-    return treedec::make_clique(nIt1, nEnd, G, cb);
-}
-
-// convenience wrapper (boost-style iterator pair)
-// transitional. do not use
-template<typename nIter_t, typename G_t>
-void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{ itested();
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
-    boost::tie(nIt1, nEnd) = nIter;
-    treedec::make_clique(nIt1, nEnd, G, cb);
-}
-#endif
-
-#if 0
-// FIXME: wrong name, used in preprocessing.
-// FIXME: does not use G...
-template<typename B_t, typename nIter_t, typename G_t>
-// void paste_vertex_range
-void fetch_neighbourhood(B_t &B, nIter_t nIter, G_t &G)
-{ itested();
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = nIter; nIt != nEnd; nIt++){itested();
-        // FIXME: hint?
-        B.insert(*nIt);
-    }
-}
-#endif
-
-// FIXME: is this required?!
+// find a minimum degree vertex using linear search.
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_min_degree_vertex(const G_t &G, bool ignore_isolated_vertices=false)
@@ -291,9 +257,9 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     boost::tie(vIt, vEnd) = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt++;
-    for(; vIt != vEnd; vIt++){untested();
+    for(; vIt != vEnd; vIt++){
         unsigned int degree = boost::degree(*vIt, G);
-        if(degree <= min_degree){untested();
+        if(degree <= min_degree){
             if(ignore_isolated_vertices && degree == 0){ continue; }
             min_degree = degree;
             min_vertex = *vIt;
@@ -308,19 +274,8 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G);
 
-#if 0 // unused (hopefully)
-// FIXME: it's make_clique.
-template<typename G_t>
-unsigned int eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G)
-{ unreachable(); // bogus function.
-    noboost::make_clique(boost::adjacent_vertices(v, G), G);
-    unsigned int deg = boost::degree(v, G);
-    boost::clear_vertex(v, G);
-    return deg; // does not make sense. the caller already knows the degree.
-}
-#endif
-
-// FIXME: what does this do?
+// copy vertices of G into degree_sequence, ordered by degree, starting with
+// lowest
 template <typename G_t>
 inline void make_degree_sequence(const G_t &G,
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence)
@@ -352,7 +307,7 @@ inline void make_degree_sequence(const G_t &G,
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
 template<typename G_t>
-inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){itested();
+inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){
     return boost::get(boost::get(boost::vertex_index, G), v);
 }
 
@@ -443,7 +398,6 @@ struct vdstuff<false, T> { //
 };
 } //detail
 
-// FIXME: not part of noboost
 template<class T>
 struct treedec_traits{ //
     typedef typename detail::vdstuff<
@@ -472,11 +426,11 @@ struct tmpbaghack{ //
 template<class T_t, class V>
 struct tmpbaghack<bag, T_t, V>{ //
     static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v)
-    {itested();
+    {
         return t[v].bag;
     }
     static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v)
-    {itested();
+    {
         return t[v].bag;
     }
 };
@@ -500,7 +454,8 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
-// FIXME: move to graph_traits
+// chooose deg implementation for graph backend.
+// to be accessed through graph_traits
 template<class G_t>
 struct deg_chooser{ //
     typedef typename misc::DEGS<G_t> type;
@@ -619,7 +574,7 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
     inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
-{ itested();
+{
     typedef typename detail::shared_adj_iter<G> Iter;
     typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
 
@@ -634,7 +589,7 @@ template<class G_t>
 bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
                  typename boost::graph_traits<G_t>::vertex_descriptor w,
                  const G_t& G)
-{ itested();
+{
     typename outedge_set<G_t>::type N1, N2;
     assign_neighbours(N1, v, G);
     assign_neighbours(N2, w, G);

@@ -19,7 +19,7 @@ struct bbt_bag{
 };
 
 
-//TODO: pruning... (and reduce data of pruned branches).
+//TODO: pruning...
 
 unsigned int elim_orderings_count = 0;
 unsigned int lb_computed_count = 0;
@@ -47,7 +47,9 @@ unsigned int branching_operator(typename boost::graph_traits<BB_t>::vertex_descr
 
                 G_t G_;
                 boost::copy_graph(BBT[v].graph, G_);
-                unsigned int w = noboost::eliminate_vertex(i, G_); //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub after this command.
+
+                //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub after this command.
+                unsigned int w = eliminate_vertex(i, G_);
                 w = (w < BBT[v].eo_width) ? BBT[v].eo_width : w;
 
                 if(w > ub){
@@ -61,11 +63,6 @@ unsigned int branching_operator(typename boost::graph_traits<BB_t>::vertex_descr
                     if(lb > ub){
                         continue;
                     }
-
-/*
-                    std::cout << "elim " << i << " (id=" << G[i].id << "): ";
-                    std::cout << "w=" <<  w << " (ub= " << ub << ")" << std::endl;
-*/
 
                     typename boost::graph_traits<BB_t>::vertex_descriptor child = boost::add_vertex(BBT);
                     boost::add_edge(v, child, BBT);
@@ -81,13 +78,6 @@ unsigned int branching_operator(typename boost::graph_traits<BB_t>::vertex_descr
                     if(w < min){
                         min = w;
                     }
-
-/*
-                    std::cout << "child: " << "";
-                    for(unsigned int i = 0; i < ext_elim_ordering.size(); i++){
-                        std::cout << ext_elim_ordering[i] << " ";
-                    } std::cout << std::endl;
-*/
                 }
             }
         }
@@ -118,14 +108,15 @@ int branch_and_bound(G_t &G){
 
     //Create the root of the branch and bound tree.
     typename boost::graph_traits<BB_t>::vertex_descriptor root = boost::add_vertex(BBT);
-    BBT[root].graph = G; //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub
+    BBT[root].graph = G;
+    //TODO: add an edge between v and w if |N(v) ^ N(w)| > ub
     BBT[root].used_so_far.assign(boost::num_vertices(G), false);
     BBT[root].eo_width = 0;
     BBT[root].active = true;
 
     leafs.push(root);
 
-    /* TODO: use best heuristics */
+    /* TODO: use best heuristic */
 
     //Use the lower bound provided by the deltaC_least_c-heuristic.
     unsigned int lb = (unsigned int)treedec::lb::deltaC_least_c(G);
@@ -161,11 +152,6 @@ int branch_and_bound(G_t &G){
             }
         }
     }
-
-    std::cout << "computed elim_orderings: " << elim_orderings_count << std::endl;
-    std::cout << "computed lbs: " << lb_computed_count << std::endl;
-
-    std::cout << "tw: " << ub << std::endl;
     return ub;
 }
 

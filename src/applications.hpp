@@ -603,7 +603,6 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
         treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
         if(node_type == treedec::nice::LEAF){
-            //(1)
             unsigned int leaf = *(bag(cur, T).begin());
             unsigned int pos = get_pos(leaf, G);
 
@@ -621,7 +620,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                                 treedec::nice::get_introduced_vertex(cur, T);
             unsigned int pos = get_pos(new_vertex, G);
 
-            //(3): If x has a neighbour in the current bag that is dominating .. in the coloring C, store the coloring
+            //If x has a neighbour in the current bag that is dominating .. in the coloring C, store the coloring
             //C' formed by coloring according to C and coloring x as dominated by a vertex.
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it
                          = results[child].begin(); it != results[child].end(); it++)
@@ -647,7 +646,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 }
             }
 
-            //(4): Add the coloring C' formed by coloring according to C and coloring x as dominating.
+            //Add the coloring C' formed by coloring according to C and coloring x as dominating.
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it
                      = results[child].begin(); it != results[child].end(); it++)
             {
@@ -675,7 +674,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
             }
 
-            //(5): Add the coloring C' formed by coloring according to C and coloring x as not known yet.
+            //Add the coloring C' formed by coloring according to C and coloring x as not known yet.
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it =
                      results[child].begin(); it != results[child].end(); it++)
             {
@@ -692,7 +691,6 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                                        treedec::nice::get_forgotten_vertex(cur, T);
             unsigned int pos = get_pos(forgotten_vertex, G);
 
-            //(2)
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it
                         = results[child].begin(); it != results[child].end(); it++)
             {
@@ -775,7 +773,6 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 unsigned int min_h = 0;
                 unsigned int ones = std::count(colorings[i].begin(), colorings[i].end(), 2);
 
-                //(6)
                 for(unsigned int g = 0; g < colorings2.size(); g++){
                     for(unsigned int h = 0; h < colorings2.size(); h++){
                         //colorings[i][l] == 0 -> colorings2[g][l] == 0 or colorings2[h][l] == 0

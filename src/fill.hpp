@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "graph.hpp"
+#include "trace.hpp"
 
 #if __cplusplus >= 201103L
 # include <unordered_set>
@@ -32,22 +33,9 @@
 static bool const lazy_init=true;
 static bool const catch_zeroes_in_decrement=true;
 
-// temporary.
-#ifndef untested
-#define untested()
-#endif
-#ifndef itested
-#define itested()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
-
-
 namespace misc {
 
 namespace detail {
-// FIXME: not here
 template<class G>
 struct fill_config{
     typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
@@ -56,8 +44,8 @@ struct fill_config{
 #else
     typedef std::unordered_set<vd_type> bag_type;
 #endif
-    // typedef stx::btree_set<vd_type> bag_type;
-    static void alloc_init(size_t){
+    static void alloc_init(size_t)
+    {
     }
     static unsigned num_threads(){return 1;}
 };
@@ -148,7 +136,7 @@ public: // queueing
     }
     void unlink(const vertex_descriptor& v)
     {
-        assert(noboost::is_valid(v,_g));
+        assert(is_valid(v,_g));
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         unlink(v, _vals[pos]);
     }
@@ -156,7 +144,7 @@ public: // queueing
 public:
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
-        assert(noboost::is_valid(v,_g));
+        assert(is_valid(v,_g));
         bool n=_fill.insert(std::make_pair(missing_edges,v)).second;
         assert(n);
         (void)n;
@@ -361,14 +349,14 @@ public: // picking
         assert(lower==0); // for now.
 
         BOOST_AUTO(b, _fill.begin());
-        assert(noboost::is_valid(b->second, _g));
+        assert(is_valid(b->second, _g));
 
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), b->second);
         assert(!_vals[pos].is_unknown()); (void)pos;
         assert(_vals[pos]==b->first);
 
         BOOST_AUTO(p, std::make_pair(b->second, b->first));
-        assert(noboost::is_valid(p.first, _g));
+        assert(is_valid(p.first, _g));
         if(erase){
             unlink(p.first, p.second);
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), p.first);
@@ -469,14 +457,12 @@ namespace treedec{
 template<class G_t>
 struct fill_chooser{
     typedef typename misc::FILL<G_t> type;
-    typedef type fill_type; // transition? don't use.
 };
 
 }
 
-//transition
+//transition, don't use.
 namespace noboost{
-    // FIXME: use graph_traits
     using treedec::fill_chooser;
 }
 

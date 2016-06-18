@@ -18,9 +18,11 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute the connected components of a graph,
-// vertex/edge deletion and other simple operations on graphs.
-//
+
+/*
+ * Offers functionality to compute the connected components of a graph,
+ * vertex/edge deletion and other simple operations on graphs.
+ */
 
 #ifndef TD_SIMPLE_GRAPH_ALGOS
 #define TD_SIMPLE_GRAPH_ALGOS
@@ -117,7 +119,7 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 // paste subgraph of G induced by X into H.
 // store map V(H) -> X \subset V(G) in vdMap.
 //
-// FIXME: misleading name. paste_induced_subgraph?
+// TODO: misleading name. paste_induced_subgraph?
 template <typename G_t, class S_t, class M_t>
 void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
@@ -322,14 +324,14 @@ template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G)
-{itested();
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
     typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
 
     unsigned int min_common = UINT_MAX;
 
-    for(; nIt1 != nEnd; nIt1++){itested();
+    for(; nIt1 != nEnd; nIt1++){
         unsigned int cnt_common = 0;
         BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
         BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);

@@ -17,36 +17,29 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers miscellaneous algorithms about computing tree decompositions.
-//
-//
-// These functions are most likely to be interesting for outside use:
-//
-// bool is_valid_decomposition(G_t const& G, T_t const& T)
-// void trivial_decomposition(G_t &G, T_t &T)
-// int get_width(T_t &T)
-// float get_average_bag_size(T_t &T)
-// unsigned int get_adhesion(T_t T)
-// void make_small(T_t &T)
-// void glue_decompositions(T_t &T1, T_t &T2)
-// void glue_bag(typename treedec_traits<T_t>::bag_type &bag,
-//               typename treedec_traits<T_t>::vd_type preprocessed_node, T_t &T)
-// void glue_bags(std::vector< boost::tuple<
-//            typename treedec_traits<T_t>::vd_type,
-//            typename treedec_traits<T_t>::bag_type
-//           > > &bags, T_t &T
-//
+
+/*
+ * Offers miscellaneous algorithms about computing tree decompositions.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - bool is_valid_decomposition(G_t const& G, T_t const& T)
+ * - void trivial_decomposition(G_t &G, T_t &T)
+ * - int get_width(T_t &T)
+ * - float get_average_bag_size(T_t &T)
+ * - void make_small(T_t &T)
+ * - void glue_decompositions(T_t &T1, T_t &T2)
+ * - void glue_bag(typename treedec_traits<T_t>::bag_type &bag,
+ *                 typename treedec_traits<T_t>::vd_type preprocessed_node, T_t &T)
+ * - void glue_bags(std::vector< boost::tuple<
+ *                   typename treedec_traits<T_t>::vd_type,
+ *                   typename treedec_traits<T_t>::bag_type
+ *                  > > &bags, T_t &T)
+ *
+ */
 
 #ifndef TD_MISC
 #define TD_MISC
-
-// here (for now)
-#ifndef unreachable
-#define unreachable()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
 
 #include <stack>
 #include <queue>
@@ -57,6 +50,7 @@
 #include "graph.hpp"
 #include "simple_graph_algos.hpp"
 #include "std.hpp"
+#include "trace.hpp"
 
 namespace treedec{
 
@@ -74,7 +68,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
             t = boost::source(*e, T);
             visited[t] = true;
         }
-        else{ //T is undirected
+        else{
+            //T is undirected
             return t;
         }
     }
@@ -82,8 +77,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     return t;
 }
 
-// TODO: duplicate (see sethack.h)
-// FIXME: ad-hoc. will fail on unordered sets without warning.
+// TODO: deduplicate (see sethack.h)
+// be careful: will fail on unordered sets without warning.
 template<class S, class T>
 inline bool set_intersect(const S& s, const T& t)
 {
@@ -159,9 +154,9 @@ bool validate_connectivity(T_t &T){
 
         if(set_intersect(forgotten, bag(cur, T))){ untested();
             return false;
-        }else if(S.empty()){
+        }
+        else if(S.empty()){
             return true;
-        }else{
         }
 
         std::set_difference(bag(cur, T).begin(),
@@ -337,7 +332,7 @@ void make_small(T_t &T){
 }
 
 
-//glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
+//Glues two "disjoint" decompositions (e.g. decompositions of two components of a graph)
 template <typename T_t>
 void glue_decompositions(T_t &T1, T_t &T2){
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
@@ -555,7 +550,7 @@ unsigned int get_depth(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     return depth;
 }
 
-//suboptimal.. O(n^2) and not O(n)
+//suboptimal.. O(n^2) instead of O(n)
 template <typename T_t>
 typename boost::graph_traits<T_t>::vertex_descriptor find_balanced_root(T_t &T){
     if(boost::num_vertices(T) <= 2){
@@ -744,6 +739,7 @@ void map_descriptors_to_bags(
         B.insert(vd);
     }
 }
+
 } // detail
 
 // transition
@@ -763,10 +759,6 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
         bag(*tIt, T) = MOVE(bag_new);
     }
 }
-
-
-#ifndef TD_SUBSETS
-#define TD_SUBSETS
 
 //Collect all subsets of [i,e) of size 'k' and store in 'subs'.
 //pass "sub" to use custom stack space.
@@ -816,8 +808,6 @@ void subsets(S const &X, int size, int k, int idx,
 }
 
 
-#endif //TD_SUBSETS
-
 //TODO: not here.
 template<class G>
 inline void detach_neighborhood(
@@ -826,8 +816,8 @@ inline void detach_neighborhood(
 {
     typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
-            nIt1 != nEnd; nIt1++){ // untested();
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
+    {
         bag.insert(get_vd(g, *nIt1));
     }
     boost::clear_vertex(c, g);

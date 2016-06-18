@@ -1,6 +1,6 @@
-// Lukas Larisch, 2014 - 2015
+// Lukas Larisch, 2014 - 2016
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// (c) 2014-2016 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -17,47 +17,56 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a minimal seperator of two vertex sets
-//
-// These functions are most likely to be interesting for outside use:
-//
-//   void seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S)
-//
-//
-// computes a seperator S up to size k, aborts and returns false if S would be greater than k:
-//
-//   bool seperate_vertices(G_t &G, std::set<unsigned int> &X, std::set<unsigned int> &Y, std::set<unsigned int> &S, unsigned int k)
-//
-//
-// This algorithm is based on Menger's theorem (1927):
-//
-//   Let G = (V, E) be a graph and A, B subsets of V. Then the minimum number
-//   of vertices seperating A from B in G is equal to the maximum number of
-//   disjoint A-B paths in G.
-//
-// Let P be a family of pairwise disjoint paths in G from X to Y. A
-// P-alternating walk is a sequence Q = w_1 . . . w_m of vertices of G such
-// that {w_i, w_(i+1)} is in E for all i in {1, .., m-1} and: (i)  No edge
-// occurs twice on Q; that is, {w_i, w_(i+1)}  != {w_j , w_(j+1)} for all
-// distinct i, j in {1, .., m-1}.  (ii) If w_i occurs on a path P = v_1 .. v_l
-// in P, say w_i = v_j, then w_(i+1) = v_(j−1) or w_(i-1) = v_(j+1).
-//
-// The algorithm below computes the maximum number of disjoint A-B paths in G
-// successivly extending a family of disjoint paths P by computing a
-// P-alternating walk W, if such one exists. If such a walk exists, P can be
-// extended to P' such that P' containes |P| + 1 disjoint paths.
-//
-// For some proofs of Menger's theorem, including a contructive one, see
-//
-//   Reinhard Diestel: Graph Theory, 4th Edition. Graduate texts in mathematics
-//                     173, Springer 2012, ISBN 978-3-642-14278-9
-//
-// For a proof of correctness of the algorithm below, see e.g.
-//
-//   J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in
-//                         Theoretical Computer Science. an EATCS Series).
-//   Springer-Verlag New York, Inc., Secaucus, NJ, USA.
-//
+
+
+/*
+ *
+ * Offers functionality to compute a minimal seperator of two vertex sets
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void seperate_vertices(G_t &G, std::set<unsigned int> &X,
+ *                          std::set<unsigned int> &Y, std::set<unsigned int> &S)
+ *
+ * Computes a seperator S up to size k, aborts and returns false if S would be
+ * greater than k:
+ *
+ * - bool seperate_vertices(G_t &G, std::set<unsigned int> &X,
+ *                          std::set<unsigned int> &Y, std::set<unsigned int> &S,
+ *                          unsigned int k)
+ *
+ */
+
+/*
+This algorithm is based on Menger's theorem (1927):
+
+  Let G = (V, E) be a graph and A, B subsets of V. Then the minimum number
+  of vertices seperating A from B in G is equal to the maximum number of
+  disjoint A-B paths in G.
+
+Let P be a family of pairwise disjoint paths in G from X to Y. A
+P-alternating walk is a sequence Q = w_1 . . . w_m of vertices of G such
+that {w_i, w_(i+1)} is in E for all i in {1, .., m-1} and: (i)  No edge
+occurs twice on Q; that is, {w_i, w_(i+1)}  != {w_j , w_(j+1)} for all
+distinct i, j in {1, .., m-1}.  (ii) If w_i occurs on a path P = v_1 .. v_l
+in P, say w_i = v_j, then w_(i+1) = v_(j−1) or w_(i-1) = v_(j+1).
+
+The algorithm below computes the maximum number of disjoint A-B paths in G
+successivly extending a family of disjoint paths P by computing a
+P-alternating walk W, if such one exists. If such a walk exists, P can be
+extended to P' such that P' containes |P| + 1 disjoint paths.
+
+For some proofs of Menger's theorem, including a contructive one, see
+
+  Reinhard Diestel: Graph Theory, 4th Edition. Graduate texts in mathematics
+                    173, Springer 2012, ISBN 978-3-642-14278-9
+
+For a proof of correctness of the algorithm below, see e.g.
+
+  J. Flum and M. Grohe. 2006. Parameterized Complexity Theory (Texts in
+                         Theoretical Computer Science. an EATCS Series).
+     Springer-Verlag New York, Inc., Secaucus, NJ, USA.
+*/
 
 #ifndef TD_NETWORK_FLOW
 #define TD_NETWORK_FLOW
@@ -69,8 +78,19 @@
 
 #include "graph.hpp"
 
-namespace treedec{
+struct Vertex_NF{
+    bool visited;
+    int predecessor;
+};
 
+struct Edge_NF{
+    bool path; //true if a path uses the edge
+};
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                          boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
+
+namespace treedec{
 
 template<class D>
 void check_dis(D dis, size_t num)
@@ -140,7 +160,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     unsigned int j = 0;
     BOOST_AUTO(dv, boost::vertices(diG).first);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = noboost::get_pos(*vIt, G);
+        unsigned int pos = get_pos(*vIt, G);
         if(!disabled[pos]){
             internal_idxMap[pos] = *dv;
             ++dv;
@@ -153,8 +173,8 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int sid = noboost::get_pos(boost::source(*eIt, G), G);
-        unsigned int tid = noboost::get_pos(boost::target(*eIt, G), G);
+        unsigned int sid = get_pos(boost::source(*eIt, G), G);
+        unsigned int tid = get_pos(boost::target(*eIt, G), G);
         if(!disabled[sid] && !disabled[tid]){
 
             typename digraph_t::edge_descriptor e1 =
@@ -170,10 +190,16 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     ++dv;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             X.begin(); sIt != X.end(); sIt++){
+<<<<<<< HEAD
         unsigned int pos = noboost::get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(source, internal_idxMap[pos], diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
+=======
+        unsigned int pos = get_pos(*sIt, G);
+        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[pos], diG).first;
+        diG[e].path = false;
+>>>>>>> development
     }
 
     typename digraph_t::vertex_descriptor sink = *dv;
@@ -181,10 +207,16 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     assert(dv == boost::vertices(diG).second);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
+<<<<<<< HEAD
         unsigned int pos = noboost::get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(internal_idxMap[pos], sink, diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
+=======
+        unsigned int pos = get_pos(*sIt, G);
+        digraph_t::edge_descriptor e = boost::add_edge(internal_idxMap[pos], sink, diG).first;
+        diG[e].path = false;
+>>>>>>> development
     }
 
     diG[j].visited = false;
@@ -468,7 +500,7 @@ bool seperate_vertices(
     //disables/deletes the vertices in the intersection of X and Y.
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
           S.begin(); sIt != S.end(); sIt++){
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         assert(!disabled[pos]);
         ++num_dis;
         disabled[pos] = true;

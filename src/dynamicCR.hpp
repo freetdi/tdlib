@@ -17,26 +17,16 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-//
-//
 
 /*
-  These functions are most likely to be interesting for outside use:
-
-- void CR_dynamic_decomp(G_t &G, T_t &T, int lb)
-- void CR_dynamic_decomp(G_t &G, T_t &T)
-*/
+ * Offers functionality to compute a tree decomposition of exact width.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void CR_dynamic_decomp(G_t &G, T_t &T, int lb)
+ * - void CR_dynamic_decomp(G_t &G, T_t &T)
+ *
+ */
 
 #ifndef TD_DYNAMICCR
 #define TD_DYNAMICCR
@@ -53,15 +43,15 @@ namespace treedec{
 //Computes the robber space-components with respect to X.
 template <typename G_t>
 void get_robber_components(G_t &G,
-     typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
-     typename std::vector<typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type> &Rcomps)
+     typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &X,
+     typename std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &Rcomps)
 {
-    typedef typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type bag_type;
+    typedef typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type bag_type;
 
     //G \ X
     std::vector<bool> disabled(boost::num_vertices(G), false);
     for(typename bag_type::iterator sIt = X.begin(); sIt != X.end(); sIt++){
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         disabled[pos] = true;
     }
 
@@ -72,12 +62,12 @@ void get_robber_components(G_t &G,
 //Computes the robber space with respect to X.
 template <typename G_t>
 static void get_robber_component(
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X_prime,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &R,
-        typename std::vector<typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type> &Rcomps)
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &X_prime,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &R,
+        typename std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &Rcomps)
 {
     for(unsigned int i = 0; i < Rcomps.size(); i++){
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type intersection;
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type intersection;
         std::set_intersection(Rcomps[i].begin(), Rcomps[i].end(),
                               X_prime.begin(), X_prime.end(),
                               std::inserter(intersection, intersection.begin()));
@@ -91,13 +81,13 @@ static void get_robber_component(
 //Checks if comp(G\X, y) = comp(G\ (X ^ X'), y) := R and X' ^ R != emptyset.
 template <typename G_t>
 bool is_monotone_dynamicCR(G_t &G,
-          typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X,
-          typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &X_prime,
-          typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &oldR,
-          typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &newR,
-          typename std::vector<typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type> &Rcomps)
+          typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &X,
+          typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &X_prime,
+          typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &oldR,
+          typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &newR,
+          typename std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &Rcomps)
 {
-    typedef typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type bag_type;
+    typedef typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type bag_type;
 
     if(X == X_prime){
         return false;
@@ -139,12 +129,12 @@ bool is_monotone_dynamicCR(G_t &G,
 
 template <typename G_t, typename W_t>
 bool make_layer(G_t &G, W_t &W,
-         typename noboost::treedec_traits<typename noboost::treedec_chooser<G_t>::type>::bag_type &vertices,
+         typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &vertices,
          unsigned int k, unsigned int idx)
 {
-    typedef typename noboost::treedec_chooser<G_t>::type T_t;
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
-    typedef typename noboost::treedec_traits<T_t>::bag_type::value_type value_type;
+    typedef typename treedec_chooser<G_t>::type T_t;
+    typedef typename treedec_traits<T_t>::bag_type bag_type;
+    typedef typename treedec_traits<T_t>::bag_type::value_type value_type;
 
     W.resize(idx+1);
 
@@ -170,7 +160,7 @@ bool make_layer(G_t &G, W_t &W,
                 //if a turn X -> X' is monotone, save the index of the entry in
                 //the layer below for computing a tree decomposition at the end
 
-                // FIXME: don't create intersection. stop at first common elt.
+                // inefficient: don't create intersection. stop at first common elt.
                 bag_type inters;
                 std::set_intersection(subs[i].begin(), subs[i].end(), 
                                       W[idx-1][j].get<3>().begin(), W[idx-1][j].get<3>().end(), std::inserter(inters, inters.begin()));
@@ -218,7 +208,7 @@ bool make_layer(G_t &G, W_t &W,
 
 //Follows the "pointers" stored in the third entry of W[layer][i] recursively.
 template <typename T_t, typename W_t, typename G_t>
-void make_tree_decomposition(T_t &T, W_t &W, typename noboost::treedec_traits<T_t>::bag_type &R,
+void make_tree_decomposition(T_t &T, W_t &W, typename treedec_traits<T_t>::bag_type &R,
                              unsigned int layer, unsigned int idx, G_t &G)
 {
     for(unsigned int i = 0; i < W[layer][idx].get<2>().size(); i++){
@@ -238,7 +228,7 @@ void make_tree_decomposition(T_t &T, W_t &W, typename noboost::treedec_traits<T_
 
 template <typename G_t, typename T_t>
 void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
-    typedef typename noboost::treedec_traits<T_t>::bag_type bag_type;
+    typedef typename treedec_traits<T_t>::bag_type bag_type;
 
     bag_type vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -249,7 +239,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     if( nv<=1 || 2*ne==nv*(nv-1u) ){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            noboost::bag(t, T).insert(*vIt);
+            bag(t, T).insert(*vIt);
         }
         return;
     }
@@ -265,7 +255,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     for(unsigned int k = (unsigned int)lb; k < vertices.size(); k++){
         for(unsigned int i = 0; i < vertices.size(); i++){
             if(make_layer(G, W, vertices, k, i)){
-                typename noboost::treedec_traits<T_t>::bag_type R;
+                typename treedec_traits<T_t>::bag_type R;
                 R.insert(W[W.size()-1][W.back().size()-1].get<0>().begin(), W[W.size()-1][W.back().size()-1].get<0>().end());
                 make_tree_decomposition(T, W, R, W.size()-1, W.back().size()-1, G);
                 return;

@@ -31,21 +31,11 @@
 # include <unordered_set>
 #endif
 
-// temporary.
-#ifndef untested
-#define untested()
-#endif
-#ifndef itested
-#define itested()
-#endif
-#ifndef incomplete
-#define incomplete()
-#endif
+#include "trace.hpp"
 
 namespace misc {
 
 namespace detail {
-// FIXME: not here
 template<class G_t>
 struct deg_config{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;

@@ -19,14 +19,15 @@
 //
 
 /*
- Offers functionality to possibly reduce the width of a tree decomposition of a given graph.
-
- These functions are most likely to be interesting for outside use:
-
- - void MSVS(G_t &G, T_t &T)
- - void minimalChordal(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
-                              std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
-*/
+ * Offers functionality to possibly reduce the width of a tree decomposition of a given graph.
+ *
+ * These functions are most likely to be interesting for outside use:
+ *
+ * - void MSVS(G_t &G, T_t &T)
+ * - void minimalChordal(G_t G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
+ *                              std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
+ *
+ */
 
 #ifndef TD_POSTPROCESSING
 #define TD_POSTPROCESSING
@@ -40,7 +41,7 @@
 
 namespace treedec{
 
-//Create a modified induced subgraph of the bag 'noboost::bag(t_desc, T)'.
+//Create a modified induced subgraph of the bag 'bag(t_desc, T)'.
 template <typename G_t, typename T_t, typename M_t, typename S_t>
 bool is_improvement_bag(G_t &H,
                         std::vector<bool> &disabled,
@@ -138,7 +139,7 @@ bool is_improvement_bag(G_t &H,
  */
 template <typename G_t, typename T_t>
 void MSVS(G_t const &G, T_t &T)
-{ untested();
+{
     assert(!is_valid_treedecomposition(G, T));
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
@@ -155,7 +156,6 @@ void MSVS(G_t const &G, T_t &T)
 
     while(true){
         width = treedec::get_width(T);
-        std::cerr << width << "\n";
 
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         G_t H;
@@ -168,7 +168,7 @@ void MSVS(G_t const &G, T_t &T)
         bag_iterator tIt, tEnd;
         bag_descriptor refinement_vertex;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
-            if(noboost::bag(*tIt, T).size() == width+1){
+            if(bag(*tIt, T).size() == width+1){
                 disabled_.resize(0);
                 vdMap_.resize(0);
                 if(is_improvement_bag(H, disabled_, X, Y, *tIt, vdMap_, G, T)){

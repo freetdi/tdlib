@@ -132,7 +132,7 @@ public: // assign
    }
 public: // ops
    bool operator==(const T& other)
-   { itested();
+   {
       if(!_t.size()){ untested();
          // BUG?
          return false;
@@ -352,7 +352,7 @@ public: // construct
     }
 
     ~neighbourhood01_iter()
-    { itested();
+    {
     }
 public: // ops
     bool operator!=(const neighbourhood01_iter& p) const
@@ -428,10 +428,11 @@ private: // data
 };
 } // detail
 
+// iterate trough [b, e) and it's neighbors within G
 template<class A, class G>
 std::pair<detail::neighbourhood01_iter<A, G>,
           detail::neighbourhood01_iter<A, G> >
-inline make_neighbourhood01_iter(A b, A e, G const& g, unsigned size=0,
+inline make_neighbourhood01_range(A b, A e, G const& g, unsigned size=0,
         bool include_base=true)
 {
     typedef detail::neighbourhood01_iter<A, G> nIter;

@@ -68,10 +68,8 @@ AC_SUBST(PYTHON_LIB_DIR)
 AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 
 AS_IF([test "$python" != no], [
-AC_PATH_PROGS([CYTHON],
-              [cython2.7 cython],
-              [no])
-AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
+	AC_PATH_PROGS([CYTHON], [cython], [no])
+	AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
 ])
 
 # Checks for libraries.

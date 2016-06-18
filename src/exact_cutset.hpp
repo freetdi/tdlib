@@ -17,31 +17,16 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-// Offers functionality to compute a tree decomposition of exact width.
-//
-// A tree decomposition is a graph that has a set of vertex indices as bundled property, e.g.:
-//
-// struct tree_dec_node
-// {
-//  std::set<unsigned int> bag;
-// };
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, tree_dec_node> tree_dec_t;
-//
-// Vertices of the input graph have to provide the attribute 'id', e.g.:
-//
-// struct Vertex
-// {
-//  unsigned int id;
-// };
-// typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> TD_graph_t;
-//
-//
-//
-// These functions are most likely to be interesting for outside use:
-//
-// void exact_cutset(G_t &G, T_t &T, int lb)
-// void exact_cutset(G_t &G, T_t &T)
-//
+
+/*
+ * Offers functionality to compute a tree decomposition of exact width.
+ *
+ * Provides following functions:
+ *
+ * - void exact_cutset(G_t &G, T_t &T, int lb)
+ * - void exact_cutset(G_t &G, T_t &T)
+ *
+ */
 
 #ifndef TD_EXACT_CUTSET
 #define TD_EXACT_CUTSET
@@ -102,7 +87,7 @@ bool explore_cutsets(G_t &G,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> cut_ext = cut;
         cut_ext.insert(candidates[i]);
 
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = MOVE(component);
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component_red = component;
         component_red.erase(candidates[i]);
 
 
@@ -110,7 +95,7 @@ bool explore_cutsets(G_t &G,
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = component_red.begin(); sIt != component_red.end(); sIt++)
         {
-            unsigned int pos = noboost::get_pos(*sIt, G);
+            unsigned int pos = get_pos(*sIt, G);
             visited[pos] = false;
         }
 
@@ -155,8 +140,8 @@ bool explore_cutsets(G_t &G,
 
 template <typename T_t>
 void glue_bags(T_t &T,
-          typename noboost::treedec_traits<T_t>::bag_type &bag1,
-          typename noboost::treedec_traits<T_t>::bag_type &bag2)
+          typename treedec_traits<T_t>::bag_type &bag1,
+          typename treedec_traits<T_t>::bag_type &bag2)
 {
     if(bag1 == bag2){
         return;
@@ -167,14 +152,14 @@ void glue_bags(T_t &T,
     bool bag1_found = false;
     bool bag2_found = false;
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
-        if(noboost::bag(*vIt1, T) == bag1){
+        if(bag(*vIt1, T) == bag1){
             b1 = *vIt1;
             bag1_found = true;
             break;
         }
     }
     for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
-        if(noboost::bag(*vIt2, T) == bag2){
+        if(bag(*vIt2, T) == bag2){
             b2 = *vIt2;
             bag2_found = true;
             break;
@@ -183,12 +168,12 @@ void glue_bags(T_t &T,
 
     if(!bag1_found){
         b1 = boost::add_vertex(T);
-        noboost::bag(b1, T) = bag1;
+        bag(b1, T) = bag1;
     }
 
     if(!bag2_found){
         b2 = boost::add_vertex(T);
-        noboost::bag(b2, T) = bag2;
+        bag(b2, T) = bag2;
     }
 
     if(!(boost::edge(b1, b2, T).second || boost::edge(b2, b1, T).second)){
@@ -209,7 +194,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
     if(boost::num_vertices(G) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        noboost::bag(t, T).insert(*vIt);
+        bag(t, T).insert(*vIt);
         if(k <= 0){
             return true;
         }
@@ -231,7 +216,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
     }
 
     for(unsigned int i = 0; i < results.size()-1; i++){
-        typename noboost::treedec_traits<T_t>::bag_type bag1, bag2;
+        typename treedec_traits<T_t>::bag_type bag1, bag2;
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = results[i].begin(); sIt != results[i].end(); sIt++){
