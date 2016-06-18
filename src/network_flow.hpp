@@ -190,16 +190,10 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     ++dv;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             X.begin(); sIt != X.end(); sIt++){
-<<<<<<< HEAD
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(source, internal_idxMap[pos], diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
-=======
-        unsigned int pos = get_pos(*sIt, G);
-        digraph_t::edge_descriptor e = boost::add_edge(source, internal_idxMap[pos], diG).first;
-        diG[e].path = false;
->>>>>>> development
     }
 
     typename digraph_t::vertex_descriptor sink = *dv;
@@ -207,16 +201,10 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     assert(dv == boost::vertices(diG).second);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
-<<<<<<< HEAD
-        unsigned int pos = noboost::get_pos(*sIt, G);
+        unsigned int pos = get_pos(*sIt, G);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(internal_idxMap[pos], sink, diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
-=======
-        unsigned int pos = get_pos(*sIt, G);
-        digraph_t::edge_descriptor e = boost::add_edge(internal_idxMap[pos], sink, diG).first;
-        diG[e].path = false;
->>>>>>> development
     }
 
     diG[j].visited = false;
