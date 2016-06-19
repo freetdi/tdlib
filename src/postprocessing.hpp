@@ -46,6 +46,7 @@ namespace detail{
 
 // here: the vertex subset is a bag in a tree decomposition and
 //       we add some more edges
+#if 0 // obsolete. use immutable_clone+callback directly
 template<class G_t, class T_t, class IG_t, class M_t>
 inline IG_t const&
 MSVS_overlay(G_t const &G, IG_t& ig,
@@ -59,6 +60,7 @@ MSVS_overlay(G_t const &G, IG_t& ig,
     draft::immutable_clone(G, ig, mybag.begin(), mybag.end(), mybag.size(), vdMap, &cb);
     return ig;
 }
+#endif
 
 } // detail
 
