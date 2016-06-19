@@ -307,8 +307,11 @@ inline void make_degree_sequence(const G_t &G,
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
 template<typename G_t>
-inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G){
-    return boost::get(boost::get(boost::vertex_index, G), v);
+//inline typename boost::graph_traits<G_t>::vertex_index_type
+inline unsigned
+   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G)
+{itested();
+    return boost::get(boost::vertex_index, G, v);
 }
 
 // return "id" where the vertex_descriptor might make more sense.
@@ -362,13 +365,17 @@ struct Edge_NF{
 
 #endif
 
+template<class G_t>
+struct graph_traits_base : public boost::graph_traits<G_t> {};
+
 // this makes some sense...
 template<class G_t>
-struct graph_traits{ //
+struct graph_traits : public graph_traits_base<G_t> { //
     typedef typename treedec_chooser<G_t>::type treedec_type;
     typedef typename outedge_set<G_t>::type outedge_set_type;
     typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
                 boost::bidirectionalS, Vertex_NF, Edge_NF> directed_overlay;
+    typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
 };
 
 template <typename G_t>
@@ -596,6 +603,111 @@ bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
 
     return(N1==N2);
 }
+
+// create ig.
+// edge(v, w, ig) == edge(ordering[v], ordering[w], g)
+// TODO: inverse map?
+// TODO: partial/induced graph?
+template<class G>
+void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
+   std::vector<typename boost::graph_traits<G>::vertex_descriptor>* ordering=NULL)
+{
+    typedef typename graph_traits<G>::immutable_type immutable_type;
+//    typedef typename graph_traits<G>::vertex_iterator vertex_iterator;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G>::edge_iterator edge_iterator;
+
+    if(!ordering){ incomplete();
+    }
+    assert(ordering->size()==boost::num_vertices(g)); // for now.
+
+
+    if(boost::num_vertices(g) != boost::num_vertices(ig)){ untested();
+        // drop a new one... (for now?)
+        // inefficient.
+        ig = MOVE(immutable_type(boost::num_vertices(g)));
+    }else if(boost::num_edges(ig)){ untested();
+        for(unsigned i=0; i<boost::num_vertices(g); ++i){
+            boost::clear_vertex(i, ig);
+        }
+    }else{ untested();
+    }
+
+    std::vector<unsigned> inverse_ordering(boost::num_vertices(g));
+    for(unsigned o=0; o<boost::num_vertices(g); ++o){
+        assert((*ordering)[o] < inverse_ordering.size());
+        inverse_ordering[(*ordering)[o]] = o;
+    }
+
+    for(unsigned o=0; o<boost::num_vertices(g); ++o){
+        assert((*ordering)[inverse_ordering[o]] == o);
+    }
+
+    edge_iterator e, eend;
+    boost::tie(e,eend) = boost::edges(g);
+    for(;e!=eend; ++e){
+        vertex_descriptor s = boost::source(*e, g);
+        vertex_descriptor t = boost::target(*e, g);
+        assert(inverse_ordering[s] < boost::num_vertices(ig));
+        assert(inverse_ordering[t] < boost::num_vertices(ig));
+        assert((s==t) == (inverse_ordering[s]==inverse_ordering[t]));
+        boost::add_edge(inverse_ordering[s], inverse_ordering[t], ig);
+    }
+}
+
+namespace draft{
+
+// check if {*vd1, *vd2} is a subset of a bag adjacent to t.
+template<class VD_t, class T_t>
+class is_in_neighbour_bd{ //
+public:
+    is_in_neighbour_bd(T_t const& T,
+        typename boost::graph_traits<T_t>::vertex_descriptor t)
+       : _T(T), _t(t)
+    {
+    }
+public:
+    bool operator() (VD_t vd1, VD_t vd2)
+    {
+        assert(vd1!=vd2);
+        if(vd1<vd2){
+        }else{ untested();
+        }
+
+        typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
+        bag_iterator nIt, nEnd;
+        boost::tie(nIt, nEnd) = boost::adjacent_vertices(_t, _T);
+        for(; nIt != nEnd; nIt++){
+            BOOST_AUTO(const& ibag, bag(*nIt, _T));
+
+            if(ibag.find(vd1)==ibag.end()){
+            }else if(ibag.find(vd2)==ibag.end()){
+            }else{
+                return true;
+            }
+        }
+        // a = vd1;
+        // b = vd2;
+        return false;
+    }
+private: //data
+    T_t const &_T;
+    typename boost::graph_traits<T_t>::vertex_descriptor _t;
+public: // HACK
+    unsigned a, b;
+};
+
+} // draft
+
+// clone subgraph induced by bag into ig.
+// store map V(H) -> X \subset V(G) in vdMap
+// add more edges for MSVS, TODO: implement properly (how?)
+template<class G_t, class T_t, class IG_t, class M_t>
+inline void induced_subgraph_with_extra_edges
+(G_t const &G, IG_t& ig, // typename graph_traits<G>::immutable_type& ig,
+       T_t const& T, typename boost::graph_traits<T_t>::vertex_descriptor bd,
+    //   URGHS. no default types without c++11.
+     M_t* vdMap /*=NULL*/);
 
 } // treedec
 
