@@ -172,7 +172,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
         unsigned int sid = get_pos(boost::source(*eIt, G), G);
         unsigned int tid = get_pos(boost::target(*eIt, G), G);
         if(!disabled[sid] && !disabled[tid]){
@@ -498,11 +498,11 @@ bool seperate_vertices(
 }
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
-template <typename G_t>
+template <typename G_t, typename S_t, typename Sep_t>
 void seperate_vertices(G_t &G, std::vector<bool> &disabled, unsigned num_dis,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
-        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
+        S_t const &X,
+        S_t const &Y,
+        Sep_t &S,
         impl::disjoint_ways<G_t>* dw=NULL)
 {
     typedef impl::disjoint_ways<G_t> dw_t;

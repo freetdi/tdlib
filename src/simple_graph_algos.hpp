@@ -223,12 +223,11 @@ inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
     return get_neighbourhood(G, disabled, X.begin(), X.end(), S_X);
 }
 
-
-template <typename G_t>
+template <typename G_t, typename V_S_t>
 void t_search_components(G_t const &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
         std::vector<bool> &visited,
-        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
+        V_S_t &components,
         int comp_idx)
 {
     unsigned int pos = get_pos(vertex, G);
@@ -243,10 +242,10 @@ void t_search_components(G_t const &G,
     }
 }
 
-
-template <typename G_t>
+// collect connected components?
+template <typename G_t, typename V_S_t>
 void get_components_provided_map(G_t const &G,
-             std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
+             V_S_t &components,
              std::vector<bool> &visited){
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

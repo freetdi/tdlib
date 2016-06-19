@@ -713,16 +713,15 @@ void glue_bags(std::vector< boost::tuple<
 
 namespace detail{
 
-template <typename G_t>
-void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-                     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_,
-                     G_t &H,
-                     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+// S_ = "vdmap[S]"
+template <typename G_t, typename S1_t, typename S2_t, typename M_t>
+void map_descriptors(S1_t const &S, S2_t &S_, G_t &H, M_t& vdMap)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-                                 = S.begin(); sIt != S.end(); sIt++)
+    BOOST_AUTO(sIt, S.begin());
+    for(;sIt!=S.end(); ++sIt)
     {
         unsigned int pos = get_pos(*sIt, H);
+        assert(pos<vdMap.size());
         S_.insert(vdMap[pos]);
     }
 }
