@@ -53,11 +53,8 @@ namespace treedec{
 namespace impl{
 
 // Check if there exists a degree-0-vertex.
-template <typename G_t>
-void Islet(G_t &G, std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > &bags, int &low)
+template <typename G_t, typename B_t>
+void Islet(G_t &G, B_t &bags, int &low)
 {
     typedef typename treedec_chooser<G_t>::type T_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -74,23 +71,17 @@ void Islet(G_t &G, std::vector<boost::tuple<
     }
 }
 
-template <typename G_t>
-void Islet(G_t &G, std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > &bags)
+template <typename G_t, typename T_t>
+void Islet(G_t &G, T_t &bags)
 {
     int low = -1;
     Islet(G, bags, low);
 }
 
 /* (Islet,) Twig and Series rules. */
-template <typename G_t, typename DEGS>
+template <typename G_t, typename B_t, typename DEGS>
 void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G,
-          std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > &bags, int &low, DEGS &degs)
+         B_t &bags, int &low, DEGS &degs)
 {
     typedef typename treedec_chooser<G_t>::type T_t;
     typename treedec_traits<T_t>::bag_type bag;
@@ -112,13 +103,10 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
 
 //Applies the Triangle rule if applicable (checks if there exists a degree-3-vertex,
 //such that at least one edge exists in its neighbourhood).
-template <typename G_t, typename DEGS>
+template <typename G_t, typename T_t, typename DEGS>
 bool Triangle(G_t &G,
               typename boost::graph_traits<G_t>::vertex_descriptor v,
-              std::vector<boost::tuple<
-                typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-                typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-              > > &bags, int &low, DEGS &degs)
+              T_t &bags, int &low, DEGS &degs)
 {
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
