@@ -407,13 +407,16 @@ struct vdstuff<false, T> { //
 
 template<class T>
 struct treedec_traits{ //
+// TODO should be this (does not work, why?)
+//    typedef typename boost::graph_traits<T>::vertex_property_type vertex_property_type;
+    typedef typename T::vertex_property_type vertex_property_type;
     typedef typename detail::vdstuff<
-       boost::is_same< typename T::vertex_property_type, bag >::value,
-        typename T::vertex_property_type >::type vd_type;
+       boost::is_same<vertex_property_type, bag >::value,
+         vertex_property_type >::type vd_type;
 
     typedef typename detail::vdstuff<
-       boost::is_same< typename T::vertex_property_type, bag >::value,
-        typename T::vertex_property_type >::bag_type bag_type;
+       boost::is_same<vertex_property_type, bag >::value,
+         vertex_property_type >::bag_type bag_type;
 
 };
 
@@ -448,7 +451,7 @@ inline typename treedec_traits<T_t>::bag_type& bag(
 	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t& T)
 {
-    typedef    typename T_t::vertex_property_type b; //>::bag_type b;
+    typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
@@ -457,7 +460,7 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t const& T)
 {
-    typedef    typename T_t::vertex_property_type b; //>::bag_type b;
+    typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
 
