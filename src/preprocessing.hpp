@@ -527,20 +527,14 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
 } //namespace impl
 
 
-template <typename G_t>
-void preprocessing(G_t &G, std::vector< boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-             > > &bags, int &low)
+template <typename G_t, typename BV_t>
+void preprocessing(G_t &G, BV_t &bags, int &low)
 {
     impl::preprocessing(G, bags, low);
 }
 
-template <typename G_t>
-void preprocessing(G_t &G, std::vector< boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-             > > &bags)
+template <typename G_t, typename BV_t>
+void preprocessing(G_t &G, BV_t &bags)
 {
     int low = -1;
     preprocessing(G, bags, low);
