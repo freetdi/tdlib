@@ -143,13 +143,16 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
 
 /* PREPROCESSING */
 
-int gc_preprocessing(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &bags, int lb){
+int gc_preprocessing(std::vector<unsigned int> &V_G,
+		               std::vector<unsigned int> &E_G,
+							std::vector<std::vector<int> > &bags, int lb)
+{
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     std::vector< boost::tuple<
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<TD_graph_t>::type>::vd_type,
-        typename noboost::treedec_traits<typename noboost::treedec_chooser<TD_graph_t>::type>::bag_type
+        typename treedec::treedec_traits<typename treedec::treedec_chooser<TD_graph_t>::type>::vd_type,
+        typename treedec::treedec_traits<typename treedec::treedec_chooser<TD_graph_t>::type>::bag_type
              > > td_bags;
     treedec::preprocessing(G, td_bags, lb);
 
