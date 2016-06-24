@@ -41,9 +41,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <boost/thread.hpp>
-#include <mutex>
-
 #include "nice_decomposition.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
@@ -187,7 +184,7 @@ void top_down_computation(T_t &T,
 namespace detail{
 
 template <typename G_t, typename A_t, typename B_t>
-bool is_clique2(G_t &G, A_t A, B_t B){
+bool is_clique(G_t &G, A_t A, B_t B){
     BOOST_AUTO(p1, A);
     for(; p1 != B; ++p1){
         BOOST_AUTO(p2, p1);
@@ -204,9 +201,8 @@ bool is_clique2(G_t &G, A_t A, B_t B){
 } //namespace detail (for max_clique)
 
 
-//TODO: bottom-up computation would fasten the computation.
 template <typename G_t, typename T_t>
-unsigned int max_clique_with_treedecomposition2(G_t &G, T_t &T,
+unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
                                typename treedec_traits<T_t>::bag_type &global_result)
 {
     unsigned int max = 0;
@@ -224,7 +220,7 @@ unsigned int max_clique_with_treedecomposition2(G_t &G, T_t &T,
             bool changed = false;
 
             for(; I != bag(*vIt, T).end(); ++I){
-                if(treedec::app::detail::is_clique2(G, (*I).first, (*I).second)){
+                if(treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
                     max = size;
 
                     global_result.clear();
