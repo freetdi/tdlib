@@ -49,7 +49,7 @@
 
 #include "graph.hpp"
 #include "simple_graph_algos.hpp"
-#include "std.hpp"
+#include "platform.hpp"
 #include "trace.hpp"
 
 namespace treedec{

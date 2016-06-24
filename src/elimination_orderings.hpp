@@ -58,7 +58,7 @@
 
 #include "graph.hpp"
 #include "fill.hpp"
-#include "std.hpp"
+#include "platform.hpp"
 
 namespace treedec{
 
