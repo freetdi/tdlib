@@ -41,6 +41,9 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include <boost/thread.hpp>
+#include <mutex>
+
 #include "nice_decomposition.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
@@ -183,14 +186,14 @@ void top_down_computation(T_t &T,
 
 namespace detail{
 
-template <typename G_t, typename T_t>
-bool is_clique(G_t &G, typename treedec_traits<T_t>::bag_type &C){
-    typename treedec_traits<T_t>::bag_type::iterator sIt1, sIt2;
-    for(sIt1 = C.begin(); sIt1 != C.end(); sIt1++){
-        sIt2 = sIt1;
-        sIt2++;
-        for(; sIt2 != C.end(); sIt2++){
-            if(!boost::edge(*sIt1, *sIt2, G).second){
+template <typename G_t, typename A_t, typename B_t>
+bool is_clique2(G_t &G, A_t A, B_t B){
+    BOOST_AUTO(p1, A);
+    for(; p1 != B; ++p1){
+        BOOST_AUTO(p2, p1);
+        p2++;
+        for(; p2 != B; ++p2){
+            if(!boost::edge(*p1, *p2, G).second){
                 return false;
             }
         }
@@ -203,23 +206,42 @@ bool is_clique(G_t &G, typename treedec_traits<T_t>::bag_type &C){
 
 //TODO: bottom-up computation would fasten the computation.
 template <typename G_t, typename T_t>
-unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
+unsigned int max_clique_with_treedecomposition2(G_t &G, T_t &T,
                                typename treedec_traits<T_t>::bag_type &global_result)
 {
     unsigned int max = 0;
 
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
-        if(bag(*vIt, T).size() < max){ continue; }
+        //We wouldn't find a larger clique.
+        if(bag(*vIt, T).size() <= max){ continue; }
 
-        std::vector<typename treedec_traits<T_t>::bag_type> subs;
-        treedec::powerset(bag(*vIt, T), subs);
+        //Search for a clique of size at least 'size' by inspecting all subsets
+        //of size exactly 'size' for size = max+1,max+2,..
+        for(unsigned int size = max+1; size <= bag(*vIt, T).size(); size++){
+            BOOST_AUTO(P, make_subsets_iter(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
+            BOOST_AUTO(I, P.first);
+            bool changed = false;
 
-        for(int i = subs.size()-1; i > 0; i--){
-            if(subs[i].size() <= max){ continue; }
-            if(treedec::app::detail::is_clique<G_t, T_t>(G, subs[i])){
-                max = subs[i].size();
-                global_result = subs[i];
+            for(; I != bag(*vIt, T).end(); ++I){
+                if(treedec::app::detail::is_clique2(G, (*I).first, (*I).second)){
+                    max = size;
+
+                    global_result.clear();
+                    BOOST_AUTO(p, (*I).first);
+
+                    for(; p != (*I).second; p++){
+                        global_result.insert(*p);
+                    }
+
+                    changed = true;
+
+                    //We wouldn't find a larger clique in this loop.
+                    break;
+                }
+            }
+            //This bag doesn't contain a clique larger that 'max'.
+            if(!changed){
                 break;
             }
         }
