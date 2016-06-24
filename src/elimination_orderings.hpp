@@ -308,6 +308,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     size_t newedges;
 
     while(boost::num_edges(G) > 0){
+        INTERRUPTION_POINT;
         //Find a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
         //

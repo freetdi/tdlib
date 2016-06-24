@@ -8,4 +8,8 @@
 #define MOVE(x) x
 #endif
 
+#ifndef INTERRUPTION_POINT
+#define INTERRUPTION_POINT
+#endif
+
 #endif
