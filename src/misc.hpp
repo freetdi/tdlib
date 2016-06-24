@@ -248,7 +248,7 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
 }
 
 template <typename G_t, typename T_t>
-void trivial_decomposition(G_t &G, T_t &T){
+void trivial_decomposition(G_t const &G, T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

@@ -171,6 +171,7 @@ void MSVS(G_t const &G, T_t &T)
         bag_iterator tIt, tEnd;
         bag_descriptor refinement_vertex;
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
+            INTERRUPTION_POINT;
             if(bag(*tIt, T).size() == width+1){
                 disabled_.resize(0);
                 vdMap_.resize(0);
