@@ -12,4 +12,8 @@
 #define INTERRUPTION_POINT
 #endif
 
+#ifndef PROPAGATION_POINT
+#define PROPAGATION_POINT
+#endif
+
 #endif

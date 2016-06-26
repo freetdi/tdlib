@@ -222,10 +222,10 @@ void MSVS(G_t const &G, T_t &T)
     typename treedec_traits<T_t>::bag_type intersection;
 
     while(true){
-        INTERRUPTION_POINT;
         // TODO: propagate results to caller
         width = treedec::get_width(T);
-//        std::cerr << "MSVS " << width << "\n";
+        PROPAGATION_POINT;
+        INTERRUPTION_POINT;
 
         //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
         H.clear();
