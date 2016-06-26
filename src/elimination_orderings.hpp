@@ -58,7 +58,7 @@
 
 #include "graph.hpp"
 #include "fill.hpp"
-#include "std.hpp"
+#include "platform.hpp"
 
 namespace treedec{
 
@@ -166,6 +166,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     unsigned min_ntd = 1; // minimum nontrivial vertex degree
     unsigned upper_bound = 0; // computed, if T
     while(boost::num_edges(G) > 0){
+        INTERRUPTION_POINT;
         assert(min_ntd != num_vert);
 
         // recompute ntd can only increase from here
@@ -308,6 +309,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     size_t newedges;
 
     while(boost::num_edges(G) > 0){
+        INTERRUPTION_POINT;
         //Find a vertex v such that least edges are missing for making the
         //neighbourhood of v a clique.
         //
@@ -405,6 +407,7 @@ void _minDegree_ordering(G_t G,
 {
     unsigned int i = 0;
     while(true){
+        INTERRUPTION_POINT;
         //Search a minimum degree vertex.
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         typename boost::graph_traits<G_t>::vertex_descriptor min_vertex;
