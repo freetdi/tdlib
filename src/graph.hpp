@@ -93,8 +93,12 @@ struct vertex_callback{ //
 template<typename G_t>
 struct edge_callback{ //
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     virtual ~edge_callback(){};
-    virtual void operator()(edge_descriptor)=0;
+    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
+    void operator()(edge_descriptor)
+    { incomplete();
+    }
 };
 
 template<typename G_t>
@@ -102,8 +106,8 @@ struct graph_callback{ // fixme: union of the above?
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     virtual ~graph_callback(){};
-    virtual void operator()(edge_descriptor)=0;
     virtual void operator()(vertex_descriptor)=0;
+    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
 };
 
 //Vertex v will remain as isolated node.
@@ -184,7 +188,7 @@ make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NU
             (*cb)(*nIt1); // hmm
             (*cb)(*nIt2); // hmm
 #endif
-                   (*cb)(ep.first);
+                   (*cb)(*nIt1, *nIt2);
                }
             }
         }
@@ -490,11 +494,11 @@ inline size_t count_missing_edges(
     size_t missing_edges = 0;
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){untested();
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){itested();
         nIt2 = nIt1;
         nIt2++;
-        for(; nIt2 != nEnd; nIt2++){untested();
-            if(!boost::edge(*nIt1, *nIt2, G).second){untested();
+        for(; nIt2 != nEnd; nIt2++){itested();
+            if(!boost::edge(*nIt1, *nIt2, G).second){itested();
                 ++missing_edges;
             }
         }

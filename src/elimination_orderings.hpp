@@ -101,16 +101,16 @@ struct fill_update_cb : public graph_callback<G_t>{
     {
         _fill->q_eval(v);
     }
-    void operator()(edge_descriptor edg)
-    {
-        assert(boost::source(edg, G) < boost::target(edg, G));
+    void operator()(vertex_descriptor v, vertex_descriptor w)
+    { untested();
+        assert(v < w);
         // e has just been inserted.
-        BOOST_AUTO(cni, common_out_edges(boost::source(edg, G), boost::target(edg, G), G));
+        BOOST_AUTO(cni, common_out_edges(v, w, G));
         BOOST_AUTO(i, cni.first);
         BOOST_AUTO(e, cni.second);
         for(; i!=e; ++i){
-            assert(*i != boost::source(edg, G));
-            assert(*i != boost::target(edg, G));
+            assert(*i != v);
+            assert(*i != w);
 //            no. maybe theres only half an edge.
 //            assert(boost::edge(boost::source(edg, G), *i, G).second);
 //            assert(boost::edge(boost::target(edg, G), *i, G).second);
