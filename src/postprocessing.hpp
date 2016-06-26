@@ -275,7 +275,6 @@ void MSVS(G_t const &G, T_t &T)
         for(; x!=disabled.end(); ++x){
             if(*x) ++num_dis;
         }
-        std::cerr<<num_dis << "\n";
         assert(num_dis==2);
 #endif
 
