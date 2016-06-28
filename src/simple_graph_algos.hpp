@@ -27,12 +27,12 @@
 #ifndef TD_SIMPLE_GRAPH_ALGOS
 #define TD_SIMPLE_GRAPH_ALGOS
 
-namespace treedec{
-
 #include <set>
 
 #include <boost/graph/adjacency_list.hpp>
 #include "graph.hpp"
+
+namespace treedec{
 
 //This function is used in the minimalChordal algorithm.
 template <typename G_t>
