@@ -19,7 +19,7 @@ pkginclude_HEADERS = \
   random.hpp \
   separator_algorithm.hpp \
   simple_graph_algos.hpp \
-  std.hpp \
+  platform.hpp \
   trace.hpp \
   upper_bounds.hpp \
   graph.hpp

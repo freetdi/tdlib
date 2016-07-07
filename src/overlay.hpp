@@ -95,7 +95,7 @@ inline IG_t const& immutable_clone(
                 BOOST_AUTO(s, get_pos(*bi, G));
                 BOOST_AUTO(t, get_pos(*vi, G));
                 boost::add_edge(reverse_map[s], reverse_map[t], ig);
-            }else if(s==-1){
+            }else if(s==UINT_MAX){
                 assert(get_pos(*bi, G)!=-1);
                 s = get_pos(*bi, G);
                 t = get_pos(*vi, G);
@@ -104,7 +104,7 @@ inline IG_t const& immutable_clone(
         }
     }
     // HACK. not here.
-    if(s!=-1){
+    if(s!=UINT_MAX){
         cb->a = reverse_map[s];
         cb->b = reverse_map[t];
     }else{

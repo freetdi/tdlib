@@ -1,4 +1,5 @@
 // Lukas Larisch, 2014 - 2016
+// Felix Salfelder, 2016
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -78,18 +79,6 @@ For a proof of correctness of the algorithm below, see e.g.
 
 #include "graph.hpp"
 
-struct Vertex_NF{
-    bool visited;
-    int predecessor;
-};
-
-struct Edge_NF{
-    bool path; //true if a path uses the edge
-};
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS,
-                          boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
-
 namespace treedec{
 
 template<class D>
@@ -102,7 +91,6 @@ void check_dis(D dis, size_t num)
     assert(n==num);
 #endif
 }
-
 
 
 //Copies the induced subgraph of G formed by disabled into diG. The graph diG
@@ -139,11 +127,10 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     //G may be a graph with ids not in range [0, |V(G)|). The maximum id of a
     //vertex in G is disabled.size().
     std::vector<typename digraph_t::vertex_descriptor> internal_idxMap(disabled.size()+3);
-    //needed for linear copy of the edge set of G
+      //needed for linear copy of the edge set of G
 
     assert(boost::num_vertices(G)>=num_dis);
     unsigned num_dig_verts = boost::num_vertices(G)+2-num_dis;
-//    std::cerr << "digaph verts " << num_dig_verts << "\n";
 
     diG.clear();
     // no resize?! roll out own resize... later.
@@ -221,9 +208,6 @@ namespace impl{
     template <typename G_t>
     class disjoint_ways{
     public:
-        // hmm does not work.
-        // disjoint_ways(G_t const& g) : dg(g) {}
-    public:
         typedef typename graph_traits<G_t>::directed_overlay digraph_t;
         typename graph_traits<G_t>::directed_overlay dg;
         typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
@@ -251,6 +235,7 @@ static void make_paths(
         P[i].clear();
     }else{
     }
+
     for(boost::tie(nIt1, nEnd1) = boost::out_edges(source, diG); nIt1!=nEnd1; ++nIt1){
         if(boost::get(&Edge_NF::path, diG, *nIt1)){
             typename digraph_t::vertex_descriptor v = boost::target(*nIt1, diG);
@@ -265,6 +250,7 @@ static void make_paths(
                                 P[i].clear();
                             }else{
                             }
+
                             goto NEXT_ITER;
                         }
                         break;
@@ -302,7 +288,7 @@ static bool t_search_disjoint_ways(
         G_t const &G)
 {
     boost::get(&Vertex_NF::visited, diG, v) = true;
-    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != v;
+    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != (int)v;
 
     //The walk has reached the sink. We can extend the set of disjoint paths by another path.
     if(v == sink){
@@ -376,7 +362,7 @@ static bool t_search_disjoint_ways(
     return false;
 }
 
-// compute disjoint ways in G \ { v | disabled[v] }
+//compute disjoint ways in G \ { v | disabled[v] }
 template <typename G_t>
 bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         unsigned num_dis,
@@ -440,16 +426,16 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
         for(; Pij!=Pi->rend(); ++Pij){
             if(boost::get(&Vertex_NF::visited, diG, *Pij)){
                 S.insert(idxMap[*Pij]);
-                goto there;
+                goto THERE;
             }else{
             }
         }
-        if(Pij==Pi->rend()){
+        if(Pij == Pi->rend()){
             S.insert(idxMap[*Pi->begin()]);
         }else{
         }
-there:
-        ;
+THERE:
+    ;
     }
 
     return true;
@@ -512,7 +498,9 @@ void seperate_vertices(G_t &G, std::vector<bool> &disabled, unsigned num_dis,
         dw=new dw_t;
     }
     assert(dw);
+
     seperate_vertices(G, disabled, num_dis, X, Y, S, UINT_MAX, dw);
+
     if(own){
         delete dw;
     }

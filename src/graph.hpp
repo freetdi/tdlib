@@ -693,15 +693,16 @@ public:
                 return true;
             }
         }
-        // a = vd1;
-        // b = vd2;
+        a = vd1;
+        b = vd2;
+
         return false;
     }
 private: //data
     T_t const &_T;
     typename boost::graph_traits<T_t>::vertex_descriptor _t;
 public: // HACK
-    //unsigned a, b;
+    unsigned a, b;
 };
 
 } // draft
