@@ -317,7 +317,7 @@ void MSVS(G_t const &G, T_t &T)
         boost::clear_vertex(refinement_vertex, T);
 
         //'refinement_vertex' gets |connected_components|-many neighbours, that are new vertices in T.
-        //The bag of neighbours i will be (connected_components[i] v S).
+        //The bag of neighbour i will be (connected_components[i] v S).
         union_S_W_i.resize(components.size());
 
         // FIXME: proper container!

@@ -45,9 +45,6 @@
 #include "platform.hpp"
 #include "trace.hpp"
 
-// OUCH
-//#include "fill.hpp"
-
 #ifndef TD_STRUCT_BAG
 #define TD_STRUCT_BAG
 struct bag{ //
@@ -264,7 +261,9 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     for(; vIt != vEnd; vIt++){
         unsigned int degree = boost::degree(*vIt, G);
         if(degree <= min_degree){
-            if(ignore_isolated_vertices && degree == 0){ continue; }
+            if(ignore_isolated_vertices && degree == 0){
+                continue;
+            }
             min_degree = degree;
             min_vertex = *vIt;
         }
@@ -341,7 +340,7 @@ inline bool is_valid(const vertex_descriptor_G& v, const G& g)
 template<class G>
 struct outedge_set{ //
     typedef std::set<unsigned> type;
-//	typedef std::set type;
+    //typedef std::set type;
 };
 
 // kludge for balu
@@ -353,7 +352,8 @@ struct treedec_chooser{ //
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
 };
 // } deprecate
-//
+
+
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
 
@@ -365,7 +365,6 @@ struct Vertex_NF{
 struct Edge_NF{
     bool path; //true if a path uses the edge
 };
-
 
 #endif
 
@@ -687,6 +686,7 @@ public:
         for(; nIt != nEnd; nIt++){
             BOOST_AUTO(const& ibag, bag(*nIt, _T));
 
+            //return true if {vd1, vd2} subseteq ibag
             if(ibag.find(vd1)==ibag.end()){
             }else if(ibag.find(vd2)==ibag.end()){
             }else{
@@ -701,7 +701,7 @@ private: //data
     T_t const &_T;
     typename boost::graph_traits<T_t>::vertex_descriptor _t;
 public: // HACK
-    unsigned a, b;
+    //unsigned a, b;
 };
 
 } // draft
@@ -742,4 +742,5 @@ namespace noboost{
 } // noboost
 
 #endif // guard
+
 // vim:ts=8:sw=4:et
