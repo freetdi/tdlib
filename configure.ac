@@ -92,6 +92,7 @@ AC_C_INLINE
 
 if test "$enable_debug" = "yes" ; then
 	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
+	CXXFLAGS="$CXXFLAGS -Wall -Wextra"
 else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
