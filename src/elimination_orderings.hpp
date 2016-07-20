@@ -132,11 +132,11 @@ namespace impl {
 #if __cplusplus >= 201103L
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T=NULL)
+   minDegree_decomp(G_t &G, T_t *T=NULL, unsigned ub = UINT_MAX)
 #else
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T)
+   minDegree_decomp(G_t &G, T_t *T, unsigned ub = UINT_MAX)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -176,6 +176,12 @@ typename boost::graph_traits<G_t>::vertices_size_type
         }
         boost::tie(c, min_ntd) = degs.pick_min(min_ntd, num_vert);
         assert(min_ntd == boost::degree(c,G));
+
+        //Abort if the width of this decomposition would be larger than 'ub'.
+        if(min_ntd > ub){
+            T->clear();
+            return UINT_MAX;
+        }
 
         adjacency_iterator I, E;
         for(boost::tie(I, E) = boost::adjacent_vertices(c, G); I!=E; ++I){
@@ -251,7 +257,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
-void minDegree_decomp(G_t &G, T_t &T){
+void minDegree_decomp(G_t &G, T_t &T, unsigned ub = UINT_MAX){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
@@ -261,7 +267,7 @@ void minDegree_decomp(G_t &G, T_t &T){
                               typename treedec_traits<T_t>::bag_type> > bags;
 
     treedec::impl::Islet(G, bags);
-    impl::minDegree_decomp(G, &T);
+    impl::minDegree_decomp(G, &T, ub);
     treedec::glue_bags(bags, T);
 }
 
@@ -274,11 +280,11 @@ namespace impl{
 #if __cplusplus >= 201103L
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type>
 typename boost::graph_traits<G_t>::vertices_size_type
-   fillIn_decomp(G_t &G, T_t *T=NULL)
+   fillIn_decomp(G_t &G, T_t *T=NULL, unsigned ub = UINT_MAX)
 #else
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   fillIn_decomp(G_t &G, T_t *T)
+   fillIn_decomp(G_t &G, T_t *T, unsigned ub = UINT_MAX)
 #endif
 { untested();
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -317,7 +323,14 @@ typename boost::graph_traits<G_t>::vertices_size_type
         boost::tie(v, min_fill) = fill.pick_min(0, -1, true);
         fill.check();
         assert(is_valid(v,G));
+
         BOOST_AUTO(deg, boost::degree(v, G));
+
+        //Abort if the width of this decomposition would be larger than 'ub'.
+        if(deg > ub){
+            T->clear();
+            return UINT_MAX;
+        }
 
         if(T){
             assert(i<bags.size());
@@ -383,7 +396,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic.
 template <typename G_t, typename T_t>
-void fillIn_decomp(G_t &G, T_t &T){
+void fillIn_decomp(G_t &G, T_t &T, unsigned ub = UINT_MAX){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
@@ -393,7 +406,7 @@ void fillIn_decomp(G_t &G, T_t &T){
                               typename treedec_traits<T_t>::bag_type> > bags;
 
     treedec::impl::Islet(G, bags);
-    impl::fillIn_decomp(G, &T);
+    impl::fillIn_decomp(G, &T, ub);
     treedec::glue_bags(bags, T);
 }
 
