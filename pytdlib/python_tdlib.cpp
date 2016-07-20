@@ -144,8 +144,8 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
 /* PREPROCESSING */
 
 int gc_preprocessing(std::vector<unsigned int> &V_G,
-		               std::vector<unsigned int> &E_G,
-							std::vector<std::vector<int> > &bags, int lb)
+                     std::vector<unsigned int> &E_G,
+                     std::vector<std::vector<int> > &bags, int lb)
 {
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
@@ -343,6 +343,38 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
     TD_tree_dec_t T;
     treedec::separator_algorithm(G, T);
     treedec::make_small(T);
+    make_python_decomp(T, V_T, E_T);
+    return treedec::get_width(T);
+}
+
+
+int gc_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+    treedec::minDegree_decomp(G, T);
+
+    treedec::make_small(T);
+
+    make_python_decomp(T, V_T, E_T);
+    return treedec::get_width(T);
+}
+
+
+int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                      std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+    treedec::fillIn_decomp(G, T);
+
+    treedec::make_small(T);
+
     make_python_decomp(T, V_T, E_T);
     return treedec::get_width(T);
 }

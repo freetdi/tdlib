@@ -69,6 +69,12 @@ This module containes the following functions** :
     - seperator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
 
+    - minDegree_decomp
+        Computes a tree decomposition according to the minDegree-heuristic
+
+    - fillIn_decomp
+        Computes a tree decomposition according to the minFill-heuristic
+
     - minDegree_ordering
         Computes an elimination ordering according to the minDegree-heuristic
 
@@ -79,9 +85,13 @@ This module containes the following functions** :
         Possibly reduces the width of a given tree decomposition with help 
         of minimal seperating vertex sets
 
-    - minimalChordal
+    - minimalChordal_ordering
         Possibly reduces the width of a given tree decomposition by 
-        triangulation minimization
+        triangulation minimization. Input: elimination ordering
+
+    - minimalChordal_decomp
+        Possibly reduces the width of a given tree decomposition by 
+        triangulation minimization. Input: tree decomposition
 
     #- random_branch_and_bound
 
@@ -93,7 +103,7 @@ This module containes the following functions** :
 
     - max_vertex_cover_with_treedecomposition
 
-    #- min_dominating_set_with_treedecomposition
+    - min_dominating_set_with_treedecomposition
 
     #- min_feedback_vertex_set_with_treedecomposition
 
@@ -640,6 +650,76 @@ def seperator_algorithm(V, E):
     return V_T_, E_T, get_width(V_T, E_T)
 
 
+def minDegree_decomp(V, E):
+    """
+    Computes a tree decomposition of a given graph based on the minDegree heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.minDegree_decomp(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_minDegree_decomp(V_G, E_G, V_T, E_T);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
+
+def fillIn_decomp(V, E):
+    """
+    Computes a tree decomposition of a given graph based on the fillIn heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.fillIn_decomp(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_fillIn_decomp(V_G, E_G, V_T, E_T);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
+
 def minDegree_ordering(V, E):
     """
     Computes an elimination ordering of a given graph based on the minDegree 
@@ -758,8 +838,7 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
     return V_T, E_T, new_width
 
-
-def minimalChordal(V, E, O):
+def minimalChordal_ordering(V, E, O):
     """
     Returns an alternative elimination ordering E' than the given elimination 
     ordering E, which may cause a lower width than E, when applied to the
@@ -781,8 +860,9 @@ def minimalChordal(V, E, O):
 
     EXAMPLES:
 
+        O1 = [i for i in range(0, len(V))]
         V_T1, E_T1, w1 = tdlib.ordering_to_treedec(V_G, E_G, O1)
-        O2 = tdlib.minimalChordal(V_G, E_G, O1)
+        O2 = tdlib.minimalChordal_ordering(V_G, E_G, O1)
         V_T2, E_T2, w2 = tdlib.ordering_to_treedec(V_G, E_G, O2)
     """
 
@@ -804,6 +884,38 @@ def minimalChordal(V, E, O):
         py_new_elim_ordering.append(labels_map[py_new_elim_ordering_[i]])
 
     return py_new_elim_ordering
+
+def minimalChordal_decomp(V_G, E_G, V_T, E_T):
+    """
+    Returns an alternative elimination ordering E' than the given elimination 
+    ordering E, which may cause a lower width than E, when applied to the
+    input graph for computing a tree decomposition.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    - V_T : a list of vertices of the input treedecomposition
+
+    - E_T : a list of edges of the input treedecomposition
+
+    OUTPUT:
+
+    - A tree decomposition of G of possibly lower width than the 
+      input treedecomposition.
+
+    EXAMPLES:
+
+        V_T1, E_T1, w1 = tdlib.minDegree_decomp(V_G, E_G)
+        V_T2, E_T2, w2 = tdlib.minimalChordal_decomp(V_G, E_G, V_T1, E_T1)
+    """
+
+    O1 = treedec_to_ordering(V_T, E_T)
+    O2 = minimalChordal_ordering(V_G, E_G, O1)
+
+    return ordering_to_treedec(V_G, E_G, O2)
 
 
 ##############################################################

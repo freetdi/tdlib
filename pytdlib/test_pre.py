@@ -27,56 +27,36 @@ class TestTdLib_pre(unittest.TestCase):
 
     def test_PP_MD(self):
         V, E, lb = tdlib.PP_MD(V_P6, E_P6)
-        self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
-        self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E) == 0, True)
         self.assertEqual(lb, 1)
 
         V, E, lb = tdlib.PP_MD(V_K5, E_K5)
-        self.assertEqual(V, [[0, 1, 2, 3, 4]])
-        self.assertEqual(E, [])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E) == 0, True)
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
-        self.assertEqual(V, [[1, 4, 7, 8, 9], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], \
-                             [1, 6, 8, 9], [1, 2, 3, 7], [0, 1, 4, 5]])
-        self.assertEqual(E, [0, 1, 0, 2, 0, 3, 2, 4, 1, 5])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E) == 0, True)
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
-        self.assertEqual(V, [[3, 5, 6, 8, 12, 14, 16], [3, 5, 6, 8, 10, 12, 14], \
-                             [1, 3, 5, 6, 8, 12, 14], [6, 10, 14, 17], \
-                             [8, 10, 12, 15], [6, 8, 13, 16], [5, 11, 12, 16], \
-                             [3, 9, 14, 16], [1, 7, 12, 14], [3, 4, 5, 10], \
-                             [1, 2, 3, 8], [0, 1, 5, 6]])
-        self.assertEqual(E, [0, 1, 0, 2, 1, 3, 1, 4, 0, 7, 2, 8, 1, 9, 2, \
-                             10, 2, 11, 0, 6, 0, 5])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E) == 0, True)
         self.assertEqual(lb, 6)
 
     def test_PP_FI_TM(self):
         V, E, lb = tdlib.PP_FI_TM(V_P6, E_P6)
-        self.assertEqual(V, [[4, 5], [3, 4], [2, 3], [1, 2], [0, 1]])
-        self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E) == 0, True)
         self.assertEqual(lb, 1)
 
         V, E, lb = tdlib.PP_FI_TM(V_K5, E_K5)
-        self.assertEqual(V, [[0, 1, 2, 3, 4]])
-        self.assertEqual(E, [])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E) == 0, True)
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_FI_TM(V_Petersen, E_Petersen)
-        self.assertEqual(V, [[0, 1, 4, 5], [1, 4, 5, 7, 8], [1, 3, 4, 7, 8], \
-                             [1, 4, 7, 8, 9], [1, 2, 3, 7], [1, 6, 8, 9]])
-        self.assertEqual(E, [1, 2, 1, 3, 2, 4, 3, 5, 1, 0])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E) == 0, True)
         self.assertEqual(lb, 4)
 
         V, E, lb = tdlib.PP_FI_TM(V_Pappus, E_Pappus)
-        self.assertEqual(V, [[0, 1, 5, 6], [1, 3, 5, 6, 8, 12, 14], \
-                             [3, 5, 6, 8, 10, 12, 14], [3, 5, 6, 8, 12, 14, 16], \
-                             [1, 2, 3, 8], [3, 4, 5, 10], [1, 7, 12, 14], \
-                             [3, 9, 14, 16], [5, 11, 12, 16], [6, 8, 13, 16], \
-                             [8, 10, 12, 15], [6, 10, 14, 17]])
-        self.assertEqual(E, [1, 2, 1, 3, 2, 5, 1, 6, 3, 7, 3, 8, 3, 9, 2, \
-                             10, 2, 11, 1, 4, 1, 0])
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E) == 0, True)
         self.assertEqual(lb, 6)
 
 
