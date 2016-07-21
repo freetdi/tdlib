@@ -1,5 +1,7 @@
+- fix is_valid_td semantics
 - cleanup interfaces
-- remove TD_ prefixed files
 - release 1.0
 - provide meta heuristic for treewidth
 - parallelize exact_cutset?
+- solvers as (callable/extensible) classes
+- more treedecomposition structures
