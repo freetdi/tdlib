@@ -314,7 +314,7 @@ inline unsigned int get_pos(const typename boost::graph_traits<G_t>::vertex_desc
 // return "id" where the vertex_descriptor might make more sense.
 // (transitional interface)
 template<typename G>
-inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
+inline unsigned get_vd(const G&, const vertex_descriptor_G& v )
 {
     // works with "TD_graph_t" (augmented adj_list)
     //return g[v].id;
@@ -323,7 +323,7 @@ inline unsigned get_vd(const G& g, const vertex_descriptor_G& v )
 
 // test if v is a valid vertex_descriptor of g
 template<typename G>
-inline bool is_valid(const vertex_descriptor_G& v, const G& g)
+inline bool is_valid(const vertex_descriptor_G&, const G&)
 {untested();
     // base case: don't know. lets say yes (better in assertions)
     return true;

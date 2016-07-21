@@ -274,8 +274,12 @@ public: // picking
     //     return *_fill[fill].begin();
     // }
     // pick a minimum fill vertex within fill range [lower, upper]
-    std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0, unsigned upper=-1, bool erase=false)
+    std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0,
+            unsigned upper=-1u, bool erase=false)
     {
+        if(upper==-1u){
+            incomplete();
+        }
         BOOST_AUTO(fp, _fill.begin());
         if(_fill.empty() || fp->first){
 
@@ -352,7 +356,8 @@ public: // picking
         assert(treedec::is_valid(b->second, _g));
 
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), b->second);
-        assert(_vals[pos].value!=-1); (void)pos;
+        (void)pos;
+        assert(!_vals[pos].is_unknown());
         assert(_vals[pos]==b->first);
 
         BOOST_AUTO(p, std::make_pair(b->second, b->first));

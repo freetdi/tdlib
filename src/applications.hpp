@@ -546,7 +546,7 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
 
 namespace detail{
 
-static void all_k_colorings(unsigned int n, unsigned int k,
+static void all_k_colorings(unsigned int /*n*/, unsigned int k,
         std::set<unsigned int> &M, std::vector<std::vector<int> > &colorings,
         std::vector<int> &pattern)
 {
