@@ -137,8 +137,8 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         }
 #endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-        //true = ignore isolated vertices
-        treedec::ordering_to_treedec(G, new_elim_ordering, T, true);
+
+        treedec::ordering_to_treedec(G, new_elim_ordering, T);
     }
 
     treedec::glue_bags(bags, T);

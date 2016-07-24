@@ -705,7 +705,11 @@ void glue_bags(std::vector< boost::tuple<
     for(unsigned int i = bags.size(); i > 0; i--){
         typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
         typename treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
-
+/*
+        if(ignore_isolated_vertices && second.empty()){
+            continue;
+        }
+*/
         glue_bag(second, first, T);
     }
 }
