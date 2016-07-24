@@ -123,9 +123,61 @@ private:
     fill_type* _fill;
     G_t const& G;
 };
+
 }// detail
 
-namespace impl {
+namespace detail{
+
+template <typename G_t, typename T_t, typename B_t, typename O_t>
+void skeletal_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
+{
+    typedef typename treedec_traits<T_t>::bag_type bag_type;
+
+    //i+1 is a hack here: since isolated vertices dont occur in elim_vertices,
+    //they are asked for their value in inv_elim_vertices while computing
+    //the some minimum, we set the default value to max{elim_verties()}.
+    std::vector<unsigned int> inv_O(boost::num_vertices(G), n_+1);
+    for(unsigned u = 0; u < n_; u++){
+        typename treedec_chooser<G_t>::value_type e=O[u];
+        unsigned pos = get_pos(e, G);
+        inv_O[pos] = u;
+    }
+
+    //Bag for the u-th elimination vertex will be stored in T[u].
+    for(unsigned u = 0; u < n_; u++){
+        boost::add_vertex(T);
+    }
+
+    //Since we made the neighbourhood N of the u-th vertex a clique,
+    //the bag of the neighbour of this vertex with lowest elimination index
+    //will have N as a subset.
+    unsigned max = n_-1u;
+    for(unsigned u = 0; u < max; u++){
+        unsigned min_index = max; //note: if there's an empty bag, we can glue it with an arbitrary bag.
+        for(typename bag_type::iterator bIt = B[u].begin(); bIt != B[u].end(); bIt++){
+           unsigned pos = get_pos(*bIt, G);
+           unsigned index = inv_O[pos];
+           if(index < min_index){
+               min_index = index;
+           }
+        }
+        assert(min_index < n_);
+        //(min_index, u) will lead to a connected directed graph, if G_t is
+        //directed.
+        boost::add_edge(min_index, u, T);
+    }
+
+    //Bag for the u-th elimination vertex will be stored in T[u].
+    for(unsigned u = 0; u < n_; u++){
+        bag(u, T) = MOVE(B[u]);
+        bag(u, T).insert(O[u]); //printer variant without this inserting?
+    }
+}
+
+} //namespace detail
+
+
+namespace impl{
 
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
@@ -152,7 +204,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     typename boost::graph_traits<G_t>::vertices_size_type num_vert=boost::num_vertices(G);
     if(T){
         bags.resize(num_vert);
-        elim_vertices.resize(num_vert);
+        elim_vertices.resize(num_vert); //note: elim_verties will not include all vertices in G!
     }else{
     }
 
@@ -232,13 +284,13 @@ typename boost::graph_traits<G_t>::vertices_size_type
     assert(boost::num_edges(G)==0);
 
 
+    //Build a treedecomposition.
     if(T){
-        for(; i > 0; i--){
-            typename treedec_chooser<G_t>::value_type e=elim_vertices[i-1];
-            glue_bag(bags[i-1], e, *T);
-        }
+        treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, i);
+
         return 0;
-    }else{
+    }
+    else{
         return upper_bound;
     }
 }
@@ -268,7 +320,7 @@ void minDegree_decomp(G_t &G, T_t &T, unsigned ub = UINT_MAX){
 
     treedec::impl::Islet(G, bags);
     impl::minDegree_decomp(G, &T, ub);
-    treedec::glue_bags(bags, T);
+    treedec::glue_bags(bags, T); //O(1) since every vertex in T contains the empty bag.
 }
 
 
