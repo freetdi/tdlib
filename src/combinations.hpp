@@ -264,7 +264,7 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
         treedec::induced_subgraph(G_, G, components[i], vdMap);
         T_t T_;
 
-        while(!treedec::exact_cutset(G, T_, lb)){
+        while(!treedec::exact_cutset(G_, T_, lb)){
             lb++;
             if(lb > k){
                 return false;
