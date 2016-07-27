@@ -40,6 +40,7 @@
 namespace misc {
 
 namespace detail {
+
 template<class G_t>
 struct deg_config{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
@@ -53,10 +54,50 @@ struct deg_config{
     static void alloc_init(size_t){
     }
     static unsigned num_threads(){return 1;}
-};
-} // detail
 
-template<class G_t, class CFG=detail::deg_config<G_t> >
+    template <typename C_t>
+    static pick(unsigned degree, C_t &C){
+        return *C[degree].begin();
+    }
+};
+
+template<class G_t>
+struct random_deg_config : deg_config<G_t>{
+    static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
+    static boost::random::uniform_int_distribution<> _dist;
+    static unsigned _rnd, _which;
+
+    static bool coin(){
+        if(!_which){
+            std::cout << "new rnd" << std::endl;
+            _rnd=_dist(_rnd_gen);
+            _which=1;
+        }
+        std::cout << "_which:" << _which << std::endl;
+        bool coin = _rnd & _which;
+        _which <<= 1;
+
+        return coin;
+    }
+
+    template <typename C_t>
+    static pick(unsigned degree, C_t &C){
+        bool c = coin();
+        if(c){
+            return *C[degree].begin();
+        }
+        else{
+            return *C[degree].rbegin();
+        }
+    }
+};
+
+
+
+} // namespace detail
+
+template<class G_t, class CFG=detail::random_deg_config<G_t> >
+//template<class G_t, class CFG=detail::deg_config<G_t> >
 class DEGS{
     DEGS(const DEGS&)
     { untested();
@@ -73,16 +114,13 @@ public: // types
     typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
 
 public: // construct
-    DEGS(const G_t &g, bool random=false): _degs(boost::num_vertices(g)), _g(g), _random(random)
+    DEGS(const G_t &g, bool random=false): _degs(boost::num_vertices(g)), _g(g)
     {
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
         }
-    if(random){ std::cout << "const;random=true" << std::endl; }
-        _rnd_gen.seed(static_cast<unsigned int>(std::time(0)));
-        _which = 0;
     }
 
 public: // queueing
@@ -115,35 +153,11 @@ public: // queueing
     {
     }
 
-private:
-    bool coin(){
-        if(_random){
-            if(!_which){
-                std::cout << "new rnd" << std::endl;
-                _rnd=_dist(_rnd_gen);
-                _which=1;
-            }
-            std::cout << "_which:" << _which << std::endl;
-            bool coin = _rnd & _which;
-            _which <<= 1;
-
-            return coin;
-        }
-        else{
-            return true;
-        }
-    }
-
 public: // picking
+
     vertex_descriptor pick(unsigned degree)
     {
-        bool c = coin();
-        if(c){
-            return *_degs[degree].begin();
-        }
-        else{
-            return *_degs[degree].rbegin();
-        }
+        return CFG::pick(degree, _degs);
     }
 
     // pick a minimum degree vertex within degree range [lower, upper]
@@ -155,14 +169,9 @@ public: // picking
             // (this loop should be safe)
             assert(lower != upper+1);
         }
-        bool c = coin();
         vertex_descriptor min_nv;
-        if(c){// std::cout << "1" << std::endl;
-            min_nv = *_degs[lower].begin();
-        }
-        else{// std::cout << "0" << std::endl;
-            min_nv = *_degs[lower].rbegin();
-        }
+        min_nv = CFG::pick(lower, _degs);
+
         return std::make_pair(min_nv, lower);
     }
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower, unsigned upper, bool erase)
@@ -230,10 +239,6 @@ private:
 
 //private: // later.
     container_type _degs;
-    boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
-    boost::random::uniform_int_distribution<> _dist;
-    unsigned _rnd, _which;
-    bool _random;
 
 private:
     const G_t& _g;

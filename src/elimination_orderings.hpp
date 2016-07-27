@@ -48,9 +48,8 @@
 #include <cmath>
 #include <climits>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 #include "trace.hpp"
 #include "preprocessing.hpp"
