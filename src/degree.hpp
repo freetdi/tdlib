@@ -56,13 +56,15 @@ struct deg_config{
     static unsigned num_threads(){return 1;}
 
     template <typename C_t>
-    static pick(unsigned degree, C_t &C){
+    static vd_type pick(unsigned degree, C_t &C){
         return *C[degree].begin();
     }
 };
 
 template<class G_t>
-struct random_deg_config : deg_config<G_t>{
+struct random_deg_config : public deg_config<G_t>{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
+
     static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
     static boost::random::uniform_int_distribution<> _dist;
     static unsigned _rnd, _which;
@@ -81,7 +83,7 @@ struct random_deg_config : deg_config<G_t>{
     }
 
     template <typename C_t>
-    static pick(unsigned degree, C_t &C){
+    static vd_type pick(unsigned degree, C_t &C){
         bool c = coin();
         if(c){
             return *C[degree].begin();
