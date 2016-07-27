@@ -56,6 +56,8 @@
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 
+#include "new_minimum_degree_ordering.hpp"
+
 #include "graph.hpp"
 #include "fill.hpp"
 #include "platform.hpp"
@@ -186,11 +188,11 @@ namespace impl{
 #if __cplusplus >= 201103L
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL, unsigned ub=UINT_MAX, bool random=false)
+   minDegree_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL, unsigned ub=UINT_MAX)
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T, O_t *O, unsigned ub=UINT_MAX, bool random=false)
+   minDegree_decomp(G_t &G, T_t *T, O_t *O, unsigned ub=UINT_MAX)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -250,19 +252,16 @@ typename boost::graph_traits<G_t>::vertices_size_type
         assert(min_ntd == boost::degree(c,G));
 
         //Abort if the width of this decomposition would be larger than 'ub'.
-        if(min_ntd > ub){
+        if(min_ntd >= ub){
             T->clear();
             throw exception_unsuccessful();
         }
 
         if(T){
             bags_i = &bags[i];
-            elim_vertices[i] = get_vd(G, c); 
+            elim_vertices[i] = get_vd(G, c);
+            upper_bound = (min_ntd > upper_bound)? min_ntd : upper_bound;
         }
-        else if(min_ntd > upper_bound){
-            upper_bound = min_ntd;
-        }
-        else{}
 
         ++i; // number of nodes in tree decomposition tree
 
@@ -271,9 +270,6 @@ typename boost::graph_traits<G_t>::vertices_size_type
             assert(*I!=c); // no self loops...
             vertex_descriptor w=*I;
             degs.unlink(w);
-            if(T && boost::degree(w, G) == 1){ //isolated vertex after detaching.
-                elim_vertices[i++] = get_vd(G, w);
-            }
         }
 
         make_clique_and_detach(c, G, *bags_i);
@@ -286,7 +282,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
             bags_i->clear();
         }
 
-        degs.unlink(c, min_ntd);
+        degs.unlink(c);
+        //degs.unlink(c, min_ntd); //does not work?!
 
         assert(boost::degree(c, G)==0);
 
@@ -302,29 +299,26 @@ typename boost::graph_traits<G_t>::vertices_size_type
     if(T){
         assert(i == num_vert);
         treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
+    }
 
-        return 0;
-    }
-    else{
-        return upper_bound;
-    }
+    //std::cout << "return " << upper_bound << std::endl;
+    return upper_bound;
 }
 
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-  minDegree_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX, bool random=false)
+  minDegree_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX)
 {
-    return minDegree_decomp(G, T, (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL, ub, random);
+    return minDegree_decomp(G, T, (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL, ub);
 
 }
 
 #if __cplusplus < 201103L
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G,bool random=false)
+   minDegree_decomp(G_t &G)
 {
-    return minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL,
-                            random);
+    return minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }
 #endif
 
@@ -333,9 +327,10 @@ typename boost::graph_traits<G_t>::vertices_size_type
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
-void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool random=false)
+typename boost::graph_traits<G_t>::vertices_size_type
+    minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
 {
-    impl::minDegree_decomp(G, &T, ub, random);
+    return impl::minDegree_decomp(G, &T, ub);
 }
 
 namespace impl{
@@ -1035,14 +1030,76 @@ void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
 
 template <typename G_t, typename T_t>
 void boost_minDegree_decomp(G_t &G, T_t &T){
-    boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> H;
+    //boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> H;
 
-    boost::copy_graph(G, H);
+    //boost::copy_graph(G, H);
 
     std::vector<int> O;
     boost_minDegree_ordering(G, O);
 
-    ordering_to_treedec(H, O, T);
+    //ordering_to_treedec(H, O, T);
+}
+
+template <typename G_t, typename T_t>
+int boost_new_minDegree_ordering(G_t &G, T_t &T){
+    boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, Vertex> H, J;
+
+    unsigned  n = boost::num_vertices(G);
+
+    boost::copy_graph(G, J);
+
+    std::vector<int> inverse_perm(n, 0);
+    std::vector<int> perm(n, 0);
+    std::vector<int> supernode_sizes(n, 1);
+    typename boost::property_map<G_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, G);
+    std::vector<int> degree(n, 0);
+
+    unsigned w = new_::minimum_degree_ordering
+             (G,
+              boost::make_iterator_property_map(&degree[0], id, degree[0]),
+              &inverse_perm[0],
+              &perm[0],
+              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+              id);
+
+/*
+    boost::copy_graph(G, H);
+
+    unsigned max = 0;
+    for(unsigned int o = 0; o < n; o++){
+        max = (boost::degree(perm[o], H) > max)? boost::degree(perm[o], H) : max;
+        make_clique(boost::adjacent_vertices(perm[o], H), H);
+        clear_vertex(perm[o], H);
+        
+    }
+    std::cout << "width after conversion: " << max << std::endl;
+
+    if(max != w){ exit(-1);
+    }
+*/
+    //ordering_to_treedec(H, perm, T);
+    //std::cout << "width after conversion: " << treedec::get_width(T) << std::endl;
+
+
+}
+
+template <typename G_t, typename T_t>
+void endless_minDegree_decomp(G_t &G, T_t &T){
+    unsigned best = UINT_MAX;
+    T_t U;
+    while(true){
+        try{
+            G_t H(G);
+
+            best = treedec::minDegree_decomp(H, T, best);
+            std::cout << "best: " << best << std::endl;
+            if(best == 0) exit(-1);
+            U = T;
+        }
+        catch(...){
+            //std::cout << "exception" << std::endl;
+        }
+    }
 }
 
 } //namespace treedec

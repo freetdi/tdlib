@@ -22,4 +22,5 @@ pkginclude_HEADERS = \
   simple_graph_algos.hpp \
   trace.hpp \
   upper_bounds.hpp \
-  graph.hpp
+  graph.hpp \
+  new_minimum_degree_ordering.hpp
