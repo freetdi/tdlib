@@ -204,7 +204,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     bag_type* bags_i=&bag_i;
     std::vector<my_vd> elim_vertices;
 
-    degs_type degs(G);
+    degs_type degs(G, random);
     const degs_type& cdegs(degs);
 
     typename boost::graph_traits<G_t>::vertices_size_type num_vert=boost::num_vertices(G);
@@ -333,7 +333,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
-void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool random=false){
+void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool random=false)
+{
     impl::minDegree_decomp(G, &T, ub, random);
 }
 

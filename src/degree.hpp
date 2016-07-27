@@ -27,6 +27,10 @@
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <ctime>
+
 #if __cplusplus >= 201103L
 # include <stx/btree_set>
 #endif
@@ -69,13 +73,16 @@ public: // types
     typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
 
 public: // construct
-    DEGS(const G_t &g): _degs(boost::num_vertices(g)), _g(g)
+    DEGS(const G_t &g, bool random=false): _degs(boost::num_vertices(g)), _g(g), _random(random)
     {
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             _degs[boost::degree(*vIt, g)].insert(*vIt);
         }
+    if(random){ std::cout << "const;random=true" << std::endl; }
+        _rnd_gen.seed(static_cast<unsigned int>(std::time(0)));
+        _which = 0;
     }
 
 public: // queueing
@@ -108,13 +115,39 @@ public: // queueing
     {
     }
 
+private:
+    bool coin(){
+        if(_random){
+            if(!_which){
+                std::cout << "new rnd" << std::endl;
+                _rnd=_dist(_rnd_gen);
+                _which=1;
+            }
+            std::cout << "_which:" << _which << std::endl;
+            bool coin = _rnd & _which;
+            _which <<= 1;
+
+            return coin;
+        }
+        else{
+            return true;
+        }
+    }
+
 public: // picking
     vertex_descriptor pick(unsigned degree)
     {
-        return *_degs[degree].begin();
+        bool c = coin();
+        if(c){
+            return *_degs[degree].begin();
+        }
+        else{
+            return *_degs[degree].rbegin();
+        }
     }
+
     // pick a minimum degree vertex within degree range [lower, upper]
-    std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
+    std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1)
     {
         while(_degs[lower].empty()){
             ++lower;
@@ -122,7 +155,14 @@ public: // picking
             // (this loop should be safe)
             assert(lower != upper+1);
         }
-        vertex_descriptor min_nv=*_degs[lower].begin();
+        bool c = coin();
+        vertex_descriptor min_nv;
+        if(c){// std::cout << "1" << std::endl;
+            min_nv = *_degs[lower].begin();
+        }
+        else{// std::cout << "0" << std::endl;
+            min_nv = *_degs[lower].rbegin();
+        }
         return std::make_pair(min_nv, lower);
     }
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower, unsigned upper, bool erase)
@@ -190,6 +230,10 @@ private:
 
 //private: // later.
     container_type _degs;
+    boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
+    boost::random::uniform_int_distribution<> _dist;
+    unsigned _rnd, _which;
+    bool _random;
 
 private:
     const G_t& _g;
