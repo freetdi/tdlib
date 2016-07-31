@@ -23,4 +23,6 @@ pkginclude_HEADERS = \
   trace.hpp \
   upper_bounds.hpp \
   graph.hpp \
-  new_minimum_degree_ordering.hpp
+  new_minimum_degree_ordering.hpp \
+  bucket_sorter.hpp \
+  random_generators.hpp

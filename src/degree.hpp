@@ -27,15 +27,9 @@
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <ctime>
-
 #if __cplusplus >= 201103L
 # include <stx/btree_set>
 #endif
-
-#include "trace.hpp"
 
 namespace misc {
 
@@ -61,64 +55,24 @@ struct deg_config{
     }
 };
 
-static bool coin(){
-    static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
-    static boost::random::uniform_int_distribution<> _dist;
-    static unsigned _rnd, _which;
-
-    _rnd_gen.seed(static_cast<unsigned int>(std::time(0)));
-
-    if(!_which){
-        _rnd=_dist(_rnd_gen);
-        _which=1;
-    }
-    bool c = _rnd & _which;
-    _which <<= 1;
-
-    return c;
-}
-
 template<class G_t>
 struct random_deg_config : public deg_config<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
 
     template <typename C_t>
     static vd_type pick(unsigned degree, C_t &C){
-        bool c = coin();
-        if(c){ //std::cout << "true" << std::endl;
+        bool c = treedec::random::coin();
+        if(c){
             return *C[degree].begin();
         }
-        else{ //std::cout << "false" << std::endl;
+        else{
             return *C[degree].rbegin();
-        }
-    }
-};
-
-template<class G_t>
-struct more_random_deg_config : public deg_config<G_t>{
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
-
-    typedef std::set<vd_type> bag_type;
-
-    template <typename C_t>
-    static vd_type pick(unsigned degree, C_t &C){
-        bool c = coin();
-        if(c){ //std::cout << "true" << std::endl;
-            typename bag_type::iterator it;
-            for(it = C[degree].begin(); coin() && it != C[degree].end(); it++);
-            return *it;
-        }
-        else{ //std::cout << "false" << std::endl;
-            typename bag_type::reverse_iterator it;
-            for(it = C[degree].rbegin(); coin() && it != C[degree].rend(); it++);
-            return *it;
         }
     }
 };
 
 } // namespace detail
 
-//template<class G_t, class CFG=detail::more_random_deg_config<G_t> >
 template<class G_t, class CFG=detail::random_deg_config<G_t> >
 //template<class G_t, class CFG=detail::deg_config<G_t> >
 class DEGS{
@@ -151,8 +105,6 @@ public: // queueing
     {
         int n=_degs[d].erase(v);
         (void)n;
-        if(boost::degree(v, _g) != d){ std::cout << "assert fail: " << boost::degree(v, _g) << ", " << d << std::endl; }
-        assert(boost::degree(v, _g) == d);// no (but why?)
         assert(n==1);
     }
     void unlink(const vertex_descriptor& v)

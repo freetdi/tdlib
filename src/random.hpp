@@ -18,8 +18,8 @@
 //
 //
 
-
 #ifndef TD_RANDOM
+#define TD_RANDOM
 
 #include <vector>
 #include <algorithm>    // std::random_shuffle
@@ -30,8 +30,6 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
-#include "elimination_orderings.hpp"
 
 namespace treedec{
 

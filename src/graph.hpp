@@ -41,9 +41,13 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "degree.hpp"
-#include "platform.hpp"
 #include "trace.hpp"
+
+#include "random_generators.hpp"
+#include "degree.hpp"
+
+#include "platform.hpp"
+
 
 // OUCH
 //#include "fill.hpp"

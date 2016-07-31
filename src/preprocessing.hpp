@@ -44,7 +44,7 @@
 #include <vector>
 #include <set>
 #include <boost/tuple/tuple.hpp>
-#include "degree.hpp"
+
 #include "graph.hpp"
 #include "misc.hpp"
 

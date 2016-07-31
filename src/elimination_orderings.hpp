@@ -52,16 +52,14 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include "trace.hpp"
-#include "preprocessing.hpp"
-#include "simple_graph_algos.hpp"
-#include "misc.hpp"
-
-#include "new_minimum_degree_ordering.hpp"
-
 #include "graph.hpp"
 #include "fill.hpp"
 #include "platform.hpp"
+
+#include "preprocessing.hpp"
+#include "simple_graph_algos.hpp"
+#include "misc.hpp"
+#include "new_minimum_degree_ordering.hpp"
 
 namespace treedec{
 
@@ -207,7 +205,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     bag_type* bags_i=&bag_i;
     std::vector<my_vd> elim_vertices;
 
-    degs_type degs(G, random);
+    degs_type degs(G);
     const degs_type& cdegs(degs);
 
     typename boost::graph_traits<G_t>::vertices_size_type num_vert=boost::num_vertices(G);
@@ -283,8 +281,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
             bags_i->clear();
         }
 
-        degs.unlink(c);
-        //degs.unlink(c, min_ntd); //does not work?!
+        //degs.unlink(c);
+        degs.unlink(c, min_ntd); //does not work?!
 
         assert(boost::degree(c, G)==0);
 
@@ -298,7 +296,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
     //Build a treedecomposition.
     if(T){
-        assert(i == num_vert);
+        //assert(i == num_vert);
         treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
     }
 
@@ -1050,6 +1048,89 @@ void endless_minDegree_decomp(G_t &G, T_t &T){
         }
         catch(...){
             //std::cout << "exception" << std::endl;
+        }
+    }
+}
+
+template <typename iO_t, typename M_t, typename G_t>
+class elim_predicate{
+public:
+    elim_predicate(iO_t &_iO, M_t &_M, G_t &_G) : iO(_iO), M(_M), G(_G){}
+
+    template <typename E_t>
+    bool operator()(const E_t &e){
+        unsigned iO_id = iO[boost::source(*e, G)];
+        if(M[boost::target(*e, G)] && iO[boost::target(*e, G)] > iO_id){
+            return true;
+        }
+        return false;
+    }
+private:
+    const M_t &M;
+    const iO_t &iO;
+    const G_t &G;
+};
+
+template <typename G_t, typename O_t, typename T_t>
+void vec_ordering_to_treedec(G_t &G, O_t &O, T_t &T){
+    size_t num_vert = boost::num_vertices(G);
+    std::vector<unsigned> iO(num_vert);
+    std::vector<bool> marker(num_vert);
+    //std::vector<std::vector<unsigned> > bags(num_vert);
+    std::vector<std::vector<bool> > bags(num_vert);
+
+    for(unsigned i = 0; i < num_vert; i++){
+        iO[O[i]] = i;
+        bags[i].assign(num_vert, false);
+        boost::add_vertex(T);
+    }
+
+    //elim_predicate predicate(iO, marker, G);
+
+    for(unsigned i = 0; i < num_vert; i++){
+        std::vector<unsigned> N;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(O[i], G); nIt != nEnd; nIt++){
+            unsigned n_node = *nIt;
+            if(iO[n_node] > i){
+                bags[i][n_node] = true;
+                N.push_back(n_node);
+            }
+        }
+
+
+        for(unsigned j = 0; j < N.size(); j++){
+            for(unsigned k = 0; k < N.size(); k++){
+                if(iO[N[k]] > iO[N[j]]){
+                    bags[N[j]][N[k]] = true;
+
+//                    if(!boost::edge(bags[i][j], bags[i][k], G).second){
+//                        boost::add_edge(bags[i][j], bags[i][k], G);
+//                    }
+
+                }
+            }
+        }
+
+/*
+        for(std::set<unsigned>::iterator sIt1 = bags[i].begin(); sIt1 != bags[i].end(); sIt1++){
+            for(std::set<unsigned>::iterator sIt2 = bags[i].begin(); sIt2 != bags[i].end(); sIt2++){
+                if(iO[*sIt2] > iO[*sIt1]){
+                    bags[*sIt1][.insert(*sIt2);
+
+//                    if(!boost::edge(bags[i][j], bags[i][k], G).second){
+//                        boost::add_edge(bags[i][j], bags[i][k], G);
+//                    }
+
+                }
+            }
+        }
+*/
+    }
+    volatile int x;
+    for(unsigned u = 0; u < num_vert; u++){
+        for(unsigned w = 0; w < num_vert; w++){
+            if(bags[u][w]){ T[u].bag.push_back(w); ++x;}
         }
     }
 }
