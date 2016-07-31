@@ -46,7 +46,7 @@ namespace treedec {
       const size_type i = boost::get(id, x);
       const size_type& next_node = next[i];
       const size_type& prev_node = prev[i];
-
+    
       //check if i is the end of the bucket list 
       if ( next_node != invalid_value() )
         prev[next_node] = prev_node; 
@@ -68,13 +68,11 @@ namespace treedec {
 
     void push(const value_type& x) {
       id_to_value[boost::get(id, x)] = x;
-      assert(bucket[x] < head.size());
       (*this)[bucket[x]].push(x);
     }
     
     void update(const value_type& x) {
       remove(x);
-      assert(bucket[x] < head.size());
       (*this)[bucket[x]].push(x);
     }
     //  private: 
@@ -148,11 +146,9 @@ namespace treedec {
         //std::cout << top() << std::endl;
         //std::cout << back() << std::endl;
         if(c) {
-          assert(top() != invalid_value());
           return std::make_pair(top(), true);
         }
         else {
-          assert(back() != invalid_value());
           return std::make_pair(back(), false);
         }
       }
