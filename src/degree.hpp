@@ -91,7 +91,7 @@ public: // types
     typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
 
 public: // construct
-    DEGS(const G_t &g, bool random=false): _degs(boost::num_vertices(g)), _g(g)
+    DEGS(const G_t &g): _degs(boost::num_vertices(g)), _g(g)
     {
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;

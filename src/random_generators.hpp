@@ -27,7 +27,7 @@ static bool coin(){
     return c;
 }
 
-static unsigned randint(){
+inline unsigned randint(){
     static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
     static boost::random::uniform_int_distribution<> _dist;
     static unsigned _rnd;

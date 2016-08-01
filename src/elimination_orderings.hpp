@@ -192,12 +192,11 @@ typename boost::graph_traits<G_t>::vertices_size_type
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T, O_t *O, unsigned ub=UINT_MAX)
+   minDegree_decomp(G_t &G, T_t *T, O_t *, unsigned ub=UINT_MAX)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename deg_chooser<G_t>::type degs_type;
     typedef typename treedec_traits<T_t>::bag_type bag_type;
@@ -420,7 +419,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   fillIn_decomp(G_t &G, T_t *T, O_t *O, unsigned ub = UINT_MAX)
+   fillIn_decomp(G_t &G, T_t *T, O_t *, unsigned ub = UINT_MAX)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
