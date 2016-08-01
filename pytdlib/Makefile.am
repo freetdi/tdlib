@@ -18,6 +18,7 @@ TESTS = \
 	test_approx.py \
 	test_apps.py \
 	test_exact.py \
+	test_fill_in.py \
 	test_lb.py \
 	test_misc.py \
 	test_post.py \
