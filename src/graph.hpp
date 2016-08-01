@@ -467,8 +467,8 @@ inline size_t count_missing_edges(
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){untested();
         nIt2 = nIt1;
         nIt2++;
-        for(; nIt2 != nEnd; nIt2++){untested();
-            if(!boost::edge(*nIt1, *nIt2, G).second){untested();
+        for(; nIt2 != nEnd; nIt2++){ itested();
+            if(!boost::edge(*nIt1, *nIt2, G).second){ itested();
                 ++missing_edges;
             }
         }
