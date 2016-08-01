@@ -186,7 +186,8 @@ namespace impl{
 //Construct a tree decomposition T of G using the elimination ordering
 //obtained by the minimum-degree heuristic. Ignore isolated vertices.
 #if __cplusplus >= 201103L
-template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t>
+template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t=
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> >
 typename boost::graph_traits<G_t>::vertices_size_type
    minDegree_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL, unsigned ub=UINT_MAX)
 #else
@@ -302,6 +303,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     return upper_bound;
 }
 
+#if __cplusplus < 201103L
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX)
@@ -310,7 +312,6 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
 }
 
-#if __cplusplus < 201103L
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
    minDegree_decomp(G_t &G)
@@ -327,7 +328,8 @@ template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
     minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
 {
-    return impl::minDegree_decomp(G, &T, ub);
+    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
+    return impl::minDegree_decomp(G, &T, (O_t*)NULL, ub);
 }
 
 
@@ -413,7 +415,9 @@ namespace impl{
 //fill-in heuristic. Ignores isolated vertices.
 //return the treewidth.
 #if __cplusplus >= 201103L
-template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t>
+template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t=
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>
+    >
 typename boost::graph_traits<G_t>::vertices_size_type
    fillIn_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL, unsigned ub = UINT_MAX)
 #else
