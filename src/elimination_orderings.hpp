@@ -236,6 +236,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
         BOOST_AUTO(it, cdegs[0].begin());
         for(; it!=cdegs[0].end(); ++it){
             elim_vertices[i++] = get_vd(G, *it);
+            degs.unlink(*it);
         }
     }
 
@@ -296,7 +297,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     }
 
     //Build a treedecomposition.
-    if(T){
+    if(T){ std::cout << "i: " << i << ", n: " << num_vert << std::endl;
         assert(i == num_vert);
         treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
     }
