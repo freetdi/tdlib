@@ -27,4 +27,5 @@ pkginclude_HEADERS = \
   minimum_degree_ordering.hpp.orig \
   bucket_sorter.hpp \
   bucket_sorter.hpp.orig \
-  random_generators.hpp
+  random_generators.hpp \
+  degree_config.hpp

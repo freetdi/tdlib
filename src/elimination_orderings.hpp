@@ -282,21 +282,22 @@ typename boost::graph_traits<G_t>::vertices_size_type
             bags_i->clear();
         }
 
-        //degs.unlink(c);
-        degs.unlink(c, min_ntd); //does not work?!
+        degs.unlink(c, min_ntd);
 
         assert(boost::degree(c, G)==0);
-
-#ifndef NDEBUG //redundant, for checking only
-        degs.reg(c,0);
-#endif
 
         degs.flush();
     }
     assert(boost::num_edges(G)==0);
 
+    BOOST_AUTO(it, cdegs[0].begin());
+    for(; it!=cdegs[0].end(); ++it){
+        elim_vertices[i++] = get_vd(G, *it);
+    }
+
     //Build a treedecomposition.
     if(T){
+        assert(i == num_vert);
         treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
     }
 
