@@ -135,10 +135,10 @@ namespace detail{
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeletal_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
-{
+{ untested();
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
-    std::vector<unsigned int> inv_O(boost::num_vertices(G));
+    std::vector<unsigned int> inv_O(boost::num_vertices(G), n_+1);
     for(unsigned u = 0; u < n_; u++){
         typename treedec_chooser<G_t>::value_type e=O[u];
         unsigned pos = get_pos(e, G);
@@ -408,6 +408,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
         assert(!bags_i->size());
 
+
 #ifndef NDEBUG
         size_t newedges = make_clique_and_detach(v, G, *bags_i, &cb);
         if(newedges == min_fill){
@@ -419,8 +420,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
 #else
         make_clique_and_detach(v, G, *bags_i, &cb);
 #endif
-
         fill.unmark_neighbours(*bags_i);
+
 
         if(!T){
             bags_i->clear();
@@ -669,12 +670,12 @@ template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t &G,
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O,
     T_t &T)
-{
+{ untested();
     unsigned n = O.size();
 
     typename std::vector<typename treedec_traits<T_t>::bag_type> bags(n);
 
-    for(unsigned int i = 0; i < O.size(); i++){
+    for(unsigned int i = 0; i < O.size(); i++){ untested();
         make_clique_and_detach(O[i], G, bags[i]);
     }
 
