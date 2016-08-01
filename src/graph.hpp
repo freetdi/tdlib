@@ -41,12 +41,11 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
+#include "platform.hpp"
+#include "random_generators.hpp"
 #include "trace.hpp"
 
-#include "random_generators.hpp"
 #include "degree.hpp"
-
-#include "platform.hpp"
 
 
 // OUCH
@@ -97,8 +96,11 @@ struct vertex_callback{ //
 template<typename G_t>
 struct edge_callback{ //
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     virtual ~edge_callback(){};
     virtual void operator()(edge_descriptor)=0;
+    virtual void operator()(vertex_descriptor, vertex_descriptor)
+    {incomplete();}
 };
 
 template<typename G_t>
@@ -108,6 +110,8 @@ struct graph_callback{ // fixme: union of the above?
     virtual ~graph_callback(){};
     virtual void operator()(edge_descriptor)=0;
     virtual void operator()(vertex_descriptor)=0;
+    virtual void operator()(vertex_descriptor, vertex_descriptor)
+    {incomplete();}
 };
 
 //Vertex v will remain as isolated node.

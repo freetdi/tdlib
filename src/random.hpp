@@ -54,7 +54,9 @@ int try_some_elimination_orderings(G_t &G,
 
     int min_width = INT_MAX;
 
+#ifdef OPENMP
     #pragma omp parallel for
+#endif
     for(unsigned int i = 0; i < count; i++){
         G_t H;
         boost::copy_graph(G, H);

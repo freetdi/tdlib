@@ -27,6 +27,9 @@
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
+#include "degree_config.hpp"
+#include "random_generators.hpp" // BUG. see below
+
 #if __cplusplus >= 201103L
 # include <stx/btree_set>
 #endif
@@ -35,28 +38,10 @@ namespace misc {
 
 namespace detail {
 
+// FIXME: wrong place
+// needs random_generators.hpp
 template<class G_t>
-struct deg_config{
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
-#if __cplusplus < 201103L
-    typedef std::set<vd_type> bag_type;
-#else
-    typedef stx::btree_set<vd_type> bag_type;
-  //typedef std::unordered_set<vd_type>
-#endif
-    // typedef stx::btree_set<vd_type> bag_type;
-    static void alloc_init(size_t){
-    }
-    static unsigned num_threads(){return 1;}
-
-    template <typename C_t>
-    static vd_type pick(unsigned degree, C_t &C){
-        return *C[degree].begin();
-    }
-};
-
-template<class G_t>
-struct random_deg_config : public deg_config<G_t>{
+struct random_deg_config : public misc::detail::deg_config<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
 
     template <typename C_t>
@@ -71,10 +56,10 @@ struct random_deg_config : public deg_config<G_t>{
     }
 };
 
+
 } // namespace detail
 
-template<class G_t, class CFG=detail::random_deg_config<G_t> >
-//template<class G_t, class CFG=detail::deg_config<G_t> >
+template<class G_t, class CFG=detail::deg_config<G_t> >
 class DEGS{
     DEGS(const DEGS&)
     { untested();
