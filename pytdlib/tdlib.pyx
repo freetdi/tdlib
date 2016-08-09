@@ -3,26 +3,26 @@ Interface with TdLib (algorithms for tree decompositions)
 
 This module defines functions based on TdLib, a
 library that implements algorithms for tree
-decompositions written by Lukas Larisch. 
+decompositions written by Lukas Larisch.
 
 Definition:
 
-A tree decomposition of a graph G is a pair (T, b) consisting of a graph T and 
-a function b: V(T) -> 2^{V(G)} associating with each vertex t in V(T) a set of 
-vertices b(t), called bags of T, that are subsets of V(G) such that 
+A tree decomposition of a graph G is a pair (T, b) consisting of a graph T and
+a function b: V(T) -> 2^{V(G)} associating with each vertex t in V(T) a set of
+vertices b(t), called bags of T, that are subsets of V(G) such that
 
 (T1) T is a tree,
 
 (T2) every vertex v in V(G) is contained in some bag of T,
 
-(T3) for every edge e in E(G) there is a node t in V(T) with e is a subset of 
+(T3) for every edge e in E(G) there is a node t in V(T) with e is a subset of
 b(t), and
 
-(T4) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty 
+(T4) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty
 and connected in T.
 
 The width of (T, b) is defined as max{|b(t)|-1: t in V(T) }.
-The treewidth of G is defined as the minimum width over all tree decompositions 
+The treewidth of G is defined as the minimum width over all tree decompositions
 of G.
 
 Some known results:
@@ -41,18 +41,18 @@ This module containes the following functions** :
         Applies save reduction rules to a given graph
 
     - PP_MD
-        Applies preprocessing followed by the minDegree-heuristic to a given 
+        Applies preprocessing followed by the minDegree-heuristic to a given
         graph
 
     - PP_FI_TM
-        Applies preprocessing followed by the minFill-heuristic followed by 
+        Applies preprocessing followed by the minFill-heuristic followed by
         triangulation minimization to a given graph
 
     - lower_bound
         Computes a lower bound with respect to treewidth of a given graph
 
     - exact_decomposition_cutset
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
         (faster than the dynamic version in practice)
 
     - exact_decomposition_cutset_decision
@@ -60,11 +60,11 @@ This module containes the following functions** :
         and returns true, if tw(G) <= k. Otherwise false will be returned
 
     - exact_decomposition_dynamic
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
         (asymptotically faster than the greedy version)
 
     #- treedecomposition_exact_branch_and_bound
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
 
     - seperator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
@@ -82,15 +82,15 @@ This module containes the following functions** :
         Computes an elimination ordering according to the minFill-heuristic
 
     - MSVS
-        Possibly reduces the width of a given tree decomposition with help 
+        Possibly reduces the width of a given tree decomposition with help
         of minimal seperating vertex sets
 
     - minimalChordal_ordering
-        Possibly reduces the width of a given tree decomposition by 
+        Possibly reduces the width of a given tree decomposition by
         triangulation minimization. Input: elimination ordering
 
     - minimalChordal_decomp
-        Possibly reduces the width of a given tree decomposition by 
+        Possibly reduces the width of a given tree decomposition by
         triangulation minimization. Input: tree decomposition
 
     #- random_branch_and_bound
@@ -840,7 +840,7 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
 def minimalChordal_ordering(V, E, O):
     """
-    Returns an alternative elimination ordering E' than the given elimination 
+    Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
     input graph for computing a tree decomposition.
 
@@ -854,8 +854,8 @@ def minimalChordal_ordering(V, E, O):
 
     OUTPUT:
 
-    - An elimination ordering on G that may cause a lower width of the 
-      treedecomposition, that can be made out of it, than the width, 
+    - An elimination ordering on G that may cause a lower width of the
+      treedecomposition, that can be made out of it, than the width,
       that O will cause.
 
     EXAMPLES:
@@ -887,7 +887,7 @@ def minimalChordal_ordering(V, E, O):
 
 def minimalChordal_decomp(V_G, E_G, V_T, E_T):
     """
-    Returns an alternative elimination ordering E' than the given elimination 
+    Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
     input graph for computing a tree decomposition.
 
@@ -903,7 +903,7 @@ def minimalChordal_decomp(V_G, E_G, V_T, E_T):
 
     OUTPUT:
 
-    - A tree decomposition of G of possibly lower width than the 
+    - A tree decomposition of G of possibly lower width than the
       input treedecomposition.
 
     EXAMPLES:
