@@ -28,7 +28,7 @@
 #include <assert.h>
 
 #if __cplusplus >= 201103L
-# include <unordered_set>
+# include <stx/btree_set>
 #endif
 
 #include "trace.hpp"
@@ -42,7 +42,8 @@ struct deg_config{
 #if __cplusplus < 201103L
     typedef std::set<vd_type> bag_type;
 #else
-    typedef std::unordered_set<vd_type> bag_type;
+    typedef stx::btree_set<vd_type> bag_type;
+  //typedef std::unordered_set<vd_type>
 #endif
     // typedef stx::btree_set<vd_type> bag_type;
     static void alloc_init(size_t){

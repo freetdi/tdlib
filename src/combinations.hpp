@@ -137,8 +137,8 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         }
 #endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-        //true = ignore isolated vertices
-        treedec::ordering_to_treedec(G, new_elim_ordering, T, true);
+
+        treedec::ordering_to_treedec(G, new_elim_ordering, T);
     }
 
     treedec::glue_bags(bags, T);
@@ -264,7 +264,7 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
         treedec::induced_subgraph(G_, G, components[i], vdMap);
         T_t T_;
 
-        while(!treedec::exact_cutset(G, T_, lb)){
+        while(!treedec::exact_cutset(G_, T_, lb)){
             lb++;
             if(lb > k){
                 return false;

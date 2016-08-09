@@ -52,6 +52,10 @@
 #include "platform.hpp"
 #include "trace.hpp"
 
+#ifndef NDEBUG
+#include <iostream>
+#endif
+
 namespace treedec{
 
 // Find a root of an acyclic graph T.
@@ -153,6 +157,14 @@ bool validate_connectivity(T_t &T){
         }
 
         if(set_intersect(forgotten, bag(cur, T))){ untested();
+#ifndef NDEBUG
+        typename treedec_traits<T_t>::bag_type I;
+        std::set_intersection(forgotten.begin(), forgotten.end(), bag(cur, T).begin(), bag(cur, T).end(), std::inserter(I, I.begin()));
+        std::cerr << "[is_valid_treedecomposition]: vertices are not connected: " << std::endl;
+        for(typename treedec_traits<T_t>::bag_type::iterator it = I.begin(); it != I.end(); it++){
+            std::cerr << *it << std::endl;
+        }
+#endif
             return false;
         }
         else if(S.empty()){
@@ -166,7 +178,6 @@ bool validate_connectivity(T_t &T){
                             std::inserter(forgotten, forgotten.begin()));
     }
 }
-
 
 /* Checks if a tree decomposition is valid with respect to G.
  *
@@ -189,6 +200,9 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
     std::vector<int> component(boost::num_vertices(T));
     int num = boost::connected_components(T, &component[0]);
     if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
+#ifndef NDEBUG
+        std::cerr << "[is_valid_treedecomposition]: treedecomposition is not a tree" << std::endl;
+#endif
         return -1;
     }
 
@@ -209,6 +223,17 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
     }
 
     if(coded_vertices != vertices){
+#ifndef NDEBUG
+        std::cerr << "[is_valid_treedecomposition]: invalid vertices or not all vertices coded: " << std::endl;
+        typename treedec_traits<T_t>::bag_type sym_diff;
+        std::set_symmetric_difference(coded_vertices.begin(), coded_vertices.end(),
+                                      vertices.begin(), vertices.end(),
+                                      std::inserter(sym_diff, sym_diff.begin()));
+        for(typename treedec_traits<T_t>::bag_type::iterator sIt=sym_diff.begin(); sIt != sym_diff.end(); sIt++){
+            std::cerr << *sIt << " ";
+        } std::cerr << std::endl;
+#endif
+
         return -2;
     }
 
@@ -235,6 +260,10 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
             }
 
             if(!is_contained){
+#ifndef NDEBUG
+        std::cerr << "[is_valid_treedecomposition]: not all edges covered: " << std::endl;
+        std::cerr << "    " << *vIt << "--" << *nIt << std::endl;
+#endif
                 return -3; //Not all edges are covered.
             }
         }
@@ -705,7 +734,11 @@ void glue_bags(std::vector< boost::tuple<
     for(unsigned int i = bags.size(); i > 0; i--){
         typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
         typename treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
-
+/*
+        if(ignore_isolated_vertices && second.empty()){
+            continue;
+        }
+*/
         glue_bag(second, first, T);
     }
 }

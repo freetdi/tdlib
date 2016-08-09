@@ -277,7 +277,7 @@ public: // picking
     std::pair<vertex_descriptor, fill_t> pick_min(unsigned lower=0,
             unsigned upper=-1u, bool erase=false)
     {
-        if(upper==-1u){
+        if(upper!=-1u){
             incomplete();
         }
         BOOST_AUTO(fp, _fill.begin());

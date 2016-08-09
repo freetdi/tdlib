@@ -138,6 +138,8 @@ bool explore_cutsets(G_t &G,
     return false;
 }
 
+namespace excut{
+
 template <typename T_t>
 void glue_bags(T_t &T,
           typename treedec_traits<T_t>::bag_type &bag1,
@@ -179,6 +181,8 @@ void glue_bags(T_t &T,
     if(!(boost::edge(b1, b2, T).second || boost::edge(b2, b1, T).second)){
         boost::add_edge(b1, b2, T);
     }
+}
+
 }
 
 
@@ -228,7 +232,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
             bag2.insert(*sIt);
         }
 
-        treedec::glue_bags(T, bag1, bag2);
+        treedec::excut::glue_bags(T, bag1, bag2);
         i++;
     }
 
