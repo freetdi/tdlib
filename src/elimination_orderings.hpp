@@ -50,6 +50,7 @@
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/adjacency_matrix.hpp>
 
 #include <boost/graph/minimum_degree_ordering.hpp>
 
@@ -763,8 +764,8 @@ namespace draft{
 // TODO: tries hard to add edges at the end. does that make sense?
 // TODO: what are the preconditions?!
 // TODO: can order be an input range?
-template <typename G_t, typename O_t, class T>
-void vec_ordering_to_tree(G_t &G, O_t &O, T& t, O_t* io=NULL)
+template <typename G_t, typename O_t, class T_t>
+void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
 {
     size_t num_vert = boost::num_vertices(G);
     assert(num_vert = O.size());
@@ -789,7 +790,7 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T& t, O_t* io=NULL)
     }
 
     for(unsigned i = 0; i < num_vert; i++){
-        auto R=boost::adjacent_vertices(O[i], G);
+        BOOST_AUTO(R, boost::adjacent_vertices(O[i], G));
         for(;R.first!=R.second;++R.first) {
             unsigned n_node = *R.first;
             if((unsigned)iO[n_node] > i){
@@ -824,7 +825,7 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T& t, O_t* io=NULL)
 
     for(unsigned i = 0; i < num_vert; i++){
         boost::add_vertex(t);
-        auto& b=bag(i,t);
+        typename treedec_traits<T_t>::bag_type& b=bag(i,t);
         duh::push(b,O[i]);
         for(unsigned j = 0; j < num_vert; j++){
             if(boost::edge(i, j, bags).second){
