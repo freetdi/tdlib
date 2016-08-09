@@ -37,7 +37,7 @@ general.
 
 This module containes the following functions** :
 
-    - preprocessing   
+    - preprocessing
         Applies save reduction rules to a given graph
 
     - PP_MD
@@ -684,12 +684,45 @@ def minDegree_decomp(V, E):
 
     return V_T_, E_T, get_width(V_T, E_T)
 
+def boost_minDegree_decomp(V, E):
+    """
+    Computes a tree decomposition of a given graph based on the (boost-)minDegree heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.boost_minDegree_decomp(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
 
 def fillIn_decomp(V, E):
     """
     Computes a tree decomposition of a given graph based on the fillIn heuristic.
-
-    INPUTS:
+     INPUTS:
 
     - V_G : a list of vertices of the input graph
 

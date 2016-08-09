@@ -49,6 +49,10 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
 int gc_minDegree_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                          std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T);
 
+int gc_boost_minDegree_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T);
+
+
 int gc_fillIn_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                       std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T);
 

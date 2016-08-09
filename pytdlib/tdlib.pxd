@@ -44,6 +44,8 @@ cdef extern from "python_tdlib.hpp":
                                 vector[vector[int]] &V_T, vector[unsigned int] &E_T)
     void gc_minDegree_decomp(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                vector[vector[int]] &V_T, vector[unsigned int] &E_T)
+    void gc_boost_minDegree_decomp(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                               vector[vector[int]] &V_T, vector[unsigned int] &E_T)
     void gc_fillIn_decomp(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                             vector[vector[int]] &V_T, vector[unsigned int] &E_T)
     void gc_minDegree_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
