@@ -758,6 +758,99 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
     ordering_to_treedec(G, O_, T);
 }
 
+namespace draft{
+
+// TODO: tries hard to add edges at the end. does that make sense?
+// TODO: what are the preconditions?!
+// TODO: can order be an input range?
+template <typename G_t, typename O_t, class T>
+void vec_ordering_to_tree(G_t &G, O_t &O, T& t, O_t* io=NULL)
+{
+    size_t num_vert = boost::num_vertices(G);
+    assert(num_vert = O.size());
+    O_t iOlocal;
+
+    if(io){
+        assert(io->size()==num_vert);
+    }else{
+        iOlocal.resize(num_vert);
+        io=&iOlocal;
+    }
+    O_t& iO=*io;
+
+    size_t invalid=num_vert;
+    std::vector<unsigned> edges(num_vert-1u, invalid);
+    assert(edges.size()==num_vert-1);
+    typedef boost::adjacency_matrix<boost::directedS> bamd;
+    bamd bags(num_vert);
+
+    for(unsigned i = 0; i < num_vert; i++){
+        iO[O[i]] = i;
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        auto R=boost::adjacent_vertices(O[i], G);
+        for(;R.first!=R.second;++R.first) {
+            unsigned n_node = *R.first;
+            if((unsigned)iO[n_node] > i){
+                boost::add_edge(i, n_node, bags);
+            }
+        }
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        std::vector<unsigned> N;
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                N.push_back(j);
+                unsigned iO_n_node = iO[j];
+                if(iO_n_node < edges[i]){
+                    edges[i] = iO_n_node;
+                }
+            }
+        }
+
+        for(unsigned j = 0; j < N.size(); j++){
+            for(unsigned k = 0; k < N.size(); k++){
+                if(iO[N[k]] > iO[N[j]]){
+                    boost::add_edge(iO[N[j]], N[k], bags);
+                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
+                        edges[iO[N[j]]] = iO[N[k]];
+                    }
+                }
+            }
+        }
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        boost::add_vertex(t);
+        auto& b=bag(i,t);
+        duh::push(b,O[i]);
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                duh::push(b,j);
+             }
+         }
+     }
+
+    for(unsigned i = 0; i < num_vert-1u; i++){
+        assert(edges[i]>i || edges[i]==invalid);
+        if(edges[i]!=invalid){
+            // normal edge, as computed above.
+            boost::add_edge(i,edges[i],t);
+        }else if(i+1!=num_vert){
+            // edge to next component
+            boost::add_edge(i,i+1,t);
+        }else{
+            // exiting last connected component.
+            // ... dont connect
+        }
+    }
+
+}
+
+} // draft
+
 namespace impl{
 
 template <typename G_t, typename T_t>
