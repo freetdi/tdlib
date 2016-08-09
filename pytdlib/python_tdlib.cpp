@@ -171,7 +171,7 @@ int gc_preprocessing(std::vector<unsigned int> &V_G,
     for(unsigned int i = 0; i < td_bags.size(); i++){
         std::vector<int> bag;
         bag.push_back(td_bags[i].get<0>());
-        for(typename treedec::treedec_traits<T>::bag_type::iteratorsIt
+        for(typename treedec::treedec_traits<T>::bag_type::iterator sIt
                  = td_bags[i].get<1>().begin(); sIt != td_bags[i].get<1>().end(); sIt++)
         {
             bag.push_back(*sIt);
