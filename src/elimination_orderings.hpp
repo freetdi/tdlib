@@ -333,6 +333,62 @@ void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX){
 
 namespace impl{
 
+template <typename G_t>
+void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
+    typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+
+    vertices_size_type n = boost::num_vertices(G);
+    edges_size_type e = boost::num_edges(G);
+
+
+    O.resize(n);
+
+    unsigned i = 0;
+    // boost does not like cliques.
+    if((n*(n-1u)) == boost::num_edges(G)){
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            O[i++] = *vIt;
+        }
+    }
+
+    std::vector<int> inverse_perm(n, 0);
+    std::vector<int> supernode_sizes(n, 1);
+    typename boost::property_map<G_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, G);
+    std::vector<int> degree(n, 0);
+
+    boost::minimum_degree_ordering
+             (G,
+              boost::make_iterator_property_map(&degree[0], id, degree[0]),
+              &inverse_perm[0],
+              &O[0],
+              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+              0,
+              id);
+}
+
+
+template <typename G_t, typename T_t>
+void endless_minDegree_decomp(G_t &G, T_t &T){
+    unsigned best = UINT_MAX;
+    G_t Gbak(G);
+    while(true){
+        try{
+            T_t U;
+            best = treedec::minDegree_decomp(G, U, best);
+            T = MOVE(U);
+        }
+        catch(...){
+        }
+        boost::copy_graph(Gbak, G);
+    }
+}
+
+} //namespace impl
+
+namespace impl{
+
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic. Ignores isolated vertices.
 //return the treewidth.
@@ -995,41 +1051,6 @@ void LEX_M_minimal_ordering(G_t &G,
             k = (k > (unsigned int)label[j])? k : (unsigned int)label[j];
         }
     }
-}
-
-template <typename G_t>
-void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
-    typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
-    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
-
-    vertices_size_type n = boost::num_vertices(G);
-    edges_size_type e = boost::num_edges(G);
-
-
-    O.resize(n);
-
-    unsigned i = 0;
-    // boost does not like cliques.
-    if((n*(n-1u)) == boost::num_edges(G)){
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            O[i++] = *vIt;
-        }
-    }
-
-    std::vector<int> inverse_perm(n, 0);
-    std::vector<int> supernode_sizes(n, 1);
-    typename boost::property_map<G_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, G);
-    std::vector<int> degree(n, 0);
-
-    boost::minimum_degree_ordering
-             (G,
-              boost::make_iterator_property_map(&degree[0], id, degree[0]),
-              &inverse_perm[0],
-              &O[0],
-              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
-              0,
-              id);
 }
 
 } //namespace treedec
