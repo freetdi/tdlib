@@ -983,7 +983,7 @@ void treedec_to_ordering(T_t &T,
 
         bag(leaf, T).clear();
 
-        treedec_to_ordering<G_t, T_t>(T, O);
+        treedec::impl::treedec_to_ordering<G_t, T_t>(T, O);
     }
 }
 

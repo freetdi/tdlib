@@ -129,7 +129,7 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
         }
         bool inX=x!=X.end() && *x==*w;
 
-        if(inX==inS){ untested();
+        if(inX==inS){
             return false;
         }
     }
@@ -142,9 +142,10 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
 //Find a nearly balanced seperator S of W by doing an extended
 //deepth-first-search which finds a minimal X-Y-seperator.
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
-template <typename G_t, typename W_t, typename S_t>
+template <typename G_t, typename W_t, typename S_t, typename digraph_t>
 bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
-    std::vector<bool> const &disabled, unsigned int k)
+    std::vector<bool> const &disabled, unsigned num_dis, unsigned int k,
+    digraph_t* dg)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
@@ -173,7 +174,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
             difference.resize(0);
 
             //N = I \setunion neigh(I)
-            BOOST_AUTO(N, make_neighbourhood01_range((*I).first, (*I).second, G, s));
+            BOOST_AUTO(N, make_neighbourhood_range((*I).first, (*I).second, G, s));
 
             assert(std::includes( N.first, N.second, N.first, N.second ));
             assert(std::includes( N.first, N.second, (*I).first, (*I).second ));
@@ -199,9 +200,9 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 
                 for(; J!=e; ++J){
                     S.clear();
+
                     std::vector<bool> disabled_(disabled);
-                    sX.clear();
-                    sY.clear();
+                    unsigned num_dis_(num_dis);
                     X_Y.clear();
 
                     // TODO. don't instanciate X_Y. just iterate.
@@ -213,20 +214,57 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                     typename vertex_set::const_iterator sIt=X_Y.begin();
                     for(; sIt!=X_Y.end(); ++sIt){
                         unsigned int pos = get_pos(*sIt, G);
+                        if(disabled_[pos]){
+                        }else{
+                            ++num_dis_;
+                        }
                         disabled_[pos] = true;
                     }
 
                     //Do the extended deepth-first-search on the neighbours of vertices in X and Y
-                    get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
-                    get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
+                    sX.clear();
+                    sY.clear();
+#if 1
+                    {
+                        BOOST_AUTO(N, make_neighbourhood_range((*I).first, (*I).second, G, s));
+                        BOOST_AUTO(NI, N.first);
+                        for(;NI!=N.second; ++NI){
+                            if(!disabled_[get_pos(*NI, G)]) {
+                                assert(sX.size()==0 || *NI>*sX.rbegin());
+                                sX.insert(sX.end(), *NI);
+                            }
+                        }
+                    }
+                    {
+                        BOOST_AUTO(N, make_neighbourhood_range((*J).first, (*J).second, G, Js));
+                        BOOST_AUTO(NI, N.first);
+                        for(;NI!=N.second; ++NI){
+                            if(!disabled_[get_pos(*NI, G)]) {
+                                assert(sY.size()==0 || *NI>*sY.rbegin());
+                                sY.insert(sY.end(), *NI);
+                            }
+                        }
+                    }
+#endif
+#if 0
+                    treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
+                    treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
+#endif
+
+                    //            assert(sX.size() == sXv.size());
+                    //          assert(sY.size() == sYv.size());
+
+                    //Z must be a subset of S.
+                    // Z=W\X_Y
 
                     std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                        std::inserter(sX, sX.begin()));
+                            std::inserter(sX, sX.begin()));
                     std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
-                                        std::inserter(sY, sY.begin()));
+                            std::inserter(sY, sY.begin()));
 
+                    //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
                     // network_flow here.
-                    if(!treedec::seperate_vertices(G, disabled_, sX, sY, S, k+1)){
+                    if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1, dg)){
                         continue;
                     }
 
@@ -262,17 +300,21 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
     }
 }
 
-//The main procedure of the seperator algorithm.
-template <typename G_t, typename T_t, class W_t, class P_t, class V_t>
+//The main recursive procedure of the seperator algorithm.
+template <typename G_t, typename T_t, class W_t, class P_t, class V_t, typename digraph_t>
 bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
         P_t const &parent, // a vertex set
         V_t &vertices, // a vertex set
-        std::vector<bool> &disabled, unsigned int k)
+        std::vector<bool> &disabled,
+        unsigned int& num_dis,
+        unsigned int k,
+        digraph_t* dg)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
 #if 0 // not yet
+    typedef typename std::vector<vertex_descriptor> vertex_vector;
     typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
                                                            // vertex_descriptor
     typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
@@ -296,6 +338,9 @@ bool sep_decomp(G_t const &G, T_t &T,
         treedec::map_descriptors_to_bags<G_t>(vertices, B1);
         treedec::sep_glue_bag(B1, B2, T);
         return true;
+    }else if(k==0){
+    }else if(k==1){
+    }else{
     }
 
     //Turn W into a superset of W of size 3k + 1.
@@ -307,12 +352,14 @@ bool sep_decomp(G_t const &G, T_t &T,
     //induced by the resulting components and the seperator recursively, add a
     //bag containing the union of W and S to the decomposition,
     //connected with the bag, created in the 'parent-call' of the procedure.
-    if(nearly_balanced_seperator(G, W, S, disabled, k)){
+    if(nearly_balanced_seperator(G, W, S, disabled, num_dis, k, dg)){
         std::vector<vertex_set> C;
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
+        for(typename std::set<vertex_descriptor>::iterator sIt
                 = S.begin(); sIt != S.end(); sIt++) {
             unsigned int pos = get_pos(*sIt, G);
+            assert(!disabled[pos]);
+            ++num_dis;
             disabled[pos] = true;
         }
 
@@ -336,16 +383,18 @@ bool sep_decomp(G_t const &G, T_t &T,
             std::set_union(is_C_i_W.begin(), is_C_i_W.end(), S.begin(), S.end(),
                            std::inserter(newW, newW.begin()));
 
-            std::vector<bool> disabled_(boost::num_vertices(G), true);
+            unsigned num_dis_ = boost::num_vertices(G);
+            std::vector<bool> disabled_(num_dis_, true);
             for(typename vertex_set::iterator sIt
                     = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++)
             {
                 unsigned int pos = get_pos(*sIt, G);
                 disabled_[pos] = false;
+                --num_dis_;
             }
 
             //Reject if no seperator can be found in one of the ongoing recursive calls.
-            if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, k)){
+            if(!sep_decomp(G, T, newW, union_W_S, union_C_i_S, disabled_, num_dis_, k, dg)){
                 return false;
             }
         }
@@ -362,6 +411,9 @@ void separator_algorithm(G_t const &G, T_t &T)
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
 
+    typedef impl::disjoint_ways<G_t> dw_t;
+    dw_t dw;
+
     unsigned int k = 0;
     bool finished = false;
 
@@ -373,8 +425,9 @@ void separator_algorithm(G_t const &G, T_t &T)
 
     while(!finished){
         std::vector<bool> disabled(boost::num_vertices(G), false);
+        unsigned num_dis=0;
         vertex_set emptySet, parent;
-        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, k);
+        finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k, &dw);
         k++;
 
         if(!finished){
