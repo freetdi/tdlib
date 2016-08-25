@@ -42,71 +42,51 @@
 
 namespace treedec{
 
-//check a modified induced subgraph of the bag 'noboost::bag(t_desc, T)' for
-//possible improvement
-template <typename B_t, typename G_t, typename T_t, typename M_t, typename S_t>
+//Check a modified induced subgraph of the bag 'bag(t_desc, T)' for
+//possible improvement.
+template <typename B_t, typename S_t, typename vd_t>
 bool is_improvement_bag(B_t const &H,
                         std::vector<bool> &disabled,
                         S_t &X,
                         S_t &Y,
-                        typename boost::graph_traits<T_t>::vertex_descriptor /*t_desc*/,
-                        M_t & /*vdMap*/,
-                        G_t const &, T_t &,
-                        typename boost::graph_traits<G_t>::vertex_descriptor a,
-                        typename boost::graph_traits<G_t>::vertex_descriptor b)
+                        vd_t a,
+                        vd_t b)
 {
 
-    typedef typename boost::graph_traits<G_t> graph_traits;
-    typedef typename boost::graph_traits<B_t>::adjacency_iterator adjacency_iterator_H;
+    typedef typename boost::graph_traits<B_t> graph_traits;
+    typedef typename graph_traits::adjacency_iterator adjacency_iterator_H;
 
     disabled.assign(boost::num_vertices(H), false);
 
+    //Test for completeness.
     typename graph_traits::vertices_size_type nv=boost::num_vertices(H);
     typename graph_traits::edges_size_type ne=boost::num_edges(H);
     if(nv*(nv-1u) == 2*ne){
-        // there is no remaining non-edge.
+        //There is no remaining non-edge.
         X.clear();
         Y.clear();
         return false;
     }
 
-    //Find a remaining
-    //non-edge {x,y} and collect the neighbours of x and y, resulting in the sets X and Y.
     assert(a!=b);
     assert(!boost::edge(a, b, H).second);
-            {
-                adjacency_iterator_H nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(a, H); nIt!=nEnd; ++nIt){
-                    X.push_back(*nIt);
-                }
 
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(b, H); nIt!=nEnd; ++nIt){
-                    Y.push_back(*nIt);
-                }
-
-                unsigned int pos1 = get_pos(a, H);
-                unsigned int pos2 = get_pos(b, H);
-                disabled[pos1] = true;
-                disabled[pos2] = true;
-
-                goto BREAK_LOOP;
-            }
-
-
-    BREAK_LOOP:
-
-    //Test for completeness.
-    nv = boost::num_vertices(H);
-    ne = boost::num_edges(H);
-    if(nv*(nv-1u) == 2*ne){ untested();
-        unreachable();
-        // H.clear();
-        X.clear();
-        Y.clear();
-        return false;
-    }else{
-        return true;
+    //Collect the neighbours of x and y, resulting in the sets X and Y.
+    adjacency_iterator_H nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(a, H); nIt!=nEnd; ++nIt){
+        X.push_back(*nIt);
     }
+
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(b, H); nIt!=nEnd; ++nIt){
+        Y.push_back(*nIt);
+    }
+
+    unsigned int pos1 = get_pos(a, H);
+    unsigned int pos2 = get_pos(b, H);
+    disabled[pos1] = true;
+    disabled[pos2] = true;
+
+    return true;
 }
 
 /* MinimalSeparatingVertexSet(MSVS)-algorithm
@@ -137,6 +117,7 @@ void MSVS(G_t const &G, T_t &T)
 
     typedef typename graph_traits<G_t>::immutable_type immutable_type;
     immutable_type H; // malloc/free, where?
+
     std::set<typename immutable_type::vertex_descriptor> S_;
     std::vector<typename immutable_type::vertex_descriptor> vdMap_, vdMap;
     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
@@ -149,8 +130,8 @@ void MSVS(G_t const &G, T_t &T)
     typename treedec_traits<T_t>::bag_type intersection;
 
     while(true){
-        // TODO: propagate results to caller
         width = treedec::get_width(T);
+
         PROPAGATION_POINT;
         INTERRUPTION_POINT;
 
@@ -165,34 +146,34 @@ void MSVS(G_t const &G, T_t &T)
         bag_iterator tIt, tEnd;
         bag_descriptor refinement_vertex;
         immutable_type const* HI=NULL;
-        bool candidate=false;
+        bool status=false;
+
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
             INTERRUPTION_POINT;
             if(bag(*tIt, T).size() == width+1){
                 disabled_.resize(0);
                 vdMap_.resize(0);
-                // induced_subgraph(H, G, bag(*tIt, T), vdMap_);
-                //
-                // ....
 
                 draft::is_in_neighbour_bd<vertex_descriptor, T_t> cb(T, *tIt);
                 BOOST_AUTO(mybag, bag(*tIt, T));
                 HI = &draft::immutable_clone(G, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
-                // HI = &MSVS_overlay(G, H, T, *tIt, &vdMap_);
-                candidate = is_improvement_bag(*HI, disabled_, X, Y, *tIt, vdMap_, G, T,
-                        cb.a, cb.b);
-                if(candidate){
+                status = is_improvement_bag
+                  <immutable_type, 
+                   std::vector<vertex_descriptor>,
+                   vertex_descriptor>
+                       (*HI, disabled_, X, Y, cb.a, cb.b);
+
+                if(status){
                     refinement_vertex = *tIt;
                     disabled = MOVE(disabled_);
                     vdMap = MOVE(vdMap_);
                     assert(vdMap.size() == boost::num_vertices(*HI));
                     break;
-                }else{
                 }
             }
         }
 
-        if(!candidate){
+        if(!status){
             return;
         }
         assert(HI);

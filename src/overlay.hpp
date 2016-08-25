@@ -83,7 +83,7 @@ inline IG_t const& immutable_clone(
         
         if(!cb){
             BOOST_AUTO(s, get_pos(*bi, G));
-            auto A=boost::adjacent_vertices(*bi,G);
+            BOOST_AUTO(A, boost::adjacent_vertices(*bi,G));
             for(;A.first!=A.second;++A.first){
                 BOOST_AUTO(t, get_pos(*A.first, G));
                 boost::add_edge(reverse_map[s], reverse_map[t], ig);
