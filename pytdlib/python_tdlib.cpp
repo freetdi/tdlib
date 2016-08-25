@@ -379,7 +379,7 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     std::vector<int> O;
 
 #ifndef NDEBUG
-    unsigned w1 = 
+    unsigned w1 =
 #endif 
     treedec::impl::boost_minDegree_ordering(G, O);
 
@@ -389,8 +389,10 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     treedec::draft::vec_ordering_to_tree(G, O, T);
 
 #ifndef NDEBUG
-    unsigned w2 = treedec::get_width(T);
+    unsigned w2 =
 #endif
+    treedec::get_width(T);
+
 
     assert(w1 == w2);
 
