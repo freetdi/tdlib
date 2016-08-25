@@ -131,7 +131,7 @@ public: // picking
             assert(lower != upper+1);
         }
         vertex_descriptor min_nv;
-        min_nv = CFG::pick(lower, _degs);
+        min_nv = CFG::pick(_degs[lower]);
 
         return std::make_pair(min_nv, lower);
     }

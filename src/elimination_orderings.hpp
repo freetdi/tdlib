@@ -358,7 +358,7 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX){
     typename boost::property_map<G_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, G);
     std::vector<int> degree(n, 0);
 
-    int w = treedec::minimum_degree_ordering
+    int w = boost::minimum_degree_ordering
              (G,
               boost::make_iterator_property_map(&degree[0], id, degree[0]),
               &iO[0],

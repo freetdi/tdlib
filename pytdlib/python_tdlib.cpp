@@ -377,9 +377,10 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     make_tdlib_graph(G, V_G, E_G, true); //true = directed
 
     std::vector<int> O;
-#ifndef NDEBUG
-    unsigned w1 = 
-#endif 
+// huh?
+// #ifndef NDEBUG
+//     unsigned w1 = 
+// #endif 
     treedec::impl::boost_minDegree_ordering(G, O);
 
     TD_graph_t H;
@@ -391,7 +392,7 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     unsigned w2 = treedec::get_width(T);
 #endif
 
-    assert(w1 == w2);
+//    assert(w1 == w2);
 
     treedec::make_small(T);
 
