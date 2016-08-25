@@ -651,7 +651,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                         std::vector<int> result(it->first);
                         result[pos] = 0;
                         results[cur][result] = boost::tuple<int, std::vector<int>, std::vector<int> >
-                                                 (it->second.get<0>(), it->first, std::vector<int>());
+                                                 (boost::get<0>(it->second), it->first, std::vector<int>());
                         applied = true;
                         break;
                     }
@@ -681,13 +681,14 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
                 result2[pos] = -1;
 
-                if(results[child][result2].get<0>() == -1){
+                if(boost::get<0>(results[child][result2]) == -1){
                     results[cur][result] = boost::tuple<int, std::vector<int>, std::vector<int> >
                                                  (-1, it->first, std::vector<int>());
                 }
                 else{
                     results[cur][result] = boost::tuple<int, std::vector<int>, std::vector<int> >
-                                                 (results[child][result2].get<0>()+1, result2, std::vector<int>());
+                                                 (boost::get<0>(results[child][result2])+1,
+                                                  result2, std::vector<int>());
                 }
 
             }
@@ -698,7 +699,8 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
             {
                 std::vector<int> result(it->first);
                 result[pos] = 1;
-                results[cur][result] = boost::make_tuple(results[child][it->first].get<0>(), it->first, std::vector<int>()); 
+                results[cur][result] = boost::make_tuple(boost::get<0>(results[child][it->first]),
+                        it->first, std::vector<int>());
             }
         }
         else if(node_type == treedec::nice::FORGET){
@@ -720,7 +722,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                     result[pos] = 0;
                     std::vector<int> choice2(result);
 
-                    int val2 = results[child][result].get<0>();
+                    int val2 = boost::get<0>(results[child][result]);
                     result[pos] = -1;
 
                     if(val1 == -1){
@@ -805,8 +807,8 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                             continue;
                         }
 
-                        int val_g = results[child1][colorings2[g]].get<0>();
-                        int val_h = results[child2][colorings2[h]].get<0>();
+                        int val_g = boost::get<0>(results[child1][colorings2[g]]);
+                        int val_h = boost::get<0>(results[child2][colorings2[h]]);
 
                         if(val_g != -1 && val_h != -1){
                             if(val_g + val_h - ones < minimum){
@@ -826,7 +828,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
 
     typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
-    return (unsigned int) results[root].begin()->second.get<0>();
+    return (unsigned int) boost::get<0>(results[root].begin()->second);
 }
 
 
@@ -850,7 +852,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         typename boost::graph_traits<G_t>::vertex_descriptor introduced_vertex =
                                  treedec::nice::get_introduced_vertex(cur, T);
 
-        std::vector<int> next_htt(results[cur][have_to_take].get<1>());
+        std::vector<int> next_htt(boost::get<1>(results[cur][have_to_take]));
 
         top_down_computation_min_dominating_set(G, T, child, results, global_result, next_htt);
     }
@@ -863,7 +865,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
 
         unsigned int pos = get_pos(forgotten_vertex, G);
 
-        std::vector<int> htt(results[cur][have_to_take].get<1>());
+        std::vector<int> htt(boost::get<1>(results[cur][have_to_take]));
         int assignment = htt[pos];
 
         if(assignment == 2){
@@ -878,8 +880,8 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor rchild =
                                    *(++boost::adjacent_vertices(cur, T).first);
 
-        std::vector<int> htt1(results[cur][have_to_take].get<1>());
-        std::vector<int> htt2(results[cur][have_to_take].get<2>());
+        std::vector<int> htt1(boost::get<1>(results[cur][have_to_take]));
+        std::vector<int> htt2(boost::get<2>(results[cur][have_to_take]));
 
         top_down_computation_min_dominating_set(G, T, lchild, results, global_result, htt1);
         top_down_computation_min_dominating_set(G, T, rchild, results, global_result, htt2);

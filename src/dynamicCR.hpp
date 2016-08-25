@@ -162,16 +162,20 @@ bool make_layer(G_t &G, W_t &W,
 
                 // inefficient: don't create intersection. stop at first common elt.
                 bag_type inters;
-                std::set_intersection(subs[i].begin(), subs[i].end(), 
-                                      W[idx-1][j].get<3>().begin(), W[idx-1][j].get<3>().end(), std::inserter(inters, inters.begin()));
+                std::set_intersection(subs[i].begin(), subs[i].end(),
+                                      boost::get<3>(W[idx-1][j]).begin(),
+                                      boost::get<3>(W[idx-1][j]).end(),
+                                      std::inserter(inters, inters.begin()));
 
                 if(!inters.empty()){
                     continue;
                 }
 
-                if(is_monotone_dynamicCR(G, subs[i], W[idx-1][j].get<0>(), W[idx-1][j].get<1>(), newR, Rcomps)){
+                if(is_monotone_dynamicCR(G, subs[i], boost::get<0>(W[idx-1][j]),
+                           boost::get<1>(W[idx-1][j]), newR, Rcomps)){
                     indices.push_back(j);
-                    std::set_difference(W[idx-1][j].get<0>().begin(), W[idx-1][j].get<0>().end(), subs[i].begin(), subs[i].end(),
+                    std::set_difference(boost::get<0>(W[idx-1][j]).begin(),
+                                        boost::get<0>(W[idx-1][j]).end(), subs[i].begin(), subs[i].end(),
                                         std::inserter(forbidden, forbidden.begin()));
                 }
             }
@@ -211,18 +215,20 @@ template <typename T_t, typename W_t, typename G_t>
 void make_tree_decomposition(T_t &T, W_t &W, typename treedec_traits<T_t>::bag_type &R,
                              unsigned int layer, unsigned int idx, G_t &G)
 {
-    for(unsigned int i = 0; i < W[layer][idx].get<2>().size(); i++){
+    for(unsigned int i = 0; i < boost::get<2>(W[layer][idx]).size(); i++){
         if(std::includes(R.begin(), R.end(),
-           W[layer-1][W[layer][idx].get<2>()[i]].get<0>().begin(),
-           W[layer-1][W[layer][idx].get<2>()[i]].get<0>().end()))
+           boost::get<0>(W[layer-1][boost::get<2>(W[layer][idx])[i]]).begin(),
+           boost::get<0>(W[layer-1][boost::get<2>(W[layer][idx])[i]]).end()))
         {
             continue;
         }
 
-        R.insert(W[layer-1][W[layer][idx].get<2>()[i]].get<0>().begin(), W[layer-1][W[layer][idx].get<2>()[i]].get<0>().end());
+        R.insert(boost::get<0>(W[layer-1][boost::get<2>(W[layer][idx])[i]]).begin(),
+                 boost::get<0>(W[layer-1][boost::get<2>(W[layer][idx])[i]]).end());
 
-        glue_two_bags(T, W[layer][idx].get<0>(), W[layer-1][W[layer][idx].get<2>()[i]].get<0>());
-        make_tree_decomposition(T, W, R, layer-1, W[layer][idx].get<2>()[i], G);
+        glue_two_bags(T, boost::get<0>(W[layer][idx]),
+                         boost::get<0>(W[layer-1][boost::get<2>(W[layer][idx])[i]]));
+        make_tree_decomposition(T, W, R, layer-1, boost::get<2>(W[layer][idx])[i], G);
     }
 }
 
@@ -256,7 +262,8 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
         for(unsigned int i = 0; i < vertices.size(); i++){
             if(make_layer(G, W, vertices, k, i)){
                 typename treedec_traits<T_t>::bag_type R;
-                R.insert(W[W.size()-1][W.back().size()-1].get<0>().begin(), W[W.size()-1][W.back().size()-1].get<0>().end());
+                R.insert(boost::get<0>(W[W.size()-1][W.back().size()-1]).begin(),
+                         boost::get<0>(W[W.size()-1][W.back().size()-1]).end());
                 make_tree_decomposition(T, W, R, W.size()-1, W.back().size()-1, G);
                 return;
             }
