@@ -28,6 +28,7 @@
 #include <map>
 
 #include <boost/graph/adjacency_list.hpp>
+#include "graph.hpp"
 #include "preprocessing.hpp"
 #include "combinations.hpp"
 #include "lower_bounds.hpp"
@@ -35,7 +36,7 @@
 #include "nice_decomposition.hpp"
 #include "applications.hpp"
 #include "misc.hpp"
-#include "graph.hpp"
+
 
 
 #ifndef TD_STRUCT_BAG
@@ -47,8 +48,8 @@ struct bag{
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> TD_tree_dec_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, bag> TD_tree_dec_directed_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
 
 #include "python_tdlib.hpp"
 

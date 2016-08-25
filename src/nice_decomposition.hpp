@@ -352,7 +352,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 //Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
 void nicify(T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t = find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor t = treedec::nice::find_root(T);
 
     //Ensure we have an empty bag at the root.
     if(bag(t, T).size() > 0){

@@ -47,10 +47,6 @@ struct Edge_NF{
 // how to fix that now?
 // "bag" is also used as shorthand for bag access...
 
-struct bag{ //
-    std::set<unsigned int> bag;
-};
-
 struct bag_t{ //
     std::set<unsigned int> bag;
 };
@@ -76,7 +72,7 @@ template<class G>
 struct treedec_chooser{ //
     typedef unsigned value_type;
     typedef std::set<unsigned> bag_type;
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> type;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag_t> type;
 };
 // } not yet
 
