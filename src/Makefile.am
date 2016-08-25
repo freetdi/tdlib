@@ -31,4 +31,5 @@ pkginclude_HEADERS = \
   bucket_sorter.hpp.orig \
   random_generators.hpp \
   degree_config.hpp \
-  overlay.hpp
+  overlay.hpp \
+  graph_traits.hpp
