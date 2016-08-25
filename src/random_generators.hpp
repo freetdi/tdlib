@@ -4,18 +4,18 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <ctime>
+#include "trace.hpp"
 
 
 namespace treedec{
 
 namespace random{
 
-static bool coin(){
+static bool coin()
+{
     static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
     static boost::random::uniform_int_distribution<> _dist;
     static unsigned _rnd, _which;
-
-    //_rnd_gen.seed(static_cast<unsigned int>(std::time(0)));
 
     if(!_which){
         _rnd=_dist(_rnd_gen);
@@ -27,12 +27,10 @@ static bool coin(){
     return c;
 }
 
-inline unsigned randint(){
+inline unsigned randint(){ untested();
     static boost::random::mt11213b _rnd_gen; //fastest according to boost reference.
     static boost::random::uniform_int_distribution<> _dist;
     static unsigned _rnd;
-
-    //_rnd_gen.seed(static_cast<unsigned int>(std::time(0)));
 
     _rnd=_dist(_rnd_gen);
 

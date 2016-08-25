@@ -44,6 +44,7 @@
 #include "platform.hpp"
 #include "random_generators.hpp"
 #include "trace.hpp"
+#include "error.hpp"
 
 #include "degree.hpp"
 
@@ -582,12 +583,6 @@ bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
 }
 
 } // treedec
-
-class exception_unsuccessful : public std::runtime_error{
-public:
-  exception_unsuccessful() : std::runtime_error("exception_unsuccessful") { }
-};
-
 
 // transition
 namespace noboost{

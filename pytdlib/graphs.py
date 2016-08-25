@@ -1,3 +1,4 @@
+from RandomGNM_250_1000 import *
 
 #some graphs
 V_P6 = [0,1,2,3,4,5]

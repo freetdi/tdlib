@@ -4,6 +4,8 @@ pkginclude_HEADERS = \
   branch_decomposition.hpp \
   combinations.hpp \
   degree.hpp \
+  degree_config.hpp \
+  error.hpp \
   fill.hpp \
   dynamicCR.hpp \
   elimination_orderings.hpp \

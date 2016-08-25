@@ -46,19 +46,21 @@ struct bag{
 #endif
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, bag> TD_tree_dec_directed_t;
 
 #include "python_tdlib.hpp"
 
 
-void make_tdlib_graph(TD_graph_t &G, std::vector<unsigned int> &V, std::vector<unsigned int> &E){
+template <typename G_t>
+void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned int> &E, bool directed=false){
     unsigned int max = 0;
     for(unsigned int i = 0; i < V.size(); i++){
         max = (V[i]>max)? V[i] : max;
     }
 
-    std::vector<TD_graph_t::vertex_descriptor> idxMap(max+1);
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> idxMap(max+1);
     for(unsigned int i = 0; i < V.size(); i++){
         idxMap[i] = boost::add_vertex(G);
     }
@@ -66,6 +68,9 @@ void make_tdlib_graph(TD_graph_t &G, std::vector<unsigned int> &V, std::vector<u
     if(E.size() != 0){
         for(unsigned int j = 0; j < E.size()-1; j++){
             boost::add_edge(idxMap[E[j]], idxMap[E[j+1]], G);
+            if(directed){
+                boost::add_edge(idxMap[E[j+1]], idxMap[E[j]], G);
+            }
             j++;
         }
     }
@@ -147,12 +152,13 @@ int gc_preprocessing(std::vector<unsigned int> &V_G,
                      std::vector<unsigned int> &E_G,
                      std::vector<std::vector<int> > &bags, int lb)
 {
+    typedef typename treedec::graph_traits<TD_graph_t>::treedec_type T;
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
     std::vector< boost::tuple<
-        typename treedec::treedec_traits<typename treedec::treedec_chooser<TD_graph_t>::type>::vd_type,
-        typename treedec::treedec_traits<typename treedec::treedec_chooser<TD_graph_t>::type>::bag_type
+        typename treedec::treedec_traits<T>::vd_type,
+        typename treedec::treedec_traits<T>::bag_type
              > > td_bags;
     treedec::preprocessing(G, td_bags, lb);
 
@@ -165,7 +171,7 @@ int gc_preprocessing(std::vector<unsigned int> &V_G,
     for(unsigned int i = 0; i < td_bags.size(); i++){
         std::vector<int> bag;
         bag.push_back(td_bags[i].get<0>());
-        for(typename noboost::treedec_traits<typename noboost::treedec_chooser<TD_graph_t>::type>::bag_type::iterator sIt
+        for(typename treedec::treedec_traits<T>::bag_type::iterator sIt
                  = td_bags[i].get<1>().begin(); sIt != td_bags[i].get<1>().end(); sIt++)
         {
             bag.push_back(*sIt);
@@ -362,6 +368,37 @@ int gc_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int
     make_python_decomp(T, V_T, E_T);
     return treedec::get_width(T);
 }
+
+
+int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+{
+    TD_graph_directed_vec_t G;
+    make_tdlib_graph(G, V_G, E_G, true); //true = directed
+
+    std::vector<int> O;
+#ifndef NDEBUG
+    unsigned w1 = 
+#endif 
+    treedec::impl::boost_minDegree_ordering(G, O);
+
+    TD_graph_t H;
+    make_tdlib_graph(H, V_G, E_G);
+    TD_tree_dec_t T;
+    treedec::draft::vec_ordering_to_tree(G, O, T);
+
+#ifndef NDEBUG
+    unsigned w2 = treedec::get_width(T);
+#endif
+
+    assert(w1 == w2);
+
+    treedec::make_small(T);
+
+    make_python_decomp(T, V_T, E_T);
+    return treedec::get_width(T);
+}
+
 
 
 int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,

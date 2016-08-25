@@ -3,26 +3,26 @@ Interface with TdLib (algorithms for tree decompositions)
 
 This module defines functions based on TdLib, a
 library that implements algorithms for tree
-decompositions written by Lukas Larisch. 
+decompositions written by Lukas Larisch.
 
 Definition:
 
-A tree decomposition of a graph G is a pair (T, b) consisting of a graph T and 
-a function b: V(T) -> 2^{V(G)} associating with each vertex t in V(T) a set of 
-vertices b(t), called bags of T, that are subsets of V(G) such that 
+A tree decomposition of a graph G is a pair (T, b) consisting of a graph T and
+a function b: V(T) -> 2^{V(G)} associating with each vertex t in V(T) a set of
+vertices b(t), called bags of T, that are subsets of V(G) such that
 
 (T1) T is a tree,
 
 (T2) every vertex v in V(G) is contained in some bag of T,
 
-(T3) for every edge e in E(G) there is a node t in V(T) with e is a subset of 
+(T3) for every edge e in E(G) there is a node t in V(T) with e is a subset of
 b(t), and
 
-(T4) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty 
+(T4) for all v in V(G) the set b^{-1} := {t in V(T): v in b(t)} is non-empty
 and connected in T.
 
 The width of (T, b) is defined as max{|b(t)|-1: t in V(T) }.
-The treewidth of G is defined as the minimum width over all tree decompositions 
+The treewidth of G is defined as the minimum width over all tree decompositions
 of G.
 
 Some known results:
@@ -37,22 +37,22 @@ general.
 
 This module containes the following functions** :
 
-    - preprocessing   
+    - preprocessing
         Applies save reduction rules to a given graph
 
     - PP_MD
-        Applies preprocessing followed by the minDegree-heuristic to a given 
+        Applies preprocessing followed by the minDegree-heuristic to a given
         graph
 
     - PP_FI_TM
-        Applies preprocessing followed by the minFill-heuristic followed by 
+        Applies preprocessing followed by the minFill-heuristic followed by
         triangulation minimization to a given graph
 
     - lower_bound
         Computes a lower bound with respect to treewidth of a given graph
 
     - exact_decomposition_cutset
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
         (faster than the dynamic version in practice)
 
     - exact_decomposition_cutset_decision
@@ -60,11 +60,11 @@ This module containes the following functions** :
         and returns true, if tw(G) <= k. Otherwise false will be returned
 
     - exact_decomposition_dynamic
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
         (asymptotically faster than the greedy version)
 
     #- treedecomposition_exact_branch_and_bound
-        Computes a tree decomposition of exact width of a given graph 
+        Computes a tree decomposition of exact width of a given graph
 
     - seperator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
@@ -82,15 +82,15 @@ This module containes the following functions** :
         Computes an elimination ordering according to the minFill-heuristic
 
     - MSVS
-        Possibly reduces the width of a given tree decomposition with help 
+        Possibly reduces the width of a given tree decomposition with help
         of minimal seperating vertex sets
 
     - minimalChordal_ordering
-        Possibly reduces the width of a given tree decomposition by 
+        Possibly reduces the width of a given tree decomposition by
         triangulation minimization. Input: elimination ordering
 
     - minimalChordal_decomp
-        Possibly reduces the width of a given tree decomposition by 
+        Possibly reduces the width of a given tree decomposition by
         triangulation minimization. Input: tree decomposition
 
     #- random_branch_and_bound
@@ -254,7 +254,7 @@ cdef cython_make_tdlib_decomp(pyV, pyE, vector[vector[int]] &V, vector[unsigned 
 
 def apply_labeling(X, labels_map):
     X_ = list()
-    if len(X) > 0: 
+    if len(X) > 0:
         #X is a list of vertices/edges
         if isinstance(X[0], int):
             for x in X:
@@ -282,11 +282,11 @@ def inverse_labels_dict(labels_map):
 
 def preprocessing(V, E):
     """
-    Returns a possibly smaller instance of a given graph G and an encoding 
-    of the parts of a tree decomposition, that could be computed so far.  
+    Returns a possibly smaller instance of a given graph G and an encoding
+    of the parts of a tree decomposition, that could be computed so far.
     If the treewidth of G is at most 3, preprocessing will reduce G
-    to the empty graph and deliver the full list of bags, from which a 
-    tree decomposition of exact width can be made of. 
+    to the empty graph and deliver the full list of bags, from which a
+    tree decomposition of exact width can be made of.
     Otherwise, the algorithm may return a smaller instance of the original
     graph and the results of the reductions, that have been made so far
     as a list of bags.
@@ -330,10 +330,10 @@ def preprocessing(V, E):
 def PP_MD(V, E):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
-    the given graph G is not greater than 3, otherwise the reduced 
+    the given graph G is not greater than 3, otherwise the reduced
     instance G' of G will be processed by the minDegree heuristic, which
     successivly eliminates a vertex of minimal degree. The returned tree
-    decomposition then may be of non-optimal width. 
+    decomposition then may be of non-optimal width.
 
     INPUTS:
 
@@ -371,10 +371,10 @@ def PP_MD(V, E):
 def PP_FI_TM(V, E):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
-    the given graph G is not greater than 3, otherwise the reduced 
+    the given graph G is not greater than 3, otherwise the reduced
     instance G' of G will be processed by the fillIn heuristic, which
     successivly eliminates a vertex, that will cause least new edges
-    within the elimination process. The resulting tree decomposition 
+    within the elimination process. The resulting tree decomposition
     will be postprocessed by the minimalChordal algorithm, that may
     reduce the width of the tree decomposition.
 
@@ -416,7 +416,7 @@ def PP_FI_TM(V, E):
 
 def lower_bound(V, E, algorithm = "deltaC_least_c"):
     """
-    Calls one of the following algorithms to compute a lower bound on the 
+    Calls one of the following algorithms to compute a lower bound on the
     treewidth of a given graph:
 
         - deltaC_min_d
@@ -433,9 +433,9 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     - E_G : a list of edges of the input graph
 
-    - algorithm -- (default: 'deltaC_least_c') specifies the algorithm to use 
-                   for computing a lower bound on the treewidth of G. The 
-                   algorithms have to be choosen among the above mentioned. 
+    - algorithm -- (default: 'deltaC_least_c') specifies the algorithm to use
+                   for computing a lower bound on the treewidth of G. The
+                   algorithms have to be choosen among the above mentioned.
 
     OUTPUT:
 
@@ -481,10 +481,10 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
 def exact_decomposition_cutset(V, E, lb=-1):
     """
-    Computes a tree decomposition of exact width, iff the given lower bound 
+    Computes a tree decomposition of exact width, iff the given lower bound
     is not greater than the treewidth of the input graph. Otherwise
     a tree decomposition of a width than matches the given lower bound
-    will be computed. This algorithm is faster than 
+    will be computed. This algorithm is faster than
     exact_decomposition_dynamic in practical, but asymptotical slower.
 
     INPUTS:
@@ -514,7 +514,7 @@ def exact_decomposition_cutset(V, E, lb=-1):
 
     labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
 
-    cdef int c_lb = lb 
+    cdef int c_lb = lb
 
     gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb)
 
@@ -527,7 +527,7 @@ def exact_decomposition_cutset_decision(V, E, k):
     """
     Computes a tree decomposition of exact width, if tw(G)  k. Otherwise
     a tree decomposition of a width than matches the given lower bound
-    will be computed. This algorithm is faster than 
+    will be computed. This algorithm is faster than
     exact_decomposition_dynamic in practical, but asymptotical slower.
 
     INPUTS:
@@ -557,10 +557,10 @@ def exact_decomposition_cutset_decision(V, E, k):
 
     cython_make_tdlib_graph(V, E, V_G, E_G)
 
-    cdef int c_k = k 
+    cdef int c_k = k
 
     is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k)
-    
+
     if is_leq is 0:
         rtn = True
     else:
@@ -570,7 +570,7 @@ def exact_decomposition_cutset_decision(V, E, k):
 
 def exact_decomposition_dynamic(V, E, lb=-1):
     """
-    Computes a tree decomposition of exact width, iff the given lower bound 
+    Computes a tree decomposition of exact width, iff the given lower bound
     is not greater than the treewidth of the input graph. Otherwise
     a tree decomposition of a width than matches the given lower bound
     will be computed.
@@ -602,7 +602,7 @@ def exact_decomposition_dynamic(V, E, lb=-1):
 
     labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
 
-    cdef int c_lb = lb 
+    cdef int c_lb = lb
 
     gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb)
 
@@ -616,7 +616,7 @@ def exact_decomposition_dynamic(V, E, lb=-1):
 
 def seperator_algorithm(V, E):
     """
-    Computes a tree decomposition of a given graph using nearly balanced 
+    Computes a tree decomposition of a given graph using nearly balanced
     seperators. The returned width is at most 4*tw(G)+1.
 
     INPUTS:
@@ -684,12 +684,45 @@ def minDegree_decomp(V, E):
 
     return V_T_, E_T, get_width(V_T, E_T)
 
+def boost_minDegree_decomp(V, E):
+    """
+    Computes a tree decomposition of a given graph based on the (boost-)minDegree heuristic.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.boost_minDegree_decomp(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
 
 def fillIn_decomp(V, E):
     """
     Computes a tree decomposition of a given graph based on the fillIn heuristic.
-
-    INPUTS:
+     INPUTS:
 
     - V_G : a list of vertices of the input graph
 
@@ -722,7 +755,7 @@ def fillIn_decomp(V, E):
 
 def minDegree_ordering(V, E):
     """
-    Computes an elimination ordering of a given graph based on the minDegree 
+    Computes an elimination ordering of a given graph based on the minDegree
     heuristic.
 
     INPUTS:
@@ -757,7 +790,7 @@ def minDegree_ordering(V, E):
 
 def fillIn_ordering(V, E):
     """
-    Computes an elimination ordering of a given graph based on the fillIn 
+    Computes an elimination ordering of a given graph based on the fillIn
     heuristic.
 
     INPUTS:
@@ -796,7 +829,7 @@ def fillIn_ordering(V, E):
 def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
     """
     This may reduce the maximal bag size of a tree decomposition by refinement
-    of the bags with help of minimal seperating vertex sets. 
+    of the bags with help of minimal seperating vertex sets.
 
     INPUTS:
 
@@ -840,7 +873,7 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
 def minimalChordal_ordering(V, E, O):
     """
-    Returns an alternative elimination ordering E' than the given elimination 
+    Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
     input graph for computing a tree decomposition.
 
@@ -854,8 +887,8 @@ def minimalChordal_ordering(V, E, O):
 
     OUTPUT:
 
-    - An elimination ordering on G that may cause a lower width of the 
-      treedecomposition, that can be made out of it, than the width, 
+    - An elimination ordering on G that may cause a lower width of the
+      treedecomposition, that can be made out of it, than the width,
       that O will cause.
 
     EXAMPLES:
@@ -887,7 +920,7 @@ def minimalChordal_ordering(V, E, O):
 
 def minimalChordal_decomp(V_G, E_G, V_T, E_T):
     """
-    Returns an alternative elimination ordering E' than the given elimination 
+    Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
     input graph for computing a tree decomposition.
 
@@ -903,7 +936,7 @@ def minimalChordal_decomp(V_G, E_G, V_T, E_T):
 
     OUTPUT:
 
-    - A tree decomposition of G of possibly lower width than the 
+    - A tree decomposition of G of possibly lower width than the
       input treedecomposition.
 
     EXAMPLES:
@@ -1148,7 +1181,7 @@ def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
 
 def ordering_to_treedec(V, E, O):
     """
-    Applies an elimination ordering on a graph and returns 
+    Applies an elimination ordering on a graph and returns
     the resulting tree decomposition.
 
     INPUTS:
@@ -1271,7 +1304,7 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
                    <= -1, if (V_T, E_T) is not a tree
                    <= -2, if not all vertices of (V_G, E_G) are covered
                    <= -3, if not all edges of (V_G, E_G) are covered
-                   == -4, if condition (T4) of a treedecomposition is 
+                   == -4, if condition (T4) of a treedecomposition is
                              not satisfied
 
     EXAMPLES:
@@ -1294,7 +1327,7 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
 
     cdef c_status;
     c_status = gc_is_valid_treedecomposition(V_G, E_G, V_T, E_T);
-    
+
     py_status = c_status
 
     if(message):

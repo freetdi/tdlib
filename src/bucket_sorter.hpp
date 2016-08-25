@@ -13,14 +13,18 @@
 //   13 June 2001: Changed some names for clarity. (Jeremy Siek)
 //   01 April 2001: Modified to use new <boost/limits.hpp> header. (JMaddock)
 //
-#ifndef TD_BUCKET_SORTER
-#define TD_BUCKET_SORTER
+//   2016: modified by Lukas Larisch
+//
+#ifndef BOOST_GRAPH_DETAIL_BUCKET_SORTER_HPP
+#define BOOST_GRAPH_DETAIL_BUCKET_SORTER_HPP
 
 #include <vector>
 #include <cassert>
 #include <boost/limits.hpp>
 
+#ifdef RANDOMSTUFF
 #include "random_generators.hpp"
+#endif
 
 namespace treedec {
 
@@ -140,6 +144,7 @@ namespace treedec {
         }
       }
       std::pair<value_type, bool> next_value() {
+#ifdef RANDOMSTUFF // FIXME
         bool c = treedec::random::coin();
         //if(c){ std::cout << "coin: true" << std::endl; }
         //else { std::cout << "coin: false" << std::endl; }
@@ -151,6 +156,9 @@ namespace treedec {
         else {
           return std::make_pair(back(), false);
         }
+#else
+		  return std::make_pair(top(), true);
+#endif
       }
 
       value_type& back() { assert(last[bucket_id] != invalid_value()); return value[ last[bucket_id] ]; }

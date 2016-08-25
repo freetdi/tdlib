@@ -8,19 +8,31 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 //
-#ifndef TD_MINIMUM_DEGREE_ORDERING_HPP
-#define TD_MINIMUM_DEGREE_ORDERING_HPP
+// this file contains some additions by Lukas Larisch 2016
+// to be sorted out...
+//
+// most importantly, minimum_degree_ordering returns an unsigned. that's the
+// bagsize of the tree decomposition corresponding to the elimination ordering.
+//
+#ifndef MINIMUM_DEGREE_ORDERING_HPP
+#define MINIMUM_DEGREE_ORDERING_HPP
 
 #include <vector>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
-//#include <boost/pending/bucket_sorter.hpp>
+#ifdef RANDOMSTUFF
 #include "bucket_sorter.hpp"
+#else
+#include <boost/pending/bucket_sorter.hpp>
+#endif
 #include <boost/detail/numeric_traits.hpp> // for integer_traits
 #include <boost/graph/graph_traits.hpp>
 #include <boost/property_map/property_map.hpp>
 
-namespace treedec {
+#include "error.hpp"
+#include "trace.hpp"
+
+namespace boost {
 
   namespace detail {
 
@@ -197,8 +209,8 @@ namespace treedec {
     template <class Graph, class MarkerP, class NumberD, class Stack,
       class VertexIndexMap>
     class predicateRemoveEdge1 {
-      typedef typename boost::graph_traits<Graph>::vertex_descriptor vertex_t;
-      typedef typename boost::graph_traits<Graph>::edge_descriptor edge_t;
+      typedef typename graph_traits<Graph>::vertex_descriptor vertex_t;
+      typedef typename graph_traits<Graph>::edge_descriptor edge_t;
     public:
       predicateRemoveEdge1(Graph& _g, MarkerP& _marker, 
                            NumberD _numbering, Stack& n_e, VertexIndexMap id)
@@ -228,8 +240,8 @@ namespace treedec {
     template <class Graph, class MarkerP>
     class predicate_remove_tagged_edges
     {
-      typedef typename boost::graph_traits<Graph>::vertex_descriptor vertex_t;
-      typedef typename boost::graph_traits<Graph>::edge_descriptor edge_t;
+      typedef typename graph_traits<Graph>::vertex_descriptor vertex_t;
+      typedef typename graph_traits<Graph>::edge_descriptor edge_t;
     public:
       predicate_remove_tagged_edges(Graph& _g, MarkerP& _marker)
         : g(&_g), marker(&_marker) {}
@@ -253,16 +265,20 @@ namespace treedec {
     class mmd_impl
     {
       // Typedefs
-      typedef boost::graph_traits<Graph> Traits;
+      typedef graph_traits<Graph> Traits;
       typedef typename Traits::vertices_size_type size_type;
-      typedef typename boost::detail::integer_traits<size_type>::difference_type 
+      typedef typename detail::integer_traits<size_type>::difference_type 
         diff_t;
       typedef typename Traits::vertex_descriptor vertex_t;
       typedef typename Traits::adjacency_iterator adj_iter;
-      typedef boost::iterator_property_map<vertex_t*, 
-        boost::identity_property_map, vertex_t, vertex_t&> IndexVertexMap;
+      typedef iterator_property_map<vertex_t*, 
+        identity_property_map, vertex_t, vertex_t&> IndexVertexMap;
       typedef detail::Stacks<diff_t> Workspace;
+#ifdef RANDOMSTUFF
       typedef treedec::bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
+#else
+      typedef bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
+#endif
         DegreeLists;
       typedef Numbering<InversePermutationMap, diff_t, vertex_t,VertexIndexMap>
         NumberingD;
@@ -290,10 +306,10 @@ namespace treedec {
       MarkerP marker;
       Workspace work_space;
       unsigned ub;
-      unsigned c;
       unsigned c1, c2, c3, c4, c5;
+      unsigned c;
     public:
-      unsigned width;
+      unsigned bagsize;
 
       mmd_impl(Graph& g, size_type n_, DegreeMap degree, 
                InversePermutationMap inverse_perm, 
@@ -314,12 +330,12 @@ namespace treedec {
         marker(n_, vertex_index_map),
         work_space(n_),
         ub(ub_),
-        width(0),
-        c(0)
+        c(0),
+        bagsize(0)
       {
-        typename boost::graph_traits<Graph>::vertex_iterator v, vend;
+        typename graph_traits<Graph>::vertex_iterator v, vend;
         size_type vid = 0;
-        for (boost::tie(v, vend) = vertices(G); v != vend; ++v, ++vid)
+        for (tie(v, vend) = vertices(G); v != vend; ++v, ++vid)
           index_vertex_vec[vid] = *v;
         index_vertex_map = IndexVertexMap(&index_vertex_vec[0]);
 
@@ -343,7 +359,7 @@ namespace treedec {
           marker.mark_done(node);
           numbering(node);
           numbering.increment();
-          list_isolated.pop_front();
+          list_isolated.pop();
         }
         size_type min_degree = 1;
         typename DegreeLists::stack list_min_degree = degreelists[min_degree];
@@ -363,6 +379,7 @@ namespace treedec {
                  ++min_degree, list_min_degree = degreelists[min_degree])
               ;
 
+<<<<<<< HEAD
             std::pair<const vertex_t, bool> node_ = list_min_degree.next_value();
             const vertex_t node = node_.first;
             const size_type node_id = get(vertex_index_map, node);
@@ -377,10 +394,30 @@ namespace treedec {
 
             if (node_.second) {
               list_min_degree.pop_front();
+=======
+            const vertex_t node = list_min_degree.top();
+            const size_type node_id = get(vertex_index_map, node);
+
+            unsigned actual_deg = min_degree+supernode_size[node];
+
+            if (actual_deg >= ub)
+              throw treedec::exception_unsuccessful();
+
+            if(actual_deg > bagsize){
+               bagsize = actual_deg;
+            }else{
+            }
+
+#ifdef COINSTIUFF
+            if (node_.second) {
+              list_min_degree.pop();
             }
             else{
               list_min_degree.pop_back();
             }
+#else
+            list_min_degree.pop();
+#endif
             numbering(node);
 
             // check if node is the last one
@@ -390,10 +427,6 @@ namespace treedec {
             }
             marker.increment_tag();
             marker.mark_tagged(node);
-
-            perm[c] = node;
-            inverse_perm[node] = c;
-            c++;
 
             this->eliminate(node);
 
@@ -406,19 +439,18 @@ namespace treedec {
           this->update( llist, min_degree);
         }
 
- list_isolated = degreelists[0];
+#ifdef SOME_WEIRD_EXTRA_CODE
+
+		  list_isolated = degreelists[0];
         while (!list_isolated.empty()) {
           vertex_t node = list_isolated.top();
           marker.mark_done(node);
           numbering(node);
           numbering.increment();
-          list_isolated.pop_front();
+          list_isolated.pop();
           //c++;
         }
-
-std::cout << "n: " << n << std::endl;
-std::cout << "c: " << c << std::endl;
-
+#endif
       } // do_mmd()
 
       void eliminate(vertex_t node)
@@ -434,7 +466,7 @@ std::cout << "c: " << c << std::endl;
         predicate_remove_tagged_edges<Graph, MarkerP> p2(G, marker);
 
         // Reconstruct the adjacent node list, push element neighbor in a List.
-        boost::remove_out_edge_if(node, p, G);
+        remove_out_edge_if(node, p, G);
         //during removal element neighbors are collected.
 
         while (!element_neighbor.empty()) {
@@ -452,22 +484,18 @@ std::cout << "c: " << c << std::endl;
           element_neighbor.pop();
         }
         adj_iter v, ve;
-        for (boost::tie(v, ve) = boost::adjacent_vertices(node, G); v != ve; ++v) {
+        for (boost::tie(v, ve) = adjacent_vertices(node, G); v != ve; ++v) {
           vertex_t v_node = *v;
           if (!degree_lists_marker.need_update(v_node) 
               && !degree_lists_marker.outmatched_or_done(v_node)) {
             degreelists.remove(v_node);
           }
           //update out edges of v_node
-          boost::remove_out_edge_if(v_node, p2, G);
+          remove_out_edge_if(v_node, p2, G);
 
-          if ( boost::out_degree(v_node, G) == 0 ) { // indistinguishable nodes
+          if ( out_degree(v_node, G) == 0 ) { // indistinguishable nodes
             supernode_size[node] += supernode_size[v_node];
             supernode_size[v_node] = 0;
-
-            perm[c] = v_node;
-            inverse_perm[v_node] = c;
-            c++;
 
             numbering.indistinguishable(v_node, node);
             marker.mark_done(v_node);
@@ -492,11 +520,11 @@ std::cout << "c: " << c << std::endl;
           typename Workspace::stack q2list = work_space.make_stack();
           typename Workspace::stack qxlist = work_space.make_stack();
 
-          vertex_t current = boost::get(index_vertex_map, llist.top());
+          vertex_t current = get(index_vertex_map, llist.top());
           adj_iter i, ie;
-          for (boost::tie(i,ie) = boost::adjacent_vertices(current, G); i != ie; ++i) {
+          for (boost::tie(i,ie) = adjacent_vertices(current, G); i != ie; ++i) {
             vertex_t i_node = *i;
-            const size_type i_id =boost:: get(vertex_index_map, i_node);
+            const size_type i_id = get(vertex_index_map, i_node);
             if (supernode_size[i_node] != 0) {
               deg0 += supernode_size[i_node];
               marker.mark_multiple_tagged(i_node);
@@ -511,7 +539,7 @@ std::cout << "c: " << c << std::endl;
 
           while (!q2list.empty()) {
             const size_type u_id = q2list.top();
-            vertex_t u_node = boost::get(index_vertex_map, u_id);
+            vertex_t u_node = get(index_vertex_map, u_id);
             // if u_id is outmatched by others, no need to update degree
             if (degree_lists_marker.outmatched_or_done(u_node)) {
               q2list.pop();
@@ -520,7 +548,7 @@ std::cout << "c: " << c << std::endl;
             marker.increment_tag();
             deg = deg0;
 
-            adj_iter nu = boost::adjacent_vertices(u_node, G).first;
+            adj_iter nu = adjacent_vertices(u_node, G).first;
             vertex_t neighbor = *nu;
             if (neighbor == u_node) {
               ++nu;
@@ -528,20 +556,17 @@ std::cout << "c: " << c << std::endl;
             }
             if (numbering.is_numbered(neighbor)) {
               adj_iter i, ie;
-              for (boost::tie(i,ie) = boost::adjacent_vertices(neighbor, G);
+              for (boost::tie(i,ie) = adjacent_vertices(neighbor, G);
                    i != ie; ++i) {
                 const vertex_t i_node = *i;
                 if (i_node == u_node || supernode_size[i_node] == 0)
                   continue;
                 if (marker.is_tagged(i_node)) {
                   if (degree_lists_marker.need_update(i_node)) {
-                    if ( boost::out_degree(i_node, G) == 2 ) { // is indistinguishable
+                    if ( out_degree(i_node, G) == 2 ) { // is indistinguishable
                       supernode_size[u_node] += supernode_size[i_node];
                       supernode_size[i_node] = 0;
                       numbering.indistinguishable(i_node, u_node);
-                      perm[c] = i_node;
-                      inverse_perm[i_node] = c;
-                      c++;
                       marker.mark_done(i_node);
                       degree_lists_marker.mark(i_node);
                     } else                        // is outmatched
@@ -577,7 +602,7 @@ std::cout << "c: " << c << std::endl;
             marker.increment_tag();
             deg = deg0;
             adj_iter i, ie;
-            for (boost::tie(i, ie) = boost::adjacent_vertices(u_node, G); i != ie; ++i) {
+            for (boost::tie(i, ie) = adjacent_vertices(u_node, G); i != ie; ++i) {
               vertex_t i_node = *i;
               if (marker.is_tagged(i_node)) 
                 continue;
@@ -585,7 +610,7 @@ std::cout << "c: " << c << std::endl;
 
               if (numbering.is_numbered(i_node)) {
                 adj_iter j, je;
-                for (boost::tie(j, je) = boost::adjacent_vertices(i_node, G); j != je; ++j) {
+                for (boost::tie(j, je) = adjacent_vertices(i_node, G); j != je; ++j) {
                   const vertex_t j_node = *j;
                   if (marker.is_not_tagged(j_node)) {
                     marker.mark_tagged(j_node);
@@ -680,19 +705,20 @@ std::cout << "c: " << c << std::endl;
      InversePermutationMap inverse_perm, 
      PermutationMap perm, 
      SuperNodeMap supernode_size, 
+     int /* delta */,
      VertexIndexMap vertex_index_map,
      unsigned ub = UINT_MAX)
   {
     detail::mmd_impl<Graph,DegreeMap,InversePermutationMap,
       PermutationMap, SuperNodeMap, VertexIndexMap> 
-      impl(G, num_vertices(G), degree, inverse_perm, 
+      impl(G, boost::num_vertices(G), degree, inverse_perm, 
            perm, supernode_size, vertex_index_map, ub);
     impl.do_mmd();
-    //impl.build_permutation(inverse_perm, perm); //do not use this.
+    impl.build_permutation(inverse_perm, perm);
 
-    return impl.width;
+    return impl.bagsize;
   }
 
-} //namespace treedec
+} // namespace boost
 
-#endif // TD_MINIMUM_DEGREE_ORDERING_HPP
+#endif // MINIMUM_DEGREE_ORDERING_HPP

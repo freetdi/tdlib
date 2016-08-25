@@ -51,7 +51,14 @@
 #include <climits>
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/tuple/tuple.hpp>
+#include <boost/graph/adjacency_matrix.hpp>
+
+#include <boost/graph/minimum_degree_ordering.hpp>
+
+#include "trace.hpp"
+#include "preprocessing.hpp"
+#include "simple_graph_algos.hpp"
+#include "misc.hpp"
 
 #include "graph.hpp"
 #include "fill.hpp"
@@ -63,10 +70,6 @@
 #include "minimum_degree_ordering.hpp"
 
 namespace treedec{
-
-template <typename G_t>
-void boost_minDegree_ordering(G_t &G, std::vector<int> &O);
-
 
 //register a 2-neigborhood to FILL
 template<class U, class G_t, class B, class F>
@@ -193,7 +196,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T, O_t *, unsigned ub=UINT_MAX)
+   minDegree_decomp(G_t &G, T_t *T, O_t *O, unsigned ub=UINT_MAX)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -261,7 +264,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
         if(T){
             bags_i = &bags[i];
             elim_vertices[i] = get_vd(G, c);
-            upper_bound = (min_ntd > upper_bound)? min_ntd : upper_bound;
+        }else if(min_ntd > upper_bound){
+            upper_bound = min_ntd;
         }
 
         ++i; // number of nodes in tree decomposition tree
@@ -310,7 +314,7 @@ template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX)
 {
-    return minDegree_decomp(G, T, (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL, ub);
+    return minDegree_decomp(G, T, (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL);
 
 }
 
@@ -327,11 +331,9 @@ typename boost::graph_traits<G_t>::vertices_size_type
 //Constructs a tree decomposition from the elimination ordering obtained by the
 //minimum-degree heuristic.
 template <typename G_t, typename T_t>
-typename boost::graph_traits<G_t>::vertices_size_type
-    minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
+void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
 {
-    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
-    return impl::minDegree_decomp(G, &T, (O_t*)NULL, ub);
+    impl::minDegree_decomp(G, &T);
 }
 
 
@@ -410,6 +412,62 @@ void endless_boost_minDegree_ordering(G_t &G, O_t &O){
 }
 
 
+
+namespace impl{
+
+template <typename G_t>
+void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
+    typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+
+    vertices_size_type n = boost::num_vertices(G);
+    edges_size_type e = boost::num_edges(G);
+
+
+    O.resize(n);
+
+    unsigned i = 0;
+    // boost does not like cliques.
+    if((n*(n-1u)) == boost::num_edges(G)){
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            O[i++] = *vIt;
+        }
+    }
+
+    std::vector<int> inverse_perm(n, 0);
+    std::vector<int> supernode_sizes(n, 1);
+    typename boost::property_map<G_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, G);
+    std::vector<int> degree(n, 0);
+
+    boost::minimum_degree_ordering
+             (G,
+              boost::make_iterator_property_map(&degree[0], id, degree[0]),
+              &inverse_perm[0],
+              &O[0],
+              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+              0,
+              id);
+}
+
+
+template <typename G_t, typename T_t>
+void endless_minDegree_decomp(G_t &G, T_t &T){
+    unsigned best = UINT_MAX;
+    G_t Gbak(G);
+    while(true){
+        try{
+            T_t U;
+            best = treedec::minDegree_decomp(G, U, best);
+            T = MOVE(U);
+        }
+        catch(...){
+        }
+        boost::copy_graph(Gbak, G);
+    }
+}
+
+} //namespace impl
 
 namespace impl{
 
@@ -781,52 +839,98 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
     ordering_to_treedec(G, O_, T);
 }
 
-template <typename G_t, typename O_t, typename T_t>
-void vec_ordering_to_treedec(G_t &G, O_t &O, T_t &T){
+namespace draft{
+
+// TODO: tries hard to add edges at the end. does that make sense?
+// TODO: what are the preconditions?!
+// TODO: can order be an input range?
+template <typename G_t, typename O_t, class T_t>
+void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
+{
     size_t num_vert = boost::num_vertices(G);
-    std::vector<unsigned> iO(num_vert);
-    std::vector<bool> marker(num_vert);
-    std::vector<std::vector<bool> > bags(num_vert);
+    assert(num_vert = O.size());
+    O_t iOlocal;
+
+    if(io){
+        assert(io->size()==num_vert);
+    }else{
+        iOlocal.resize(num_vert);
+        io=&iOlocal;
+    }
+    O_t& iO=*io;
+
+    size_t invalid=num_vert;
+    std::vector<unsigned> edges(num_vert-1u, invalid);
+    assert(edges.size()==num_vert-1);
+    typedef boost::adjacency_matrix<boost::directedS> bamd;
+    bamd bags(num_vert);
 
     for(unsigned i = 0; i < num_vert; i++){
         iO[O[i]] = i;
-        bags[i].assign(num_vert, false);
-        boost::add_vertex(T);
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        BOOST_AUTO(R, boost::adjacent_vertices(O[i], G));
+        for(;R.first!=R.second;++R.first) {
+            unsigned n_node = *R.first;
+            if((unsigned)iO[n_node] > i){
+                boost::add_edge(i, n_node, bags);
+            }
+        }
     }
 
     for(unsigned i = 0; i < num_vert; i++){
         std::vector<unsigned> N;
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(O[i], G); nIt != nEnd; nIt++){
-            unsigned n_node = *nIt;
-            if(iO[n_node] > i){
-                bags[i][n_node] = true;
-                N.push_back(n_node);
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                N.push_back(j);
+                unsigned iO_n_node = iO[j];
+                if(iO_n_node < edges[i]){
+                    edges[i] = iO_n_node;
+                }
             }
         }
-
 
         for(unsigned j = 0; j < N.size(); j++){
             for(unsigned k = 0; k < N.size(); k++){
                 if(iO[N[k]] > iO[N[j]]){
-                    bags[N[j]][N[k]] = true;
+                    boost::add_edge(iO[N[j]], N[k], bags);
+                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
+                        edges[iO[N[j]]] = iO[N[k]];
+                    }
                 }
             }
         }
     }
 
-/*
-    for(unsigned u = 0; u < num_vert; u++){
-        for(unsigned w = 0; w < num_vert; w++){
-            if(bags[u][w]){
-                T[u].bag.push_back(w);
-            }
+    for(unsigned i = 0; i < num_vert; i++){
+        boost::add_vertex(t);
+        typename treedec_traits<T_t>::bag_type& b=bag(i,t);
+        duh::push(b,O[i]);
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                duh::push(b,j);
+             }
+         }
+     }
+
+    for(unsigned i = 0; i < num_vert-1u; i++){
+        assert(edges[i]>i || edges[i]==invalid);
+        if(edges[i]!=invalid){
+            // normal edge, as computed above.
+            boost::add_edge(i,edges[i],t);
+        }else if(i+1!=num_vert){
+            // edge to next component
+            boost::add_edge(i,i+1,t);
+        }else{
+            // exiting last connected component.
+            // ... dont connect
         }
     }
 
-TODO: add edges
-*/
 }
+
+} // draft
 
 namespace impl{
 
@@ -1122,27 +1226,6 @@ void LEX_M_minimal_ordering(G_t &G,
         }
     }
 }
-
-/*
-template <typename iO_t, typename M_t, typename G_t>
-class elim_predicate{
-public:
-    elim_predicate(iO_t &_iO, M_t &_M, G_t &_G) : iO(_iO), M(_M), G(_G){}
-
-    template <typename E_t>
-    bool operator()(const E_t &e){
-        unsigned iO_id = iO[boost::source(*e, G)];
-        if(M[boost::target(*e, G)] && iO[boost::target(*e, G)] > iO_id){
-            return true;
-        }
-        return false;
-    }
-private:
-    const M_t &M;
-    const iO_t &iO;
-    const G_t &G;
-};
-*/
 
 } //namespace treedec
 

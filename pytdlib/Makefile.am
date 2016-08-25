@@ -5,6 +5,8 @@ inst_PYTHON = __init__.py
 inst_LTLIBRARIES = tdlib.la
 tdlib_la_SOURCES = tdlib.pyx python_tdlib.cpp
 
+PACKAGE_STRING+= python interface
+
 CLEANFILES += tdlib.cpp
 
 AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
@@ -23,6 +25,8 @@ TESTS = \
 	test_misc.py \
 	test_post.py \
 	test_pre.py
+
+$(TESTS:%.py=%.log): all-am
 
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)

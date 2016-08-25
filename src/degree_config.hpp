@@ -20,6 +20,8 @@
 #ifndef TD_DEGREE_CONFIG_H
 #define TD_DEGREE_CONFIG_H
 #include <boost/graph/graph_traits.hpp>
+#include "trace.hpp"
+#include <set>
 
 namespace misc {
 namespace detail {
@@ -37,8 +39,12 @@ struct deg_config{
     static unsigned num_threads(){return 1;}
 
     template <typename C_t>
-    static vd_type pick(unsigned degree, C_t &C){
-        return *C[degree].begin();
+    static vd_type pick(C_t &C){
+        return *C.begin();
+    }
+    template <typename C_t>
+    static vd_type pick_and_erase(C_t &){
+		 incomplete();
     }
 };
 
