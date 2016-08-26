@@ -5,19 +5,27 @@ from graphs import *
 
 class TestTdLib_pre(unittest.TestCase):
 
-    def test_preprocessing(self):
+    def test_preprocessing_P6(self):
         V_, E_, B, lb = tdlib.preprocessing(V_P6, E_P6)
         self.assertEqual(V_, [])
         self.assertEqual(E_, [])
-        self.assertEqual(len(B), 5)
+        for i in range(len(B)):
+            B[i].sort()
+        B.sort()
+        self.assertEqual(B, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
         self.assertEqual(lb, 1)
 
+    def test_preprocessing_K5(self):
         V_, E_, B, lb = tdlib.preprocessing(V_K5, E_K5)
         self.assertEqual(V_, [])
         self.assertEqual(E_, [])
-        self.assertEqual(len(B), 4)
+        for i in range(len(B)):
+            B[i].sort()
+        B.sort()
+        self.assertEqual(B, [[0, 1, 2, 3, 4], [1, 2, 3, 4], [2, 3, 4], [3, 4]])
         self.assertEqual(lb, 4)
 
+    def test_preprocessing_Peter(self):
         V_, E_, B, lb = tdlib.preprocessing(V_Petersen, E_Petersen)
         self.assertEqual(V_, V_Petersen)
         self.assertEqual(E_, [0,1,0,4,0,5,1,2,1,6,2,3,2,7,3, \

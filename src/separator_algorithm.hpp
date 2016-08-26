@@ -224,7 +224,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                     //Do the extended deepth-first-search on the neighbours of vertices in X and Y
                     sX.clear();
                     sY.clear();
-#if 1
+
                     {
                         BOOST_AUTO(N, make_neighbourhood_range((*I).first, (*I).second, G, s));
                         BOOST_AUTO(NI, N.first);
@@ -245,25 +245,14 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                             }
                         }
                     }
-#endif
-#if 0
-                    treedec::get_neighbourhood(G, disabled_, (*I).first, (*I).second, sX);
-                    treedec::get_neighbourhood(G, disabled_, (*J).first, (*J).second, sY);
-#endif
-
-                    //            assert(sX.size() == sXv.size());
-                    //          assert(sY.size() == sYv.size());
 
                     //Z must be a subset of S.
                     // Z=W\X_Y
-
                     std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
                             std::inserter(sX, sX.begin()));
                     std::set_difference(W.begin(), W.end(), X_Y.begin(), X_Y.end(),
                             std::inserter(sY, sY.begin()));
 
-                    //status1 = nf1::seperate_vertices(G, disabled_, sX, sY, S_, k+1);
-                    // network_flow here.
                     if(!treedec::seperate_vertices(G, disabled_, num_dis_, sX, sY, S, k+1, dg)){
                         continue;
                     }
@@ -313,12 +302,6 @@ bool sep_decomp(G_t const &G, T_t &T,
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
-#if 0 // not yet
-    typedef typename std::vector<vertex_descriptor> vertex_vector;
-    typedef typename treedec_traits<T_t>::vd_type vd_type; // vertex identifier. possibly shorter than
-                                                           // vertex_descriptor
-    typedef typename std::set<vd_type> vd_set;             // just treedec bag_type?
-#endif
 
     //tw(G) > k - one could replace this with a better lower bound (see lower_bounds.hpp).
     if(boost::num_edges(G) > k*boost::num_vertices(G)){
@@ -338,9 +321,6 @@ bool sep_decomp(G_t const &G, T_t &T,
         treedec::map_descriptors_to_bags<G_t>(vertices, B1);
         treedec::sep_glue_bag(B1, B2, T);
         return true;
-    }else if(k==0){
-    }else if(k==1){
-    }else{
     }
 
     //Turn W into a superset of W of size 3k + 1.
