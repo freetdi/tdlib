@@ -110,16 +110,16 @@ struct fill_update_cb : public graph_callback<G_t>{
     {
         _fill->q_eval(v);
     }
-    void operator()(edge_descriptor edg)
-    {
-        assert(boost::source(edg, G) < boost::target(edg, G));
+    void operator()(vertex_descriptor s, vertex_descriptor t)
+    { untested();
+        assert(s < t); // likely not. is this necessary below?
         // e has just been inserted.
-        BOOST_AUTO(cni, common_out_edges(boost::source(edg, G), boost::target(edg, G), G));
+        BOOST_AUTO(cni, common_out_edges(s, t, G));
         BOOST_AUTO(i, cni.first);
         BOOST_AUTO(e, cni.second);
-        for(; i!=e; ++i){
-            assert(*i != boost::source(edg, G));
-            assert(*i != boost::target(edg, G));
+        for(; i!=e; ++i){ untested();
+            assert(*i != s);
+            assert(*i != t);
 //            no. maybe theres only half an edge.
 //            assert(boost::edge(boost::source(edg, G), *i, G).second);
 //            assert(boost::edge(boost::target(edg, G), *i, G).second);
@@ -416,7 +416,8 @@ void endless_boost_minDegree_ordering(G_t &G, O_t &O){
 namespace impl{
 
 template <typename G_t>
-void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
+typename boost::graph_traits<G_t>::vertices_size_type
+boost_minDegree_ordering(G_t &G, std::vector<int> &O){
     typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 
@@ -448,6 +449,9 @@ void boost_minDegree_ordering(G_t &G, std::vector<int> &O){
               boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
               0,
               id);
+
+    incomplete();
+    return 0;
 }
 
 
