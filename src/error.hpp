@@ -30,5 +30,10 @@ public:
   exception_unsuccessful() : std::runtime_error("exception_unsuccessful") { }
 };
 
+class exception_invalid_precondition : public std::runtime_error{
+public:
+  exception_invalid_precondition() : std::runtime_error("exception_invalid_precondition") { }
+};
+
 }
 #endif

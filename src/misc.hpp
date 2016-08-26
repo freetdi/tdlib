@@ -156,14 +156,14 @@ bool validate_connectivity(T_t &T){
             }
         }
 
-        if(set_intersect(forgotten, bag(cur, T))){ untested();
+        if(set_intersect(forgotten, bag(cur, T))){
 #ifndef NDEBUG
-        typename treedec_traits<T_t>::bag_type I;
-        std::set_intersection(forgotten.begin(), forgotten.end(), bag(cur, T).begin(), bag(cur, T).end(), std::inserter(I, I.begin()));
-        std::cerr << "[is_valid_treedecomposition]: vertices are not connected: " << std::endl;
-        for(typename treedec_traits<T_t>::bag_type::iterator it = I.begin(); it != I.end(); it++){
-            std::cerr << *it << std::endl;
-        }
+            typename treedec_traits<T_t>::bag_type I;
+            std::set_intersection(forgotten.begin(), forgotten.end(), bag(cur, T).begin(), bag(cur, T).end(), std::inserter(I, I.begin()));
+            std::cerr << "[is_valid_treedecomposition]: vertices are not connected: " << std::endl;
+            for(typename treedec_traits<T_t>::bag_type::iterator it = I.begin(); it != I.end(); it++){
+                std::cerr << *it << std::endl;
+            }
 #endif
             return false;
         }
@@ -178,71 +178,6 @@ bool validate_connectivity(T_t &T){
                             std::inserter(forgotten, forgotten.begin()));
     }
 }
-
-
-
-
-
-namespace HACK{
-// hmm, inefficient. should sort first
-// but then, need mutable bags :/
-// (e.g. in check_treedec below)
-template <class X>
-inline bool contains(std::vector<X> const& c, X const& v)
-{
-	typedef typename std::vector<X>::const_iterator it;
-
-	for(it i=c.begin(); i!=c.end(); ++i){
-		if(v == *i) return true;
-	}
-	return false;
-}
-template <class C>
-inline bool contains(C const& c, typename C::value_type const& v)
-{
-	return(c.find(v) != c.end());
-}
-}
-namespace duh{
-template<class C, class E>
-void ins(C& c, E e)
-{
-	c.insert(e);
-}
-// "insert" into vector.
-// the intent is to not generate dups, hence assert.
-template<class E>
-void ins(std::vector<unsigned>& c, E e)
-{
-        assert(!HACK::contains(c,e));
-	c.push_back(e);
-}
-template<class E>
-void ins(std::vector<short unsigned>& c, E e)
-{
-        assert(!HACK::contains(c,e));
-	c.push_back(e);
-}
-template<class C, class E>
-void push(C& c, E e)
-{
-	bool check=c.insert(e).second;
-        assert(check); (void)check;
-}
-template<class E>
-void push(std::vector<unsigned>& c, E e)
-{
-	c.push_back(e);
-}
-template<class E>
-void push(std::vector<short unsigned>& c, E e)
-{
-	c.push_back(e);
-}
-} // duh
-
-
-
 
 
 /* Checks if a tree decomposition is valid with respect to G.
@@ -327,8 +262,8 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
 
             if(!is_contained){
 #ifndef NDEBUG
-        std::cerr << "[is_valid_treedecomposition]: not all edges covered: " << std::endl;
-        std::cerr << "    " << *vIt << "--" << *nIt << std::endl;
+                std::cerr << "[is_valid_treedecomposition]: not all edges covered: " << std::endl;
+                std::cerr << "    " << *vIt << "--" << *nIt << std::endl;
 #endif
                 return -3; //Not all edges are covered.
             }

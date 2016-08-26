@@ -31,6 +31,12 @@ class TestTdLib_post(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V_T2, E_T2) == 0, True)
         self.assertEqual(w2, 6)
 
+        V_G, E_G = randomGNP(30, .1)
+        V_T1, E_T1, w1 = tdlib.minDegree_decomp(V_G, E_G)
+        V_T2, E_T2, w2 = tdlib.minimalChordal_decomp(V_G, E_G, V_T1, E_T1)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_G, E_G, V_T2, E_T2) == 0, True)
+        self.assertEqual(w2 <= w1, True)
+
 
 if __name__ == '__main__':
     unittest.main()

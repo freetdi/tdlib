@@ -38,14 +38,6 @@
 #include "misc.hpp"
 
 
-
-#ifndef TD_STRUCT_BAG
-#define TD_STRUCT_BAG
-struct bag{
-    std::set<unsigned int> bag;
-};
-#endif
-
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
@@ -686,4 +678,4 @@ int gc_get_width(std::vector<std::vector<int> > &V_T){
     return width-1;
 }
 
-
+// vim:ts=8:sw=2:et

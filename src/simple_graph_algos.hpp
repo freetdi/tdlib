@@ -126,7 +126,9 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     if(boost::num_vertices(H)==0){
         return copy_induced_subgraph(H, G, X, vdMap);
-    }else{ untested();
+    }
+    else{
+        throw exception_invalid_precondition();
     }
     std::vector<vertex_descriptor> internal_map(boost::num_vertices(G));
     std::vector<bool> disabled(boost::num_vertices(G), true);

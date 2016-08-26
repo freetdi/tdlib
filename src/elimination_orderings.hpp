@@ -139,7 +139,7 @@ namespace detail{
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeletal_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
-{ untested();
+{
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
     std::vector<unsigned int> inv_O(boost::num_vertices(G), n_+1);
@@ -518,7 +518,6 @@ typename boost::graph_traits<G_t>::vertices_size_type
             assert(i<bags.size());
             bags_i = &bags[i];
             elim_vertices[i] = get_vd(G, v);
-        }else{untested();
         }
 
         fill.mark_neighbors(v, min_fill);
@@ -787,12 +786,12 @@ template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t &G,
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O,
     T_t &T)
-{ untested();
+{
     unsigned n = O.size();
 
     typename std::vector<typename treedec_traits<T_t>::bag_type> bags(n);
 
-    for(unsigned int i = 0; i < O.size(); i++){ untested();
+    for(unsigned int i = 0; i < O.size(); i++){
         make_clique_and_detach(O[i], G, bags[i]);
     }
 
