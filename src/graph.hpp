@@ -399,10 +399,20 @@ struct deg_chooser{ //
 // isolate c in g
 // return bag
 // optionally: pass pointer to bag for storage.
+//TODO: not here.
 template<class G>
 inline void detach_neighborhood(
         typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename graph_traits<G>::outedge_set_type& bag);
+        G& g, typename graph_traits<G>::outedge_set_type & bag)
+{
+    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
+    {
+        bag.insert(get_vd(g, *nIt1));
+    }
+    boost::clear_vertex(c, g);
+}
 
 
 // count number of edges missing in 1-neighborhood of v
