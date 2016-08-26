@@ -23,7 +23,6 @@
 #define OVERLAY_H
 
 namespace treedec {
-namespace draft {
 
 // immutable overlay
 // make a vertex subset of a graph look like a graph
@@ -154,8 +153,8 @@ inline IG_t const& immutable_clone(
     return immutable_clone(G, ig, bbegin, bend, bag_nv, vdMap, c);
 }
 
-} // draft
-
 } // treedec
+
 #endif // guard
+
 // vim:ts=8:sw=4:et

@@ -301,7 +301,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     }
 
     //Build a treedecomposition.
-    if(T){ std::cout << "i: " << i << ", n: " << num_vert << std::endl;
+    if(T){
         assert(i == num_vert);
         treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
     }
@@ -386,7 +386,6 @@ void endless_minDegree_decomp(G_t &G, T_t &T){
             G_t H(G);
 
             best = treedec::minDegree_decomp(H, T, best);
-            std::cout << "best: " << best << std::endl;
             U = T;
         }
         catch(...){
@@ -394,30 +393,12 @@ void endless_minDegree_decomp(G_t &G, T_t &T){
     }
 }
 
-template <typename G_t, typename O_t>
-void endless_boost_minDegree_ordering(G_t &G, O_t &O){
-    unsigned best = UINT_MAX;
-    while(true){
-        try{
-            G_t H(G);
-            O_t O2;
-
-            best = treedec::boost_minDegree_ordering(H, O2, best);
-            std::cout << "best: " << best << std::endl;
-            O = O2;
-        }
-        catch(...){
-        }
-    }
-}
-
-
-
 namespace impl{
 
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-boost_minDegree_ordering(G_t &G, std::vector<int> &O){
+  boost_minDegree_ordering(G_t &G, std::vector<int> &O)
+{
     typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 
@@ -450,7 +431,6 @@ boost_minDegree_ordering(G_t &G, std::vector<int> &O){
               0,
               id);
 
-    incomplete();
     return 0;
 }
 
@@ -843,13 +823,8 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
     ordering_to_treedec(G, O_, T);
 }
 
-namespace draft{
-
-// TODO: tries hard to add edges at the end. does that make sense?
-// TODO: what are the preconditions?!
-// TODO: can order be an input range?
 template <typename G_t, typename O_t, class T_t>
-void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
+void vec_ordering_to_tree(G_t &G, O_t &O, T_t& T, O_t* io=NULL)
 {
     size_t num_vert = boost::num_vertices(G);
     assert(num_vert = O.size());
@@ -866,6 +841,7 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
     size_t invalid=num_vert;
     std::vector<unsigned> edges(num_vert-1u, invalid);
     assert(edges.size()==num_vert-1);
+
     typedef boost::adjacency_matrix<boost::directedS> bamd;
     bamd bags(num_vert);
 
@@ -908,12 +884,11 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
     }
 
     for(unsigned i = 0; i < num_vert; i++){
-        boost::add_vertex(t);
-        typename treedec_traits<T_t>::bag_type& b=bag(i,t);
-        duh::push(b,O[i]);
+        boost::add_vertex(T);
+        bag(i,T).insert(O[i]);
         for(unsigned j = 0; j < num_vert; j++){
             if(boost::edge(i, j, bags).second){
-                duh::push(b,j);
+                bag(i,T).insert(j);
              }
          }
      }
@@ -922,19 +897,18 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T_t& t, O_t* io=NULL)
         assert(edges[i]>i || edges[i]==invalid);
         if(edges[i]!=invalid){
             // normal edge, as computed above.
-            boost::add_edge(i,edges[i],t);
-        }else if(i+1!=num_vert){
+            boost::add_edge(i, edges[i], T);
+        }
+        else if(i+1!=num_vert){
             // edge to next component
-            boost::add_edge(i,i+1,t);
-        }else{
+            boost::add_edge(i, i+1, T);
+        }
+        else{
             // exiting last connected component.
             // ... dont connect
         }
     }
-
 }
-
-} // draft
 
 namespace impl{
 

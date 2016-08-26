@@ -906,21 +906,6 @@ void subsets(S const &X, int size, int k, int idx,
     return subsets(X, size, k, idx, subs, &sub);
 }
 
-
-//TODO: not here.
-template<class G>
-inline void detach_neighborhood(
-        typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename outedge_set<G>::type& bag)
-{
-    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
-    // inefficient.
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
-    {
-        bag.insert(get_vd(g, *nIt1));
-    }
-    boost::clear_vertex(c, g);
-}
 } // namespace treedec
 
 #endif //TD_MISC

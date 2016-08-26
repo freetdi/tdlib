@@ -97,9 +97,6 @@ bool is_improvement_bag(B_t const &H,
  * If no separator can be found for none of the maximum-sized bags, the algorithm stops. Otherwise,
  * the tree decomposition T is refined according to S.
  *
- * Warning: This function is not tested with directed treedecompositions
- *           (and probably computes an invalid treedecomposition. It should
- *            be possible to fix this by re-rooting the resulting treedecomposition).
  */
 template <typename G_t, typename T_t>
 void MSVS(G_t const &G, T_t &T)
@@ -154,9 +151,9 @@ void MSVS(G_t const &G, T_t &T)
                 disabled_.resize(0);
                 vdMap_.resize(0);
 
-                draft::is_in_neighbour_bd<vertex_descriptor, T_t> cb(T, *tIt);
+                is_in_neighbour_bd<vertex_descriptor, T_t> cb(T, *tIt);
                 BOOST_AUTO(mybag, bag(*tIt, T));
-                HI = &draft::immutable_clone(G, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
+                HI = &immutable_clone(G, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
                 status = is_improvement_bag
                   <immutable_type, 
                    std::vector<vertex_descriptor>,

@@ -285,7 +285,7 @@ static bool t_search_disjoint_ways(
         G_t const &G)
 {
     boost::get(&Vertex_NF::visited, diG, v) = true;
-    bool on_a_path = boost::get(&Vertex_NF::predecessor, diG, v) != v;
+    bool on_a_path = (unsigned) boost::get(&Vertex_NF::predecessor, diG, v) != v;
 
     //The walk has reached the sink. We can extend the set of disjoint paths by another path.
     if(v == sink){

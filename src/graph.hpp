@@ -64,22 +64,10 @@ private:
 #endif
 
 namespace treedec{ //
-#if 0 // later, need c++11
-    template<typename G>
-    using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
-    template<typename G>
-    using vertex_descriptor = typename boost::graph_traits<G>::vertex_descriptor;
-    template<typename G>
-    using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
-#define vertex_iterator_G vertex_iterator<G>
-#define vertex_descriptor_G typename vertex_descriptor<G>
-#define adjacency_iterator_G typename adjacency_iterator<G>
-#else
+
 #define vertex_iterator_G typename boost::graph_traits<G>::vertex_iterator
 #define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
-#endif
-
 
 template<class G>
 void check(G const&)
@@ -88,7 +76,7 @@ void check(G const&)
 
 template<typename G>
 void remove_vertex(vertex_iterator_G u, G &g)
-{untested();
+{
     remove_vertex(*u, g);
 }
 
@@ -287,28 +275,27 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
            const G_t &G);
 
-// copy vertices of G into degree_sequence, ordered by degree, starting with
-// lowest
+//Copy vertices of G into degree_sequence, ordered by degree, starting with lowest.
 template <typename G_t>
 inline void make_degree_sequence(const G_t &G,
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence)
-{untested();
+{
     unsigned int max_degree = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){untested();
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::degree(*vIt, G);
         max_degree = (degree>max_degree)? degree : max_degree;
     }
 
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){untested();
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int degree = boost::degree(*vIt, G);
-        if(degree > 0){untested();
+        if(degree > 0){
             buckets[degree].push_back(*vIt);
         }
     }
-    for(unsigned int i = 1; i <= max_degree; i++){untested();
-        for(unsigned int j = 0; j < buckets[i].size(); j++){untested();
+    for(unsigned int i = 1; i <= max_degree; i++){
+        for(unsigned int j = 0; j < buckets[i].size(); j++){
             degree_sequence.push_back(buckets[i][j]);
         }
     }
@@ -591,24 +578,17 @@ void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
     }
 }
 
-namespace draft{
-
 // check if {*vd1, *vd2} is a subset of a bag adjacent to t.
 template<class VD_t, class T_t>
 class is_in_neighbour_bd{ //
 public:
     is_in_neighbour_bd(T_t const& T,
         typename boost::graph_traits<T_t>::vertex_descriptor t)
-       : _T(T), _t(t)
-    {
-    }
+       : _T(T), _t(t) {}
 public:
     bool operator() (VD_t vd1, VD_t vd2)
     {
         assert(vd1!=vd2);
-        if(vd1<vd2){
-        }else{ untested();
-        }
 
         typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
         bag_iterator nIt, nEnd;
@@ -634,17 +614,17 @@ public: // HACK
     VD_t a, b;
 };
 
-} // draft
 
 // clone subgraph induced by bag into ig.
 // store map V(H) -> X \subset V(G) in vdMap
 // add more edges for MSVS, TODO: implement properly (how?)
-template<class G_t, class T_t, class IG_t, class M_t>
-inline void induced_subgraph_with_extra_edges
-(G_t const &G, IG_t& ig, // typename graph_traits<G>::immutable_type& ig,
-       T_t const& T, typename boost::graph_traits<T_t>::vertex_descriptor bd,
-    //   URGHS. no default types without c++11.
-     M_t* vdMap /*=NULL*/);
+//template<class G_t, class T_t, class IG_t, class M_t>
+//inline void induced_subgraph_with_extra_edges
+//(G_t const &G, IG_t& ig, // typename graph_traits<G>::immutable_type& ig,
+//       T_t const& T, typename boost::graph_traits<T_t>::vertex_descriptor bd,
+//    //   URGHS. no default types without c++11.
+//     M_t* vdMap /*=NULL*/);
+
 
 } // treedec
 
