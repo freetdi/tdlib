@@ -314,6 +314,12 @@ void minimalChordal(G_t &G,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
 {
+#ifndef NDEBUG
+    for(unsigned int i = 0; i < old_elimination_ordering.size(); i++){
+        assert(boost::degree(old_elimination_ordering[i], G) > 0);
+    }
+#endif
+
     //Make 'G' a filled-in graph according to 'old_elimination_ordering'. This operation stores
     //all new edges in F.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;

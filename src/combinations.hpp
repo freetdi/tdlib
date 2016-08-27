@@ -139,7 +139,15 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
 
-        treedec::ordering_to_treedec(G, new_elim_ordering, T);
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering_(old_elim_ordering.size());
+        unsigned c = 0;
+        for(unsigned i = 0; i < new_elim_ordering.size(); i++){
+            if(boost::degree(new_elim_ordering[i], G) > 0){
+                new_elim_ordering_[c++] = new_elim_ordering[i];
+            }
+        }
+
+        treedec::ordering_to_treedec(G, new_elim_ordering_, T);
     }
 
     treedec::glue_bags(bags, T);
