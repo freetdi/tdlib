@@ -968,13 +968,23 @@ void treedec_to_ordering(T_t &T,
 
 template <typename G_t, typename T_t>
 void treedec_to_ordering(T_t &T,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elimination_ordering)
+      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
 {
     if(boost::num_vertices(T) == 0){
         return;
     }
+    else if(boost::num_vertices(T) == 1){
+        typename boost::graph_traits<T_t>::vertex_descriptor t =
+                                                   *(boost::vertices(T).first);
+        for(typename treedec_traits<T_t>::bag_type::iterator sIt =
+                            bag(t, T).begin(); sIt != bag(t, T).end(); sIt++)
+        {
+            O.push_back(*sIt);
+        }
+        return;
+    }
 
-    treedec::impl::treedec_to_ordering<G_t, T_t>(T, elimination_ordering);
+    treedec::impl::treedec_to_ordering<G_t, T_t>(T, O);
 }
 
 //Make G a filled graph according to the provided elimination_ordering. Stores
