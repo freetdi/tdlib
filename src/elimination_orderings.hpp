@@ -592,7 +592,9 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub = UINT_MAX){
                               typename treedec_traits<T_t>::bag_type> > bags;
 
     treedec::impl::Islet(G, bags);
-    impl::fillIn_decomp(G, &T, ub);
+    if(boost::num_edges(G) > 0){
+        impl::fillIn_decomp(G, &T, ub);
+    }
     treedec::glue_bags(bags, T);
 }
 
