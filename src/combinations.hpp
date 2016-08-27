@@ -102,7 +102,10 @@ void PP_FI(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
-        treedec::impl::fillIn_decomp(G, &T);
+        treedec::fillIn_decomp(
+         G, T,
+         (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL,
+         UINT_MAX, true); //ignore_isolated_vertices
     }
     treedec::glue_bags(bags, T);
 }
@@ -134,11 +137,6 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
         treedec::fillIn_ordering(G, old_elim_ordering, true);
         G = H; // reset
 
-#ifdef MORE_DEBUG
-        for( auto i : old_elim_ordering){
-            assert(is_valid(i,G));
-        }
-#endif
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
 
         treedec::ordering_to_treedec(G, new_elim_ordering, T);
@@ -150,7 +148,6 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
 {
-    trace1("exact_decomposition_cutset", lb);
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
@@ -177,8 +174,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
 
     lb = (low > lb)? low : lb;
     lb = (lb_deltaC > lb)? lb_deltaC : lb;
-
-    trace1("excut comb", lb);
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.
     typedef std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components_t;

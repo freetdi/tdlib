@@ -32,4 +32,5 @@ pkginclude_HEADERS = \
   random_generators.hpp \
   degree_config.hpp \
   overlay.hpp \
-  graph_traits.hpp
+  graph_traits.hpp \
+  convenience.hpp
