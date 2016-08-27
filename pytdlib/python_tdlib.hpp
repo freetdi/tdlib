@@ -9,6 +9,9 @@ int gc_preprocessing(std::vector<unsigned int> &V_G, std::vector<unsigned int> &
 int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
              std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb);
 
+int gc_PP_FI(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb);
+
 int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb);
 

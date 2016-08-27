@@ -155,4 +155,5 @@ template<typename G_t>
 inline unsigned
    get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G);
 
+
 #endif

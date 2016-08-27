@@ -194,6 +194,24 @@ int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 }
 
 
+int gc_PP_FI(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+{
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+
+    treedec::PP_FI(G, T, lb);
+
+    treedec::make_small(T);
+
+    make_python_decomp(T, V_T, E_T);
+
+    return treedec::get_width(T);
+}
+
+
 int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
 {

@@ -138,7 +138,7 @@ private:
 namespace detail{
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void skeletal_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
+void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
 {
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
@@ -192,11 +192,13 @@ namespace impl{
 template <typename G_t, typename T_t=typename treedec_chooser<G_t>::type, typename O_t=
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> >
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL, unsigned ub=UINT_MAX)
+   minDegree_decomp(G_t &G, T_t *T=NULL, O_t *O=NULL,
+                    unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   minDegree_decomp(G_t &G, T_t *T, O_t *O, unsigned ub=UINT_MAX)
+   minDegree_decomp(G_t &G, T_t *T, O_t *O,
+                    unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
 #endif
 {
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -238,7 +240,9 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
         BOOST_AUTO(it, cdegs[0].begin());
         for(; it!=cdegs[0].end(); ++it){
-            elim_vertices[i++] = get_vd(G, *it);
+            if(!ignore_isolated_vertices){ //preprocessing-related
+                elim_vertices[i++] = get_vd(G, *it);
+            }
             degs.unlink(*it);
         }
     }
@@ -264,7 +268,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
         if(T){
             bags_i = &bags[i];
             elim_vertices[i] = get_vd(G, c);
-        }else if(min_ntd > upper_bound){
+        }
+        else if(min_ntd > upper_bound){
             upper_bound = min_ntd;
         }
 
@@ -302,39 +307,48 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
     //Build a treedecomposition.
     if(T){
-        assert(i == num_vert);
-        treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, num_vert);
+#ifndef NDEBUG
+        if(!ignore_isolated_vertices){
+            assert(i == num_vert);
+        }
+#endif
+        treedec::detail::skeleton_to_treedec(G, *T, bags, elim_vertices, i);
     }
 
     return upper_bound;
 }
 
+} // namespace impl
+
+//Constructs a tree decomposition from the elimination ordering obtained by the
+//minimum-degree heuristic.
+template <typename G_t, typename T_t, typename O_t>
+void minDegree_decomp(G_t &G, T_t &T, O_t *O,
+                      unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
+{
+    impl::minDegree_decomp(G, &T, &O, ub, ignore_isolated_vertices);
+}
+
 #if __cplusplus < 201103L
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-  minDegree_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX)
+  minDegree_decomp(G_t &G, T_t &T,
+                   unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
 {
-    return minDegree_decomp(G, T, (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL);
-
+    return impl::minDegree_decomp(
+        G, &T,
+        (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL,
+        ub, ignore_isolated_vertices
+       );
 }
 
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
    minDegree_decomp(G_t &G)
 {
-    return minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
+    return impl::minDegree_decomp(G, (typename treedec_chooser<G_t>::type*)NULL);
 }
 #endif
-
-} // namespace impl
-
-//Constructs a tree decomposition from the elimination ordering obtained by the
-//minimum-degree heuristic.
-template <typename G_t, typename T_t>
-void minDegree_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
-{
-    impl::minDegree_decomp(G, &T);
-}
 
 
 
@@ -551,7 +565,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     }
 
     if(T){
-        treedec::detail::skeletal_to_treedec(G, *T, bags, elim_vertices, i);
+        treedec::detail::skeleton_to_treedec(G, *T, bags, elim_vertices, i);
 
         return 0;
     }
@@ -797,7 +811,7 @@ void ordering_to_treedec(G_t &G,
         make_clique_and_detach(O[i], G, bags[i]);
     }
 
-    treedec::detail::skeletal_to_treedec(G, T, bags, O, n);
+    treedec::detail::skeleton_to_treedec(G, T, bags, O, n);
 }
 
 } //namespace impl

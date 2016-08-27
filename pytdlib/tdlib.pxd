@@ -10,6 +10,8 @@ cdef extern from "python_tdlib.hpp":
                          vector[vector[int]] &bags, int lb)
     int gc_PP_MD(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                  vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
+    int gc_PP_FI(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                 vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
     int gc_PP_FI_TM(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                     vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb)
 

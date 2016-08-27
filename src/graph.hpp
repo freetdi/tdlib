@@ -308,6 +308,13 @@ inline unsigned
     return boost::get(boost::vertex_index, G, v);
 }
 
+template<typename G_t>
+inline unsigned
+   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t& G)
+{
+    return boost::get(boost::vertex_index, G, v);
+}
+
 template<class G>
 struct outedge_set{
     typedef typename graph_traits<G>::outedge_set_type type;

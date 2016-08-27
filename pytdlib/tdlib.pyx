@@ -44,6 +44,10 @@ This module containes the following functions** :
         Applies preprocessing followed by the minDegree-heuristic to a given
         graph
 
+    - PP_FI
+        Applies preprocessing followed by the minFill-heuristic to a given
+        graph
+
     - PP_FI_TM
         Applies preprocessing followed by the minFill-heuristic followed by
         triangulation minimization to a given graph
@@ -132,6 +136,7 @@ from libcpp.vector cimport vector
 
 from tdlib cimport gc_preprocessing
 from tdlib cimport gc_PP_MD
+from tdlib cimport gc_PP_FI
 from tdlib cimport gc_PP_FI_TM
 
 from tdlib cimport gc_deltaC_min_d
@@ -362,6 +367,47 @@ def PP_MD(V, E):
     cdef int c_lb = -1
 
     gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    return V_T_, E_T, get_width(V_T, E_T)
+
+
+def PP_FI(V, E):
+    """
+    Returns a tree decomposition of exact width, iff the treewidth of
+    the given graph G is not greater than 3, otherwise the reduced
+    instance G' of G will be processed by the fillIn heuristic, which
+    successivly eliminates a vertex, that will cause least new edges
+    within the elimination process.
+
+    INPUTS:
+
+    - V_G : a list of vertices of the input graph
+
+    - E_G : a list of edges of the input graph
+
+    OUTPUTS:
+
+    - V_T : a list of vertices of a treedecomposition
+
+    - E_T : a list of edges of a treedecomposition
+
+    - width : the width of (V_T, E_T)
+
+    EXAMPLES:
+
+        V_T, E_T, width = tdlib.PP_FI(V_G, E_G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+
+    cdef int c_lb = -1
+
+    gc_PP_FI(V_G, E_G, V_T, E_T, c_lb)
 
     V_T_ = apply_labeling(V_T, labels_map)
 

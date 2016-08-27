@@ -77,7 +77,10 @@ void PP_MD(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
-        impl::minDegree_decomp(G, &T);
+        treedec::minDegree_decomp(
+         G, T,
+         (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL,
+         UINT_MAX, true); //ignore_isolated_vertices
     }
     treedec::glue_bags(bags, T);
 }
