@@ -582,45 +582,6 @@ void make_binary(T_t &T){
 
 namespace detail{
 
-template <typename T_t>
-unsigned int get_depth(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, std::vector<bool> &visited)
-{
-    visited[t] = true;
-    unsigned int depth = 0;
-    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(t, T); nIt != nEnd; nIt++){
-        if(!visited[*nIt]){
-            unsigned int depth_branch = get_depth(T, *nIt, visited)+1;
-            depth = (depth_branch > depth)? depth_branch : depth;
-        }
-    }
-
-    return depth;
-}
-
-//suboptimal.. O(n^2) instead of O(n)
-template <typename T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor find_balanced_root(T_t &T){
-    if(boost::num_vertices(T) <= 2){
-        return *boost::vertices(T).first;
-    }
-
-    typename boost::graph_traits<T_t>::vertex_descriptor root;
-
-    unsigned int min_depth = UINT_MAX;
-    for(unsigned int t = 0; t < boost::num_vertices(T); t++){
-        std::vector<bool> visited(boost::num_vertices(T), false);
-        unsigned int depth = get_depth(T, t, visited);
-
-        if(depth < min_depth){
-            min_depth = depth;
-            root = t;
-        }
-    }
-
-    return root;
-}
-
 //Complexity: O(|V(T)|)
 template <typename T_undir_t, typename T_dir_t>
 void make_rooted(T_undir_t &T, T_dir_t &T_,
@@ -653,15 +614,10 @@ void make_rooted(T_undir_t &T, T_dir_t &T_,
 } //namespace detail
 
 template <typename T_undir_t, typename T_dir_t>
-void make_rooted(T_undir_t &T, T_dir_t &T_, bool balanced = false)
+void make_rooted(T_undir_t &T, T_dir_t &T_)
 {
     typename boost::graph_traits<T_undir_t>::vertex_descriptor t;
-    if(balanced){
-        t = detail::find_balanced_root(T);
-    }
-    else{
-        t = *boost::vertices(T).first;
-    }
+    t = *boost::vertices(T).first;
 
     detail::make_rooted(T, T_, t);
 }
