@@ -146,10 +146,6 @@ namespace treedec {
       std::pair<value_type, bool> next_value() {
 #ifdef RANDOMSTUFF // FIXME
         bool c = treedec::random::coin();
-        //if(c){ std::cout << "coin: true" << std::endl; }
-        //else { std::cout << "coin: false" << std::endl; }
-        //std::cout << top() << std::endl;
-        //std::cout << back() << std::endl;
         if(c) {
           return std::make_pair(top(), true);
         }
@@ -176,8 +172,6 @@ namespace treedec {
     };
     
     stack operator[](const bucket_type& i) {
-      //std::cout << "i: " << i << std::endl;
-      //std::cout << "head.size(): " << head.size() << std::endl;
       assert(i < head.size());
       return stack(i, head.begin(), next.begin(), prev.begin(), last.begin(),
                    id_to_value.begin(), id);
