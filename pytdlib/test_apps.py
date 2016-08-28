@@ -70,21 +70,6 @@ class TestTdLib_app(unittest.TestCase):
         DS3 = tdlib.min_dominating_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
         self.assertEqual(len(DS3), 5)
 
-    """
-    def test_min_feedback_vertex_set_with_treedecomposition(self):
-        V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
-        FVS1 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)
-        self.assertEqual(len(FVS1), 3)
-
-        V_T2, E_T2, lb = tdlib.PP_MD(V_Wagner, E_Wagner)
-        FVS2 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Wagner, E_Wagner, V_T2, E_T2)
-        self.assertEqual(len(FVS2), 3)
-
-        V_T3, E_T3, lb = tdlib.PP_MD(V_Pappus, E_Pappus)
-        FVS3 = tdlib.min_feedback_vertex_set_with_treedecomposition(V_Pappus, E_Pappus, V_T3, E_T3)
-        self.assertEqual(len(FVS3), 5)
-    """
-
     def test_min_coloring_with_treedecomposition(self):
         V_T1, E_T1, lb = tdlib.PP_MD(V_Petersen, E_Petersen)
         C = tdlib.min_coloring_with_treedecomposition(V_Petersen, E_Petersen, V_T1, E_T1)

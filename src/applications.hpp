@@ -28,6 +28,9 @@
  * - void min_dominating_set_with_treedecomposition(G_t&, T_t&, typename treedec_traits<T_t>::bag_type &result)
  * - void min_coloring_with_treedecomposition(G_t&, T_t&, std::vector<typename treedec_traits<T_t>::bag_type> &result)
  *
+ * IMPORT NOTE: ensure that the input treedecomposition is directed by
+ *              using treedec::make_rooted(undir_t, dir_t)
+ *
  */
 
 #ifndef TD_APPLICATIONS
@@ -1164,6 +1167,7 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
     treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_results_map);
 
     typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
+
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         unsigned int pos = get_pos(*vIt, G);
@@ -1172,8 +1176,8 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
 
     global_result.resize(k);
     for(unsigned int i = 0; i < global_results_map.size(); i++){
-        unsigned int pos = global_results_map[i];
-        global_result[pos].insert(inv_map[pos]);
+        unsigned int col = global_results_map[i];
+        global_result[col].insert(inv_map[i]);
     }
 
     return k;

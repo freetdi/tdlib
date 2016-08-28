@@ -84,14 +84,9 @@ cdef extern from "python_tdlib.hpp":
     void gc_min_coloring_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                     vector[vector[int]] &col)
-
     void gc_min_dominating_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                        vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                        vector[unsigned int] &DS)
-
-    #void gc_min_feedback_vertex_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                                                   vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-    #                                                   vector[unsigned int] &FVS)
 
 ##############################################################
 ############ MISC ############################################
@@ -101,7 +96,7 @@ cdef extern from "python_tdlib.hpp":
                                vector[unsigned int] &elim_ordering)
     void gc_treedec_to_ordering(vector[vector[int]] &V, vector[unsigned int] &E,
                                 vector[unsigned int] &elim_ordering);
-    int gc_is_valid_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+    int gc_validate_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T)
     void gc_trivial_decomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                   vector[vector[int]] &V_T, vector[unsigned int] &E_T)

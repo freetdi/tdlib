@@ -101,7 +101,7 @@ bool is_improvement_bag(B_t const &H,
 template <typename G_t, typename T_t>
 void MSVS(G_t const &G, T_t &T)
 {
-    assert(!is_valid_treedecomposition(G, T));
+    assert(is_valid_treedecomposition(G, T));
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
@@ -314,12 +314,6 @@ void minimalChordal(G_t &G,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
 {
-#ifndef NDEBUG
-    for(unsigned int i = 0; i < old_elimination_ordering.size(); i++){
-        assert(boost::degree(old_elimination_ordering[i], G) > 0);
-    }
-#endif
-
     //Make 'G' a filled-in graph according to 'old_elimination_ordering'. This operation stores
     //all new edges in F.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;

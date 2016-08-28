@@ -109,8 +109,6 @@ This module containes the following functions** :
 
     - min_dominating_set_with_treedecomposition
 
-    #- min_feedback_vertex_set_with_treedecomposition
-
     - min_coloring_with_treedecomposition
 
     - treedec_to_ordering
@@ -165,14 +163,13 @@ from tdlib cimport gc_minimalChordal
 from tdlib cimport gc_max_clique_with_treedecomposition
 from tdlib cimport gc_max_independent_set_with_treedecomposition
 from tdlib cimport gc_min_vertex_cover_with_treedecomposition
-#from tdlib cimport gc_min_dominating_set_with_treedecomposition
-#from tdlib cimport gc_min_feedback_vertex_set_with_treedecomposition
+from tdlib cimport gc_min_dominating_set_with_treedecomposition
 from tdlib cimport gc_min_coloring_with_treedecomposition
 
 from tdlib cimport gc_ordering_to_treedec
 from tdlib cimport gc_treedec_to_ordering
 from tdlib cimport gc_trivial_decomposition
-from tdlib cimport gc_is_valid_treedecomposition
+from tdlib cimport gc_validate_treedecomposition
 from tdlib cimport gc_get_width
 
 
@@ -1346,12 +1343,7 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
 
     OUTPUT:
 
-    - error_code :     0, if (V_T, E_T) is valid with respect to (V_G, E_G)
-                   <= -1, if (V_T, E_T) is not a tree
-                   <= -2, if not all vertices of (V_G, E_G) are covered
-                   <= -3, if not all edges of (V_G, E_G) are covered
-                   == -4, if condition (T4) of a treedecomposition is
-                             not satisfied
+    - True if (V_T, E_T) is a valid treedecomposition else False.
 
     EXAMPLES:
 
@@ -1369,12 +1361,14 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
     if(rtn is False):
         if message:
             print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
-        return -6
+        return False
 
     cdef c_status;
-    c_status = gc_is_valid_treedecomposition(V_G, E_G, V_T, E_T);
+    c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T);
 
     py_status = c_status
+
+    print("status: " + str(py_status))
 
     if(message):
         if(py_status == 0):
@@ -1390,7 +1384,7 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
         else:
             pass
 
-    return py_status
+    return py_status == 0
 
 
 def get_width(V, E):

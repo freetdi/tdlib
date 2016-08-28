@@ -146,14 +146,4 @@ inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_d
     return v;
 }
 
-//Return the internal vertex position.
-//To be used as a narrower alternative to vertex_descriptor.
-//Positions are in {0, 1, ..., num_vertices-1}, where applicable.
-//(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
-// this position must be stable under copy and assignment operations.
-template<typename G_t>
-inline unsigned
-   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G);
-
-
 #endif

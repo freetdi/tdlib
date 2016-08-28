@@ -397,7 +397,7 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     TD_graph_t H;
     make_tdlib_graph(H, V_G, E_G);
     TD_tree_dec_t T;
-    treedec::vec_ordering_to_tree(G, O, T);
+    treedec::vec_ordering_to_tree(H, O, T);
 
 #ifndef NDEBUG
     unsigned w2 =
@@ -405,14 +405,13 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     treedec::get_width(T);
 
 
-    assert(w1 == w2);
+    //assert(w1 == w2);
 
     treedec::make_small(T);
 
     make_python_decomp(T, V_T, E_T);
     return treedec::get_width(T);
 }
-
 
 
 int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
@@ -538,13 +537,16 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    TD_tree_dec_directed_t T;
+    TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    treedec::nice::nicify(T);
+    TD_tree_dec_directed_t T_;
+    treedec::make_rooted(T, T_);
+
+    treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::max_independent_set_with_treedecomposition(G, T, result);
+    treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
 
     IS.resize(result.size());
     unsigned int i = 0;
@@ -561,13 +563,16 @@ void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, 
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    TD_tree_dec_directed_t T;
+    TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    treedec::nice::nicify(T);
+    TD_tree_dec_directed_t T_;
+    treedec::make_rooted(T, T_);
+
+    treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::min_vertex_cover_with_treedecomposition(G, T, result);
+    treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
 
     VC.resize(result.size());
     unsigned int i = 0;
@@ -584,13 +589,16 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    TD_tree_dec_directed_t T;
+    TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    treedec::nice::nicify(T);
+    TD_tree_dec_directed_t T_;
+    treedec::make_rooted(T, T_);
+
+    treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::min_dominating_set_with_treedecomposition(G, T, result);
+    treedec::app::min_dominating_set_with_treedecomposition(G, T_, result);
 
     DS.resize(result.size());
     unsigned int i = 0;
@@ -607,13 +615,16 @@ void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std:
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    TD_tree_dec_directed_t T;
+    TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    treedec::nice::nicify(T);
+    TD_tree_dec_directed_t T_;
+    treedec::make_rooted(T, T_);
+
+    treedec::nice::nicify(T_);
 
     std::vector<std::set<unsigned int> > result;
-    treedec::app::min_coloring_with_treedecomposition(G, T, result);
+    treedec::app::min_coloring_with_treedecomposition(G, T_, result);
 
     C.resize(result.size());
     for(unsigned int i = 0; i < result.size(); i++){
@@ -675,7 +686,7 @@ int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigne
 }
 
 
-int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+int gc_validate_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
 {
     TD_graph_t G;
@@ -684,7 +695,7 @@ int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<un
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    return treedec::is_valid_treedecomposition(G, T);
+    return treedec::validate_treedecomposition(G, T);
 }
 
 

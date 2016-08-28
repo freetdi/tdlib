@@ -147,14 +147,15 @@ bool validate_connectivity(T_t &T){
         //Get the parent of cur.
         typename boost::graph_traits<T_t>::vertex_descriptor parent;
         if(!S.empty()){
-            typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
-                if(!visited[*nIt]){
-                    parent = *nIt;
-                    break;
+            //This works because T is a tree (first check in caller func).
+            typename boost::graph_traits<T_t>::in_edge_iterator eIt, eEnd;
+            for(boost::tie(eIt, eEnd) = boost::in_edges(cur, T); eIt != eEnd; eIt++){
+                if(!visited[boost::source(*eIt, T)]){
+                    parent = boost::source(*eIt, T);
                 }
             }
         }
+
 
         if(set_intersect(forgotten, bag(cur, T))){
 #ifndef NDEBUG
@@ -179,6 +180,21 @@ bool validate_connectivity(T_t &T){
     }
 }
 
+template <typename G_t>
+bool is_tree(G_t const& G){
+    //This is a root if G is a tree.
+    typename boost::graph_traits<G_t>::vertex_descriptor root = find_root(G);
+
+    //This will not be exhaustive if 'root' is not a root.
+    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
+    components.resize(1);
+    t_search_components(G, root, visited, components, 0);
+
+    //root itself is not contained in components[0].
+    return (components[0].size()+1 == boost::num_vertices(G));
+}
+
 
 /* Checks if a tree decomposition is valid with respect to G.
  *
@@ -191,16 +207,13 @@ bool validate_connectivity(T_t &T){
  * -5 = The empty graph must have a treedecomposition with one vertex and an empty bag
  */
 template <typename G_t, typename T_t>
-int is_valid_treedecomposition(G_t const& G, T_t const& T){
+int validate_treedecomposition(G_t const& G, T_t const& T){
     if(boost::num_vertices(T) == 0){
         //The empty graph has a treedecomposition with 1 vertex and an empty bag.
         return -5;
     }
 
-    //Checks if T is a tree.
-    std::vector<int> component(boost::num_vertices(T));
-    int num = boost::connected_components(T, &component[0]);
-    if(num > 1 || boost::num_edges(T) > boost::num_vertices(T)-1){
+    if(!is_tree(T)){
 #ifndef NDEBUG
         std::cerr << "[is_valid_treedecomposition]: treedecomposition is not a tree" << std::endl;
 #endif
@@ -275,6 +288,11 @@ int is_valid_treedecomposition(G_t const& G, T_t const& T){
     }
 
     return 0;
+}
+
+template <typename G_t, typename T_t>
+bool is_valid_treedecomposition(G_t const& G, T_t const& T){
+    return (validate_treedecomposition(G, T) == 0);
 }
 
 template <typename G_t, typename T_t>

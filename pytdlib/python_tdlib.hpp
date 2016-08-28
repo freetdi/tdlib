@@ -111,7 +111,7 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
 int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                              std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T);
 
-int gc_is_valid_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+int gc_validate_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T);
 
 int gc_get_width(std::vector<std::vector<int> > &V_T);

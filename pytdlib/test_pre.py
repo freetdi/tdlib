@@ -35,7 +35,7 @@ class TestTdLib_pre(unittest.TestCase):
 
     def test_PP_MD_0(self):
         V, E, w = tdlib.PP_MD(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
         V.sort()
         self.assertEqual(V, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
@@ -43,22 +43,22 @@ class TestTdLib_pre(unittest.TestCase):
 
     def test_PP_MD_1(self):
         V, E, w = tdlib.PP_MD(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
         self.assertEqual(w, 4)
 
     def test_PP_MD_2(self):
         V, E, w = tdlib.PP_MD(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_MD_3(self):
         V, E, w = tdlib.PP_MD(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
         self.assertEqual(w, 6)
 
     def test_PP_FI_0(self):
         V, E, w = tdlib.PP_FI(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
         V.sort()
         self.assertEqual(V, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
@@ -66,22 +66,22 @@ class TestTdLib_pre(unittest.TestCase):
 
     def test_PP_FI_1(self):
         V, E, w = tdlib.PP_FI(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_2(self):
         V, E, w = tdlib.PP_FI(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_3(self):
         V, E, w = tdlib.PP_FI(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
         self.assertEqual(w, 6)
 
     def test_PP_FI_TM_0(self):
         V, E, w = tdlib.PP_FI_TM(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
         V.sort()
         self.assertEqual(V, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
         self.assertEqual(E, [0, 1, 1, 2, 2, 3, 3, 4])
@@ -89,17 +89,17 @@ class TestTdLib_pre(unittest.TestCase):
 
     def test_PP_FI_TM_1(self):
         V, E, w = tdlib.PP_FI_TM(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_TM_2(self):
         V, E, w = tdlib.PP_FI_TM(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_TM_3(self):
         V, E, w = tdlib.PP_FI_TM(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E) == 0, True)
+        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
         self.assertEqual(w, 6)
 
 
