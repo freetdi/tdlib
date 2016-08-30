@@ -332,7 +332,7 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX){
 
     O.resize(n);
     unsigned i = 0;
-    if((n*n-1u) == boost::num_edges(G)){ //boost bug?!
+    if(n == 0 || (n*n-1u) == boost::num_edges(G) || boost::num_edges(G) == 0){ //boost bugs?!
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
@@ -354,7 +354,7 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX){
               id,
               ub);
 
-    return w;
+    return w-1;
 }
 
 template <typename G_t, typename O_t>
@@ -396,12 +396,12 @@ typename boost::graph_traits<G_t>::vertices_size_type
     O.resize(n);
 
     unsigned i = 0;
-    // boost does not like cliques.
-    if((n*(n-1u)) == boost::num_edges(G)){
+    if(n == 0 || (n*n-1u) == boost::num_edges(G) || e == 0){ //boost bugs?!
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
         }
+        return 0;
     }
 
     std::vector<int> inverse_perm(n, 0);
@@ -813,6 +813,12 @@ template <typename G_t, typename O_t, class T_t>
 void vec_ordering_to_tree(G_t &G, O_t &O, T_t& T, O_t* io=NULL)
 {
     size_t num_vert = boost::num_vertices(G);
+
+    if(num_vert == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     assert(num_vert = O.size());
     O_t iOlocal;
 
