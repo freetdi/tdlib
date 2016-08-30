@@ -24,7 +24,7 @@ def dump_td_as_dot(V_T, E_T, outname):
     fout.close()
 
 class TestTdLib_packages(unittest.TestCase):
-    """ works...
+    """
     def test_CFGs_MD(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -38,9 +38,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_boost_MD(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -54,9 +52,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.boost_minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_FI(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -70,9 +66,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.fillIn_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_PP(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -87,9 +81,7 @@ class TestTdLib_packages(unittest.TestCase):
             V_T, E_T, B, lb = tdlib.preprocessing(V, E)
             if V_T is []:
                 self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works....
     def test_CFGs_PP_MD(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -103,9 +95,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_MD(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works....
     def test_CFGs_PP_FI(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -119,9 +109,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_FI(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works....
     def test_CFGs_PP_FI_TM(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -135,9 +123,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_FI_TM(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_MSVS_trivial(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -152,9 +138,7 @@ class TestTdLib_packages(unittest.TestCase):
             V_T, E_T = tdlib.trivial_decomposition(V, E)
             V_T, E_T, w = tdlib.MSVS(V, E, V_T, E_T)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_minimalChordal_trivial(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -169,9 +153,7 @@ class TestTdLib_packages(unittest.TestCase):
             V_T, E_T = tdlib.trivial_decomposition(V, E)
             V_T, E_T, w = tdlib.minimalChordal_decomp(V, E, V_T, E_T)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_seperator_algorithm(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -185,9 +167,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.seperator_algorithm(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_CFGs_conversion(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -207,7 +187,7 @@ class TestTdLib_packages(unittest.TestCase):
 
     """ LBs """
 
-    """ works...
+    """
     #indirect test
     def test_CFGs_LB1(self):
         for i in range(0, CFGS_count+1):
@@ -305,6 +285,7 @@ class TestTdLib_packages(unittest.TestCase):
                 print("e: " + str(len(E)))
 
             tdlib.lower_bound(V, E, "LBPC_deltaC")
+
     """
 
     """ takes long time...
@@ -327,8 +308,7 @@ class TestTdLib_packages(unittest.TestCase):
     """ APPs """
 
     #validation (is_clique, is_IS, is_VC,..) in tdlib?
-
-    """ works...
+    """
     def test_CFGs_max_clique(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -342,9 +322,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             S = tdlib.max_clique_with_treedecomposition(V, E, V_T, E_T)
-    """
 
-    """ works...
     def test_CFGs_max_independent_set(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -358,9 +336,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             S = tdlib.max_independent_set_with_treedecomposition(V, E, V_T, E_T)
-    """
 
-    """ works...
     def test_CFGs_min_vertex_cover(self):
         for i in range(0, CFGS_count+1):
             V = eval("CFGs.V_" + str(i))
@@ -374,9 +350,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             S = tdlib.min_vertex_cover_with_treedecomposition(V, E, V_T, E_T)
-    """
 
-    """ works...
     def test_CFGs_min_dominating_set(self):
         for i in range(0, CFGS_count+1):
             if i == 999: #huge graph
@@ -392,9 +366,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             S = tdlib.min_dominating_set_with_treedecomposition(V, E, V_T, E_T)
-    """
 
-    """ works...
     def test_CFGs_min_coloring(self):
         for i in range(0, CFGS_count+1):
             if i == 999: #huge graph
@@ -412,7 +384,6 @@ class TestTdLib_packages(unittest.TestCase):
             S = tdlib.min_coloring_with_treedecomposition(V, E, V_T, E_T)
     """
 
-    """ works...
     def test_DIMACS_MD(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -426,9 +397,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ works...
     def test_DIMACS_boost_MD(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -442,9 +411,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.boost_minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ ?
     def test_DIMACS_FI(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -458,9 +425,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.fillIn_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ ?
     def test_DIMACS_PP_MD(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -474,9 +439,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_MD(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ ?
     def test_DIMACS_PP_FI(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -490,9 +453,7 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_FI(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
-    """ ?
     def test_DIMACS_PP_FI_TM(self):
         for i in range(0, DIMACS_count+1):
             V = eval("dimacs.V_" + str(i))
@@ -506,7 +467,6 @@ class TestTdLib_packages(unittest.TestCase):
 
             V_T, E_T, w = tdlib.PP_FI_TM(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
 if __name__ == '__main__':
     unittest.main()

@@ -1358,7 +1358,7 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
     inv_labels_dict = inverse_labels_dict(labels_map)
     rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
 
-    if(rtn is False):
+    if(rtn is False and pyV_t != [[]] and pyE_T != []):
         if message:
             print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
         return False
@@ -1367,8 +1367,6 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
     c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T);
 
     py_status = c_status
-
-    print("status: " + str(py_status))
 
     if(message):
         if(py_status == 0):
