@@ -4,12 +4,10 @@ import unittest
 from graphs import *
 
 class TestTdLib(unittest.TestCase):
-    """ error
     def test_seperator_algorithm_0(self):
         for V, E in cornercases:
             V_T, E_T, w = tdlib.seperator_algorithm(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
     def test_seperator_algorithm_1(self):
         V, E, w = tdlib.seperator_algorithm(V_P6, E_P6)

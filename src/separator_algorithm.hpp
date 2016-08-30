@@ -383,11 +383,16 @@ bool sep_decomp(G_t const &G, T_t &T,
     return false;
 }
 
-//Starts the seperator algorithm, and tries k = 0,1,2,.. until the whole
+//Starts the separator algorithm, and tries k = 0,1,2,.. until the whole
 //graph could be decomposed.
 template <typename G_t, typename T_t>
 void separator_algorithm(G_t const &G, T_t &T)
 {
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename std::set<vertex_descriptor> vertex_set;
 
