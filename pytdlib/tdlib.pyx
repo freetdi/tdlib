@@ -938,7 +938,7 @@ def minimalChordal_ordering(V, E, O):
 
     EXAMPLES:
 
-        O1 = [i for i in range(0, len(V))]
+        O1 = range(0, len(V))
         V_T1, E_T1, w1 = tdlib.ordering_to_treedec(V_G, E_G, O1)
         O2 = tdlib.minimalChordal_ordering(V_G, E_G, O1)
         V_T2, E_T2, w2 = tdlib.ordering_to_treedec(V_G, E_G, O2)
@@ -946,9 +946,10 @@ def minimalChordal_ordering(V, E, O):
 
     cdef vector[unsigned int] V_G, E_G, old_elim_ordering, new_elim_ordering
     labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
 
     for l in range(0, len(O)):
-        old_elim_ordering.push_back(O[l])
+        old_elim_ordering.push_back(inv_labels_dict[O[l]])
 
     gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering)
 
