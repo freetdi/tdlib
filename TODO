@@ -1,4 +1,3 @@
-- fix is_valid_td semantics
 - cleanup interfaces
 - release 1.0
 - provide meta heuristic for treewidth
