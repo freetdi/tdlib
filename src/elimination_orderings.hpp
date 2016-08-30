@@ -31,8 +31,8 @@
  * - void fillIn_decomp(G_t &G, T_t &T)
  * - void minDegree_ordering(G_t &G,
  *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
- * - int boost_minDegree_ordering(G_t &G, O_t &elim_ordering)
- * - int boost_minDegree_ordering(G_t &G, O_t &elim_ordering, O_t &inv_elim_ordering)
+ * - unsigned boost_minDegree_ordering(G_t &G, O_t &elim_ordering)
+ * - unsigned boost_minDegree_ordering(G_t &G, O_t &elim_ordering, O_t &inv_elim_ordering)
  * - void fillIn_ordering(G_t& G,
  *         typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering)
  * - void ordering_to_treedec(G_t &G,
@@ -326,18 +326,21 @@ typename boost::graph_traits<G_t>::vertices_size_type
 }
 
 
+// BUG: duplicate. use impl.
 template <typename G_t, typename O_t>
-int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX){
+int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
+{ untested();
     unsigned n = boost::num_vertices(G);
 
     O.resize(n);
     unsigned i = 0;
-    if(n == 0 || (n*n-1u) == boost::num_edges(G) || boost::num_edges(G) == 0){ //boost bugs?!
+    if(n == 0 || n*(n-1u) == boost::num_edges(G) || boost::num_edges(G) == 0){ untested();
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
         }
-        return n-1u;
+        return n;
+    }else{ untested();
     }
 
     std::vector<int> inverse_perm(n, 0);
@@ -354,7 +357,7 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX){
               id,
               ub);
 
-    return w-1;
+    return w;
 }
 
 template <typename G_t, typename O_t>
@@ -392,16 +395,17 @@ typename boost::graph_traits<G_t>::vertices_size_type
     vertices_size_type n = boost::num_vertices(G);
     edges_size_type e = boost::num_edges(G);
 
-
     O.resize(n);
 
     unsigned i = 0;
-    if(n == 0 || (n*n-1u) == boost::num_edges(G) || e == 0){ //boost bugs?!
+    if(n == 0){ untested();
+        return 0;
+    }else if(n*(n-1u) == boost::num_edges(G) || e == 0){ untested();
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
         }
-        return 0;
+        return 0; // BUG. does not match prototype
     }
 
     std::vector<int> inverse_perm(n, 0);
@@ -418,7 +422,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
               0,
               id);
 
-    return 0;
+    return 0; // BUG. does not match prototype
 }
 
 
