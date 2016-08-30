@@ -1372,6 +1372,7 @@ namespace detail{
 template<class A, class G>
 class neighbourhood01_iter { //
 public: // types
+    typedef typename boost::graph_traits<G>::vertex_descriptor value_type;
     typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef std::vector<adjacency_iterator> scratch_type;
@@ -1569,6 +1570,13 @@ private: // data
     base_t _include_base;
 };
 } // detail
+
+namespace std{
+    template<class A, class B>
+    struct iterator_traits<detail::neighbourhood01_iter<A, B> >{ //
+        typedef typename detail::neighbourhood01_iter<A, B>::value_type value_type;
+    };
+}
 
 // iterate depending on include_base
 // - [b, e) and neighbors           if bINCLUDE
