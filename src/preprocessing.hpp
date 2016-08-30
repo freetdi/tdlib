@@ -441,9 +441,14 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     typedef typename deg_chooser<G_t>::type degs_type;
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
+    typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
+
+    if(num_vert == 0){
+        return;
+    }
+
     degs_type degs(G);
     const degs_type& cdegs(degs);
-    typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(G);
 
     //Islet rule
     if(!cdegs[0].empty()){
@@ -453,7 +458,6 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             bags.push_back(boost::make_tuple(*I, bag_type()));
         }
         low = (low > 0)? low : 0;
-    }else{
     }
 
     unsigned min_ntd = 1;

@@ -4,13 +4,11 @@ import unittest
 from graphs import *
 
 class TestTdLib_pre(unittest.TestCase):
-    """ segfault
     def test_preprocessing_0(self):
         for V, E in cornercases:
             V_, E_, B, lb = tdlib.preprocessing(V, E)
             self.assertEqual(V_, [])
             self.assertEqual(E_, [])
-    """
 
     def test_preprocessing_1(self):
         V_, E_, B, lb = tdlib.preprocessing(V_P6, E_P6)
@@ -58,13 +56,12 @@ class TestTdLib_pre(unittest.TestCase):
         V_, E_, B, lb = tdlib.preprocessing(V_Grid_5_5, E_Grid_5_5)
         self.assertEqual(lb, 4)
 
-    """ segfault
     def test_preprocessing_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
                 V_T, E_T, B, lb = tdlib.preprocessing(V, E)
-    """
+
 
     def test_PP_MD_0(self):
         for V, E in cornercases:
