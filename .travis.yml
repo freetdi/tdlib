@@ -18,12 +18,12 @@ env:
   global:
     - secure: "token"
 
-# addons:
-#   apt:
-#     sources:
-#       - wily
-#     packages:
-#       - cython
+addons:
+  apt:
+    sources:
+      - trusty
+    packages:
+      - libboost-dev
 
 install:
   - sudo pip install cython
