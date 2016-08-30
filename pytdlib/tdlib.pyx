@@ -910,9 +910,11 @@ def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
 
     gc_MSVS(V_G, E_G, V_T, E_T)
 
+    V_T_ = apply_labeling(V_T, labels_map)
+
     new_width = get_width(V_T, E_T)
 
-    return V_T, E_T, new_width
+    return V_T_, E_T, new_width
 
 def minimalChordal_ordering(V, E, O):
     """

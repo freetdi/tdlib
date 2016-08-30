@@ -4,13 +4,11 @@ import unittest
 from graphs import *
 
 class TestTdLib_post(unittest.TestCase):
-    """ error
     def test_MSVS_0(self):
         for V, E in cornercases:
             V_T, E_T = tdlib.trivial_decomposition(V, E)
             V_T, E_T, w = tdlib.MSVS(V, E, V_T, E_T)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
     def test_MSVS_1(self):
         V_T, E_T = tdlib.trivial_decomposition(V_P6, E_P6)
@@ -30,13 +28,11 @@ class TestTdLib_post(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V_T, E_T), True)
         self.assertEqual(w, 4)
 
-    """ error
     def test_MSVS_4(self):
         V, E = tdlib.trivial_decomposition(V_Petersen_double, E_Petersen_double)
         V, E, w = tdlib.MSVS(V_Petersen_double, E_Petersen_double, V, E)
         self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen_double, E_Petersen_double, V, E), True)
         self.assertEqual(w, 4)
-    """
 
     def test_MSVS_5(self):
         V, E = tdlib.trivial_decomposition(V_Wagner, E_Wagner)
