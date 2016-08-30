@@ -1,4 +1,6 @@
 language: cpp
+sudo: required
+dist: trusty
 
 os:
   - linux
@@ -16,12 +18,20 @@ env:
   global:
     - secure: "token"
 
+# addons:
+#   apt:
+#     sources:
+#       - wily
+#     packages:
+#       - cython
+
 install:
-  - sudo apt-get install cython
+  - sudo pip install cython
 
 script:
   - uname -a
   - $CXX --version
+  - cython --version
   - autoconf --version
   - automake --version
   - python --version

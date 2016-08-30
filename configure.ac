@@ -67,9 +67,24 @@ AC_SUBST(PYTHON_LIB_DIR)
 
 AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 
+cythonver_req="0.20.0"
+
 AS_IF([test "$python" != no], [
 	AC_PATH_PROGS([CYTHON], [cython], [no])
-	AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
+	AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])],
+    AC_MSG_CHECKING([for $CYTHON >= $cythonver_req])
+    [cythonver=`$CYTHON --version 2>&1 | sed -e 's/[[^0-9\.]]//g'`]
+    AS_IF([test -n "$cythonver"], [
+      AS_VERSION_COMPARE(${cythonver},${cythonver_req},
+	    [cmp=-1],[cmp=0],[cmp=1])
+	    AC_MSG_RESULT([${cythonver}])
+      AS_IF([test "${cmp}" = "-1"],
+	    [AC_MSG_ERROR([need $CYTHON >= $cythonver_req])])
+		],[
+      AC_MSG_RESULT([not identified])
+	 ])
+    unset cythonver
+	)
 ])
 
 # Checks for libraries.
@@ -85,7 +100,6 @@ AS_IF([test x"$PYTHON" != x], [
 ])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 
 # Checks for library functions.
