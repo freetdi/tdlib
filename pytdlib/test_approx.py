@@ -96,12 +96,11 @@ class TestTdLib(unittest.TestCase):
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
 
-    """ segfault
+
     def test_boost_minDegree_decomp_decomp_0(self):
         for V, E in cornercases:
             V_T, E_T, w = tdlib.boost_minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
     def test_boost_minDegree_decomp_1(self):
         V, E, w = tdlib.boost_minDegree_decomp(V_P6, E_P6)
