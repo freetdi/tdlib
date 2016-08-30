@@ -206,13 +206,11 @@ class TestTdLib_app(unittest.TestCase):
                 S = tdlib.min_vertex_cover_with_treedecomposition(V, E, V_T, E_T)
 
 
-    """
     def test_min_dominating_set_with_treedecomposition_0a(self):
         V, E = cornercases[0]
         V_T, E_T, w = tdlib.PP_MD(V, E)
         S = tdlib.min_dominating_set_with_treedecomposition(V, E, V_T, E_T)
         self.assertEqual(len(S), 0)
-    """
 
     def test_min_dominating_set_with_treedecomposition_0b(self):
         V, E = cornercases[1]
@@ -267,14 +265,12 @@ class TestTdLib_app(unittest.TestCase):
         S = tdlib.min_dominating_set_with_treedecomposition(V_Grid_5_5, E_Grid_5_5, V_T, E_T)
         self.assertEqual(len(S), 7)
 
-    """ segfault
     def test_min_dominating_set_with_treedecomposition_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
                 V_T, E_T, w = tdlib.PP_MD(V, E)
                 S = tdlib.min_dominating_set_with_treedecomposition(V, E, V_T, E_T)
-    """
 
 
     def test_min_coloring_with_treedecomposition_0a(self):
@@ -283,20 +279,17 @@ class TestTdLib_app(unittest.TestCase):
         S = tdlib.min_coloring_with_treedecomposition(V, E, V_T, E_T)
         self.assertEqual(len(S), 0)
 
-    """ wrong results (should be 1 but is 2)
     def test_min_coloring_with_treedecomposition_0b(self):
         V, E = cornercases[1]
         V_T, E_T, w = tdlib.PP_MD(V, E)
         S = tdlib.min_coloring_with_treedecomposition(V, E, V_T, E_T)
         self.assertEqual(len(S), 1)
 
-
     def test_min_coloring_with_treedecomposition_0c(self):
         V, E = cornercases[2]
         V_T, E_T, w = tdlib.PP_MD(V, E)
         S = tdlib.min_coloring_with_treedecomposition(V, E, V_T, E_T)
         self.assertEqual(len(S), 1)
-    """
 
     def test_min_coloring_with_treedecomposition_0d(self):
         V, E = cornercases[3]

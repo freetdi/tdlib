@@ -898,6 +898,10 @@ template <typename G_t, typename T_t>
 unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
                   typename treedec_traits<T_t>::bag_type &global_result)
 {
+    if(boost::num_vertices(G) == 0){
+        return 0;
+    }
+
     typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -1148,9 +1152,12 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
     if(boost::num_vertices(G) == 0){
         return 0;
     }
-    if(boost::num_vertices(T) == 1){
+    if(boost::num_edges(G) == 0){
         global_result.resize(1);
-        global_result[0].insert(*(boost::vertices(G).first));
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            global_result[0].insert(*vIt);
+        }
         return 1;
     }
 
