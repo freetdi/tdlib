@@ -1,0 +1,35 @@
+language: cpp
+
+os:
+  - linux
+
+compiler:
+  - gcc
+  - clang
+
+python:
+  - "2.7"
+virtualenv:
+  system_site_packages: true
+
+env:
+  global:
+    - secure: "token"
+
+install:
+  - sudo apt-get install cython
+
+script:
+  - uname -a
+  - $CXX --version
+  - autoconf --version
+  - automake --version
+  - python --version
+  - pwd
+  - ls
+
+  # run all checks
+  - ./bootstrap
+  - ./configure --enable-debug
+  -  make check
+  -  make distcheck
