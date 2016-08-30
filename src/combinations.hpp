@@ -283,6 +283,11 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
 
 template <typename G_t, typename T_t>
 void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+
     //preprocessing
     int low = -1;
     std::vector<boost::tuple<

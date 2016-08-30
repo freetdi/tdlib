@@ -67,12 +67,10 @@ class TestTdLib_exact(unittest.TestCase):
 
         self.assertEqual(status, True)
 
-    """ segfault
-    def test_exact_decomposition_cutset_0(self):
+    def test_exact_decomposition_dynamic_0(self):
         for V, E in cornercases:
             V_T, E_T, w = tdlib.exact_decomposition_dynamic(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
-    """
 
     def test_exact_decomposition_dynamic_1(self):
         V, E, tw = tdlib.exact_decomposition_dynamic(V_P6, E_P6)
