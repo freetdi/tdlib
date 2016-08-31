@@ -53,6 +53,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 
+#include <boost/graph/copy.hpp>
 #include <boost/graph/minimum_degree_ordering.hpp>
 
 #include "trace.hpp"
