@@ -307,17 +307,23 @@ void trivial_decomposition(G_t const &G, T_t &T){
 }
 
 template <typename T_t>
-int get_width(T_t &T){
-    int max = -1;
+size_t get_bagsize(T_t const &T){
+    size_t max = 0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         size_t bag_size = bag(*tIt, T).size();
-        if((int)bag_size > max){
-            max = (int)bag_size;
+        if(bag_size > max){
+            max = bag_size;
         }
     }
 
-    return (max-1);
+    return (max);
+}
+
+// this is really... stupid.
+template <typename T_t>
+int get_width(T_t const &T){
+    return get_bagsize(T)-1;
 }
 
 template <typename T_t>
