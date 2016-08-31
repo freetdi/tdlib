@@ -813,6 +813,9 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
     ordering_to_treedec(G, O_, T);
 }
 
+namespace draft{
+
+// still broken. import from cont, later...
 template <typename G_t, typename O_t, class T_t>
 void vec_ordering_to_tree(G_t &G, O_t &O, T_t& T, O_t* io=NULL)
 {
@@ -905,6 +908,8 @@ void vec_ordering_to_tree(G_t &G, O_t &O, T_t& T, O_t* io=NULL)
         }
     }
 }
+
+} // draft
 
 namespace impl{
 
