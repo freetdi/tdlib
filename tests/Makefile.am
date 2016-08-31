@@ -47,5 +47,5 @@ AM_CXXFLAGS = -O0 -g
 tdlib:
 	-ln -sf $(top_srcdir)/src tdlib
 
-EXTRA_DIST = \
-	svbs_random.h
+# EXTRA_DIST = \
+# 	svbs_random.h
