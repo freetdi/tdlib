@@ -54,7 +54,7 @@
 #include <boost/graph/adjacency_matrix.hpp>
 
 #include <boost/graph/copy.hpp>
-#include <boost/graph/minimum_degree_ordering.hpp>
+// #include <boost/graph/minimum_degree_ordering.hpp>
 
 #include "trace.hpp"
 #include "preprocessing.hpp"
@@ -68,7 +68,11 @@
 #include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
-#include "minimum_degree_ordering.hpp"
+
+#ifndef MINIMUM_DEGREE_ORDERING_HPP
+# include "minimum_degree_ordering.hpp"
+# define HAVE_MINDEGREE_FORK
+#endif
 
 namespace treedec{
 

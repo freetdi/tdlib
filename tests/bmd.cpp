@@ -4,7 +4,6 @@
 #include <boost/random.hpp>
 #include <iostream>
 #include <stdlib.h>
-#include <tdlib/minimum_degree_ordering.hpp> // HACKED
 #include <tdlib/elimination_orderings.hpp>
 #include <tdlib/graph.hpp>
 #include <tdlib/trace.hpp>

@@ -17,11 +17,16 @@
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
 #define MINIMUM_DEGREE_ORDERING_HPP
 
+// #define RANDOMSTUFF
+// #define RANDOMPUSH // does not help
+// #define RANDOMPOP // <= this is broken!
+
 #include <vector>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #ifdef RANDOMSTUFF
-#include "bucket_sorter.hpp"
+#include "debucket_sorter.hpp"
+#include "random_generators.hpp"
 #else
 #include <boost/pending/bucket_sorter.hpp>
 #endif
@@ -274,11 +279,7 @@ namespace boost {
       typedef iterator_property_map<vertex_t*, 
         identity_property_map, vertex_t, vertex_t&> IndexVertexMap;
       typedef detail::Stacks<diff_t> Workspace;
-#ifdef RANDOMSTUFF
-      typedef treedec::bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
-#else
       typedef bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
-#endif
         DegreeLists;
       typedef Numbering<InversePermutationMap, diff_t, vertex_t,VertexIndexMap>
         NumberingD;
@@ -324,7 +325,7 @@ namespace boost {
         vertex_index_map(id),
         index_vertex_vec(n_), 
         n(n_),
-        degreelists(n_ + 1, n_*n_, degree, id),
+        degreelists(n_ + 1, n_, degree, id),
         numbering(inverse_perm, n_, vertex_index_map),
         degree_lists_marker(n_, vertex_index_map), 
         marker(n_, vertex_index_map),
@@ -379,23 +380,21 @@ namespace boost {
                  ++min_degree, list_min_degree = degreelists[min_degree])
               ;
 
-<<<<<<< HEAD
-            std::pair<const vertex_t, bool> node_ = list_min_degree.next_value();
-            const vertex_t node = node_.first;
-            const size_type node_id = get(vertex_index_map, node);
-
-            unsigned actual_deg = min_degree+supernode_size[node]-1;
-
-            if (actual_deg >= ub)
-              throw exception_unsuccessful();
-
-            width = (actual_deg > width)? actual_deg : width;
-
-
-            if (node_.second) {
-              list_min_degree.pop_front();
-=======
+#ifdef RANDOMPOP
+            vertex_t node;
+            if(treedec::random::coin()){ untested();
+               node = list_min_degree.top();
+               list_min_degree.pop_front();
+            }else{ untested();
+               node = list_min_degree.bottom();
+               list_min_degree.pop_back();
+            }
+#else
             const vertex_t node = list_min_degree.top();
+            list_min_degree.pop();
+#endif
+
+
             const size_type node_id = get(vertex_index_map, node);
 
             unsigned actual_deg = min_degree+supernode_size[node];
@@ -408,16 +407,6 @@ namespace boost {
             }else{
             }
 
-#ifdef COINSTIUFF
-            if (node_.second) {
-              list_min_degree.pop();
-            }
-            else{
-              list_min_degree.pop_back();
-            }
-#else
-            list_min_degree.pop();
-#endif
             numbering(node);
 
             // check if node is the last one
@@ -582,7 +571,15 @@ namespace boost {
 
             deg -= supernode_size[u_node];
             degree[u_node] = deg; //update degree
+#ifdef RANDOMPUSH
+            if(treedec::random::coin()){ untested();
+               degreelists[deg].push_front(u_node);
+            }else{ untested();
+               degreelists[deg].push_back(u_node);
+            }
+#else
             degreelists[deg].push(u_node);
+#endif
             //u_id has been pushed back into degreelists
             degree_lists_marker.unmark(u_node);
             if (min_degree > deg) 

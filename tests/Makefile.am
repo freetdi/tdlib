@@ -23,11 +23,11 @@
 #
 
 check_PROGRAMS = \
+	bmd \
 	common_out_edges \
 	vec2tree
 
 notyets = \
-	bmd \
 	svbs_random \
 	onion \
 	gala_bmd \
