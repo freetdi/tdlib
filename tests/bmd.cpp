@@ -31,10 +31,10 @@ int main(int argc, char** argv)
 	size_t n=boost::num_vertices(g);
 	std::cout << "generated " << e << " edges, " << n << " vertices\n";
 
-	auto EE=boost::edges(g);
+	BOOST_AUTO(EE, boost::edges(g));
 	for(;EE.first!=EE.second; ++EE.first){
-		auto s=boost::source(*EE.first, g);
-		auto t=boost::target(*EE.first, g);
+		BOOST_AUTO(s, boost::source(*EE.first, g));
+		BOOST_AUTO(t, boost::target(*EE.first, g));
 		if(!boost::edge(t,s,g).second){
 			boost::add_edge(t,s,g);
 		}
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 	std::cout << "symmetric " << e << " edges\n";
 
 	unsigned i=0;
-	auto E=boost::edges(g);
+	BOOST_AUTO(E, boost::edges(g));
 	for(;E.first!=E.second; ++E.first){
 		++i;
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	}
 
 	std::deque<unsigned long > iso;
-	auto V=boost::vertices(g);
+	BOOST_AUTO(V, boost::vertices(g));
 	for(;V.first!=V.second; ++V.first){
 			if(boost::out_degree(*V.first, g)){
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
 	std::vector<int> inverse_perm(n, 0);
 	std::vector<int> supernode_sizes(n, 1);
-	auto id = boost::get(boost::vertex_index, g);
+	BOOST_AUTO(id, boost::get(boost::vertex_index, g));
 	std::vector<int> degree(n, 0);
 	std::vector<int> io(n, 0);
 	std::vector<int> o(n, 0);

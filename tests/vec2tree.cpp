@@ -23,8 +23,10 @@ int main()
 
 	unsigned j=0;
 	std::vector<size_t> o(num_vertices(g));
-	for(auto& i:o){
-		i=j++;
+
+	BOOST_AUTO(i, o.begin());
+	for(;i!=o.end(); ++i){
+		*i = j++;
 	}
 	std::vector<size_t> io(o.size());
 
@@ -38,9 +40,10 @@ int main()
 	// check if the inverse permutation is indeed one
 	// needed??
 	j = 0;
-	for(auto i : io){
-		if(i!=j++){
-			std::cerr << "not an inverse perm" << i << " " << j << "\n";
+	BOOST_AUTO(ii, io.begin());
+	for(; ii!=io.end(); ++ii){
+		if(*ii!=j++){
+			std::cerr << "not an inverse perm" << *ii << " " << j << "\n";
 		}
 	}
 }

@@ -19,9 +19,8 @@ int main()
 	boost::add_edge(1,2,G);
 	boost::add_edge(1,4,G);
 
-	auto i = treedec::common_out_edges(0,1,G).first;
-	auto e = treedec::common_out_edges(0,1,G).second;
-
+	BOOST_AUTO(i, treedec::common_out_edges(0,1,G).first);
+	BOOST_AUTO(e, treedec::common_out_edges(0,1,G).second);
 
 	unsigned count=0;
 	for(;i!=e;++i){
