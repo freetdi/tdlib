@@ -196,7 +196,7 @@ bool is_tree(G_t const& G){
 }
 
 
-/* Checks if a tree decomposition is valid with respect to G.
+/* Check if a tree decomposition is valid with respect to G.
  *
  *  0 = valid
  * -1 = (at least) not a tree
@@ -207,7 +207,8 @@ bool is_tree(G_t const& G){
  * -5 = The empty graph must have a treedecomposition with one vertex and an empty bag
  */
 template <typename G_t, typename T_t>
-int validate_treedecomposition(G_t const& G, T_t const& T){
+int check_treedec(G_t const& G, T_t const& T)
+{
     if(boost::num_vertices(T) == 0){
         //The empty graph has a treedecomposition with 1 vertex and an empty bag.
         return -5;
@@ -291,6 +292,12 @@ int validate_treedecomposition(G_t const& G, T_t const& T){
 }
 
 template <typename G_t, typename T_t>
+int validate_treedecomposition(G_t const& G, T_t const& T)
+{
+    return check_treedec(G, T);
+}
+
+template <typename G_t, typename T_t>
 bool is_valid_treedecomposition(G_t const& G, T_t const& T){
     return (validate_treedecomposition(G, T) == 0);
 }
@@ -307,17 +314,23 @@ void trivial_decomposition(G_t const &G, T_t &T){
 }
 
 template <typename T_t>
-int get_width(T_t &T){
-    int max = -1;
+size_t get_bagsize(T_t const &T){
+    size_t max = 0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         size_t bag_size = bag(*tIt, T).size();
-        if((int)bag_size > max){
-            max = (int)bag_size;
+        if(bag_size > max){
+            max = bag_size;
         }
     }
 
-    return (max-1);
+    return (max);
+}
+
+// this is really... stupid.
+template <typename T_t>
+int get_width(T_t const &T){
+    return get_bagsize(T)-1;
 }
 
 template <typename T_t>

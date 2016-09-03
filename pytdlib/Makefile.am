@@ -19,12 +19,14 @@ AM_LDFLAGS = -module -omit-version
 TESTS = \
 	test_approx.py \
 	test_apps.py \
+	test_bmd.py \
 	test_exact.py \
 	test_fill_in.py \
 	test_lb.py \
 	test_misc.py \
 	test_post.py \
-	test_pre.py
+	test_pre.py \
+	test_sep.py
 
 $(TESTS:%.py=%.log): all-am
 

@@ -22,18 +22,30 @@
 # Boston, MA 02110-1301, USA.
 #
 
-ACLOCAL_AMFLAGS = -Im4
+check_PROGRAMS = \
+	bmd \
+	common_out_edges \
+	vec2tree
 
-if USE_PYTHON
-pytdlib = pytdlib
-endif
+notyets = \
+	svbs_random \
+	onion \
+	gala_bmd \
+	gala_hw \
+	dfs \
+	bfs
 
-if ENABLE_DOC
-DOC_SUBDIR = doc
-else
-DOC_SUBDIR =
-endif
+TESTS = $(check_PROGRAMS)
 
-SUBDIRS = $(pytdlib) src tests $(DOC_SUBDIR)
+AM_DEFAULT_SOURCE_EXT=.cpp
 
-EXTRA_DIST = cython.am
+BUILT_SOURCES=tdlib
+
+AM_CPPFLAGS = -I. -DTRACE_UNTESTED
+AM_CXXFLAGS = -O0 -g
+
+tdlib:
+	-ln -sf $(top_srcdir)/src tdlib
+
+# EXTRA_DIST = \
+# 	svbs_random.h
