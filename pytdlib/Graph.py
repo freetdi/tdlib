@@ -14,3 +14,6 @@ class Graph:
 
     def edges(self):
         return self._E
+
+    def backend(self):
+        return self._backend

@@ -70,7 +70,7 @@ This module containes the following functions** :
     #- treedecomposition_exact_branch_and_bound
         Computes a tree decomposition of exact width of a given graph
 
-    - seperator_algorithm
+    - separator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
 
     - minDegree_decomp
@@ -102,14 +102,19 @@ This module containes the following functions** :
     #- random_elimination_orderings
 
     - max_clique_with_treedecomposition
+        Computes a maximal clique with help of a tree decomposition
 
     - max_independent_set_with_treedecomposition
+        Computes a maximal independent set with help of a tree decomposition
 
     - max_vertex_cover_with_treedecomposition
+        Computes a minimal vertex cover with help of a tree decomposition
 
     - min_dominating_set_with_treedecomposition
+        Computes a minimal dominating set with help of a tree decomposition
 
     - min_coloring_with_treedecomposition
+        Computes a minimal coloring with help of a tree decomposition
 
     - treedec_to_ordering
         Computes an elimination ordering out of a tree decomposition
@@ -147,7 +152,7 @@ from tdlib cimport gc_LBPC_deltaC
 
 from tdlib cimport gc_exact_decomposition_cutset
 from tdlib cimport gc_exact_decomposition_cutset_decision
-#from tdlib cimport gc_exact_decomposition_dynamic
+from tdlib cimport gc_exact_decomposition_dynamic
 #from tdlib cimport gc_exact_decomposition_branch_and_bound
 
 from tdlib cimport gc_seperator_algorithm
