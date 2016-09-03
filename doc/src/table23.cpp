@@ -10,6 +10,12 @@
 #include <tdlib/applications.hpp>
 #include <tdlib/misc.hpp>
 
+#ifdef RESULTS_HERE
+#define RESULTS_DIR
+#else
+#define RESULTS_DIR "./Results/"
+#endif
+
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 
@@ -101,7 +107,7 @@ int main(int argc, char * const * argv){
     avg_set /= graphs_count;
 
 
-    std::ofstream texresults("./Results/23_max_clique.tex", std::ios::app);
+    std::ofstream texresults(RESULTS_DIR "23_max_clique.tex", std::ios::app);
 
     tex_tabular_entry(texresults, package, graphs_count, avg_width, max_width, totaltime1, avg_set, max_set, totaltime2, totaltime);
 

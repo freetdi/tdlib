@@ -10,6 +10,12 @@
 #include <tdlib/lower_bounds.hpp>
 #include <tdlib/misc.hpp>
 
+#ifdef RESULTS_HERE
+#define RESULTS_DIR
+#else
+#define RESULTS_DIR "./Results/"
+#endif
+
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 
@@ -132,7 +138,7 @@ int main(int argc, char * const * argv){
         test_single(std::string(argv[i]));
     }
 
-    std::ofstream texresults("./Results/3_lb2.tex", std::ios::app);
+    std::ofstream texresults(RESULTS_DIR "3_lb2.tex", std::ios::app);
 
     texresults << convert.str();
 

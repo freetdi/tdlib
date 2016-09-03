@@ -28,6 +28,12 @@ if USE_PYTHON
 pytdlib = pytdlib
 endif
 
-SUBDIRS = $(pytdlib) src
+if ENABLE_DOC
+DOC_SUBDIR = doc
+else
+DOC_SUBDIR =
+endif
+
+SUBDIRS = $(pytdlib) src $(DOC_SUBDIR)
 
 EXTRA_DIST = cython.am

@@ -9,6 +9,11 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([])
 LT_INIT()
 
+# docbuild
+AC_ARG_ENABLE([doc],
+  AS_HELP_STRING([--disable-doc], [Disable docbuild]))
+AM_CONDITIONAL([ENABLE_DOC], [test "$enable_doc" != no])
+
 # debugging
 AC_MSG_CHECKING([if debug code should be compiled in])
 AC_ARG_ENABLE([debug],
@@ -99,6 +104,8 @@ fi
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
+AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([doc/src/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 
 AC_OUTPUT

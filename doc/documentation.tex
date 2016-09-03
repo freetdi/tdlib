@@ -17,7 +17,8 @@
 \usepackage{comment}
 \usepackage{enumitem}
 \usetikzlibrary{arrows}
-\usepackage[autostyle]{csquotes}
+% does not work (why?)
+%\usepackage[autostyle]{csquotes}
 
 \newtheorem*{definition}{Definition}
 
@@ -511,7 +512,7 @@ Figure 1 shows the proportion of rules applied on the tested graphs. Figure 2 sh
 package & \#graphs & avg width & max width & \#not fully prep. & avg reduction & total time[ms] \\
 \hline 
 \hline 
-\input{./Results/1_PP.tex}
+\input{1_PP.tex}
 \hline
 \end{tabular}
 }
@@ -1049,7 +1050,7 @@ MCSC-max-mcs &  \\
 name & delta & delta2 & gamma & deltaD & delta2D & gammaD-left \\
 \hline
 \hline
-\input{./Results/2_lb1.tex}
+\input{2_lb1.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of degree-based lower bound algorithms on the not by preprocessing fully reducable graphs. (1/2)}
@@ -1063,7 +1064,7 @@ name & delta & delta2 & gamma & deltaD & delta2D & gammaD-left \\
 name & gammaD-right & gammaD-min-e & deltaC-min-d & deltaC-max-d & deltaC-leastC \\
 \hline
 \hline
-\input{./Results/3_lb2.tex}
+\input{3_lb2.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of degree-based lower bound algorithms on the not by preprocessing fully reducable graphs. (2/2)}
@@ -1079,7 +1080,7 @@ name & gammaD-right & gammaD-min-e & deltaC-min-d & deltaC-max-d & deltaC-leastC
 name & LBNdeltaD & LBNdeltaC & LBNCdeltaD & LBNCdeltaC \\
 \hline
 \hline
-\input{./Results/4_lb_improved1.tex}
+\input{4_lb_improved1.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of improved graph-based lower bound algorithms on the not by preprocessing fully reducable graphs. (1/2)}
@@ -1093,7 +1094,7 @@ name & LBNdeltaD & LBNdeltaC & LBNCdeltaD & LBNCdeltaC \\
 name & LBPdeltaD & LBPdeltaC & LBPCdeltaD & LBPCdeltaC \\
 \hline
 \hline
-\input{./Results/5_lb_improved2.tex}
+\input{5_lb_improved2.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of improved graph-based lower bound algorithms on the not by preprocessing fully reducable graphs. (2/2)}
@@ -1109,7 +1110,7 @@ name & LBPdeltaD & LBPdeltaC & LBPCdeltaD & LBPCdeltaC \\
 name & MCS & MCSC \\
 \hline
 \hline
-\input{./Results/6_lb_mcs.tex}
+\input{6_lb_mcs.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of MCS-lower bound algorithms on some of the not by preprocessing fully reducable graphs.}
@@ -1260,7 +1261,7 @@ We have evaluated the exact algorithm on the by preprocessing (for treewidth at 
 name & $|V'|$ & $|E'|$ & tw & time[ms] \\
 \hline
 \hline   
-\input{./Results/7_exact_cutset.tex}
+\input{7_exact_cutset.tex}
 \hline
 \end{tabular}
 \caption{greedyCR with default lower bound.}
@@ -1275,7 +1276,7 @@ The computation on handle\_dhcp needed 0.633976 ms when $lb=6$ was provided, but
 name & $|V'|$ & $|E'|$ & tw & time[s] \\
 \hline
 \hline   
-\input{./Results/8_exact_dynamic.tex}
+\input{8_exact_dynamic.tex}
 \hline
 \end{tabular}
 \end{table}
@@ -1347,7 +1348,7 @@ The complexity is $O(|V^{3}(G)|)$: minDegree will be called exactly $|V(G)|+1$ t
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/9_MD.tex}
+\input{9_MD.tex}
 \hline
 \end{tabular}
 \caption{\small{Results on running the minDegree heuristic.} }
@@ -1360,7 +1361,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/10_PP_MD.tex}
+\input{10_PP_MD.tex}
 \hline
 \end{tabular}
 \caption{\small{Results on first applying preprocessing, then on the reduced instances the minDegree heuristic.}}
@@ -1377,7 +1378,7 @@ We also implemented the fillIn heuristic: Choose a vertex v such that the number
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/11_FI.tex}
+\input{11_FI.tex}
 \hline
 \end{tabular}
 \caption{\small{Results on running the fillIn heuristic.} }
@@ -1390,7 +1391,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/12_PP_FI.tex}
+\input{12_PP_FI.tex}
 \hline
 \end{tabular}
 \caption{\small{Results on first applying preprocessing, then on the reduced instances the fillIn heuristic.}}
@@ -1409,7 +1410,7 @@ The classic approach to obtaining tree-decompositions of control-flow graphs is 
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/13_thorup.tex}
+\input{13_thorup.tex}
 \hline
 \end{tabular}
 \caption{Comparison of Thorup's heuristic with preprocessing + minDegree-heuristic. Preprocessing + minDegree gives on about $\frac{1}{3}$ of all instances better results, and in none worse than Thorup's heuristic. The runtime of Thorup's heuristic is inferior to preprocessing + minDegree by a factor up to 2.}
@@ -1517,7 +1518,7 @@ For W $\subseteq V(G), |W| = 3k + 1$, a W-separation of order $\leq k + 1$, can 
 package & \#graphs & avg width & avg appr. & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/14_separator.tex}
+\input{14_separator.tex}
 \hline
 \end{tabular}
 \caption{Evaluation of the seperator-algorithm implementation. The worst approximation factor of 4 is adopted on almost each graph. The maximal width over all graphs, produced by the seperator algorithm was 8, graphs of higher treewidth could be decomposed with better approximation factor by tendency.}
@@ -1954,7 +1955,7 @@ We cannot proceed, because all bags of size 4 with additional edges induce a cli
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/15_msvs_trivial.tex}
+\input{15_msvs_trivial.tex}
 \hline
 \end{tabular}
 \caption{Results on applying MSVS on the trivial decomposition.}
@@ -1970,7 +1971,7 @@ Results on applying MSVS on the tree decomposition returned by the seperator alg
 package & \#graphs & avg width & max width & \#improved & time[ms] \\
 \hline
 \hline
-\input{./Results/16_sep_msvs.tex}
+\input{16_sep_msvs.tex}
 \hline
 \end{tabular}
 
@@ -2332,7 +2333,7 @@ Triangulation minimization has no effect on tree decomposition returned from the
 package & \#graphs & avg width & max width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/17_FI_TM.tex}
+\input{17_FI_TM.tex}
 \hline
 \end{tabular}
 \end{table}
@@ -2344,7 +2345,7 @@ package & \#graphs & avg width & max width & max width & time[ms] \\
 package & \#graphs & avg width & max width & \#improved & time[ms] \\
 \hline
 \hline
-\input{./Results/18_PP_FI_TM.tex}
+\input{18_PP_FI_TM.tex}
 \hline
 \end{tabular}
 \end{table}
@@ -2356,7 +2357,7 @@ package & \#graphs & avg width & max width & \#improved & time[ms] \\
 package & \#graphs & avg width & max width & \#improved & time[ms] \\
 \hline
 \hline
-\input{./Results/19_sep_TM.tex}
+\input{19_sep_TM.tex}
 \hline
 \end{tabular}
 \caption{Applying the minimalChordal-heuristic on the treedecomposition returned by the seperator algorithm.}
@@ -2396,7 +2397,7 @@ max-Clique is computed by solving max-Clique on the by bags induced subgraphs of
 package & \#graphs & avg width & max width & time1[ms] & avg set size & max set size & time2[ms] & totaltime \\
 \hline
 \hline
-\input{./Results/23_max_clique.tex}
+\input{23_max_clique.tex}
 \hline
 \end{tabular}
 
@@ -2408,7 +2409,7 @@ package & \#graphs & avg width & max width & time1[ms] & avg set size & max set 
 package & \#graphs & avg width & max width & time1[ms] & avg set size & max set size & time2[ms] & totaltime \\
 \hline
 \hline
-\input{./Results/24_max_independent_set.tex}
+\input{24_max_independent_set.tex}
 \hline
 \end{tabular}
 
@@ -2420,7 +2421,7 @@ package & \#graphs & avg width & max width & time1[ms] & avg set size & max set 
 package & \#graphs & avg width & max width & time1[ms] & avg set size & max set size & time2[ms] & totaltime \\
 \hline
 \hline
-\input{./Results/25_min_vertex_cover.tex}
+\input{25_min_vertex_cover.tex}
 \hline
 \end{tabular}
 
@@ -2432,7 +2433,7 @@ package & \#graphs & avg width & max width & time1[ms] & avg set size & max set 
 package & \#graphs & avg width & max width & time1[ms] & avg set size & max set size & time2[ms] & totaltime \\
 \hline
 \hline
-\input{./Results/26_min_dominating_set.tex}
+\input{26_min_dominating_set.tex}
 \hline
 \end{tabular}
 
@@ -2444,7 +2445,7 @@ package & \#graphs & avg width & max width & time1[ms] & avg set size & max set 
 package & \#graphs & avg width & max width & time1[ms] & avg set size & max set size & time2[ms] & totaltime \\
 \hline
 \hline
-\input{./Results/27_min_coloring.tex}
+\input{27_min_coloring.tex}
 \hline
 \end{tabular}
 
@@ -2511,7 +2512,7 @@ make install; python; import tdlib; help(tdlib);
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/20_separator.tex}
+\input{20_separator.tex}
 \hline
 \end{tabular}
 }
@@ -2525,7 +2526,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/15_msvs_trivial.tex}
+\input{15_msvs_trivial.tex}
 \hline
 \end{tabular}
 }
@@ -2541,7 +2542,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/28_sep_msvs.tex}
+\input{28_sep_msvs.tex}
 \hline
 \end{tabular}
 }
@@ -2555,7 +2556,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/29_sep_TM.tex}
+\input{29_sep_TM.tex}
 \hline
 \end{tabular}
 }
@@ -2571,7 +2572,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/30_MD.tex}
+\input{30_MD.tex}
 \hline
 \end{tabular}
 }
@@ -2585,7 +2586,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/31_PP_MD.tex}
+\input{31_PP_MD.tex}
 \hline
 \end{tabular}
 }
@@ -2601,7 +2602,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/32_FI.tex}
+\input{32_FI.tex}
 \hline
 \end{tabular}
 }
@@ -2615,7 +2616,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/33_FI_TM.tex}
+\input{33_FI_TM.tex}
 \hline
 \end{tabular}
 }
@@ -2631,7 +2632,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/34_PP_FI_TM.tex}
+\input{34_PP_FI_TM.tex}
 \hline
 \end{tabular}
 }
@@ -2645,7 +2646,7 @@ package & \#graphs & avg width & max width & time[ms] \\
 package & \#graphs & avg width & max width & time[ms] \\
 \hline
 \hline
-\input{./Results/13_thorup.tex}
+\input{13_thorup.tex}
 \hline
 \end{tabular}
 }
@@ -2666,7 +2667,7 @@ TM $\overset{\wedge}{=}$ triangulation minimization \\
 name & tw & MD & PP+MD & FI & FI+TM & MSVS & Sep. & Sep.+MSVS & Sep.+TM \\
 \hline
 \hline
-\input{./Results/all_algorithms_rest_graphs_1.tex}
+\input{all_algorithms_rest_graphs_1.tex}
 \hline
 \end{tabular}
 }
@@ -2680,7 +2681,7 @@ name & tw & MD & PP+MD & FI & FI+TM & MSVS & Sep. & Sep.+MSVS & Sep.+TM \\
 name & tw & MD & PP+MD & FI & FI+TM & MSVS & Sep. & Sep.+MSVS & Sep.+TM \\
 \hline
 \hline
-\input{./Results/all_algorithms_rest_graphs_2.tex}
+\input{all_algorithms_rest_graphs_2.tex}
 \hline
 \end{tabular}
 }

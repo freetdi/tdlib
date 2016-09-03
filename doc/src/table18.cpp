@@ -9,6 +9,12 @@
 #include <tdlib/combinations.hpp>
 #include <tdlib/misc.hpp>
 
+#ifdef RESULTS_HERE
+#define RESULTS_DIR
+#else
+#define RESULTS_DIR "./Results/"
+#endif
+
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 
@@ -89,7 +95,7 @@ int main(int argc, char * const * argv){
     avg_width /= graphs_count;
 
 
-    std::ofstream texresults("./Results/18_PP_FI_TM.tex", std::ios::app);
+    std::ofstream texresults(RESULTS_DIR "18_PP_FI_TM.tex", std::ios::app);
 
     tex_tabular_entry(texresults, package, graphs_count, avg_width, max_width, diff, totaltime);
 

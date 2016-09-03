@@ -21,8 +21,22 @@ void tex_hline(OUT &out){
     out << "\\hline" << std::endl;
 }
 
-template <typename OUT>
-void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4, auto &arg5, auto &arg6, auto &arg7)
+template <typename OUT,
+	typename AUTO1,
+	typename AUTO2,
+	typename AUTO3,
+	typename AUTO4,
+	typename AUTO5,
+	typename AUTO6,
+	typename AUTO7>
+void tex_tabular_entry(OUT &out,
+		AUTO1 &arg1,
+		AUTO2 &arg2,
+		AUTO3 &arg3,
+		AUTO4 &arg4,
+		AUTO5 &arg5,
+		AUTO6 &arg6,
+		AUTO7 &arg7)
 {
     out << arg1 << " & "
         << arg2 << " & "
@@ -33,8 +47,20 @@ void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4,
         << arg7 << " \\\\" << std::endl;
 }
 
-template <typename OUT>
-void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4, auto &arg5, auto &arg6)
+template <typename OUT,
+	typename AUTO1,
+	typename AUTO2,
+	typename AUTO3,
+	typename AUTO4,
+	typename AUTO5,
+	typename AUTO6>
+void tex_tabular_entry(OUT &out,
+		AUTO1 &arg1,
+		AUTO2 &arg2,
+		AUTO3 &arg3,
+		AUTO4 &arg4,
+		AUTO5 &arg5,
+		AUTO6 &arg6)
 {
     out << arg1 << " & "
         << arg2 << " & "
@@ -44,8 +70,18 @@ void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4,
         << arg6 << " \\\\" << std::endl;
 }
 
-template <typename OUT>
-void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4, auto &arg5)
+template <typename OUT,
+	typename AUTO1,
+	typename AUTO2,
+	typename AUTO3,
+	typename AUTO4,
+	typename AUTO5>
+void tex_tabular_entry(OUT &out,
+		AUTO1 &arg1,
+		AUTO2 &arg2,
+		AUTO3 &arg3,
+		AUTO4 &arg4,
+		AUTO5 &arg5)
 {
     out << arg1 << " & "
         << arg2 << " & "
@@ -54,8 +90,26 @@ void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4,
         << arg5 << " \\\\" << std::endl;
 }
 
-template <typename OUT>
-void tex_tabular_entry(OUT &out, auto &arg1, auto &arg2, auto &arg3, auto &arg4, auto &arg5, auto &arg6, auto &arg7, auto &arg8, auto &arg9)
+template <typename OUT,
+	typename AUTO1,
+	typename AUTO2,
+	typename AUTO3,
+	typename AUTO4,
+	typename AUTO5,
+	typename AUTO6,
+	typename AUTO7,
+	typename AUTO8,
+	typename AUTO9>
+void tex_tabular_entry(OUT &out,
+		AUTO1 &arg1,
+		AUTO2 &arg2,
+		AUTO3 &arg3,
+		AUTO4 &arg4,
+		AUTO5 &arg5,
+		AUTO6 &arg6,
+		AUTO7 &arg7,
+		AUTO8 &arg8,
+		AUTO9 &arg9)
 {
     out << arg1 << " & "
         << arg2 << " & "
