@@ -44,6 +44,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include "iter.hpp"
 #include "nice_decomposition.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"

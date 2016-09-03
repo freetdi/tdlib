@@ -110,6 +110,40 @@ void PP_FI(G_t &G, T_t &T, int &low){
     treedec::glue_bags(bags, T);
 }
 
+//Applies the fillIn-heuristic followed by triangulation minimization.
+template <typename G_t, typename T_t>
+void FI_TM(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
+        boost::add_vertex(T);
+        return;
+    }
+    else if(boost::num_vertices(G) == 1){
+        typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
+        bag(t, T).insert(*(boost::vertices(G).first));
+        return;
+    }
+
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
+
+    G_t H(G);
+    //true = ignore isolated vertices
+    treedec::fillIn_ordering(G, old_elim_ordering, true);
+    G = H; // reset
+
+    treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
+
+    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering_(old_elim_ordering.size());
+    unsigned c = 0;
+    for(unsigned i = 0; i < new_elim_ordering.size(); i++){
+        if(boost::degree(new_elim_ordering[i], G) > 0){
+            new_elim_ordering_[c++] = new_elim_ordering[i];
+        }
+    }
+
+    treedec::ordering_to_treedec(G, new_elim_ordering_, T);
+}
+
 
 //Recursively applies preprocessing rules and glues corresponding bags with
 //current tree decomposition. This version applies the fillIn-heuristic followed
@@ -129,29 +163,12 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     treedec::preprocessing(G, bags, low);
 
     if(boost::num_edges(G) > 0){
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
-
-        G_t H(G);
-        //true = ignore isolated vertices
-        treedec::fillIn_ordering(G, old_elim_ordering, true);
-        G = H; // reset
-
-        treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering_(old_elim_ordering.size());
-        unsigned c = 0;
-        for(unsigned i = 0; i < new_elim_ordering.size(); i++){
-            if(boost::degree(new_elim_ordering[i], G) > 0){
-                new_elim_ordering_[c++] = new_elim_ordering[i];
-            }
-        }
-
-        treedec::ordering_to_treedec(G, new_elim_ordering_, T);
+        treedec::FI_TM(G, T);
     }
 
     treedec::glue_bags(bags, T);
 }
+
 
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
