@@ -1,4 +1,6 @@
 from RandomGNM_250_1000 import *
+from Graph import Graph
+from Decomp import Decomp
 
 #some graphs
 V_P6 = [0,1,2,3,4,5]

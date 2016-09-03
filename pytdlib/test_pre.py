@@ -6,14 +6,16 @@ from graphs import *
 class TestTdLib_pre(unittest.TestCase):
     def test_preprocessing_0(self):
         for V, E in cornercases:
-            V_, E_, B, lb = tdlib.preprocessing(V, E)
-            self.assertEqual(V_, [])
-            self.assertEqual(E_, [])
+            G = Graph(V, E)
+            G_, B, lb = tdlib.preprocessing(G)
+            self.assertEqual(G_.vertices(), [])
+            self.assertEqual(G_.edges(), [])
 
     def test_preprocessing_1(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_P6, E_P6)
-        self.assertEqual(V_, [])
-        self.assertEqual(E_, [])
+        G = Graph(V_P6, E_P6)
+        G_, B, lb = tdlib.preprocessing(G)
+        self.assertEqual(G_.vertices(), [])
+        self.assertEqual(G_.edges(), [])
         for i in range(len(B)):
             B[i].sort()
         B.sort()
@@ -21,9 +23,10 @@ class TestTdLib_pre(unittest.TestCase):
         self.assertEqual(lb, 1)
 
     def test_preprocessing_2(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_K5, E_K5)
-        self.assertEqual(V_, [])
-        self.assertEqual(E_, [])
+        G = Graph(V_K5, E_K5)
+        G_, B, lb = tdlib.preprocessing(G)
+        self.assertEqual(G_.vertices(), [])
+        self.assertEqual(G_.edges(), [])
         for i in range(len(B)):
             B[i].sort()
         B.sort()
@@ -32,177 +35,212 @@ class TestTdLib_pre(unittest.TestCase):
 
 
     def test_preprocessing_3(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_Petersen, E_Petersen)
-        self.assertEqual(V_, V_Petersen)
-        self.assertEqual(E_, [0,1,0,4,0,5,1,2,1,6,2,3,2,7,3, \
+        G = Graph(V_Petersen, E_Petersen)
+        G_, B, lb = tdlib.preprocessing(G)
+        self.assertEqual(G_.vertices(), V_Petersen)
+        self.assertEqual(G_.edges(), [0,1,0,4,0,5,1,2,1,6,2,3,2,7,3, \
                               4,3,8,4,9,5,7,5,8,6,8,6,9,7,9])
 
         self.assertEqual(len(B), 0)
         self.assertEqual(lb, 4)
 
     def test_preprocessing_4(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_Petersen_double, E_Petersen_double)
+        G = Graph(V_Petersen_double, E_Petersen_double)
+        G_, B, lb = tdlib.preprocessing(G)
         self.assertEqual(len(B), 0)
 
     def test_preprocessing_5(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_Wagner, E_Wagner)
+        G = Graph(V_Wagner, E_Wagner)
+        G_, B, lb = tdlib.preprocessing(G)
         self.assertEqual(len(B), 0)
 
     def test_preprocessing_6(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_Pappus, E_Pappus)
+        G = Graph(V_Pappus, E_Pappus)
+        G_, B, lb = tdlib.preprocessing(G)
         self.assertEqual(len(B), 0)
 
     def test_preprocessing_7(self):
-        V_, E_, B, lb = tdlib.preprocessing(V_Grid_5_5, E_Grid_5_5)
+        G = Graph(V_Grid_5_5, E_Grid_5_5)
+        G_, B, lb = tdlib.preprocessing(G)
         self.assertEqual(lb, 4)
 
     def test_preprocessing_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
-                V_T, E_T, B, lb = tdlib.preprocessing(V, E)
+                G = Graph(V, E)
+                G_, B, lb = tdlib.preprocessing(G)
 
 
     def test_PP_MD_0(self):
         for V, E in cornercases:
-            V_T, E_T, w = tdlib.PP_MD(V, E)
-            self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+            G = Graph(V, E)
+            T, w = tdlib.PP_MD(G)
+            self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_MD_1(self):
-        V, E, w = tdlib.PP_MD(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
+        G = Graph(V_P6, E_P6)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
     def test_PP_MD_2(self):
-        V, E, w = tdlib.PP_MD(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
+        G = Graph(V_K5, E_K5)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_MD_3(self):
-        V, E, w = tdlib.PP_MD(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
+        G = Graph(V_Petersen, E_Petersen)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_MD_4(self):
-        V, E, w = tdlib.PP_MD(V_Petersen_double, E_Petersen_double)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen_double, E_Petersen_double, V, E), True)
+        G = Graph(V_Petersen_double, E_Petersen_double)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_MD_5(self):
-        V, E, w = tdlib.PP_MD(V_Wagner, E_Wagner)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E), True)
+        G = Graph(V_Wagner, E_Wagner)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_MD_6(self):
-        V, E, w = tdlib.PP_MD(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
+        G = Graph(V_Pappus, E_Pappus)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 6)
 
     def test_PP_MD_7(self):
-        V, E, w = tdlib.PP_MD(V_Grid_5_5, E_Grid_5_5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Grid_5_5, E_Grid_5_5, V, E), True)
+        G = Graph(V_Grid_5_5, E_Grid_5_5)
+        T, w = tdlib.PP_MD(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 5)
 
     def test_PP_MD_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
-                V_T, E_T, w = tdlib.PP_MD(V, E)
-                self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+                G = Graph(V, E)
+                T, w = tdlib.PP_MD(G)
+                self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+
 
     def test_PP_FI_0(self):
         for V, E in cornercases:
-            V_T, E_T, w = tdlib.PP_FI(V, E)
-            self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+            G = Graph(V, E)
+            T, w = tdlib.PP_FI(G)
+            self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_FI_1(self):
-        V, E, w = tdlib.PP_FI(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
+        G = Graph(V_P6, E_P6)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
     def test_PP_FI_2(self):
-        V, E, w = tdlib.PP_FI(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
+        G = Graph(V_K5, E_K5)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_3(self):
-        V, E, w = tdlib.PP_FI(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
+        G = Graph(V_Petersen, E_Petersen)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_FI_4(self):
-        V, E, w = tdlib.PP_FI(V_Petersen_double, E_Petersen_double)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen_double, E_Petersen_double, V, E), True)
+        G = Graph(V_Petersen_double, E_Petersen_double)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_FI_5(self):
-        V, E, w = tdlib.PP_FI(V_Wagner, E_Wagner)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E), True)
+        G = Graph(V_Wagner, E_Wagner)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_6(self):
-        V, E, w = tdlib.PP_FI(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
+        G = Graph(V_Pappus, E_Pappus)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 6)
 
     def test_PP_FI_7(self):
-        V, E, w = tdlib.PP_FI(V_Grid_5_5, E_Grid_5_5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Grid_5_5, E_Grid_5_5, V, E), True)
+        G = Graph(V_Grid_5_5, E_Grid_5_5)
+        T, w = tdlib.PP_FI(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 5)
 
     def test_PP_FI_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
-                V_T, E_T, w = tdlib.PP_FI(V, E)
-                self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+                G = Graph(V, E)
+                T, w = tdlib.PP_FI(G)
+                self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+
 
     def test_PP_FI_TM_0(self):
         for V, E in cornercases:
-            V_T, E_T, w = tdlib.PP_FI_TM(V, E)
-            self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+            G = Graph(V, E)
+            T, w = tdlib.PP_FI_TM(G)
+            self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_FI_TM_1(self):
-        V, E, w = tdlib.PP_FI_TM(V_P6, E_P6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_P6, E_P6, V, E), True)
+        G = Graph(V_P6, E_P6)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
     def test_PP_FI_TM_2(self):
-        V, E, w = tdlib.PP_FI_TM(V_K5, E_K5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_K5, E_K5, V, E), True)
+        G = Graph(V_K5, E_K5)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_TM_3(self):
-        V, E, w = tdlib.PP_FI_TM(V_Petersen, E_Petersen)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen, E_Petersen, V, E), True)
+        G = Graph(V_Petersen, E_Petersen)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_FI_TM_4(self):
-        V, E, w = tdlib.PP_FI_TM(V_Petersen_double, E_Petersen_double)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Petersen_double, E_Petersen_double, V, E), True)
+        G = Graph(V_Petersen_double, E_Petersen_double)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 4 and w <= 5, True) #c++11 issuse
 
     def test_PP_FI_TM_5(self):
-        V, E, w = tdlib.PP_FI_TM(V_Wagner, E_Wagner)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Wagner, E_Wagner, V, E), True)
+        G = Graph(V_Wagner, E_Wagner)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 4)
 
     def test_PP_FI_TM_6(self):
-        V, E, w = tdlib.PP_FI_TM(V_Pappus, E_Pappus)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Pappus, E_Pappus, V, E), True)
+        G = Graph(V_Pappus, E_Pappus)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 6)
 
     def test_PP_FI_TM_7(self):
-        V, E, w = tdlib.PP_FI_TM(V_Grid_5_5, E_Grid_5_5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(V_Grid_5_5, E_Grid_5_5, V, E), True)
+        G = Graph(V_Grid_5_5, E_Grid_5_5)
+        T, w = tdlib.PP_FI_TM(G)
+        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 5)
 
     def test_PP_FI_TM_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)
-                V_T, E_T, w = tdlib.PP_FI_TM(V, E)
-                self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+                G = Graph(V, E)
+                T, w = tdlib.PP_FI_TM(G)
+                self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
 if __name__ == '__main__':
     unittest.main()
