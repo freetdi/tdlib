@@ -17,3 +17,6 @@ class Graph:
 
     def backend(self):
         return self._backend
+
+    def graphtype(self):
+        return self._backend

@@ -286,6 +286,14 @@ def inverse_labels_dict(labels_map):
         inv_dict[labels_map[i]] = i
     return inv_dict
 
+def graphtype_to_uint(string):
+    if string == "boost_graph_undirected":
+        return 0
+    elif string == "boost_graph_directed":
+        return 1
+    else:
+        raise Exception
+
 
 ##############################################################
 ############ PREPROCESSING ###################################
@@ -325,7 +333,9 @@ def preprocessing(G):
 
     cdef int c_lb = -1
 
-    py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb, graphtype)
 
     V_G_ = apply_labeling(V_G, labels_map)
     c_bags_ = apply_labeling(c_bags, labels_map)
@@ -364,7 +374,9 @@ def PP_MD(G):
 
     cdef int c_lb = -1
 
-    gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_MD(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -403,7 +415,9 @@ def PP_FI(G):
 
     cdef int c_lb = -1
 
-    gc_PP_FI(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_FI(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -444,7 +458,9 @@ def PP_FI_TM(G):
 
     cdef int c_lb = -1
 
-    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -495,20 +511,22 @@ def lower_bound(G, algorithm = "deltaC_least_c"):
     cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     cdef int c_lb = 0
 
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
     if(algorithm == "deltaC_min_d"):
-        c_lb = gc_deltaC_min_d(V_G, E_G)
+        c_lb = gc_deltaC_min_d(V_G, E_G, graphtype)
     elif(algorithm == "deltaC_max_d"):
-        c_lb = gc_deltaC_max_d(V_G, E_G)
+        c_lb = gc_deltaC_max_d(V_G, E_G, graphtype)
     elif(algorithm == "deltaC_least_c"):
-        c_lb = gc_deltaC_least_c(V_G, E_G)
+        c_lb = gc_deltaC_least_c(V_G, E_G, graphtype)
     elif(algorithm == "LBN_deltaC"):
-        c_lb = gc_LBN_deltaC(V_G, E_G)
+        c_lb = gc_LBN_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBNC_deltaC"):
-        c_lb = gc_LBNC_deltaC(V_G, E_G)
+        c_lb = gc_LBNC_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBP_deltaC"):
-        c_lb = gc_LBP_deltaC(V_G, E_G)
+        c_lb = gc_LBP_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBPC_deltaC"):
-        c_lb = gc_LBPC_deltaC(V_G, E_G)
+        c_lb = gc_LBPC_deltaC(V_G, E_G, graphtype)
     else:
         print("Invalid lower bound algorithm")
         return -2
@@ -552,7 +570,9 @@ def exact_decomposition_cutset(G, lb=-1):
 
     cdef int c_lb = lb
 
-    gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -590,7 +610,9 @@ def exact_decomposition_cutset_decision(G, k):
 
     cdef int c_k = k
 
-    is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k, graphtype)
 
     if is_leq is 0:
         rtn = True
@@ -631,7 +653,9 @@ def exact_decomposition_dynamic(G, lb=-1):
 
     cdef int c_lb = lb
 
-    gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -668,7 +692,9 @@ def seperator_algorithm(G):
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_seperator_algorithm(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_seperator_algorithm(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -701,7 +727,9 @@ def minDegree_decomp(G):
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_minDegree_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minDegree_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -733,7 +761,9 @@ def boost_minDegree_decomp(G):
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -767,7 +797,9 @@ def fillIn_decomp(G):
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_fillIn_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_fillIn_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -797,7 +829,9 @@ def minDegree_ordering(G):
     cdef vector[unsigned int] V_G, E_G, elim_ordering
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_minDegree_ordering(V_G, E_G, elim_ordering);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minDegree_ordering(V_G, E_G, elim_ordering, graphtype);
 
     py_elim_ordering = []
     cdef i;
@@ -830,7 +864,9 @@ def fillIn_ordering(G):
     cdef vector[unsigned int] V_G, E_G, elim_ordering
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_fillIn_ordering(V_G, E_G, elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_fillIn_ordering(V_G, E_G, elim_ordering, graphtype)
 
     py_elim_ordering = []
     cdef i;
@@ -878,7 +914,9 @@ def MSVS(G, T):
     if(rtn is False):
         return
 
-    gc_MSVS(V_G, E_G, V_T, E_T)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_MSVS(V_G, E_G, V_T, E_T, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -919,7 +957,9 @@ def minimalChordal_ordering(G, O):
     for l in range(0, len(O)):
         old_elim_ordering.push_back(inv_labels_dict[O[l]])
 
-    gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering, graphtype)
 
     py_new_elim_ordering_ = []
     cdef i;
@@ -994,7 +1034,9 @@ def max_clique_with_treedecomposition(G, T):
     if(rtn is False):
         return
 
-    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
 
     py_C = []
     cdef i;
@@ -1035,7 +1077,9 @@ def max_independent_set_with_treedecomposition(G, T):
     if(rtn is False):
         return
 
-    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_, graphtype);
 
     py_IS = []
     cdef i;
@@ -1076,7 +1120,9 @@ def min_vertex_cover_with_treedecomposition(G, T):
     if(rtn is False):
         return
 
-    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, graphtype);
 
     py_VC = []
     cdef i;
@@ -1117,7 +1163,9 @@ def min_dominating_set_with_treedecomposition(G, T):
     if(rtn is False):
         return
 
-    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS, graphtype)
 
     py_DS = []
     cdef i;
@@ -1157,7 +1205,9 @@ def min_coloring_with_treedecomposition(G, T):
     if(rtn is False):
         return
 
-    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
 
     py_C = []
     cdef i;
@@ -1211,7 +1261,9 @@ def ordering_to_treedec(G, O):
     for i in range(0, len(O)):
         elim_ordering.push_back(inv_labels_dict[O[i]])
 
-    gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -1281,7 +1333,9 @@ def trivial_decomposition(G):
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_trivial_decomposition(V_G, E_G, V_T, E_T)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_trivial_decomposition(V_G, E_G, V_T, E_T, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
@@ -1326,8 +1380,10 @@ def is_valid_treedecomposition(G, T, message=True):
             print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
         return False
 
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
     cdef c_status;
-    c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T);
+    c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T, graphtype);
 
     py_status = c_status
 
