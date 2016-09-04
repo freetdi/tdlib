@@ -822,7 +822,7 @@ namespace draft{
 
 // still broken. import from cont, later...
 template <typename G_t, typename O_t, class T_t>
-void vec_ordering_to_tree(G_t &G, O_t &O, T_t& T, O_t* io=NULL)
+void vec_ordering_to_tree(G_t const &G, O_t &O, T_t& T, O_t* io=NULL)
 {
     size_t num_vert = boost::num_vertices(G);
 
