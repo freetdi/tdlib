@@ -137,46 +137,6 @@ AUTHOR: Lukas Larisch (now): Initial version
 
 from libcpp.vector cimport vector
 
-from tdlib cimport gc_preprocessing
-from tdlib cimport gc_PP_MD
-from tdlib cimport gc_PP_FI
-from tdlib cimport gc_PP_FI_TM
-
-from tdlib cimport gc_deltaC_min_d
-from tdlib cimport gc_deltaC_max_d
-from tdlib cimport gc_deltaC_least_c
-from tdlib cimport gc_LBN_deltaC
-from tdlib cimport gc_LBNC_deltaC
-from tdlib cimport gc_LBP_deltaC
-from tdlib cimport gc_LBPC_deltaC
-
-from tdlib cimport gc_exact_decomposition_cutset
-from tdlib cimport gc_exact_decomposition_cutset_decision
-from tdlib cimport gc_exact_decomposition_dynamic
-#from tdlib cimport gc_exact_decomposition_branch_and_bound
-
-from tdlib cimport gc_seperator_algorithm
-from tdlib cimport gc_minDegree_ordering
-from tdlib cimport gc_fillIn_ordering
-
-#from tdlib cimport gc_random_branch_and_bound
-#from tdlib cimport gc_random_elimination_orderings
-
-from tdlib cimport gc_MSVS
-from tdlib cimport gc_minimalChordal
-
-from tdlib cimport gc_max_clique_with_treedecomposition
-from tdlib cimport gc_max_independent_set_with_treedecomposition
-from tdlib cimport gc_min_vertex_cover_with_treedecomposition
-from tdlib cimport gc_min_dominating_set_with_treedecomposition
-from tdlib cimport gc_min_coloring_with_treedecomposition
-
-from tdlib cimport gc_ordering_to_treedec
-from tdlib cimport gc_treedec_to_ordering
-from tdlib cimport gc_trivial_decomposition
-from tdlib cimport gc_validate_treedecomposition
-from tdlib cimport gc_get_width
-
 from Graph import Graph
 from Decomp import Decomp
 
@@ -286,6 +246,7 @@ def inverse_labels_dict(labels_map):
         inv_dict[labels_map[i]] = i
     return inv_dict
 
+#do not change without modifying python_tdlib.cpp
 def graphtype_to_uint(string):
     if string == "boost_graph_undirected":
         return 0
