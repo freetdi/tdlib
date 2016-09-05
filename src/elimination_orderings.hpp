@@ -206,6 +206,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
                     unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
 #endif
 {
+    (void) O; // (fixed in experimental.)
     typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
@@ -464,10 +465,11 @@ typename boost::graph_traits<G_t>::vertices_size_type
 #else
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-   fillIn_decomp(G_t &G, T_t *T, O_t *,
+   fillIn_decomp(G_t &G, T_t *T, O_t *O,
                  unsigned ub = UINT_MAX)
 #endif
 {
+    (void) O; // (fixed in experimental.)
     typedef typename treedec_chooser<G_t>::value_type my_vd;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename fill_chooser<G_t>::type fill_type;

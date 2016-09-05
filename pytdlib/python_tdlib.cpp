@@ -585,6 +585,7 @@ int gc_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int
 int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                          std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
+  (void)graphtype; // incomplete();?
     TD_graph_directed_vec_t G;
     make_tdlib_graph(G, V_G, E_G, true); //true = directed
 
@@ -603,10 +604,12 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
 #ifndef NDEBUG
     unsigned w2 =
 #endif
-    treedec::get_width(T);
+    treedec::get_bagsize(T);
 
-
-    //assert(w1 == w2);
+#ifndef NDEBUG
+    // assert(w1 == w2); // why not?
+    (void)w1; (void)w2;
+#endif
 
     treedec::make_small(T);
 
@@ -620,7 +623,7 @@ int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &
 {
     TD_tree_dec_t T;
 
-    if(graphtype == 0){
+    if(graphtype == 0 /* bug, use enum! */ ){
         TD_graph_t G;
         make_tdlib_graph(G, V_G, E_G);
 
