@@ -39,6 +39,7 @@
 
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
@@ -92,11 +93,11 @@ void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<un
 
 }
 
-
-void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+template <typename G_t>
+void make_python_graph(G_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                        bool ignore_isolated_vertices=false)
 {
-    boost::graph_traits<TD_graph_t>::vertex_iterator vIt, vEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(ignore_isolated_vertices && boost::degree(*vIt, G) == 0){
             continue;
@@ -104,7 +105,7 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
         V_G.push_back(*vIt);
     }
 
-    boost::graph_traits<TD_graph_t>::edge_iterator eIt, eEnd;
+    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
         E_G.push_back(boost::source(*eIt, G));
         E_G.push_back(boost::target(*eIt, G));
@@ -112,15 +113,16 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
 }
 
 
-void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
+template <typename T_t>
+void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
                         std::vector<unsigned int> &E_T)
 {
-    std::map<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int> vertex_map;
-    boost::graph_traits<TD_tree_dec_t>::vertex_iterator tIt, tEnd;
+    std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     unsigned int id = 0;
     
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        vertex_map.insert(std::pair<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int>(*tIt, id++));
+        vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id++));
         std::vector<int> bag;
         for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++){
             bag.push_back(*sIt);
@@ -128,9 +130,9 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
         V_T.push_back(bag);
     }
     
-    boost::graph_traits<TD_tree_dec_t>::edge_iterator eIt, eEnd;
+    typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(T); eIt != eEnd; eIt++){
-        std::map<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int>::iterator v, w;
+        typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
         v = vertex_map.find(boost::source(*eIt, T));
         w = vertex_map.find(boost::target(*eIt, T));
         E_T.push_back(v->second);
@@ -355,9 +357,9 @@ int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned 
                            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
     //TD_graph_t G;
-    TD_graph_directed_vec_t G;
+    TD_graph_vec_t G;
     //make_tdlib_graph(G, V_G, E_G);
-    make_tdlib_graph(G, V_G, E_G, true);
+    make_tdlib_graph(G, V_G, E_G);
 
     TD_tree_dec_t T;
     treedec::separator_algorithm(G, T);
