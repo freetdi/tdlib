@@ -96,7 +96,7 @@ class TestTdLib(unittest.TestCase):
             V_T, E_T, w = tdlib.minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
 
-
+    """
     def test_boost_minDegree_decomp_decomp_0(self):
         for V, E in cornercases:
             V_T, E_T, w = tdlib.boost_minDegree_decomp(V, E)
@@ -142,6 +142,7 @@ class TestTdLib(unittest.TestCase):
             V, E = randomGNP(20, 0.2)
             V_T, E_T, w = tdlib.boost_minDegree_decomp(V, E)
             self.assertEqual(tdlib.is_valid_treedecomposition(V, E, V_T, E_T), True)
+    """
 
     def test_minDegree_ordering_0(self):
         for V, E in cornercases:
