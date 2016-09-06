@@ -69,42 +69,11 @@ namespace treedec{ //
 #define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
 
-template<class G>
-void check(G const&)
-{
-}
-
 template<typename G>
 void remove_vertex(vertex_iterator_G u, G &g)
 {
     remove_vertex(*u, g);
 }
-
-template<typename vertex_descriptor>
-struct vertex_callback{ //
-    virtual ~vertex_callback(){};
-    virtual void operator()(vertex_descriptor)=0;
-};
-
-template<typename G_t>
-struct edge_callback{ //
-    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    virtual ~edge_callback(){};
-    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
-    void operator()(edge_descriptor)
-    { incomplete();
-    }
-};
-
-template<typename G_t>
-struct graph_callback{ // fixme: union of the above?
-    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    virtual ~graph_callback(){};
-    virtual void operator()(vertex_descriptor)=0;
-    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
-};
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
@@ -315,10 +284,9 @@ inline unsigned
     return boost::get(boost::vertex_index, G, v);
 }
 
+// obsolete?
 template<class G>
-struct outedge_set{
-    typedef typename graph_traits<G>::outedge_set_type type;
-};
+struct outedge_set;
 
 template <typename G_t>
 std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
@@ -381,10 +349,8 @@ size_t bag_size(V const & v, G const& g)
     return bag(v, g).size();
 }
 
-// chooose deg implementation for graph backend.
-// to be accessed through graph_traits
 template<class G_t>
-struct deg_chooser{ //
+struct deg_chooser { //
     typedef typename misc::DEGS<G_t> type;
     typedef type degs_type; // transition? don't use.
 };
