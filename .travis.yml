@@ -24,6 +24,9 @@ addons:
       - trusty
     packages:
       - libboost-dev
+      - libboost-graph-dev
+      - libboost-system-dev
+      - libboost-thread-dev
 
 install:
   - sudo pip install cython
