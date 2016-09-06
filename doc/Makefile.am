@@ -15,7 +15,7 @@ documentation.pdf: documentation.tex  documentation.bib
 	$(BIBTEX) $<
 	$(TEX_ENV) $(PDFLATEX) $<
 
-SUBDIRS=src .
+SUBDIRS=graphs src .
 
 table1: ./src/table1.cpp
 	$(CC) $(CFLAGS) $(LDFLAGS) -o table1 ./src/table1.cpp
