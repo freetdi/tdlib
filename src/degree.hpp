@@ -27,6 +27,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>
 
+#include "container.hpp"
 #include "degree_config.hpp"
 #include "random_generators.hpp" // BUG. see below
 
@@ -118,6 +119,7 @@ public: // picking
 
     vertex_descriptor pick(unsigned degree)
     {
+        // BUG. don't leak _degs. they are private.
         return CFG::pick(degree, _degs);
     }
 

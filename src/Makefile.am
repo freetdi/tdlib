@@ -3,6 +3,8 @@ pkginclude_HEADERS = \
   applications.hpp \
   branch_decomposition.hpp \
   combinations.hpp \
+  container_traits.hpp \
+  container.hpp \
   degree.hpp \
   degree_config.hpp \
   error.hpp \

@@ -198,7 +198,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
     if(boost::num_vertices(G) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        bag(t, T).insert(*vIt);
+        insert(bag(t, T), *vIt);
         if(k <= 0){
             return true;
         }
@@ -229,7 +229,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = results[i+1].begin(); sIt != results[i+1].end(); sIt++){
-            bag2.insert(*sIt);
+            insert(bag2, *sIt);
         }
 
         treedec::excut::glue_bags(T, bag1, bag2);

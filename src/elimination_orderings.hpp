@@ -182,7 +182,7 @@ void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
     //Bag for the u-th elimination vertex will be stored in T[u].
     for(unsigned u = 0; u < n_; u++){
         bag(u, T) = MOVE(B[u]);
-        bag(u, T).insert(O[u]); //printer variant without this inserting?
+        insert(bag(u, T), O[u]); //printer variant without this inserting?
     }
 }
 
@@ -889,13 +889,14 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T_t& T, O_t* io=NULL)
         }
     }
 
-    for(unsigned i = 0; i < num_vert; i++){
+    for(unsigned i = 0; i < num_vert; i++){ itested();
         boost::add_vertex(T);
-        bag(i,T).insert(O[i]);
-        for(unsigned j = 0; j < num_vert; j++){
-            if(boost::edge(i, j, bags).second){
-                bag(i,T).insert(j);
-             }
+        BOOST_AUTO(&b, bag(i,T));
+        push(b, O[i]);
+        for(unsigned j = 0; j < num_vert; j++){ itested();
+            if(boost::edge(i, j, bags).second){ itested();
+                push(b, j);
+            }
          }
      }
 

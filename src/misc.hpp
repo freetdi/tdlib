@@ -47,6 +47,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 
+#include "container.hpp"
 #include "graph.hpp"
 #include "simple_graph_algos.hpp"
 #include "platform.hpp"
@@ -234,7 +235,7 @@ int check_treedec(G_t const& G, T_t const& T)
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename treedec_traits<T_t>::bag_type::value_type v;
         v = *vIt;
-        vertices.insert(v);
+        insert(vertices, v);
     }
 
     if(coded_vertices != vertices){
@@ -309,7 +310,7 @@ void trivial_decomposition(G_t const &G, T_t &T){
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename treedec_traits<T_t>::bag_type::value_type v = *vIt;
-        bag(t, T).insert(v);
+        insert(bag(t, T), v);
     }
 }
 
@@ -757,7 +758,7 @@ void map_descriptors_to_bags(
                   S.begin(); sIt != S.end(); sIt++)
     {
         typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type::value_type vd = *sIt;
-        B.insert(vd);
+        push(B, vd);
     }
 }
 
