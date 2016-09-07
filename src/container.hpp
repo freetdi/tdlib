@@ -23,9 +23,9 @@
 // #include "config.h" // not yet
 #include "container_traits.hpp"
 
-// #ifdef HAVE_STX_BTREE_SET // not yet
+#ifdef HAVE_STX_BTREE_SET_H
 #include <stx/btree_set>
-// #endif
+#endif
 
 namespace treedec{
 namespace xduh{ // dont use in new code.

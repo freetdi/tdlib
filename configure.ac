@@ -91,6 +91,10 @@ AS_IF([test "$python" != no], [
 
 # Checks for header files.
 
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([stx/btree_set.h])
+AC_LANG_POP([C++])
+
 # BUG: in auto mode disable python if there are no headers...
 AS_IF([test "$python" != no], [
 AS_IF([test x"$PYTHON" != x], [

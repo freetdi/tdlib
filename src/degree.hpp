@@ -31,7 +31,7 @@
 #include "degree_config.hpp"
 #include "random_generators.hpp" // BUG. see below
 
-#if __cplusplus >= 201103L
+#ifdef HAVE_STX_BTREE_SET_H
 # include <stx/btree_set>
 #endif
 
