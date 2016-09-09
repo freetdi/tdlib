@@ -73,6 +73,10 @@ class TestTdLib_exact(unittest.TestCase):
                 if(not isleq):
                     print("error [validate width], graph: " + str(G.vertices()) + ", " + str(G.edges()))
                     print("width_PP_FI_TM: " + str(w2))
+                    N, M, width = tdlib.exact_decomposition_cutset(G)
+                    hrgl = tdlib.check_treedec(V, E, N, M, message=True)
+                    print("proper width_PP_FI_TM: " + str(width) + " " + str(hrgl))
+                    self.assertEqual(hrgl, 0)
                     status = False
 
         self.assertEqual(status, True)
