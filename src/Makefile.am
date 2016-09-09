@@ -1,3 +1,5 @@
+SUBDIRS = \
+  impl
 
 pkginclude_HEADERS = \
   applications.hpp \

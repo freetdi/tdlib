@@ -454,7 +454,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     if(!cdegs[0].empty()){
         BOOST_AUTO(I, cdegs[0].begin());
         BOOST_AUTO(E, cdegs[0].end());
-        for(; I != E; I++){
+        for(; I != E; ++I){
             bags.push_back(boost::make_tuple(*I, bag_type()));
         }
         low = (low > 0)? low : 0;
@@ -487,18 +487,19 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
                 }
                 //Buddy
                 BOOST_AUTO(it2, it1);
-                it2++;
+                ++it2;
                 for(; it2 != cdegs[3].end(); ++it2){
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
                         reduction_complete = false;
                         goto NEXT_ITER;
                     }
                 }
-                //Cube
+#if 0 //Cube (not yet)
                 if(cdegs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
                     reduction_complete = false;
                     goto NEXT_ITER;
                 }
+#endif
             }
             goto ARBITRARY_DEGREE;
         }

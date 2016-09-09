@@ -39,7 +39,7 @@ struct deg_config{
     static unsigned num_threads(){return 1;}
 
     template <typename C_t>
-    static vd_type pick(C_t &C){
+    static vd_type pick(C_t const &C){
         return *C.begin();
     }
     template <typename C_t>
