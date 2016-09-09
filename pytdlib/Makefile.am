@@ -35,7 +35,18 @@ PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
     export PYTHONPATH='.';
 
-EXTRA_DIST = tdlib.pxd tdlib.pyx python_tdlib.hpp graphs.py RandomGNM_250_1000.py CFGs.py dimacs.py Graph.py Decomp.py $(TESTS)
+EXTRA_DIST = \
+	$(TESTS) \
+	CFGs.py \
+	Decomp.py \
+	dimacs.py \
+	graphs.py \
+	Graph.py \
+	python_tdlib.hpp \
+	RandomGNM_250_1000.py \
+	tdlib.pxd \
+	tdlib.pyx \
+	util.py
 
 $(TESTS:%.py=%.log): P
 .PHONY: P
