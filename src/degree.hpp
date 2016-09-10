@@ -92,6 +92,7 @@ public: // types
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename CFG::bag_type bag_type;
+    // typedef typename CFG::const_bag_type const_bag_type;
     typedef typename bag_type::iterator bag_iterator;
     typedef typename boost::property_map<G_t, boost::vertex_index_t>::const_type idmap_type;
     typedef typename boost::iterator_property_map<degree_t*, idmap_type, value_type, value_type&>
@@ -103,7 +104,7 @@ public: // types
             vertex_descriptor,
             degreemap_type,
            idmap_type > container_type;
-    typedef typename container_type::stack internal_bag_type;
+    typedef typename container_type::const_stack internal_bag_type;
 
     //typedef std::vector<bag_type> container_type;
     //typedef typename container_type::iterator iterator;
@@ -286,6 +287,7 @@ public: // picking
     } //void check()
 
 #if 1
+    /// hmm better: iterator range?!
     internal_bag_type const operator[](size_t x) const
     {
         return _degs[x];

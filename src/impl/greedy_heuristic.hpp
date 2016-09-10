@@ -248,11 +248,12 @@ public:
     {
         assert(_o); // ?!
         const degs_type& cdegs(_degs);
-        BOOST_AUTO(it, cdegs[0].begin());
+        auto const& B=cdegs[0];
+        auto it=B.begin();
         // collect isolated vertices created during
         // do_it. (initially isolated vs have been taken care of
         // conditionally).
-        for(; it!=cdegs[0].end(); ++it){ untested();
+        for(; it!=B.end(); ++it){ untested();
             assert(_i<_o->size());
             (*_o)[_i++] = get_vd(_g, *it);
         }

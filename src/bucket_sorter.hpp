@@ -42,6 +42,7 @@ namespace boost {
         prev(_length, invalid_value()),
         id_to_value(_length),
         bucket(_bucket), id(_id) { }
+    bucket_sorter(){untested();}
     
     void remove(const value_type& x) {
       const size_type i = get(id, x);
@@ -75,53 +76,78 @@ namespace boost {
     }
     
     typedef typename std::vector<size_type>::iterator Iter;
+    typedef typename std::vector<size_type>::const_iterator ConstIter;
     typedef typename std::vector<value_type>::iterator IndexValueMap;
+    typedef typename std::vector<value_type>::const_iterator ConstIndexValueMap;
     
   public:
 
-    friend class stack;
-
-    class stack {
+    template<class Iter_, class IndexValueMap_>
+    class stack_ {
     public:
       typedef bucket_sorter base;
       typedef bucket_sorter::value_type value_type;
     public:
       class const_iterator{
       public:
-        const_iterator(size_type t, stack const& s_)
+        const_iterator(size_type t, stack_ const& s_)
            : s(s_), b(t) {}
         const_iterator(const const_iterator& p)
-           : s(p.s), b(p.b) {}
+           : s(p.s), b(p.b) {untested();}
+        const_iterator(const const_iterator&& p)
+           : s(p.s), b(p.b) {untested();}
+        ~const_iterator(){untested();}
       public:
-        value_type operator*() const{
+        value_type operator*() const{ untested();
+          trace1("*", this);
           trace2("*", b, s.value[b]);
+          trace1("*", &s);
+          trace1("*", s.next[b]);
           assert(b!=invalid_value());
           return s.value[b];
         }
-        const_iterator& operator++(){
+        const_iterator& operator++(){ untested();
           assert(b!=invalid_value());
+//          assert(b<s.next.size());
+          trace1("++", this);
+          trace1("++", b);
+          trace1("++", &s);
+          trace1("++", s.next[b]);
           b = s.next[b];
           return *this;
         }
-        bool operator!=(const_iterator const& o)
-		  {
-			  trace2("!=", b, o.b);
-			  untested(); return o.b!=b; }
+        bool operator!=(const_iterator const& o){ untested();
+          trace2("!=", b, o.b);
+          trace2("?", b, s.next[b]);
+          untested(); return o.b!=b;
+        }
         bool operator==(const_iterator const& o)
-		  { untested(); return o.b==b; }
+        { untested(); return o.b==b; }
       private:
-        stack const& s;
+        stack_ const& s;
         size_type b;
       };
     public:
-      stack(bucket_type _bucket_id, Iter h, Iter n, Iter p, IndexValueMap v,
+      stack_(const stack_& p)
+        : bucket_id(p.bucket_id),
+          head(p.head),
+          next(p.next),
+          prev(p.prev),
+          value(p.value),
+          id(p.id)
+      {untested();
+      }
+      // stack_(const stack_&&){untested();}
+    public:
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
             const ValueIndexMap& _id)
-      : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) {}
+      : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { untested(); }
 
       // Avoid using default arg for ValueIndexMap so that the default
       // constructor of the ValueIndexMap is not required if not used.
-      stack(bucket_type _bucket_id, Iter h, Iter n, Iter p, IndexValueMap v)
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v) {}
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v)
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v) { untested(); }
+
 
       void push(const value_type& x) {
         const size_type new_head = get(id, x);
@@ -144,40 +170,39 @@ namespace boost {
       bool empty() const { return head[bucket_id] == invalid_value(); }
     public: // iterator access
       const_iterator begin() const{
-			trace2("", bucket_id, head[bucket_id]);
-			return const_iterator(head[bucket_id], *this);
-		}
-		// BUG: template override in degree.hpp does not match (why?)
+        trace2("", bucket_id, head[bucket_id]);
+        return const_iterator(head[bucket_id], *this);
+      }
+      // BUG: template override in degree.hpp does not match (why?)
       const_iterator rbegin() const{
-			return const_iterator(head[bucket_id], *this);
-		}
+        return const_iterator(head[bucket_id], *this);
+      }
       const_iterator end() const{ return const_iterator(invalid_value(), *this); }
-	 private: // BUG
+    private:
       bucket_type bucket_id;
-      Iter head;
-      Iter next;
-      Iter prev;
-      IndexValueMap value;
+      Iter_ head;
+      Iter_ next;
+      Iter_ prev;
+      IndexValueMap_ value;
       ValueIndexMap id;
     };
+
+    typedef stack_<Iter, IndexValueMap> stack;
+    typedef stack_<ConstIter, ConstIndexValueMap> const_stack;
     
     stack operator[](const bucket_type& i) { untested();
       assert(i < head.size());
       return stack(i, head.begin(), next.begin(), prev.begin(),
                    id_to_value.begin(), id);
     }
-    stack operator[](const bucket_type& i) const{
+    const_stack operator[](const bucket_type& i) const{ untested();
+      trace2("stack[]", i, next.size());
       assert(i < head.size());
-		typedef std::vector<size_type> vec;
-		auto& h=const_cast<vec&>(head);
-		auto& n=const_cast<vec&>(next);
-		auto& p=const_cast<vec&>(prev);
-		auto&i2v=const_cast<std::vector<value_type>&>(id_to_value);
-//		auto& vim=const_cast<ValueIndexMap&>(id);
 
-      return stack(i, h.begin(), n.begin(), p.begin(),
-                   i2v.begin(), id);
+      return const_stack(i, head.begin(), next.begin(), prev.begin(),
+                   id_to_value.begin(), id);
     }
+    unsigned size() const{ return head.size(); }
   protected:
     std::vector<size_type>   head;
     std::vector<size_type>   next;
