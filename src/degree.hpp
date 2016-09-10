@@ -22,6 +22,9 @@
 #ifndef TD_DEGREE_HPP
 #define TD_DEGREE_HPP
 
+// use local copy
+#include "trace.hpp"
+#include "bucket_sorter_bits.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -31,6 +34,18 @@
 #include "degree_config.hpp"
 #include "random_generators.hpp" // BUG. see below
 
+// #if __cplusplus >= 201103L
+// # include <unordered_set>
+// #include <stx/btree_set>
+// #endif
+
+#include "degree_config.hpp"
+#include "platform.hpp"
+#include "trace.hpp"
+#include "graph_traits.hpp"
+
+#include <stack>
+
 #ifdef HAVE_STX_BTREE_SET_H
 # include <stx/btree_set>
 #endif
@@ -39,20 +54,24 @@ namespace misc {
 
 namespace detail {
 
+
 // FIXME: wrong place
 // needs random_generators.hpp
+// BUG: used by svbs_random.
 template<class G_t>
 struct random_deg_config : public misc::detail::deg_config<G_t>{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd_type;
 
+    // FIXME: need to choose bucket backend...
+    // (the default does not implement back access)
+
     template <typename C_t>
-    static vd_type pick(unsigned degree, C_t &C){
+    static vd_type pick(C_t const &C){
         bool c = treedec::random::coin();
         if(c){
-            return *C[degree].begin();
-        }
-        else{
-            return *C[degree].rbegin();
+            return *C.begin();
+        }else{ itested();
+            return treedec::back(C);
         }
     }
 };
@@ -67,31 +86,71 @@ class DEGS{
     }
 
 public: // types
+    typedef typename boost::graph_traits<G_t>::vertices_size_type size_type;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type value_type;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_iterator vertex_iterator;
     typedef typename CFG::bag_type bag_type;
+    // typedef typename CFG::const_bag_type const_bag_type;
     typedef typename bag_type::iterator bag_iterator;
-    typedef std::vector<bag_type> container_type;
-    typedef typename container_type::iterator iterator;
-    typedef typename container_type::const_iterator const_iterator;
-    typedef typename boost::graph_traits<G_t>::vertices_size_type degree_t;
+    typedef typename boost::property_map<G_t, boost::vertex_index_t>::const_type idmap_type;
+    typedef typename boost::iterator_property_map<degree_t*, idmap_type, value_type, value_type&>
+        degreemap_type;
+
+    // TODO/BUG/FIXME?
+    // bucket sorter keeps pos_to_vd map, although not always necessary...
+    typedef boost::bucket_sorter<value_type,
+            vertex_descriptor,
+            degreemap_type,
+           idmap_type > container_type;
+    typedef typename container_type::const_stack internal_bag_type;
+
+    //typedef std::vector<bag_type> container_type;
+    //typedef typename container_type::iterator iterator;
+    //typedef typename container_type::const_iterator const_iterator;
 
 public: // construct
-    DEGS(const G_t &g): _degs(boost::num_vertices(g)), _g(g)
+    DEGS(const G_t &g): _g(g),
+         _vi(boost::get(boost::vertex_index, g)),
+         _vals(boost::num_vertices(g)),
+         _degs(boost::num_vertices(g), // length
+               boost::num_vertices(g) /*-1?*/,  // max_bucket
+               boost::make_iterator_property_map(&_vals[0], _vi, size_type()),
+               _vi)
     {
+        if(!boost::num_vertices(g)){
+        }
         CFG::alloc_init(boost::num_vertices(g));
         vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
-            _degs[boost::degree(*vIt, g)].insert(*vIt);
+        for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){ itested();
+            unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *vIt);
+            assert(pos<_vals.size());
+            _vals[pos] = boost::degree(*vIt, g);
+            trace2("deginit", pos, _vals[pos]);
+            _degs.push(*vIt);
         }
     }
 
+public:
+    DEGS& operator=(const DEGS& d)
+    { untested();
+        assert(&d._g==&_g);
+        _degs = d._degs;
+        return *this;
+    }
+    DEGS& operator=(const DEGS&& d)
+    { untested();
+        assert(&d._g==&_g);
+        _degs = MOVE(d._degs);
+        return *this;
+    }
+
 public: // queueing
-    void unlink(const vertex_descriptor& v, size_t d)
+    void unlink(const vertex_descriptor& v, size_t)
     {
-        int n=_degs[d].erase(v);
-        (void)n;
-        assert(n==1);
+        assert(treedec::is_valid(v, _g));
+        _degs.remove(v);
     }
     void unlink(const vertex_descriptor& v)
     {
@@ -99,6 +158,11 @@ public: // queueing
         unlink(v,d);
     }
 
+    void q_update(const vertex_descriptor& v)
+    {
+        unlink(v);
+        _q.push(v);
+    }
     void reg(const vertex_descriptor& v)
     {
         size_t d=boost::degree(v,_g);
@@ -106,47 +170,82 @@ public: // queueing
     }
     void reg(const vertex_descriptor& v, size_t d)
     {
-        // assert(boost::degree(v, _g) == d); no (but why?)
-        bool n=_degs[d].insert(v).second;
-        assert(n); (void)n;
+        assert(treedec::is_valid(v,_g));
+//        bool n=_fill.insert(std::make_pair(missing_edges,v)).second;
+//        assert(n);
+//        (void)n;
+
+        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
+        _vals[pos] = d;
+        trace2("reg", v, pos);
+        _degs.push(v); // updates reverse map. (necessary?!)
     }
 
+    void update_queued()
+    { untested();
+
+        while(!_q.empty()){
+            reg(_q.top());
+            _q.pop();
+        }
+    }
     void flush() const
     {
     }
 
 public: // picking
-
-    vertex_descriptor pick(unsigned degree)
+    vertex_descriptor pick(unsigned degree, bool erase=false)
     {
-        // BUG. don't leak _degs. they are private.
-        return CFG::pick(degree, _degs);
+        if(erase){
+            incomplete();
+        }
+        return CFG::pick(_degs[degree]);
+    }
+    bag_type const detach_bag(unsigned degree)
+    {
+#if 0 // pre-bucket
+        auto& D = _degs[degree];
+        bag_type B=MOVE(_degs[degree]);
+        D.clear();
+#else
+        // this is inefficient...
+        auto D = _degs[degree];
+        bag_type B;
+        while(!D.empty()){
+            vertex_descriptor t=D.top();
+            treedec::push(B, t);
+            D.pop();
+        }
+#endif
+        return B;
     }
 
     // pick a minimum degree vertex within degree range [lower, upper]
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1)
     {
-        while(_degs[lower].empty()){
+        while(_degs[lower].empty()){ untested();
             ++lower;
             // min_ntd==num_vert contradicts the outer loop condition
             // (this loop should be safe)
             assert(lower != upper+1);
         }
         vertex_descriptor min_nv;
+        // trace4("", lower, _degs[lower].top(), *_degs[lower].begin(), CFG::pick(_degs[lower]));
         min_nv = CFG::pick(_degs[lower]);
 
         return std::make_pair(min_nv, lower);
     }
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower, unsigned upper, bool erase)
     {
-        vertex_descriptor p=pick_min(lower,upper);
-        if(erase){ untested();
+        auto p=pick_min(lower,upper);
+        if(erase){
             unlink(p.first,p.second);
         }else{untested();
         }
         return p;
     }
 
+#if 0
     size_t num_nodes() const{ untested();
         unsigned N=0;
         for(const_iterator i=_degs.begin(); i!=_degs.end(); ++i) { itested();
@@ -154,6 +253,7 @@ public: // picking
         }
         return N;
     }
+#endif
 
     void check()
     { // sometimes required when debugging fancy callbacks :/
@@ -186,7 +286,9 @@ public: // picking
 #endif
     } //void check()
 
-    bag_type const& operator[](size_t x) const
+#if 1
+    /// hmm better: iterator range?!
+    internal_bag_type const operator[](size_t x) const
     {
         return _degs[x];
     }
@@ -194,17 +296,22 @@ public: // picking
     {
         return _degs.size();
     }
+#endif
 private:
     bag_type& operator[](size_t x)
     {
         return _degs[x];
     }
 
-//private: // later.
+private:
+//    std::vector<status_t> _vals;
+    const G_t& _g;
+    idmap_type _vi;
+    std::vector<value_type> _vals;
     container_type _degs;
 
 private:
-    const G_t& _g;
+    std::stack<vertex_descriptor> _q;
 }; // DEGS
 
 } //namespace misc
@@ -217,11 +324,15 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
     BOOST_AUTO(E, neighborhood.end());
 
     for(; I != E ; ++I){
+
+        typename boost::graph_traits<G_t>::vertex_descriptor x=*I;
+        assert(treedec::is_valid(x, G));
         size_t deg = boost::degree(*I, G);
         degree.reg(*I, deg);
     }
 }
 
+// obsolete. don't use.
 template<class G_t, class D>
 void unlink_1_neighbourhood(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t &G, D &degs){
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;

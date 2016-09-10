@@ -134,3 +134,5 @@ class TestTdLib_post(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+# vim:ts=8:sw=4:et

@@ -118,6 +118,7 @@ fi
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
 AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([src/impl/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
 AC_OUTPUT

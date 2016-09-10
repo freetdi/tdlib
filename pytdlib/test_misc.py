@@ -4,7 +4,6 @@ import unittest
 from graphs import *
 
 class TestTdLib_misc(unittest.TestCase):
-
     def test_conversion_0(self):
         for V, E in cornercases:
             G = Graph(V, E)
@@ -159,6 +158,7 @@ class TestTdLib_misc(unittest.TestCase):
         del T.vertices()[-1]
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T, False), False)
 
-
 if __name__ == '__main__':
     unittest.main()
+
+# vim:ts=8:sw=4:et
