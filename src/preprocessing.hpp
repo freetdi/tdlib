@@ -474,12 +474,10 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         vertex_descriptor v;
         boost::tie(v, min_ntd) = degs.pick_min(min_ntd, num_vert);
 
-        bool reduction_complete = true;
-
         //degree {1,2}-rules
         if(min_ntd <= 2){
             eliminate_vertex(v, G, bags, low, degs);
-            reduction_complete = false;
+            continue;
         }
         //degree 3-rules
         else if(min_ntd == 3){ untested();
@@ -488,7 +486,6 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             for(; it1!=B.end(); ++it1){ untested();
                 //Triangle
                 if(Triangle(G, *it1, bags, low, degs)){ untested();
-                    reduction_complete = false;
                     goto NEXT_ITER;
                 }else{untested();
                 }
@@ -497,13 +494,11 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
                 ++it2;
                 for(; it2!=B.end(); ++it2){ untested();
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
                     }
                 }
 #if 0 //Cube (not yet)
                 if(cdegs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
-                    reduction_complete = false;
                     goto NEXT_ITER;
                 }
 #endif
@@ -520,20 +515,17 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
                 auto it=B.begin();
                 for(; it != B.end(); ++it){
                     if(Simplicial(G, *it, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
                     }
                     if(AlmostSimplicial(G, *it, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
                     }
                 }
             }
         }
-        NEXT_ITER:
-        if(reduction_complete){
-            return;
-        }
+        return;
+NEXT_ITER:
+        ;
     }
 }
 
