@@ -25,6 +25,8 @@ TESTS = \
 	test_lb.py \
 	test_misc.py \
 	test_post.py \
+	test_pp_md.py \
+	test_pp_fi.py \
 	test_pre.py \
 	test_sep.py
 
