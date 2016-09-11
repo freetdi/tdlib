@@ -118,7 +118,7 @@ namespace boost {
         }
         bool operator!=(const_iterator const& o){ untested();
           trace2("!=", b, o.b);
-          trace2("?", b, s.next[b]);
+          trace2("?", b, (b==invalid_value())?b:s.next[b]);
           untested(); return o.b!=b;
         }
         bool operator==(const_iterator const& o)

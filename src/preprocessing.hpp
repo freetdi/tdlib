@@ -454,7 +454,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     //Islet rule
     assert(cdegs.size());
     if(!cdegs[0].empty()){ untested();
-        auto B=cdegs[0];
+        auto const& B=cdegs[0];
         auto I=B.begin();
         auto E=B.end();
         for(;I!=E; ++I){ untested();
