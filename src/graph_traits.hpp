@@ -43,10 +43,6 @@ struct Edge_NF{
 
 #endif
 
-// ouch. this is actually bag_t
-// how to fix that now?
-// "bag" is also used as shorthand for bag access...
-
 struct bag_t{ //
     std::set<unsigned int> bag;
 };
@@ -55,10 +51,6 @@ struct bag_t{ //
 #define TD_STRUCT_BAG
 
 }// treedec
-
-// KLUGE: put it here...
-// (and cross fingers)
-//using bag = treedec::bag_t;
 
 namespace treedec{
 
