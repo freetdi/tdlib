@@ -65,6 +65,11 @@ class TestTdLib_pre(unittest.TestCase):
         self.assertEqual(lb, 4)
 
     def test_preprocessing_8(self):
+        G = Graph(V_Gs_at_ipo, E_Gs_at_ipo)
+        G_, B, lb = tdlib.preprocessing(G)
+        self.assertEqual(lb, 3)
+
+    def test_preprocessing_GNP(self):
         for n in range(0, 13):
             for i in range(0, 10):
                 V, E = randomGNP(n, 0.2)

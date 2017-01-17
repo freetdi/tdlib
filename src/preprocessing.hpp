@@ -55,12 +55,12 @@ namespace impl{
 // Check if there exists a degree-0-vertex.
 template <typename G_t, typename B_t>
 void Islet(G_t &G, B_t &bags, int &low)
-{
+{ untested();
     typedef typename treedec_chooser<G_t>::type T_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::degree(*vIt, G) == 0){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
+        if(boost::degree(*vIt, G) == 0){ untested();
             typename treedec_traits<T_t>::vd_type vd=get_vd(G, *vIt);
             typename treedec_traits<T_t>::bag_type emptybag;
 
@@ -73,7 +73,7 @@ void Islet(G_t &G, B_t &bags, int &low)
 
 template <typename G_t, typename T_t>
 void Islet(G_t &G, T_t &bags)
-{
+{ untested();
     int low = -1;
     Islet(G, bags, low);
 }
@@ -209,8 +209,13 @@ bool Cube(G_t &G,
     b = *(++f);
     c = *(++f);
 
-    if(boost::degree(a, G) != 3 || boost::degree(b, G) != 3 || boost::degree(c, G) != 3){
+    if(boost::degree(a, G)!=3){
         return false;
+    }else if(boost::degree(b, G)!=3){
+        return false;
+    }else if(boost::degree(c, G)!=3){ untested();
+        return false;
+    }else{
     }
 
     vertex_descriptor N[9];
@@ -333,7 +338,7 @@ bool Simplicial(G_t &G,
         treedec::make_clique_and_detach(v, G, xbag);
         redegree(NULL, G, xbag, degs);
 
-        if (unsigned(low) > xbag.size()){
+        if (unsigned(low) > xbag.size()){ untested();
             low = xbag.size();
         }
 
@@ -418,7 +423,7 @@ bool AlmostSimplicial(G_t &G,
 
             return true;
         }
-        else if(vertices_size_type(low) < deg_v-1u){
+        else if(vertices_size_type(low) < deg_v-1u){ untested();
             low = deg_v-1;
             return true;
         }
@@ -453,11 +458,11 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
 
     //Islet rule
     assert(cdegs.size());
-    if(!cdegs[0].empty()){ untested();
+    if(!cdegs[0].empty()){
         auto const& B=cdegs[0];
         auto I=B.begin();
         auto E=B.end();
-        for(;I!=E; ++I){ untested();
+        for(;I!=E; ++I){
             vertex_descriptor v=*I;
             auto t=boost::make_tuple(v, bag_type());
             bags.push_back(t);
@@ -474,34 +479,48 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         vertex_descriptor v;
         boost::tie(v, min_ntd) = degs.pick_min(min_ntd, num_vert);
 
-        //degree {1,2}-rules
         if(min_ntd <= 2){
+            //degree {1,2}-rules
             eliminate_vertex(v, G, bags, low, degs);
             continue;
-        }
-        //degree 3-rules
-        else if(min_ntd == 3){ untested();
+        }else if(min_ntd==3){
+            //degree 3-rules
             auto const& B=cdegs[3];
             auto it1=B.begin();
-            for(; it1!=B.end(); ++it1){ untested();
+            unsigned cnt=0;
+            for(; cnt<4; ++cnt){
+                if(it1==B.end()){
+                    break;
+                }else{
+                    ++it1;
+                }
+            }
+            it1=B.begin();
+            for(; it1!=B.end(); ++it1){
                 //Triangle
-                if(Triangle(G, *it1, bags, low, degs)){ untested();
+                if(Triangle(G, *it1, bags, low, degs)){
                     goto NEXT_ITER;
-                }else{untested();
+                }else{
+                    // graph is unchanged.
                 }
                 //Buddy
-                BOOST_AUTO(it2, it1);
+                auto it2=it1;
                 ++it2;
-                for(; it2!=B.end(); ++it2){ untested();
+                for(; it2!=B.end(); ++it2){
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
                         goto NEXT_ITER;
+                    }else{
+                        // graph is unchanged.
                     }
                 }
-#if 0 //Cube (not yet)
-                if(cdegs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
+                if(cnt!=4){
+                    // less than 4.
+                    // not enough for cube rule
+                }else if(Cube(G, *it1, bags, low, degs)){
                     goto NEXT_ITER;
+                }else{
+                    // graph is unchanged.
                 }
-#endif
             }
             goto ARBITRARY_DEGREE;
         }
@@ -540,7 +559,7 @@ void preprocessing(G_t &G, BV_t &bags, int &low)
 
 template <typename G_t, typename BV_t>
 void preprocessing(G_t &G, BV_t &bags)
-{
+{ untested();
     int low = -1;
     preprocessing(G, bags, low);
 }

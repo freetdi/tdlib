@@ -75,7 +75,7 @@ namespace detail{//
     template<class C, class X=void>
     struct container_inspect{//
         static bool contains(C& c, typename C::value_type e)
-        { untested();
+        {
           incomplete();
           return false;
         }
@@ -86,12 +86,12 @@ namespace detail{//
     struct container_modify{//
         // push, insert new item
         static void push(C& c, typename C::value_type e)
-        { untested();
+        {
           assert(!container_inspect<C>::contains(c, e));
           c.insert(e);
         }
         static void insert(C& c, typename C::value_type e)
-        { untested();
+        {
           c.insert(e);
         }
     };

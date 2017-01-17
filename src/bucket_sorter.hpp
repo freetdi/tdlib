@@ -93,12 +93,18 @@ namespace boost {
         const_iterator(size_type t, stack_ const& s_)
            : s(s_), b(t) {}
         const_iterator(const const_iterator& p)
-           : s(p.s), b(p.b) {untested();}
+           : s(p.s), b(p.b) {}
         const_iterator(const const_iterator&& p)
            : s(p.s), b(p.b) {untested();}
-        ~const_iterator(){untested();}
+        ~const_iterator(){}
       public:
-        value_type operator*() const{ untested();
+        const_iterator& operator=(const const_iterator&& o){
+          assert(&s==&o.s); // how to compile time check?!
+                            // or just fallback to pointer?
+          b = o.b;
+          return *this;
+        }
+        value_type operator*() const{
           trace1("*", this);
           trace2("*", b, s.value[b]);
           trace1("*", &s);
@@ -106,7 +112,7 @@ namespace boost {
           assert(b!=invalid_value());
           return s.value[b];
         }
-        const_iterator& operator++(){ untested();
+        const_iterator& operator++(){
           assert(b!=invalid_value());
 //          assert(b<s.next.size());
           trace1("++", this);
@@ -116,13 +122,13 @@ namespace boost {
           b = s.next[b];
           return *this;
         }
-        bool operator!=(const_iterator const& o){ untested();
+        bool operator!=(const_iterator const& o){
           trace2("!=", b, o.b);
           trace2("?", b, (b==invalid_value())?b:s.next[b]);
           untested(); return o.b!=b;
         }
         bool operator==(const_iterator const& o)
-        { untested(); return o.b==b; }
+        { return o.b==b; }
       private:
         stack_ const& s;
         size_type b;
@@ -141,7 +147,7 @@ namespace boost {
     public:
       stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
             const ValueIndexMap& _id)
-      : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { untested(); }
+      : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { }
 
       // Avoid using default arg for ValueIndexMap so that the default
       // constructor of the ValueIndexMap is not required if not used.
@@ -190,12 +196,12 @@ namespace boost {
     typedef stack_<Iter, IndexValueMap> stack;
     typedef stack_<ConstIter, ConstIndexValueMap> const_stack;
     
-    stack operator[](const bucket_type& i) { untested();
+    stack operator[](const bucket_type& i) {
       assert(i < head.size());
       return stack(i, head.begin(), next.begin(), prev.begin(),
                    id_to_value.begin(), id);
     }
-    const_stack operator[](const bucket_type& i) const{ untested();
+    const_stack operator[](const bucket_type& i) const{
       trace2("stack[]", i, next.size());
       assert(i < head.size());
 

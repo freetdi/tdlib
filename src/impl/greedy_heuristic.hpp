@@ -145,13 +145,13 @@ public:
         unsigned upper_bound = 0; // computed, if T
 
         // constructor?
-        if(_t){ untested();
+        if(_t){
             assert(elim_vertices.size() == num_vert);
             auto zerodegbag=MOVE(_degs.detach_bag(0));
             BOOST_AUTO(it, zerodegbag.begin());
 
-            if(_iiv){ untested();
-            }else{ untested();
+            if(_iiv){
+            }else{
                 for(; it!=zerodegbag.end(); ++it){
                     elim_vertices[i++] = get_vd(_g, *it);
                 }
@@ -159,13 +159,13 @@ public:
         }
 
         //trace1("entering MD", boost::num_edges(_g));
-        while(boost::num_edges(_g) > 0){ untested();
+        while(boost::num_edges(_g) > 0){
             INTERRUPTION_POINT;
             assert(min_ntd != num_vert);
 
             // recompute ntd can only increase from here
             vertex_descriptor c;
-            if(min_ntd>1){ untested();
+            if(min_ntd>1){
                 --min_ntd;
             }
             boost::tie(c, min_ntd) = _degs.pick_min(min_ntd, num_vert);
@@ -180,10 +180,10 @@ public:
             if(_o){
                 elim_vertices[i] = get_vd(_g, c);
             }
-            if(_t){ untested();
+            if(_t){
                 assert(i<_bags.size());
                 bags_i = &_bags[i];
-            }else if(min_ntd > upper_bound){ untested();
+            }else if(min_ntd > upper_bound){
                 upper_bound = min_ntd;
             }
             assert(bags_i);
@@ -191,7 +191,7 @@ public:
             ++i; // number of nodes in tree decomposition tree
 
             adjacency_iterator I, E;
-            for(boost::tie(I, E) = boost::adjacent_vertices(c, _g); I!=E; ++I){ untested();
+            for(boost::tie(I, E) = boost::adjacent_vertices(c, _g); I!=E; ++I){
                 assert(*I!=c); // no self loops...
                 vertex_descriptor w=*I;
                 _degs.unlink(w);
@@ -203,7 +203,7 @@ public:
 #endif
 
             redegree(NULL, _g, *bags_i, _degs);
-            if(!_t){ untested();
+            if(!_t){
                 bags_i->clear();
             }
 
@@ -226,7 +226,7 @@ public:
 
         //Build a treedecomposition.
         if(_t){
-            if(!_iiv){ untested();
+            if(!_iiv){
           //      i = num_vert;
             }
         }
@@ -253,7 +253,7 @@ public:
         // collect isolated vertices created during
         // do_it. (initially isolated vs have been taken care of
         // conditionally).
-        for(; it!=B.end(); ++it){ untested();
+        for(; it!=B.end(); ++it){
             assert(_i<_o->size());
             (*_o)[_i++] = get_vd(_g, *it);
         }

@@ -53,6 +53,9 @@ E_Edgeless = []
 V_Clique = [1,2,3,4,5]
 E_Clique = [(1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5)]
 
+V_Gs_at_ipo = [1,2,3,4,5,6,7,8]
+E_Gs_at_ipo = [(1,2),(1,3),(1,4),(2,6),(2,7),(3,6),(3,8),(4,7),(4,8),(5,6),(5,7),(5,8)]
+
 cornercases = [[V_Empty, E_Empty], [V_OneNode, E_OneNode], [V_Edgeless, E_Edgeless], [V_Clique,  E_Clique]]
 
 
