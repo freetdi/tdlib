@@ -154,14 +154,14 @@ void glue_bags(T_t &T,
     bool bag1_found = false;
     bool bag2_found = false;
     for(boost::tie(vIt1, vEnd) = boost::vertices(T); vIt1 != vEnd; vIt1++){
-        if(bag(*vIt1, T) == bag1){
+        if(bag(T, *vIt1) == bag1){
             b1 = *vIt1;
             bag1_found = true;
             break;
         }
     }
     for(boost::tie(vIt2, vEnd) = boost::vertices(T); vIt2 != vEnd; vIt2++){
-        if(bag(*vIt2, T) == bag2){
+        if(bag(T, *vIt2) == bag2){
             b2 = *vIt2;
             bag2_found = true;
             break;
@@ -170,12 +170,12 @@ void glue_bags(T_t &T,
 
     if(!bag1_found){
         b1 = boost::add_vertex(T);
-        bag(b1, T) = bag1;
+        bag(T, b1) = bag1;
     }
 
     if(!bag2_found){
         b2 = boost::add_vertex(T);
-        bag(b2, T) = bag2;
+        bag(T, b2) = bag2;
     }
 
     if(!(boost::edge(b1, b2, T).second || boost::edge(b2, b1, T).second)){
@@ -198,7 +198,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
     if(boost::num_vertices(G) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
-        bag(t, T).insert(*vIt);
+        insert(bag(T, t), *vIt);
         if(k <= 0){
             return true;
         }
@@ -229,7 +229,7 @@ bool exact_cutset(G_t &G, T_t &T, int k){
 
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = results[i+1].begin(); sIt != results[i+1].end(); sIt++){
-            bag2.insert(*sIt);
+            insert(bag2, *sIt);
         }
 
         treedec::excut::glue_bags(T, bag1, bag2);

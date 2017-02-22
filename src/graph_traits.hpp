@@ -43,10 +43,6 @@ struct Edge_NF{
 
 #endif
 
-// ouch. this is actually bag_t
-// how to fix that now?
-// "bag" is also used as shorthand for bag access...
-
 struct bag_t{ //
     std::set<unsigned int> bag;
 };
@@ -55,10 +51,6 @@ struct bag_t{ //
 #define TD_STRUCT_BAG
 
 }// treedec
-
-// KLUGE: put it here...
-// (and cross fingers)
-//using bag = treedec::bag_t;
 
 namespace treedec{
 
@@ -86,6 +78,11 @@ struct graph_traits : public graph_traits_base<G_t> { //
     typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
 };
 
+// obsolete. use graph_traits directly.
+template<class G>
+struct outedge_set{
+    typedef typename graph_traits<G>::outedge_set_type type;
+};
 
 // test if v is a valid vertex_descriptor of g
 template<typename G>
@@ -145,5 +142,60 @@ inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_d
     //return g[v].id;
     return v;
 }
+
+//Return the internal vertex position.
+//To be used as a narrower alternative to vertex_descriptor.
+//Positions are in {0, 1, ..., num_vertices-1}, where applicable.
+//(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
+// this position must be stable under copy and assignment operations.
+// // BUG: namespace
+template<typename G_t>
+inline unsigned
+   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G);
+
+namespace treedec{
+
+// chooose deg implementation for graph backend.
+// to be accessed through graph_traits
+template<class G_t>
+struct deg_chooser;
+
+template<class G>
+void check(G const&)
+{
+}
+
+namespace detail{
+  template<class G>
+  class shared_adj_iter;
+}
+
+template<typename vertex_descriptor>
+struct vertex_callback{ //
+    virtual ~vertex_callback(){};
+    virtual void operator()(vertex_descriptor)=0;
+};
+
+template<typename G_t>
+struct edge_callback{ //
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    virtual ~edge_callback(){};
+    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
+    void operator()(edge_descriptor)
+    { incomplete();
+    }
+};
+
+template<typename G_t>
+struct graph_callback{ // fixme: union of the above?
+    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    virtual ~graph_callback(){};
+    virtual void operator()(vertex_descriptor)=0;
+    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
+};
+
+} // treedec
 
 #endif

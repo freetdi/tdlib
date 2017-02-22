@@ -102,10 +102,9 @@ void PP_FI(G_t &G, T_t &T, int &low){
 
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
-        treedec::fillIn_decomp(
-         G, T,
-         (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL,
-         UINT_MAX, true); //ignore_isolated_vertices
+        unsigned low2=-1;
+        treedec::impl::fillIn_decomp(G, T, low2);
+        low = low2;
     }
     treedec::glue_bags(bags, T);
 }

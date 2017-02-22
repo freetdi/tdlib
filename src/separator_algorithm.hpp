@@ -280,9 +280,9 @@ void sep_glue_bag(typename treedec_traits<T_t>::bag_type &b,
 
     typename boost::graph_traits<T_t>::vertex_iterator vertexIt, vertexEnd;
     for(boost::tie(vertexIt, vertexEnd) = boost::vertices(T); vertexIt != vertexEnd; vertexIt++){
-        if(bag(*vertexIt, T) == glueBag){
+        if(bag(T, *vertexIt) == glueBag){
             typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            bag(t_dec_node, T) = b;
+            bag(T, t_dec_node) = b;
             boost::add_edge(t_dec_node, *vertexIt, T);
             return;
         }

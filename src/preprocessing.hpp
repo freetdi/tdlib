@@ -55,12 +55,12 @@ namespace impl{
 // Check if there exists a degree-0-vertex.
 template <typename G_t, typename B_t>
 void Islet(G_t &G, B_t &bags, int &low)
-{
+{ untested();
     typedef typename treedec_chooser<G_t>::type T_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::degree(*vIt, G) == 0){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
+        if(boost::degree(*vIt, G) == 0){ untested();
             typename treedec_traits<T_t>::vd_type vd=get_vd(G, *vIt);
             typename treedec_traits<T_t>::bag_type emptybag;
 
@@ -73,7 +73,7 @@ void Islet(G_t &G, B_t &bags, int &low)
 
 template <typename G_t, typename T_t>
 void Islet(G_t &G, T_t &bags)
-{
+{ untested();
     int low = -1;
     Islet(G, bags, low);
 }
@@ -101,8 +101,9 @@ void eliminate_vertex(typename boost::graph_traits<G_t>::vertex_descriptor v, G_
     low = (low > (int)deg)? low : deg;
 }
 
-//Applies the Triangle rule if applicable (checks if there exists a degree-3-vertex,
-//such that at least one edge exists in its neighbourhood).
+//Apply the Triangle rule if applicable (checks if there exists a
+//degree-3-vertex, such that at least one edge exists in its neighbourhood).
+//return true, if degs has been modified.
 template <typename G_t, typename T_t, typename DEGS>
 bool Triangle(G_t &G,
               typename boost::graph_traits<G_t>::vertex_descriptor v,
@@ -208,8 +209,13 @@ bool Cube(G_t &G,
     b = *(++f);
     c = *(++f);
 
-    if(boost::degree(a, G) != 3 || boost::degree(b, G) != 3 || boost::degree(c, G) != 3){
+    if(boost::degree(a, G)!=3){
         return false;
+    }else if(boost::degree(b, G)!=3){
+        return false;
+    }else if(boost::degree(c, G)!=3){ untested();
+        return false;
+    }else{
     }
 
     vertex_descriptor N[9];
@@ -332,7 +338,7 @@ bool Simplicial(G_t &G,
         treedec::make_clique_and_detach(v, G, xbag);
         redegree(NULL, G, xbag, degs);
 
-        if (unsigned(low) > xbag.size()){
+        if (unsigned(low) > xbag.size()){ untested();
             low = xbag.size();
         }
 
@@ -417,7 +423,7 @@ bool AlmostSimplicial(G_t &G,
 
             return true;
         }
-        else if(vertices_size_type(low) < deg_v-1u){
+        else if(vertices_size_type(low) < deg_v-1u){ untested();
             low = deg_v-1;
             return true;
         }
@@ -451,11 +457,15 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
     const degs_type& cdegs(degs);
 
     //Islet rule
+    assert(cdegs.size());
     if(!cdegs[0].empty()){
-        BOOST_AUTO(I, cdegs[0].begin());
-        BOOST_AUTO(E, cdegs[0].end());
-        for(; I != E; I++){
-            bags.push_back(boost::make_tuple(*I, bag_type()));
+        auto const& B=cdegs[0];
+        auto I=B.begin();
+        auto E=B.end();
+        for(;I!=E; ++I){
+            vertex_descriptor v=*I;
+            auto t=boost::make_tuple(v, bag_type());
+            bags.push_back(t);
         }
         low = (low > 0)? low : 0;
     }
@@ -469,35 +479,47 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
         vertex_descriptor v;
         boost::tie(v, min_ntd) = degs.pick_min(min_ntd, num_vert);
 
-        bool reduction_complete = true;
-
-        //degree {1,2}-rules
         if(min_ntd <= 2){
+            //degree {1,2}-rules
             eliminate_vertex(v, G, bags, low, degs);
-            reduction_complete = false;
-        }
-        //degree 3-rules
-        else if(min_ntd == 3){
-            BOOST_AUTO(it1, cdegs[3].begin());
-            for(; it1!=cdegs[3].end(); ++it1){
+            continue;
+        }else if(min_ntd==3){
+            //degree 3-rules
+            auto const& B=cdegs[3];
+            auto it1=B.begin();
+            unsigned cnt=0;
+            for(; cnt<4; ++cnt){
+                if(it1==B.end()){
+                    break;
+                }else{
+                    ++it1;
+                }
+            }
+            it1=B.begin();
+            for(; it1!=B.end(); ++it1){
                 //Triangle
                 if(Triangle(G, *it1, bags, low, degs)){
-                    reduction_complete = false;
                     goto NEXT_ITER;
+                }else{
+                    // graph is unchanged.
                 }
                 //Buddy
-                BOOST_AUTO(it2, it1);
-                it2++;
-                for(; it2 != cdegs[3].end(); ++it2){
+                auto it2=it1;
+                ++it2;
+                for(; it2!=B.end(); ++it2){
                     if(Buddy(G, *it1, *it2, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
+                    }else{
+                        // graph is unchanged.
                     }
                 }
-                //Cube
-                if(cdegs[3].size() >= 4 && Cube(G, *it1, bags, low, degs)){
-                    reduction_complete = false;
+                if(cnt!=4){
+                    // less than 4.
+                    // not enough for cube rule
+                }else if(Cube(G, *it1, bags, low, degs)){
                     goto NEXT_ITER;
+                }else{
+                    // graph is unchanged.
                 }
             }
             goto ARBITRARY_DEGREE;
@@ -508,23 +530,21 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             low = (low >= 4)? low : 4;
 
             for(unsigned int i = min_ntd; i < num_vert; ++i){
-                BOOST_AUTO(it, cdegs[i].begin());
-                for(; it != cdegs[i].end(); ++it){
+                auto const& B=cdegs[i];
+                auto it=B.begin();
+                for(; it != B.end(); ++it){
                     if(Simplicial(G, *it, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
                     }
                     if(AlmostSimplicial(G, *it, bags, low, degs)){
-                        reduction_complete = false;
                         goto NEXT_ITER;
                     }
                 }
             }
         }
-        NEXT_ITER:
-        if(reduction_complete){
-            return;
-        }
+        return;
+NEXT_ITER:
+        ;
     }
 }
 
@@ -539,7 +559,7 @@ void preprocessing(G_t &G, BV_t &bags, int &low)
 
 template <typename G_t, typename BV_t>
 void preprocessing(G_t &G, BV_t &bags)
-{
+{ untested();
     int low = -1;
     preprocessing(G, bags, low);
 }

@@ -147,12 +147,12 @@ void MSVS(G_t const &G, T_t &T)
 
         for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt!=tEnd; ++tIt){
             INTERRUPTION_POINT;
-            if(bag(*tIt, T).size() == width+1){
+            if(bag(T, *tIt).size() == width+1){
                 disabled_.resize(0);
                 vdMap_.resize(0);
 
                 is_in_neighbour_bd<vertex_descriptor, T_t> cb(T, *tIt);
-                BOOST_AUTO(mybag, bag(*tIt, T));
+                BOOST_AUTO(mybag, bag(T, *tIt));
                 HI = &immutable_clone(G, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
                 status = is_improvement_bag
                   <immutable_type, 
@@ -204,8 +204,8 @@ void MSVS(G_t const &G, T_t &T)
         //the bag of 'refinement_vertex' with this bag.
         typename treedec_traits<T_t>::bag_type B;
         treedec::map_descriptors_to_bags<G_t>(S, B);
-        typename treedec_traits<T_t>::bag_type old_bag = bag(refinement_vertex, T);
-        bag(refinement_vertex, T) = MOVE(B);
+        typename treedec_traits<T_t>::bag_type old_bag = bag(T, refinement_vertex);
+        bag(T, refinement_vertex) = MOVE(B);
 
         //Store the connected components of H[V(H)\S] in 'components'.
         std::vector<std::set<vertex_descriptor> > components;
@@ -243,7 +243,7 @@ void MSVS(G_t const &G, T_t &T)
             newN[i] = boost::add_vertex(T);
             typename treedec_traits<T_t>::bag_type uB;
             treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
-            bag(newN[i], T) = MOVE(uB);
+            bag(T, newN[i]) = MOVE(uB);
 
             boost::add_edge(refinement_vertex, newN[i], T);
         }
@@ -255,12 +255,12 @@ void MSVS(G_t const &G, T_t &T)
         for(unsigned int i = 0; i <  oldN.size(); i++){
             intersection.clear();
             std::set_intersection(old_bag.begin(), old_bag.end(),
-                                  bag(oldN[i], T).begin(),
-                                  bag(oldN[i], T).end(),
+                                  bag(T, oldN[i]).begin(),
+                                  bag(T, oldN[i]).end(),
                                   std::inserter(intersection, intersection.begin()));
 
             for(unsigned int j = 0; j < newN.size(); j++){
-                if(std::includes(bag(newN[j], T).begin(), bag(newN[j], T).end(),
+                if(std::includes(bag(T, newN[j]).begin(), bag(T, newN[j]).end(),
                                  intersection.begin(), intersection.end()))
                 {
                     boost::add_edge(newN[j], oldN[i], T);

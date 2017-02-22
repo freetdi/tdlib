@@ -69,42 +69,11 @@ namespace treedec{ //
 #define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
 
-template<class G>
-void check(G const&)
-{
-}
-
 template<typename G>
 void remove_vertex(vertex_iterator_G u, G &g)
 {
     remove_vertex(*u, g);
 }
-
-template<typename vertex_descriptor>
-struct vertex_callback{ //
-    virtual ~vertex_callback(){};
-    virtual void operator()(vertex_descriptor)=0;
-};
-
-template<typename G_t>
-struct edge_callback{ //
-    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    virtual ~edge_callback(){};
-    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
-    void operator()(edge_descriptor)
-    { incomplete();
-    }
-};
-
-template<typename G_t>
-struct graph_callback{ // fixme: union of the above?
-    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-    virtual ~graph_callback(){};
-    virtual void operator()(vertex_descriptor)=0;
-    virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
-};
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
@@ -315,10 +284,9 @@ inline unsigned
     return boost::get(boost::vertex_index, G, v);
 }
 
+// obsolete?
 template<class G>
-struct outedge_set{
-    typedef typename graph_traits<G>::outedge_set_type type;
-};
+struct outedge_set;
 
 template <typename G_t>
 std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
@@ -359,8 +327,8 @@ struct tmpbaghack<bag_t, T_t, V>{ //
 
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type& bag(
-	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
-        T_t& T)
+        T_t& T,
+	const typename boost::graph_traits<T_t>::vertex_descriptor& v)
 {
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
@@ -368,8 +336,8 @@ inline typename treedec_traits<T_t>::bag_type& bag(
 
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type const& bag(
-        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
-        T_t const& T)
+        T_t const& T,
+        const typename boost::graph_traits<T_t>::vertex_descriptor& v)
 {
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
@@ -378,13 +346,11 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
 template<class V, class G>
 size_t bag_size(V const & v, G const& g)
 {
-    return bag(v, g).size();
+    return bag(g, v).size();
 }
 
-// chooose deg implementation for graph backend.
-// to be accessed through graph_traits
 template<class G_t>
-struct deg_chooser{ //
+struct deg_chooser { //
     typedef typename misc::DEGS<G_t> type;
     typedef type degs_type; // transition? don't use.
 };
@@ -601,7 +567,7 @@ public:
         bag_iterator nIt, nEnd;
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(_t, _T);
         for(; nIt != nEnd; nIt++){
-            BOOST_AUTO(const& ibag, bag(*nIt, _T));
+            BOOST_AUTO(const& ibag, bag(_T, *nIt));
 
             // BUG, does not work on vectors.
             if(ibag.find(vd1)==ibag.end()){

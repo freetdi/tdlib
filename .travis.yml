@@ -40,6 +40,6 @@ script:
 
   # run all checks
   - ./bootstrap
-  - ./configure --enable-debug
+  - ./configure --enable-debug CXXFLAGS=-std=c++11
   -  make check
-  -  make distcheck
+  -  make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
