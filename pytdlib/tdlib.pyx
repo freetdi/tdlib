@@ -70,7 +70,7 @@ This module containes the following functions** :
     #- treedecomposition_exact_branch_and_bound
         Computes a tree decomposition of exact width of a given graph
 
-    - seperator_algorithm
+    - separator_algorithm
         Computes a 4-approximate tree decomposition of a given graph
 
     - minDegree_decomp
@@ -102,14 +102,19 @@ This module containes the following functions** :
     #- random_elimination_orderings
 
     - max_clique_with_treedecomposition
+        Computes a maximal clique with help of a tree decomposition
 
     - max_independent_set_with_treedecomposition
+        Computes a maximal independent set with help of a tree decomposition
 
     - max_vertex_cover_with_treedecomposition
+        Computes a minimal vertex cover with help of a tree decomposition
 
     - min_dominating_set_with_treedecomposition
+        Computes a minimal dominating set with help of a tree decomposition
 
     - min_coloring_with_treedecomposition
+        Computes a minimal coloring with help of a tree decomposition
 
     - treedec_to_ordering
         Computes an elimination ordering out of a tree decomposition
@@ -132,45 +137,8 @@ AUTHOR: Lukas Larisch (now): Initial version
 
 from libcpp.vector cimport vector
 
-from tdlib cimport gc_preprocessing
-from tdlib cimport gc_PP_MD
-from tdlib cimport gc_PP_FI
-from tdlib cimport gc_PP_FI_TM
-
-from tdlib cimport gc_deltaC_min_d
-from tdlib cimport gc_deltaC_max_d
-from tdlib cimport gc_deltaC_least_c
-from tdlib cimport gc_LBN_deltaC
-from tdlib cimport gc_LBNC_deltaC
-from tdlib cimport gc_LBP_deltaC
-from tdlib cimport gc_LBPC_deltaC
-
-from tdlib cimport gc_exact_decomposition_cutset
-from tdlib cimport gc_exact_decomposition_cutset_decision
-#from tdlib cimport gc_exact_decomposition_dynamic
-#from tdlib cimport gc_exact_decomposition_branch_and_bound
-
-from tdlib cimport gc_seperator_algorithm
-from tdlib cimport gc_minDegree_ordering
-from tdlib cimport gc_fillIn_ordering
-
-#from tdlib cimport gc_random_branch_and_bound
-#from tdlib cimport gc_random_elimination_orderings
-
-from tdlib cimport gc_MSVS
-from tdlib cimport gc_minimalChordal
-
-from tdlib cimport gc_max_clique_with_treedecomposition
-from tdlib cimport gc_max_independent_set_with_treedecomposition
-from tdlib cimport gc_min_vertex_cover_with_treedecomposition
-from tdlib cimport gc_min_dominating_set_with_treedecomposition
-from tdlib cimport gc_min_coloring_with_treedecomposition
-
-from tdlib cimport gc_ordering_to_treedec
-from tdlib cimport gc_treedec_to_ordering
-from tdlib cimport gc_trivial_decomposition
-from tdlib cimport gc_validate_treedecomposition
-from tdlib cimport gc_get_width
+from Graph import Graph
+from Decomp import Decomp
 
 
 ##############################################################
@@ -278,11 +246,20 @@ def inverse_labels_dict(labels_map):
         inv_dict[labels_map[i]] = i
     return inv_dict
 
+#do not change without modifying python_tdlib.cpp
+def graphtype_to_uint(string):
+    if string == "boost_graph_undirected":
+        return 0
+    elif string == "boost_graph_directed":
+        return 1
+    else:
+        raise Exception
+
 
 ##############################################################
 ############ PREPROCESSING ###################################
 
-def preprocessing(V, E):
+def preprocessing(G):
     """
     Returns a possibly smaller instance of a given graph G and an encoding
     of the parts of a tree decomposition, that could be computed so far.
@@ -295,41 +272,39 @@ def preprocessing(V, E):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_G : a list of vertices of the reduced input graph
-
-    - E_G : a list of edges of the reduced input graph
+    - G' : reduced input graph
 
     - bags
 
-    - lb : a lower bounds on treewidth of (V_G, E_G)
+    - lb : a lower bounds on treewidth of G'
 
     EXAMPLES:
 
-        V_T, E_T, bags, lb = tdlib.preprocessing(V_G, E_G)
+        G_, bags, lb = tdlib.preprocessing(G)
     """
 
     cdef vector[unsigned int] V_G, E_G
     cdef vector[vector[int]] c_bags;
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = -1
 
-    py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    py_lb = gc_preprocessing(V_G, E_G, c_bags, c_lb, graphtype)
 
     V_G_ = apply_labeling(V_G, labels_map)
     c_bags_ = apply_labeling(c_bags, labels_map)
 
-    return V_G_, E_G, c_bags_, py_lb
+    return Graph(V_G_, E_G), c_bags_, py_lb
 
 
-def PP_MD(V, E):
+def PP_MD(G):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
     the given graph G is not greater than 3, otherwise the reduced
@@ -339,38 +314,39 @@ def PP_MD(V, E):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph (must provide the methods vertices() and edges())
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.PP_MD(V_G, E_G)
+        G = Graph([1,2,3], [[1,2],[2,3]])
+        T, width = tdlib.PP_MD(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = -1
 
-    gc_PP_MD(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_MD(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def PP_FI(V, E):
+def PP_FI(G):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
     the given graph G is not greater than 3, otherwise the reduced
@@ -380,38 +356,38 @@ def PP_FI(V, E):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.PP_FI(V_G, E_G)
+        T, width = tdlib.PP_FI(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = -1
 
-    gc_PP_FI(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_FI(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def PP_FI_TM(V, E):
+def PP_FI_TM(G):
     """
     Returns a tree decomposition of exact width, iff the treewidth of
     the given graph G is not greater than 3, otherwise the reduced
@@ -423,41 +399,41 @@ def PP_FI_TM(V, E):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.PP_FI_TM(V_G, E_G)
+        T, width = tdlib.PP_FI_TM(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = -1
 
-    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_PP_FI_TM(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
 ##############################################################
 ############ LOWER BOUNDS ####################################
 
-def lower_bound(V, E, algorithm = "deltaC_least_c"):
+def lower_bound(G, algorithm = "deltaC_least_c"):
     """
     Calls one of the following algorithms to compute a lower bound on the
     treewidth of a given graph:
@@ -472,9 +448,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     - algorithm -- (default: 'deltaC_least_c') specifies the algorithm to use
                    for computing a lower bound on the treewidth of G. The
@@ -482,7 +456,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 
     OUTPUT:
 
-    - lb : a lower bound on the treewidth of (V_G, E_G)
+    - lb : a lower bound on the treewidth of G
 
     EXAMPLES:
         lb = tdlib.lower_bound(G, "deltaC_min_d")
@@ -495,23 +469,25 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
     """
 
     cdef vector[unsigned int] V_G, E_G
-    cython_make_tdlib_graph(V, E, V_G, E_G)
+    cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     cdef int c_lb = 0
 
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
     if(algorithm == "deltaC_min_d"):
-        c_lb = gc_deltaC_min_d(V_G, E_G)
+        c_lb = gc_deltaC_min_d(V_G, E_G, graphtype)
     elif(algorithm == "deltaC_max_d"):
-        c_lb = gc_deltaC_max_d(V_G, E_G)
+        c_lb = gc_deltaC_max_d(V_G, E_G, graphtype)
     elif(algorithm == "deltaC_least_c"):
-        c_lb = gc_deltaC_least_c(V_G, E_G)
+        c_lb = gc_deltaC_least_c(V_G, E_G, graphtype)
     elif(algorithm == "LBN_deltaC"):
-        c_lb = gc_LBN_deltaC(V_G, E_G)
+        c_lb = gc_LBN_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBNC_deltaC"):
-        c_lb = gc_LBNC_deltaC(V_G, E_G)
+        c_lb = gc_LBNC_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBP_deltaC"):
-        c_lb = gc_LBP_deltaC(V_G, E_G)
+        c_lb = gc_LBP_deltaC(V_G, E_G, graphtype)
     elif(algorithm == "LBPC_deltaC"):
-        c_lb = gc_LBPC_deltaC(V_G, E_G)
+        c_lb = gc_LBPC_deltaC(V_G, E_G, graphtype)
     else:
         print("Invalid lower bound algorithm")
         return -2
@@ -522,7 +498,7 @@ def lower_bound(V, E, algorithm = "deltaC_least_c"):
 ##############################################################
 ############ EXACT ALGORITHMS ################################
 
-def exact_decomposition_cutset(V, E, lb=-1):
+def exact_decomposition_cutset(G, lb=-1):
     """
     Computes a tree decomposition of exact width, iff the given lower bound
     is not greater than the treewidth of the input graph. Otherwise
@@ -532,41 +508,41 @@ def exact_decomposition_cutset(V, E, lb=-1):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - lb : a lower bound to the treewidth of (V_G, E_G),
+    - lb : a lower bound to the treewidth of G,
            e.g. computed by lower_bound (default: '-1')
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.exact_decomposition_cutset(V_G, E_G)
+        T, width = tdlib.exact_decomposition_cutset(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = lb
 
-    gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_exact_decomposition_cutset(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def exact_decomposition_cutset_decision(V, E, k):
+def exact_decomposition_cutset_decision(G, k):
     """
     Computes a tree decomposition of exact width, if tw(G)  k. Otherwise
     a tree decomposition of a width than matches the given lower bound
@@ -575,34 +551,29 @@ def exact_decomposition_cutset_decision(V, E, k):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - lb : a lower bound to the treewidth of (V_G, E_G),
-           e.g. computed by lower_bound (default: '-1')
+    - k : parameter for the question 'tw(G) < k'
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
-
-    - E_T : a list of edges of a treedecomposition
-
-    - status : the width of (V_T, E_T)
+    - status : True if tw(G) < k, else False.
 
     EXAMPLES:
 
-        V_T, E_T, status = tdlib.exact_decomposition_cutset(V_G, E_G)
+        status = tdlib.exact_decomposition_cutset_decision(G, 3)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    cython_make_tdlib_graph(V, E, V_G, E_G)
+    cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_k = k
 
-    is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    is_leq = gc_exact_decomposition_cutset_decision(V_G, E_G, V_T, E_T, c_k, graphtype)
 
     if is_leq is 0:
         rtn = True
@@ -611,7 +582,7 @@ def exact_decomposition_cutset_decision(V, E, k):
 
     return rtn
 
-def exact_decomposition_dynamic(V, E, lb=-1):
+def exact_decomposition_dynamic(G, lb=-1):
     """
     Computes a tree decomposition of exact width, iff the given lower bound
     is not greater than the treewidth of the input graph. Otherwise
@@ -620,192 +591,192 @@ def exact_decomposition_dynamic(V, E, lb=-1):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - lb : a lower bound to the treewidth of (V_G, E_G),
+    - lb : a lower bound to the treewidth of G,
            e.g. computed by lower_bound (default: '-1')
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.exact_decomposition_dynamic(V_G, E_G)
+        T, width = tdlib.exact_decomposition_dynamic(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef int c_lb = lb
 
-    gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_exact_decomposition_dynamic(V_G, E_G, V_T, E_T, c_lb, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
 ##############################################################
 ############ APPROXIMATIVE ALGORITHMS ########################
 
-def seperator_algorithm(V, E):
+def seperator_algorithm(G):
     """
     Computes a tree decomposition of a given graph using nearly balanced
     seperators. The returned width is at most 4*tw(G)+1.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.seperator_algorithm(V_G, E_G)
+        T, width = tdlib.seperator_algorithm(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_seperator_algorithm(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_seperator_algorithm(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def minDegree_decomp(V, E):
+def minDegree_decomp(G):
     """
     Computes a tree decomposition of a given graph based on the minDegree heuristic.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.minDegree_decomp(V_G, E_G)
+        T, width = tdlib.minDegree_decomp(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_minDegree_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minDegree_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
 
-def boost_minDegree_decomp(V, E):
+    return T, get_width(T)
+
+def boost_minDegree_decomp(G):
     """
     Computes a tree decomposition of a given graph based on the (boost-)minDegree heuristic.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.boost_minDegree_decomp(V_G, E_G)
+        T, width = tdlib.boost_minDegree_decomp(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_boost_minDegree_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def fillIn_decomp(V, E):
+def fillIn_decomp(G):
     """
     Computes a tree decomposition of a given graph based on the fillIn heuristic.
      INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    INPUTS:
 
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T, width = tdlib.fillIn_decomp(V_G, E_G)
+        T, width = tdlib.fillIn_decomp(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_fillIn_decomp(V_G, E_G, V_T, E_T);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_fillIn_decomp(V_G, E_G, V_T, E_T, graphtype);
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def minDegree_ordering(V, E):
+def minDegree_ordering(G):
     """
     Computes an elimination ordering of a given graph based on the minDegree
     heuristic.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
@@ -813,13 +784,15 @@ def minDegree_ordering(V, E):
 
     EXAMPLES:
 
-        O = tdlib.minDegree_ordering(V_G, E_G)
+        O = tdlib.minDegree_ordering(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, elim_ordering
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_minDegree_ordering(V_G, E_G, elim_ordering);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minDegree_ordering(V_G, E_G, elim_ordering, graphtype);
 
     py_elim_ordering = []
     cdef i;
@@ -831,30 +804,30 @@ def minDegree_ordering(V, E):
     return elim_ordering_
 
 
-def fillIn_ordering(V, E):
+def fillIn_ordering(G):
     """
     Computes an elimination ordering of a given graph based on the fillIn
     heuristic.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - O : an elimination ordering on (V_G, E_G)
+    - O : an elimination ordering on (G)
 
     EXAMPLES:
 
-        O = tdlib.fillIn_ordering(V_G, E_G)
+        O = tdlib.fillIn_ordering(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, elim_ordering
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_fillIn_ordering(V_G, E_G, elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_fillIn_ordering(V_G, E_G, elim_ordering, graphtype)
 
     py_elim_ordering = []
     cdef i;
@@ -869,54 +842,51 @@ def fillIn_ordering(V, E):
 ##############################################################
 ############ POSTPROCESSING ##################################
 
-def MSVS(pyV_G, pyE_G, pyV_T, pyE_T):
+def MSVS(G, T):
     """
     This may reduce the maximal bag size of a tree decomposition by refinement
     of the bags with help of minimal seperating vertex sets.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUTS:
 
-    - V_T' : a list of vertices of a treedecomposition
+    - T' : a treedecomposition of G
 
-    - E_T' : a list of edges of a treedecomposition
-
-    - width : the width of (V_T', E_T')
+    - width : the width of T'
 
     EXAMPLES:
 
-        V_T1, E_T1 = tdlib.trivial_decomposition(V_G, E_G)
-        V_T2, E_T2, width = tdlib.MSVS(V_G, E_G, V_T1, E_T1)
+        T1 = tdlib.trivial_decomposition(G)
+        T2, width = tdlib.MSVS(G, T1)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_MSVS(V_G, E_G, V_T, E_T)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_MSVS(V_G, E_G, V_T, E_T, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    new_width = get_width(V_T, E_T)
+    T_ = Decomp(V_T_, E_T)
 
-    return V_T_, E_T, new_width
+    return T_, get_width(T_)
 
-def minimalChordal_ordering(V, E, O):
+
+def minimalChordal_ordering(G, O):
     """
     Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
@@ -924,11 +894,9 @@ def minimalChordal_ordering(V, E, O):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - O : an elimination ordering on (V_G, E_G)
+    - O : an elimination ordering on G
 
     OUTPUT:
 
@@ -939,19 +907,20 @@ def minimalChordal_ordering(V, E, O):
     EXAMPLES:
 
         O1 = range(0, len(V))
-        V_T1, E_T1, w1 = tdlib.ordering_to_treedec(V_G, E_G, O1)
-        O2 = tdlib.minimalChordal_ordering(V_G, E_G, O1)
-        V_T2, E_T2, w2 = tdlib.ordering_to_treedec(V_G, E_G, O2)
+        O2 = tdlib.minimalChordal_ordering(G, O1)
+        T, w = tdlib.ordering_to_treedec(G, O2)
     """
 
     cdef vector[unsigned int] V_G, E_G, old_elim_ordering, new_elim_ordering
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
 
     for l in range(0, len(O)):
         old_elim_ordering.push_back(inv_labels_dict[O[l]])
 
-    gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_minimalChordal(V_G, E_G, old_elim_ordering, new_elim_ordering, graphtype)
 
     py_new_elim_ordering_ = []
     cdef i;
@@ -964,7 +933,8 @@ def minimalChordal_ordering(V, E, O):
 
     return py_new_elim_ordering
 
-def minimalChordal_decomp(V_G, E_G, V_T, E_T):
+
+def minimalChordal_decomp(G, T):
     """
     Returns an alternative elimination ordering E' than the given elimination
     ordering E, which may cause a lower width than E, when applied to the
@@ -972,69 +942,62 @@ def minimalChordal_decomp(V_G, E_G, V_T, E_T):
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUT:
 
-    - A tree decomposition of G of possibly lower width than the
-      input treedecomposition.
+    - T' : a tree decomposition of G of possibly lower width than the width of T
 
     EXAMPLES:
 
-        V_T1, E_T1, w1 = tdlib.minDegree_decomp(V_G, E_G)
-        V_T2, E_T2, w2 = tdlib.minimalChordal_decomp(V_G, E_G, V_T1, E_T1)
+        T1, w1 = tdlib.minDegree_decomp(G)
+        T2, w2 = tdlib.minimalChordal_decomp(G, T1)
     """
 
-    O1 = treedec_to_ordering(V_T, E_T)
-    O2 = minimalChordal_ordering(V_G, E_G, O1)
+    O1 = treedec_to_ordering(T)
+    O2 = minimalChordal_ordering(G, O1)
 
-    return ordering_to_treedec(V_G, E_G, O2)
+    return ordering_to_treedec(G, O2)
 
 
 ##############################################################
 ############ APPLICATIONS ####################################
 
-def max_clique_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+def max_clique_with_treedecomposition(G, T):
     """
     Computes a maximum clique with help of a tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUT:
 
-    - C:    a maximum clique in the input graph
+    - C:    a maximum clique in G
 
     EXAMPLES:
 
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        C = tdlib.max_clique_with_treedecomposition(V_G, E_G, V_T, E_T)
+        T, w = tdlib.seperator_algorithm(G)
+        C = tdlib.max_clique_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, C_
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
 
     py_C = []
     cdef i;
@@ -1045,41 +1008,39 @@ def max_clique_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
     return py_C
 
 
-def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+def max_independent_set_with_treedecomposition(G, T):
     """
     Computes a maximum sized independent set with help of a tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUT:
 
-    - IS:    a maximum sized independent set in the input graph
+    - IS:    a maximum sized independent set in G
 
     EXAMPLES:
 
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        IS = tdlib.max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T)
+        T, w = tdlib.seperator_algorithm(G)
+        IS = tdlib.max_independent_set_with_treedecomposition(V, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, IS_
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_, graphtype);
 
     py_IS = []
     cdef i;
@@ -1090,41 +1051,39 @@ def max_independent_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
     return py_IS
 
 
-def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+def min_vertex_cover_with_treedecomposition(G, T):
     """
     Computes a minimum vertex cover with help of a tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUT:
 
-    - VC:    a minimal vertex cover in the input graph
+    - VC:    a minimal vertex cover in G
 
     EXAMPLES:
 
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        VC = tdlib.min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T)
+        T, w = tdlib.seperator_algorithm(G)
+        VC = tdlib.min_vertex_cover_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, VC_
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, graphtype);
 
     py_VC = []
     cdef i;
@@ -1135,36 +1094,39 @@ def min_vertex_cover_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
     return py_VC
 
 
-def min_dominating_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+def min_dominating_set_with_treedecomposition(G, T):
     """
     Computes a minimal dominating set based on a tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUTS:
 
-    - DS : a list of vertices of a minimal dominating set
+    - DS : a list of vertices of a minimal dominating set in G
+
+    EXAMPLES:
+
+        T, w = tdlib.seperator_algorithm(G)
+        DS = tdlib.min_dominating_set_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, DS
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS, graphtype)
 
     py_DS = []
     cdef i;
@@ -1174,41 +1136,39 @@ def min_dominating_set_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
     return py_DS
 
 
-def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
+def min_coloring_with_treedecomposition(G, T):
     """
     Computes a minimum coloring with help of a tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
+    - T : a treedecomposition of G
 
     OUTPUT:
 
-    - VC:    a minimal coloring of the input graph
+    - VC:    a minimal coloring of G
 
     EXAMPLES:
 
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        VC = tdlib.min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T)
+        T, w = tdlib.seperator_algorithm(G)
+        VC = tdlib.min_coloring_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T, C_
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
     if(rtn is False):
         return
 
-    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_);
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
 
     py_C = []
     cdef i;
@@ -1225,59 +1185,76 @@ def min_coloring_with_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T):
 ##############################################################
 ############ MISC ############################################
 
-def ordering_to_treedec(V, E, O):
+def ordering_to_treedec(G, O):
     """
     Applies an elimination ordering on a graph and returns
     the resulting tree decomposition.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
-
-    - O : an elimination ordering on (V_G, E_G)
+    - O : an elimination ordering on G
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
-
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        O = tdlib.fillIn_ordering(V_G, E_G)
-        V_T, E_T, width = tdlib.ordering_to_treedec(V_G, E_G, O)
+        O = tdlib.fillIn_ordering(G)
+        T, width = tdlib.ordering_to_treedec(G)
     """
 
-    if(sorted(V) != sorted(O)):
+    if(sorted(G.vertices()) != sorted(O)):
         print("error: an elimination ordering must be a permutation of the vertices!")
         return
 
     cdef vector[unsigned int] V_G, E_G, E_T, elim_ordering
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     inv_labels_dict = inverse_labels_dict(labels_map)
 
     for i in range(0, len(O)):
         elim_ordering.push_back(inv_labels_dict[O[i]])
 
-    gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_ordering_to_treedec(V_G, E_G, V_T, E_T, elim_ordering, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T, get_width(V_T, E_T)
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def treedec_to_ordering(V, E):
+def treedec_to_ordering(T):
+    """
+    Converts a treedecomposition to an elimination ordering.
+
+    INPUTS:
+
+    - T : a treedecomposition
+
+    OUTPUTS:
+
+    - O : an elimination ordering
+
+    EXAMPLES:
+
+        T = tdlib.fillIn_decomp(G)
+        O = tdlib.treedec_to_ordering(T)
+    """
+
     cdef vector[unsigned int] E_T, elim_ordering
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_decomp(V, E, V_T, E_T)
+    labels_map = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T)
 
     gc_treedec_to_ordering(V_T, E_T, elim_ordering)
 
@@ -1293,81 +1270,81 @@ def treedec_to_ordering(V, E):
     return py_elim_ordering
 
 
-def trivial_decomposition(V, E):
+def trivial_decomposition(G):
     """
     Returns a trivial tree decomposition of the given graph.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
-
-    - E_G : a list of edges of the input graph
+    - G : input graph
 
     OUTPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
+    - T : a treedecomposition of G
 
-    - E_T : a list of edges of a treedecomposition
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T = tdlib.trivial_decomposition(V_G, E_G)
+        T, w = tdlib.trivial_decomposition(G)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(V, E, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
-    gc_trivial_decomposition(V_G, E_G, V_T, E_T)
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_trivial_decomposition(V_G, E_G, V_T, E_T, graphtype)
 
     V_T_ = apply_labeling(V_T, labels_map)
 
-    return V_T_, E_T
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
 
 
-def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
+def is_valid_treedecomposition(G, T, message=True):
     """
     Checks, if the definition of a tree decomposition holds for
     a tree decomposition and a graph.
 
     INPUTS:
 
-    - V_G : a list of vertices of the input graph
+    - G : input graph
 
-    - E_G : a list of edges of the input graph
+    - T : treedecomposition
 
-    - V_T : a list of vertices of the input treedecomposition
-
-    - E_T : a list of edges of the input treedecomposition
-
-    - message : outputs error message iff (V_T, E_T) is invalid with
-                respect to (V_G, E_G) (optional)
+    - message : outputs error message iff T is invalid with
+                respect to G (optional)
 
     OUTPUT:
 
-    - True if (V_T, E_T) is a valid treedecomposition else False.
+    - status : True if T is a valid treedecomposition of G else False.
 
     EXAMPLES:
 
-        V_T, E_T, lb = tdlib.seperator_algorithm(V_G, E_G)
-        status = tdlib.is_valid_treedecomposition(V_G, E_G, V_T, E_T)
+        T, w = tdlib.seperator_algorithm(G)
+        status = tdlib.is_valid_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
-    labels_map = cython_make_tdlib_graph(pyV_G, pyE_G, V_G, E_G)
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
     inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(pyV_T, pyE_T, V_T, E_T, inv_labels_dict)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
 
-    if(rtn is False and pyV_T != [[]] and pyE_T != []):
+    if(rtn is False and T.vertices() != [[]] and T.edges() != []):
         if message:
             print("error: labels_dict is corrupted (possible reason: there is no bijective mapping 'bags -> vertices'")
         return False
 
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
     cdef c_status;
-    c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T);
+    c_status = gc_validate_treedecomposition(V_G, E_G, V_T, E_T, graphtype);
 
     py_status = c_status
 
@@ -1388,25 +1365,23 @@ def is_valid_treedecomposition(pyV_G, pyE_G, pyV_T, pyE_T, message=True):
     return py_status == 0
 
 
-def get_width(V, E):
+def get_width(T):
     """
     Returns the width of a given tree decomposition.
 
     INPUTS:
 
-    - V_T : a list of vertices of a treedecomposition
-
-    - E_T : a list of edges of a treedecomposition
+    - T : a treedecomposition
 
     OUTPUT:
 
-    - width : the width of (V_T, E_T)
+    - width : the width of T
 
     EXAMPLES:
 
-        V_T, E_T = tdlib.trivial_decomposition(V_G, E_G)
-        width = tdlib.get_width(V_T, E_T)
+        T = tdlib.trivial_decomposition(G)
+        width = tdlib.get_width(T)
     """
 
-    return gc_get_width(V)
+    return gc_get_width(T.vertices())
 

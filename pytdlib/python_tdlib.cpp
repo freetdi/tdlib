@@ -39,6 +39,7 @@
 
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
@@ -92,11 +93,11 @@ void make_tdlib_decomp(T_t &T, std::vector<std::vector<int> > &V, std::vector<un
 
 }
 
-
-void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+template <typename G_t>
+void make_python_graph(G_t &G, std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                        bool ignore_isolated_vertices=false)
 {
-    boost::graph_traits<TD_graph_t>::vertex_iterator vIt, vEnd;
+    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         if(ignore_isolated_vertices && boost::degree(*vIt, G) == 0){
             continue;
@@ -104,7 +105,7 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
         V_G.push_back(*vIt);
     }
 
-    boost::graph_traits<TD_graph_t>::edge_iterator eIt, eEnd;
+    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
         E_G.push_back(boost::source(*eIt, G));
         E_G.push_back(boost::target(*eIt, G));
@@ -112,15 +113,16 @@ void make_python_graph(TD_graph_t &G, std::vector<unsigned int> &V_G, std::vecto
 }
 
 
-void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
+template <typename T_t>
+void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
                         std::vector<unsigned int> &E_T)
 {
-    std::map<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int> vertex_map;
-    boost::graph_traits<TD_tree_dec_t>::vertex_iterator tIt, tEnd;
+    std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     unsigned int id = 0;
     
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        vertex_map.insert(std::pair<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int>(*tIt, id++));
+        vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id++));
         std::vector<int> bag;
         for(std::set<unsigned int>::iterator sIt = T[*tIt].bag.begin(); sIt != T[*tIt].bag.end(); sIt++){
             bag.push_back(*sIt);
@@ -128,9 +130,9 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
         V_T.push_back(bag);
     }
     
-    boost::graph_traits<TD_tree_dec_t>::edge_iterator eIt, eEnd;
+    typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(T); eIt != eEnd; eIt++){
-        std::map<boost::graph_traits<TD_tree_dec_t>::vertex_descriptor, unsigned int>::iterator v, w;
+        typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
         v = vertex_map.find(boost::source(*eIt, T));
         w = vertex_map.find(boost::target(*eIt, T));
         E_T.push_back(v->second);
@@ -143,22 +145,41 @@ void make_python_decomp(TD_tree_dec_t &T, std::vector<std::vector<int> > &V_T,
 
 int gc_preprocessing(std::vector<unsigned int> &V_G,
                      std::vector<unsigned int> &E_G,
-                     std::vector<std::vector<int> > &bags, int lb)
+                     std::vector<std::vector<int> > &bags, int lb, unsigned graphtype)
 {
     typedef typename treedec::graph_traits<TD_graph_t>::treedec_type T;
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
 
     std::vector< boost::tuple<
         typename treedec::treedec_traits<T>::vd_type,
         typename treedec::treedec_traits<T>::bag_type
              > > td_bags;
-    treedec::preprocessing(G, td_bags, lb);
 
-    V_G.clear();
-    E_G.clear();
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    make_python_graph(G, V_G, E_G, true); //ignores isolated vertices
+        treedec::preprocessing(G, td_bags, lb);
+
+        V_G.clear();
+        E_G.clear();
+
+        make_python_graph(G, V_G, E_G, true); //ignores isolated vertices
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::preprocessing(G, td_bags, lb);
+
+        V_G.clear();
+        E_G.clear();
+
+        make_python_graph(G, V_G, E_G, true); //ignores isolated vertices
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     bags.resize(td_bags.size());
     for(unsigned int i = 0; i < td_bags.size(); i++){
@@ -177,17 +198,28 @@ int gc_preprocessing(std::vector<unsigned int> &V_G,
 
 
 int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    treedec::PP_MD(G, T, lb);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_MD(G, T, lb);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_MD(G, T, lb);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
@@ -195,17 +227,28 @@ int gc_PP_MD(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 
 
 int gc_PP_FI(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    treedec::PP_FI(G, T, lb);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_FI(G, T, lb);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_FI(G, T, lb);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
@@ -213,17 +256,28 @@ int gc_PP_FI(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 
 
 int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-               std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+               std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    treedec::PP_FI_TM(G, T, lb);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_FI_TM(G, T, lb);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::PP_FI_TM(G, T, lb);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
@@ -233,76 +287,171 @@ int gc_PP_FI_TM(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 /* LOWER BOUNDS */
 
 
-int gc_deltaC_min_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_deltaC_min_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::deltaC_min_d(G);
+        return treedec::lb::deltaC_min_d(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::deltaC_min_d(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_deltaC_max_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_deltaC_max_d(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::deltaC_max_d(G);
+        return treedec::lb::deltaC_max_d(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::deltaC_max_d(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_deltaC_least_c(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_deltaC_least_c(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::deltaC_least_c(G);
+        return treedec::lb::deltaC_least_c(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::deltaC_least_c(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_LBN_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_LBN_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::LBN_deltaC(G);
+        return treedec::lb::LBN_deltaC(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::LBN_deltaC(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_LBNC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_LBNC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::LBNC_deltaC(G);
+        return treedec::lb::LBNC_deltaC(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::LBNC_deltaC(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_LBP_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_LBP_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::LBP_deltaC(G);
+        return treedec::lb::LBP_deltaC(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::LBP_deltaC(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
-int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
+int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
 
-    return treedec::lb::LBPC_deltaC(G);
+        return treedec::lb::LBPC_deltaC(G);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::lb::LBPC_deltaC(G);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 
 /* EXACT TREE DECOMPOSITIONS */
 
 int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    treedec::exact_decomposition_cutset(G, T, lb);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::exact_decomposition_cutset(G, T, lb);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::exact_decomposition_cutset(G, T, lb);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
@@ -310,21 +459,34 @@ int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<un
 
 
 int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k)
+                                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int k, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    bool rtn = treedec::exact_decomposition_cutset_decision(G, T, k);
+    bool rtn;
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        rtn = treedec::exact_decomposition_cutset_decision(G, T, k);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        rtn = treedec::exact_decomposition_cutset_decision(G, T, k);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     if(!rtn){
         return -1;
     }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return 0;
@@ -332,17 +494,28 @@ int gc_exact_decomposition_cutset_decision(std::vector<unsigned int> &V_G, std::
 
 
 int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb)
+                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    treedec::exact_decomposition_dynamic(G, T, lb);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::exact_decomposition_dynamic(G, T, lb);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::exact_decomposition_dynamic(G, T, lb);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
 
     return treedec::get_width(T);
@@ -352,38 +525,67 @@ int gc_exact_decomposition_dynamic(std::vector<unsigned int> &V_G, std::vector<u
 /* APPOXIMATIVE TREE DECOMPOSITIONS */
 
 int gc_seperator_algorithm(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
-    treedec::separator_algorithm(G, T);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::separator_algorithm(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::separator_algorithm(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
+
     treedec::make_small(T);
     make_python_decomp(T, V_T, E_T);
+
     return treedec::get_width(T);
 }
 
 
 int gc_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
-    treedec::minDegree_decomp(G, T);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::minDegree_decomp(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::minDegree_decomp(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
+
     return treedec::get_width(T);
 }
 
 
 int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
+  (void)graphtype; // incomplete();?
     TD_graph_directed_vec_t G;
     make_tdlib_graph(G, V_G, E_G, true); //true = directed
 
@@ -397,15 +599,17 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
     TD_graph_t H;
     make_tdlib_graph(H, V_G, E_G);
     TD_tree_dec_t T;
-    treedec::vec_ordering_to_tree(H, O, T);
+    treedec::draft::vec_ordering_to_tree(H, O, T);
 
 #ifndef NDEBUG
     unsigned w2 =
 #endif
-    treedec::get_width(T);
+    treedec::get_bagsize(T);
 
-
-    //assert(w1 == w2);
+#ifndef NDEBUG
+    // assert(w1 == w2); // why not?
+    (void)w1; (void)w2;
+#endif
 
     treedec::make_small(T);
 
@@ -415,45 +619,82 @@ int gc_boost_minDegree_decomp(std::vector<unsigned int> &V_G, std::vector<unsign
 
 
 int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                      std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+                      std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
-    treedec::fillIn_decomp(G, T);
+
+    if(graphtype == 0 /* bug, use enum! */ ){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::fillIn_decomp(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::fillIn_decomp(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     treedec::make_small(T);
-
     make_python_decomp(T, V_T, E_T);
+
     return treedec::get_width(T);
 }
 
 
 void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
-                           std::vector<unsigned int> &elim_ordering)
+                           std::vector<unsigned int> &elim_ordering, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V, E);
-
     std::vector<TD_graph_t::vertex_descriptor> elim_ordering_;
-    treedec::minDegree_ordering(G, elim_ordering_);
 
-    elim_ordering.resize(boost::num_vertices(G));
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::minDegree_ordering(G, elim_ordering_);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::minDegree_ordering(G, elim_ordering_);
+    }
+    else{
+        assert(false);
+    }
+
+    elim_ordering.resize(V.size());
     for(unsigned int i = 0; i < elim_ordering_.size(); i++){
         elim_ordering[i] = elim_ordering_[i];
     }
 }
 
 
-void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering){
-    TD_graph_t G;
-    make_tdlib_graph(G, V, E);
-
+void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E, std::vector<unsigned int> &elim_ordering, unsigned graphtype){
     std::vector<TD_graph_t::vertex_descriptor> elim_ordering_;
-    treedec::fillIn_ordering(G, elim_ordering_);
 
-    elim_ordering.resize(boost::num_vertices(G));
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::fillIn_ordering(G, elim_ordering_);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::fillIn_ordering(G, elim_ordering_);
+    }
+    else{
+        assert(false);
+    }
+
+    elim_ordering.resize(V.size());
     for(unsigned int i = 0; i < elim_ordering_.size(); i++){
         elim_ordering[i] = elim_ordering_[i];
     }
@@ -463,15 +704,27 @@ void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> 
 /* POSTPROCESSING */
 
 int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    treedec::MSVS(G, T);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::MSVS(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::MSVS(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     V_T.clear();
     E_T.clear();
@@ -483,11 +736,8 @@ int gc_MSVS(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
 
 void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                        std::vector<unsigned int> &old_elimination_ordering,
-                       std::vector<unsigned int> &new_elimination_ordering)
+                       std::vector<unsigned int> &new_elimination_ordering, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V, E);
-
     typename std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor>
                    old_elimination_ordering_tmp(old_elimination_ordering.size());
 
@@ -498,7 +748,21 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
     typename std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor>
                                                      new_elimination_ordering_tmp;
 
-    treedec::minimalChordal(G, old_elimination_ordering_tmp, new_elimination_ordering_tmp);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::minimalChordal(G, old_elimination_ordering_tmp, new_elimination_ordering_tmp);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V, E);
+
+        treedec::minimalChordal(G, old_elimination_ordering_tmp, new_elimination_ordering_tmp);
+    }
+    else{
+        assert(false);
+    }
 
     new_elimination_ordering.resize(new_elimination_ordering_tmp.size());
     for(unsigned int i = 0; i < new_elimination_ordering_tmp.size(); i++){
@@ -511,16 +775,28 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
 
 void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                          std::vector<unsigned int> &C)
+                                          std::vector<unsigned int> &C, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
     std::set<unsigned int> result;
-    treedec::app::max_clique_with_treedecomposition(G, T, result);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::max_clique_with_treedecomposition(G, T, result);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::max_clique_with_treedecomposition(G, T, result);
+    }
+    else{
+        assert(false);
+    }
 
     C.resize(result.size());
     unsigned int i = 0;
@@ -532,11 +808,8 @@ void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::v
 
 void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                   std::vector<unsigned int> &IS)
+                                                   std::vector<unsigned int> &IS, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
@@ -546,7 +819,22 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
+    }
+    else{
+        assert(false);
+    }
 
     IS.resize(result.size());
     unsigned int i = 0;
@@ -558,11 +846,8 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
 
 void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                std::vector<unsigned int> &VC)
+                                                std::vector<unsigned int> &VC, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
@@ -572,7 +857,22 @@ void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, 
     treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
+    }
+    else{
+        assert(false);
+    }
 
     VC.resize(result.size());
     unsigned int i = 0;
@@ -584,11 +884,8 @@ void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, 
 
 void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                  std::vector<unsigned int> &DS)
+                                                  std::vector<unsigned int> &DS, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
@@ -598,7 +895,22 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
     treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
-    treedec::app::min_dominating_set_with_treedecomposition(G, T_, result);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_dominating_set_with_treedecomposition(G, T_, result);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_dominating_set_with_treedecomposition(G, T_, result);
+    }
+    else{
+        assert(false);
+    }
 
     DS.resize(result.size());
     unsigned int i = 0;
@@ -610,11 +922,8 @@ void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G
 
 void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                        std::vector<std::vector<int> > &C)
+                                        std::vector<std::vector<int> > &C, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
@@ -624,7 +933,22 @@ void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std:
     treedec::nice::nicify(T_);
 
     std::vector<std::set<unsigned int> > result;
-    treedec::app::min_coloring_with_treedecomposition(G, T_, result);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_coloring_with_treedecomposition(G, T_, result);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::app::min_coloring_with_treedecomposition(G, T_, result);
+    }
+    else{
+        assert(false);
+    }
 
     C.resize(result.size());
     for(unsigned int i = 0; i < result.size(); i++){
@@ -639,18 +963,31 @@ void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std:
 
 int gc_ordering_to_treedec(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                            std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                           std::vector<unsigned int> &elim_ordering)
+                           std::vector<unsigned int> &elim_ordering, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
 
-    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_(boost::num_vertices(G));
+    std::vector<TD_graph_t::vertex_descriptor> elim_ordering_(V_G.size());
     for(unsigned int i = 0; i < elim_ordering.size(); i++){
         elim_ordering_[i] = elim_ordering[i];
     }
-    treedec::ordering_to_treedec(G, elim_ordering_, T);
+
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::ordering_to_treedec(G, elim_ordering_, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::ordering_to_treedec(G, elim_ordering_, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     make_python_decomp(T, V_T, E_T);
 
@@ -672,13 +1009,27 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
 }
 
 
-int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
+int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, std::vector<std::vector<int> > &V_T,
+                             std::vector<unsigned int> &E_T, unsigned graphtype)
+{
     TD_tree_dec_t T;
 
-    treedec::trivial_decomposition(G, T);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::trivial_decomposition(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        treedec::trivial_decomposition(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 
     make_python_decomp(T, V_T, E_T);
 
@@ -687,15 +1038,27 @@ int gc_trivial_decomposition(std::vector<unsigned int> &V_G, std::vector<unsigne
 
 
 int gc_validate_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T)
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
 {
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    return treedec::validate_treedecomposition(G, T);
+    if(graphtype == 0){
+        TD_graph_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::validate_treedecomposition(G, T);
+    }
+    else if(graphtype == 1){
+        TD_graph_vec_t G;
+        make_tdlib_graph(G, V_G, E_G);
+
+        return treedec::validate_treedecomposition(G, T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
 }
 
 

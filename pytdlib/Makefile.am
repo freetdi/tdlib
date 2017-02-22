@@ -19,12 +19,16 @@ AM_LDFLAGS = -module -omit-version
 TESTS = \
 	test_approx.py \
 	test_apps.py \
+	test_bmd.py \
 	test_exact.py \
 	test_fill_in.py \
 	test_lb.py \
 	test_misc.py \
 	test_post.py \
-	test_pre.py
+	test_pp_md.py \
+	test_pp_fi.py \
+	test_pre.py \
+	test_sep.py
 
 $(TESTS:%.py=%.log): all-am
 
@@ -33,7 +37,18 @@ PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
     export PYTHONPATH='.';
 
-EXTRA_DIST = tdlib.pxd tdlib.pyx python_tdlib.hpp graphs.py RandomGNM_250_1000.py CFGs.py dimacs.py $(TESTS)
+EXTRA_DIST = \
+	$(TESTS) \
+	CFGs.py \
+	Decomp.py \
+	dimacs.py \
+	graphs.py \
+	Graph.py \
+	python_tdlib.hpp \
+	RandomGNM_250_1000.py \
+	tdlib.pxd \
+	tdlib.pyx \
+	util.py
 
 $(TESTS:%.py=%.log): P
 .PHONY: P
