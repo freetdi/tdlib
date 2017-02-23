@@ -27,6 +27,7 @@ pkginclude_HEADERS = \
   separator_algorithm.hpp \
   simple_graph_algos.hpp \
   trace.hpp \
+  timer.hpp \
   upper_bounds.hpp \
   graph.hpp \
   minimum_degree_ordering.hpp \
