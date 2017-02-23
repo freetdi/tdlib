@@ -1,9 +1,14 @@
 import tdlib
 import unittest
+import sys
+
+if(sys.argv[1]!="long"):
+	sys.exit(77)
+
+sys.argv=sys.argv[:1]
 
 from graphs import *
 import CFGs
-import dimacs
 
 PREFIX = "CFGs"
 COUNT = 1816
@@ -22,47 +27,42 @@ def dump_td_as_dot(V_T, E_T, outname):
     fout.close()
 
 class TestTdLib_packages(unittest.TestCase):
-    #indirect test
-    def test_CFGs_LB1(self):
+    #TODO: validation (is_clique, is_IS, is_VC,..) in tdlib?
+    def test_CFGs_max_clique(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "deltaC_min_d")
+            T, w = tdlib.minDegree_decomp(G)
+            S = tdlib.max_clique_with_treedecomposition(G, T)
 
-    #indirect test
-    def test_CFGs_LB2(self):
+    def test_CFGs_max_independent_set(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "deltaC_max_d")
+            T, w = tdlib.minDegree_decomp(G)
+            S = tdlib.max_independent_set_with_treedecomposition(G, T)
 
-    #indirect test
-    def test_CFGs_LB3(self):
+    def test_CFGs_min_vertex_cover(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "deltaC_least_c")
+            T, w = tdlib.minDegree_decomp(G)
+            S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
 
-    #indirect test
-    def test_CFGs_LB4(self):
+    def test_CFGs_min_dominating_set(self):
         for i in range(0, COUNT+1):
-            G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "LBN_deltaC")
+            if i == 999: #huge graph
+                continue;
 
-    #indirect test
-    def test_CFGs_LB5(self):
-        for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "LBNC_deltaC")
+            T, w = tdlib.minDegree_decomp(G)
+            S = tdlib.min_dominating_set_with_treedecomposition(G, T)
 
-    #indirect test
-    def test_CFGs_LB6(self):
+    def test_CFGs_min_coloring(self):
         for i in range(0, COUNT+1):
-            G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "LBP_deltaC")
+            if i == 999: #huge graph
+                continue
 
-    #indirect test
-    def test_CFGs_LB7(self):
-        for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "LBPC_deltaC")
+            T, w = tdlib.minDegree_decomp(G)
+            S = tdlib.min_coloring_with_treedecomposition(G, T)
 
 if __name__ == '__main__':
     unittest.main()
