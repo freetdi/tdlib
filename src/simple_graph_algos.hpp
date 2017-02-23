@@ -224,12 +224,11 @@ inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
     return get_neighbourhood(G, disabled, X.begin(), X.end(), S_X);
 }
 
-
-template <typename G_t>
+template <typename G_t, typename B_t>
 void t_search_components(G_t const &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
         std::vector<bool> &visited,
-        std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
+        std::vector<B_t> &components,
         int comp_idx)
 {
     unsigned int pos = get_pos(vertex, G);
@@ -243,7 +242,6 @@ void t_search_components(G_t const &G,
         }
     }
 }
-
 
 template <typename G_t, typename VB_t>
 void get_components_provided_map(G_t const &G,
@@ -264,11 +262,13 @@ void get_components_provided_map(G_t const &G,
     }
 }
 
-template <typename G_t>
+#if 0 // duplicates?
+
+template <typename G_t, typename B_t>
 void t_search_components(G_t &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
         std::vector<bool> &visited,
-        std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &components,
+        std::vector<B_t> &components,
         int comp_idx)
 {
     unsigned int pos = get_pos(vertex, G);
@@ -301,6 +301,7 @@ void get_components_provided_map(G_t &G,
         }
     }
 }
+#endif
 
 template <typename G_t>
 void get_components(G_t &G,

@@ -106,14 +106,15 @@ void MSVS(G_t const &G, T_t &T)
     typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
+    typedef typename graph_traits<G_t>::immutable_type immutable_type;
+    typedef typename boost::graph_traits<immutable_type>::vertex_descriptor imm_vertex_descriptor;
 
     std::vector<bool> disabled;
     std::vector<bool> disabled_;
     unsigned width = treedec::get_width(T);
     std::set<vertex_descriptor> S;
-    std::vector<vertex_descriptor> X, Y;
+    std::vector<imm_vertex_descriptor> X, Y;
 
-    typedef typename graph_traits<G_t>::immutable_type immutable_type;
     immutable_type H; // malloc/free, where?
 
     std::set<typename immutable_type::vertex_descriptor> S_;
@@ -157,8 +158,8 @@ void MSVS(G_t const &G, T_t &T)
                 HI = &immutable_clone(G, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
                 status = is_improvement_bag
                   <immutable_type, 
-                   std::vector<vertex_descriptor>,
-                   vertex_descriptor>
+                   std::vector<imm_vertex_descriptor>,
+                   long unsigned /* H positions... */>
                        (*HI, disabled_, X, Y, cb.a, cb.b);
 
                 if(status){

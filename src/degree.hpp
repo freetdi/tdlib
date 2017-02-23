@@ -327,8 +327,8 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
 
         typename boost::graph_traits<G_t>::vertex_descriptor x=*I;
         assert(treedec::is_valid(x, G));
-        size_t deg = boost::degree(*I, G);
-        degree.reg(*I, deg);
+        size_t deg = boost::degree(x, G);
+        degree.reg(x, deg);
     }
 }
 
