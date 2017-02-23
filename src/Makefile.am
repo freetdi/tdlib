@@ -2,6 +2,7 @@ SUBDIRS = \
   impl
 
 pkginclude_HEADERS = \
+  algo.hpp \
   applications.hpp \
   branch_decomposition.hpp \
   combinations.hpp \
