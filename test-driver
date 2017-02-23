@@ -124,6 +124,10 @@ case $tweaked_estatus:$expect_failure in
   *:*)   col=$red res=FAIL  recheck=yes gcopy=yes;;
 esac
 
+if [ $res = FAIL ]; then
+	cat $log_file;
+fi
+
 # Report the test outcome and exit status in the logs, so that one can
 # know whether the test passed or failed simply by looking at the '.log'
 # file, without the need of also peaking into the corresponding '.trs'
