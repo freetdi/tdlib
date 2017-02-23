@@ -103,6 +103,7 @@ void MSVS(G_t const &G, T_t &T)
 {
     assert(is_valid_treedecomposition(G, T));
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
 
@@ -116,7 +117,7 @@ void MSVS(G_t const &G, T_t &T)
     immutable_type H; // malloc/free, where?
 
     std::set<typename immutable_type::vertex_descriptor> S_;
-    std::vector<typename immutable_type::vertex_descriptor> vdMap_, vdMap;
+    std::vector<G_vertex_descriptor> vdMap_, vdMap;
     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
 
     // FIXME: (terribly) inefficient:
@@ -208,7 +209,8 @@ void MSVS(G_t const &G, T_t &T)
         bag(refinement_vertex, T) = MOVE(B);
 
         //Store the connected components of H[V(H)\S] in 'components'.
-        std::vector<std::set<vertex_descriptor> > components;
+        typedef typename boost::graph_traits<immutable_type>::vertex_descriptor HI_vertex_descriptor;
+        std::vector<std::set<HI_vertex_descriptor> > components;
         treedec::get_components_provided_map(*HI, components, visited);
 
         //Store the (neighbours of 'refinement_vertex' in T) in 'oldN'.

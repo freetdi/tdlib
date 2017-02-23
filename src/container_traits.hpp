@@ -76,6 +76,7 @@ namespace detail{//
     struct container_inspect{//
         static bool contains(C& c, typename C::value_type e)
         {
+          (void) c; (void) e;
           incomplete();
           return false;
         }

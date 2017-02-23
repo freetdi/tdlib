@@ -245,9 +245,9 @@ void t_search_components(G_t const &G,
 }
 
 
-template <typename G_t>
+template <typename G_t, typename VB_t>
 void get_components_provided_map(G_t const &G,
-             std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components,
+             VB_t &components,
              std::vector<bool> &visited){
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

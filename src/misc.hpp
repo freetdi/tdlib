@@ -735,16 +735,14 @@ void glue_bags(std::vector< boost::tuple<
 
 namespace detail{
 
-template <typename G_t>
-void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
-                     std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_,
-                     G_t &H,
-                     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
+// first argument: set of vertices in H.
+// second argument: set of vdMap values...
+template <typename G_t, typename VDSET, typename M_t>
+void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &S,
+                     VDSET &S_, G_t &H, M_t& vdMap)
 {
-    for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
-                                 = S.begin(); sIt != S.end(); sIt++)
-    {
-        unsigned int pos = get_pos(*sIt, H);
+    for(auto sIt : S) {
+        unsigned int pos = get_pos(sIt, H);
         S_.insert(vdMap[pos]);
     }
 }
