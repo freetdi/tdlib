@@ -1,4 +1,3 @@
-
 def is_permutation(x):
 	c=[0]*len(x)
 	for i in x:
@@ -7,3 +6,4 @@ def is_permutation(x):
 		if(not i):
 			return False
 	return True;
+

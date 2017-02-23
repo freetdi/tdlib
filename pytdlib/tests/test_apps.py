@@ -1,3 +1,4 @@
+import test_base
 import tdlib
 import unittest
 import random
