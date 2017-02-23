@@ -36,5 +36,6 @@ pkginclude_HEADERS = \
   bucket_sorter.hpp.orig \
   random_generators.hpp \
   overlay.hpp \
+  validation.hpp \
   graph_traits.hpp \
   convenience.hpp
