@@ -270,20 +270,6 @@ inline void make_degree_sequence(const G_t &G,
     }
 }
 
-template<typename G_t>
-inline unsigned
-   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G)
-{
-    return boost::get(boost::vertex_index, G, v);
-}
-
-template<typename G_t>
-inline unsigned
-   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t& G)
-{
-    return boost::get(boost::vertex_index, G, v);
-}
-
 // obsolete?
 template<class G>
 struct outedge_set;
@@ -327,8 +313,8 @@ struct tmpbaghack<bag_t, T_t, V>{ //
 
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type& bag(
-        T_t& T,
-	const typename boost::graph_traits<T_t>::vertex_descriptor& v)
+	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
+        T_t& T)
 {
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
@@ -336,8 +322,8 @@ inline typename treedec_traits<T_t>::bag_type& bag(
 
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type const& bag(
-        T_t const& T,
-        const typename boost::graph_traits<T_t>::vertex_descriptor& v)
+        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
+        T_t const& T)
 {
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
@@ -346,7 +332,7 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
 template<class V, class G>
 size_t bag_size(V const & v, G const& g)
 {
-    return bag(g, v).size();
+    return bag(v, g).size();
 }
 
 template<class G_t>
@@ -567,7 +553,7 @@ public:
         bag_iterator nIt, nEnd;
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(_t, _T);
         for(; nIt != nEnd; nIt++){
-            BOOST_AUTO(const& ibag, bag(_T, *nIt));
+            BOOST_AUTO(const& ibag, bag(*nIt, _T));
 
             // BUG, does not work on vectors.
             if(ibag.find(vd1)==ibag.end()){
@@ -584,7 +570,7 @@ private: //data
     T_t const &_T;
     typename boost::graph_traits<T_t>::vertex_descriptor _t;
 public: // HACK
-    VD_t a, b;
+    long unsigned a, b;
 };
 
 

@@ -43,6 +43,10 @@ struct Edge_NF{
 
 #endif
 
+// ouch. this is actually bag_t
+// how to fix that now?
+// "bag" is also used as shorthand for bag access...
+
 struct bag_t{ //
     std::set<unsigned int> bag;
 };
@@ -51,6 +55,10 @@ struct bag_t{ //
 #define TD_STRUCT_BAG
 
 }// treedec
+
+// KLUGE: put it here...
+// (and cross fingers)
+//using bag = treedec::bag_t;
 
 namespace treedec{
 
@@ -148,10 +156,17 @@ inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_d
 //Positions are in {0, 1, ..., num_vertices-1}, where applicable.
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
-// // BUG: namespace
+
+namespace treedec{
+
 template<typename G_t>
-inline unsigned
-   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, const G_t& G);
+inline typename boost::graph_traits<G_t>::vertices_size_type
+   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const& G)
+{
+    return boost::get(boost::vertex_index, G, v);
+}
+
+} // treedec
 
 namespace treedec{
 

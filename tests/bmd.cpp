@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 
 	unsigned ub=-1;
 
-	int w =
+	unsigned w =
 #ifndef HAVE_MINDEGREE_FORK
 		0;
 	itested();

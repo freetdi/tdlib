@@ -37,28 +37,34 @@ namespace treedec{
 
 namespace ub{
 
-// remove later (underscore prefix, to be considered detail/private)
-template <typename G_t>
-unsigned int _minDegree(G_t &G)
-{
-    return treedec::impl::minDegree_decomp(G);
-}
-
 template <typename G_t>
 unsigned int minDegree(G_t& G){
-    return _minDegree(G);
-}
-
-// remove later (underscore prefix, to be considered detail/private)
-template <typename G_t>
-unsigned int _fillIn(G_t &G)
 {
-    return treedec::impl::fillIn_decomp(G);
+    typedef typename treedec::graph_traits<G_t>::treedec_type T_t;
+
+    if(boost::num_vertices(G) == 0){
+        return 0;
+    }else{
+    }
+
+    typedef typename std::vector<typename treedec_chooser<G_t>::value_type> O_t;
+    T_t T; // dummy
+
+    impl::minDegree<G_t, T_t, O_t> MD(G, &T, (O_t*)NULL, -1u, false);
+    MD.do_it();
+    return MD.get_bagsize(); // FIXME: (still used!)
+}
 }
 
 template <typename G_t>
-unsigned int fillIn(G_t& G){
-    return _fillIn(G);
+unsigned int fillIn(G_t& G)
+{ untested();
+    typedef typename treedec::graph_traits<G_t>::treedec_type T_t;
+
+    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
+    impl::fillIn<G_t, T_t, O_t> FI(G, (T_t*)NULL, (O_t*)NULL, 0);
+    FI.do_it();
+    return FI.get_bagsize()-1;
 }
 
 } //namespace ub

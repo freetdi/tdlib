@@ -245,7 +245,7 @@ void CR_dynamic_decomp(G_t &G, T_t &T, int lb){
     if( nv<=1 || 2*ne==nv*(nv-1u) ){
         typename boost::graph_traits<T_t>::vertex_descriptor t = boost::add_vertex(T);
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            bag(T, t).insert(*vIt);
+            bag(t, T).insert(*vIt);
         }
         return;
     }
