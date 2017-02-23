@@ -36,7 +36,6 @@
  * - unsigned boost_minDegree_ordering(G_t &G, O_t &elim_ordering, O_t &inv_elim_ordering)
  * - void fillIn_ordering(G_t& G, O_t &elim_ordering)
  * - void ordering_to_treedec(G_t &G, O_t &elim_ordering, T_t &T)
- *   BUG: G_t is a template arg, why?
  * - void treedec_to_ordering<G_t, T_t>(T_t &T, O_t& elim_ordering)
  * - void LEX_M_minimal_ordering(G_t &G, O_t& elim_ordering)
  *
@@ -141,15 +140,13 @@ namespace treedec{ //
 //
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-  minDegree_decomp(G_t &G, T_t &T, O_t *O, //BUG: should be optional//,
+  minDegree_decomp(G_t &G, T_t &T, O_t *O, //FIXME: should be optional//,
                       unsigned ub=UINT_MAX /* FIXME: move to backend */,
                       bool ignore_isolated_vertices=false /* FIXME: move to backend */)
 {
-    // here?
-    if(boost::num_vertices(G) == 0){ untested();
+    if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return 0;
-    }else{
     }
 
     impl::minDegree<G_t, T_t, O_t> MD(G, &T, O, ub, ignore_isolated_vertices);
@@ -175,11 +172,11 @@ typename boost::graph_traits<G_t>::vertices_size_type
     impl::minDegree<G_t, T_t, O_t> MD(G, &T, (O_t*)NULL, -1u, false);
     MD.do_it();
     MD.tree_decomposition();
-    return MD.get_bagsize(); // BUG (still used!)
+    return MD.get_bagsize(); // FIXME: (still used!)
 }
 
 
-// BUG: duplicate. use impl.
+// FIXME: duplicate. use impl.
 template <typename G_t, typename O_t>
 int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
 { untested();
@@ -209,12 +206,12 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
     std::vector<int> degree(n, 0);
 
     /*
-     * (Graph& G, 
-     *  DegreeMap degree, 
-     *  InversePermutationMap inverse_perm, 
-     *  PermutationMap perm, 
-     *  SuperNodeMap supernode_size, 
-     *  int delta, 
+     * (Graph& G,
+     *  DegreeMap degree,
+     *  InversePermutationMap inverse_perm,
+     *  PermutationMap perm,
+     *  SuperNodeMap supernode_size,
+     *  int delta,
      *  VertexIndexMap vertex_index_map)
      */
 
@@ -261,46 +258,6 @@ struct dummy_callback{
 }
 
 namespace impl{
-
-template <typename G_t, typename T_t, class CB=hack_cleanup_later::dummy_callback<unsigned>,
-        class Graphtype=G_t >
-void endless_minDegree_decomp(G_t &G, T_t &T, CB* cb=NULL, Graphtype* =NULL)
-{ untested();
-    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
-    unsigned best = UINT_MAX;
-    unsigned n = boost::num_vertices(G);
-    unsigned ne = boost::num_edges(G);
-    Graphtype Gbak(G);
-    T_t U;
-    impl::minDegree<G_t, T_t, O_t> MD(G, &U, (O_t*)NULL, best);
-    assert(n==boost::num_vertices(G));
-    assert(n==boost::num_vertices(Gbak));
-    assert(ne==boost::num_edges(G));
-    assert(ne==boost::num_edges(Gbak));
-    while(true){
-        try{
-            MD.do_it();
-            MD.tree_decomposition(); // FIXME: not here.
-            best = get_bagsize(U); // stupid?
-            T = U;
-            assert(boost::num_vertices(T));
-            assert(n==boost::num_vertices(G));
-            if(cb){ untested();
-                // this is sort of an interruption point.
-                (*cb)(best);
-            }else{ itested();
-            }
-        }catch(exception_unsuccessful){
-            (*cb)(0);
-            // probably not better. retry.
-        }
-        boost::copy_graph(Gbak, G);
-        MD.reset();
-        assert(ne==boost::num_edges(G));
-        assert(n==boost::num_vertices(G));
-    }
-}
-
 
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
@@ -366,37 +323,6 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
     return fillIn_decomp(G, &T, ub);
 }
 
-template <typename G_t, class O, class CB=hack_cleanup_later::dummy_callback<unsigned>,
-        class Graphtype=G_t >
-void endless_fillIn_ordering(G_t &G, O &o, CB* cb=NULL, Graphtype* =NULL)
-{ untested();
-    typedef typename treedec::graph_traits<G_t>::treedec_type T;
-    T t;
-    unsigned best = -1u;
-    unsigned n = boost::num_vertices(G);
-    unsigned ne = boost::num_edges(G);
-    Graphtype Gbak(G);
-    O U;
-    fillIn<G_t, T, O> fill(G, &t, &U, best);
-    while(true){ untested();
-        try{ untested();
-            fill.do_it();
-            best = fill.get_bagsize();
-            o = U;
-            if(cb){ untested();
-                // this is sort of an interruption point.
-                (*cb)(best);
-            }else{ untested();
-            }
-        }catch(exception_unsuccessful){ untested();
-            (*cb)(0);
-            // probably not better. retry.
-        }
-        boost::copy_graph(Gbak, G);
-        assert(ne==boost::num_edges(G));
-        assert(n==boost::num_vertices(G));
-    }
-}
 
 } //namespace impl
 
@@ -491,16 +417,15 @@ void fillIn_ordering(G_t &G, O_t &elim_ordering, bool ignore_isolated_vertices=f
 template<typename G_t>
 void fillIn_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
-      bool ignore_isolated_vertices=false /* bug, not in frontend! */)
+      bool ignore_isolated_vertices=false /* fixme, not in frontend! */)
 {
     detail::fillIn_ordering(G, elim_ordering, ignore_isolated_vertices);
 }
 
 // incomplete: inefficient. see some.h
-// (seems to be not in use, remove?)
 template <typename G_t, typename O_t>
 int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
-{ untested();
+{
     int width = -1;
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){ untested();
@@ -549,7 +474,7 @@ void ordering_to_treedec(G_t &G,
 
 template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
-{ untested();
+{
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_(O.size());
     for(unsigned int i = 0; i < O.size(); i++){ O_[i] = O[i]; }
 
@@ -737,9 +662,10 @@ template <typename G_t, typename T_t>
 void treedec_to_ordering(T_t &T,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
 {
-    if(boost::num_vertices(T) == 0){ untested();
+    if(boost::num_vertices(T) == 0){
         return;
-    }else if(boost::num_vertices(T) == 1){
+    }
+    else if(boost::num_vertices(T) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t =
                                                    *(boost::vertices(T).first);
         for(typename treedec_traits<T_t>::bag_type::iterator sIt =
@@ -755,8 +681,6 @@ void treedec_to_ordering(T_t &T,
 
 //Make G a filled graph according to the provided elimination_ordering. Stores
 //the cliques in C and the additional edges in F.
-// BUG: dont use ^make_ if nothing is made.
-// BUG: not listed above and not used. remove?
 template <typename G_t>
 void make_filled_graph(G_t &G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
@@ -983,31 +907,6 @@ void LEX_M_minimal_ordering(G_t &G,
         }
     }
 }
-
-namespace impl{ //
-
-/*
-template <typename iO_t, typename M_t, typename G_t>
-class elim_predicate{ untested();
-public:
-    elim_predicate(iO_t &_iO, M_t &_M, G_t &_G) : iO(_iO), M(_M), G(_G){}
-
-    template <typename E_t>
-    bool operator()(const E_t &e){ untested();
-        unsigned iO_id = iO[boost::source(*e, G)];
-        if(M[boost::target(*e, G)] && iO[boost::target(*e, G)] > iO_id){ untested();
-            return true;
-        }
-        return false;
-    }
-private:
-    const M_t &M;
-    const iO_t &iO;
-    const G_t &G;
-};
-*/
-
-} //impl
 
 } //namespace treedec
 

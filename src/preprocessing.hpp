@@ -55,12 +55,12 @@ namespace impl{
 // Check if there exists a degree-0-vertex.
 template <typename G_t, typename B_t>
 void Islet(G_t &G, B_t &bags, int &low)
-{ untested();
+{
     typedef typename treedec_chooser<G_t>::type T_t;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
-        if(boost::degree(*vIt, G) == 0){ untested();
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::degree(*vIt, G) == 0){
             typename treedec_traits<T_t>::vd_type vd=get_vd(G, *vIt);
             typename treedec_traits<T_t>::bag_type emptybag;
 
@@ -73,7 +73,7 @@ void Islet(G_t &G, B_t &bags, int &low)
 
 template <typename G_t, typename T_t>
 void Islet(G_t &G, T_t &bags)
-{ untested();
+{
     int low = -1;
     Islet(G, bags, low);
 }
@@ -213,9 +213,8 @@ bool Cube(G_t &G,
         return false;
     }else if(boost::degree(b, G)!=3){
         return false;
-    }else if(boost::degree(c, G)!=3){ untested();
+    }else if(boost::degree(c, G)!=3){
         return false;
-    }else{
     }
 
     vertex_descriptor N[9];
@@ -338,7 +337,7 @@ bool Simplicial(G_t &G,
         treedec::make_clique_and_detach(v, G, xbag);
         redegree(NULL, G, xbag, degs);
 
-        if (unsigned(low) > xbag.size()){ untested();
+        if (unsigned(low) > xbag.size()){
             low = xbag.size();
         }
 
@@ -423,7 +422,7 @@ bool AlmostSimplicial(G_t &G,
 
             return true;
         }
-        else if(vertices_size_type(low) < deg_v-1u){ untested();
+        else if(vertices_size_type(low) < deg_v-1u){
             low = deg_v-1;
             return true;
         }
@@ -559,7 +558,7 @@ void preprocessing(G_t &G, BV_t &bags, int &low)
 
 template <typename G_t, typename BV_t>
 void preprocessing(G_t &G, BV_t &bags)
-{ untested();
+{
     int low = -1;
     preprocessing(G, bags, low);
 }

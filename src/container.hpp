@@ -28,45 +28,6 @@
 #endif
 
 namespace treedec{
-namespace xduh{ // dont use in new code.
-template<class C, class E>
-void ins(C& c, E e)
-{
-	c.insert(e);
-}
-// "insert" into vector.
-// the intent is to not generate dups, hence assert.
-template<class E>
-void ins(std::vector<unsigned>& c, E e)
-{
-//        assert(!HACK::contains(c,e));
-	c.push_back(e);
-}
-template<class E>
-void ins(std::vector<short unsigned>& c, E e)
-{
-//        assert(!HACK::contains(c,e));
-	c.push_back(e);
-}
-template<class C, class E>
-void push(C& c, E e)
-{
-	bool check=c.insert(e).second;
-        assert(check); (void)check;
-}
-template<class E>
-void push(std::vector<unsigned>& c, E e)
-{
-	c.push_back(e);
-}
-template<class E>
-void push(std::vector<short unsigned>& c, E e)
-{
-	c.push_back(e);
-}
-
-} // duh
-
 
 template<class C>
 typename C::value_type& front(C& c)
