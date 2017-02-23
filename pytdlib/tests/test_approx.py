@@ -1,4 +1,4 @@
-import test_base
+import base
 import tdlib
 import unittest
 import util
