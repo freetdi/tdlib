@@ -55,6 +55,7 @@ log_file=  # Where to save the output of the test script.
 trs_file=  # Where to save the metadata of the test run.
 expect_failure=no
 color_tests=no
+debug=no
 enable_hard_errors=yes
 compiler_args=
 while test $# -gt 0; do
@@ -64,6 +65,7 @@ while test $# -gt 0; do
   --test-name) test_name=$2; shift;;
   --log-file) log_file=$2; shift;;
   --long) compiler_args=long; shift;;
+  --debug) debug=yes; shift;;
   --trs-file) trs_file=$2; shift;;
   --color-tests) color_tests=$2; shift;;
   --expect-failure) expect_failure=$2; shift;;
@@ -124,7 +126,7 @@ case $tweaked_estatus:$expect_failure in
   *:*)   col=$red res=FAIL  recheck=yes gcopy=yes;;
 esac
 
-if [ $res = FAIL ]; then
+if [ "$debug" = yes -a $res = FAIL ]; then
 	cat $log_file;
 fi
 

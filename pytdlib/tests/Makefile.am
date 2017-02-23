@@ -18,8 +18,10 @@ test_long_approx_CFGs.py test_long_apps_CFGs.py test_long_lb_CFGs.py
 
 # AM_PY_LOG_DRIVER_FLAGS=--short
 
+AM_PY_LOG_DRIVER_FLAGS=$(DEBUGFLAG)
+
 longcheck:
-	$(MAKE) check TESTS=$(LONG_TESTS) AM_PY_LOG_DRIVER_FLAGS=--long
+	$(MAKE) check TESTS=$(LONG_TESTS) AM_PY_LOG_DRIVER_FLAGS+=--long
 
 $(TESTS:%.py=%.log): all-am
 
@@ -28,7 +30,7 @@ $(LONG_TESTS:%.py=%.log): AM_PY_LOG_DRIVER_FLAGS=
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
-    export PYTHONPATH='.';
+    export PYTHONPATH='.:..';
 
 EXTRA_DIST = \
 	$(TESTS) \
