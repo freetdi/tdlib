@@ -122,8 +122,8 @@ void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
 
     //Bag for the u-th elimination vertex will be stored in T[u].
     for(unsigned u = 0; u < n_; u++){ itested();
-        bag(T, u) = MOVE(B[u]);
-        insert(bag(T, u), O[u]); //printer variant without this inserting?
+        bag(u, T) = MOVE(B[u]);
+        insert(bag(u, T), O[u]); //printer variant without this inserting?
     }
 }
 
@@ -358,7 +358,7 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
         if(v==B.end()){
             break;
         }
-        insert(bag(T, f), *v);
+        insert(bag(f, T), *v);
         auto b=boost::add_vertex(T);
         boost::add_edge(f, b, T);
         f = b;
@@ -572,7 +572,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
 
     for(unsigned i = 0; i < num_vert; i++){ itested();
         boost::add_vertex(t);
-        auto& b=bag(t, i);
+        auto& b=bag(i,t);
         push(b, O[i]);
         for(unsigned j = 0; j < num_vert; j++){ itested();
             if(boost::edge(i, j, bags).second){ itested();
@@ -614,7 +614,7 @@ void treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::degree(*tIt, T) <= 1 && !bag(T, *tIt).empty()){
+        if(boost::degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -629,19 +629,21 @@ void treedec_to_ordering(T_t &T,
         typename treedec_traits<T_t>::bag_type difference;
 
         if(boost::degree(leaf, T) == 1){
-            if(!std::includes(bag(T, parent).begin(),
-                              bag(T, parent).end(),
-                              bag(T, leaf).begin(),
-                              bag(T, leaf).end()))
+            if(!std::includes(bag(parent, T).begin(),
+                              bag(parent, T).end(),
+                              bag(leaf, T).begin(),
+                              bag(leaf, T).end()))
             {
-                std::set_difference(bag(T, leaf).begin(), bag(T, leaf).end(),
-                                    bag(T, parent).begin(), bag(T, parent).end(),
+                std::set_difference(bag(leaf, T).begin(),
+                                    bag(leaf, T).end(),
+                                    bag(parent, T).begin(),
+                                    bag(parent, T).end(),
                                     std::inserter(difference, difference.begin()));
             }
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = MOVE(bag(T, leaf));
+            difference = MOVE(bag(leaf, T));
         }
 
         for(typename treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();
@@ -650,7 +652,7 @@ void treedec_to_ordering(T_t &T,
             O.push_back(*sIt);
         }
 
-        bag(T, leaf).clear();
+        bag(leaf, T).clear();
 
         impl::treedec_to_ordering<G_t, T_t>(T, O);
     }
@@ -669,7 +671,7 @@ void treedec_to_ordering(T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor t =
                                                    *(boost::vertices(T).first);
         for(typename treedec_traits<T_t>::bag_type::iterator sIt =
-                            bag(T, t).begin(); sIt != bag(T, t).end(); sIt++)
+                            bag(t, T).begin(); sIt != bag(t, T).end(); sIt++)
         {
             O.push_back(*sIt);
         }
