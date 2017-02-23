@@ -48,6 +48,7 @@
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "graph.hpp"
+#include "validation.hpp"
 
 namespace treedec{
 
@@ -246,6 +247,8 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         }
     }
 
+    assert(treedec::validation::is_valid_clique(G, result));
+
     return max;
 }
 
@@ -381,6 +384,8 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
+
+	assert(treedec::validation::is_valid_independent_set(G, result));
 
     return max;
 }
@@ -531,7 +536,7 @@ template <typename G_t, typename T_t>
 unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
               typename treedec_traits<T_t>::bag_type &global_result)
 {
-    std::vector<std::map<typename treedec_traits<T_t>::bag_type, int> > results(boost::num_vertices(T)); 
+    std::vector<std::map<typename treedec_traits<T_t>::bag_type, int> > results(boost::num_vertices(T));
 
     unsigned int max = treedec::app::detail::bottom_up_computation_vertex_cover(G, T, results);
 
@@ -540,6 +545,8 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
+
+    assert(treedec::validation::is_valid_vertex_cover(G, result));
 
     return max;
 }
@@ -729,19 +736,17 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                     result[pos] = -1;
 
                     if(val1 == -1){
-                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>()); 
+                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>());
                     }
                     else if(val2 == -1){
-                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>()); 
+                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>());
                     }
                     else if(val1 < val2){
-                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>()); 
+                        results[cur][result] = boost::make_tuple(val1, choice1, std::vector<int>());
                     }
                     else{
-                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>()); 
+                        results[cur][result] = boost::make_tuple(val2, choice2, std::vector<int>());
                     }
-
-                    
                 }
             }
         }
@@ -919,6 +924,8 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
         std::vector<int> have_to_take(boost::num_vertices(G), -1);
         treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, global_result, have_to_take);
     }
+
+    assert(treedec::validation::is_valid_dominating_set(G, result));
 
     return (unsigned int) min;
 }
@@ -1186,6 +1193,8 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
         unsigned int col = global_results_map[i];
         global_result[col].insert(inv_map[i]);
     }
+
+    assert(treedec::validation::is_valid_coloring(G, result));
 
     return k;
 }
