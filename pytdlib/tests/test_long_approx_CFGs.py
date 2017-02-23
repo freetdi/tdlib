@@ -2,7 +2,7 @@ import tdlib
 import unittest
 import sys
 
-if(sys.argv[1]!="long"):
+if(len(sys.argv)<2 or sys.argv[1]!="long"):
 	sys.exit(77)
 
 sys.argv=sys.argv[:1]
