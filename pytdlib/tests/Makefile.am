@@ -21,7 +21,7 @@ test_long_approx_CFGs.py test_long_apps_CFGs.py test_long_lb_CFGs.py
 AM_PY_LOG_DRIVER_FLAGS=$(DEBUGFLAG)
 
 longcheck:
-	$(MAKE) check TESTS=$(LONG_TESTS) AM_PY_LOG_DRIVER_FLAGS+=--long
+	$(MAKE) check TESTS="$(LONG_TESTS)" AM_PY_LOG_DRIVER_FLAGS+=--long
 
 $(TESTS:%.py=%.log): all-am
 
