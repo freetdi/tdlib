@@ -483,7 +483,6 @@ public: // implementation
             assert(boost::degree(v, _g)==0);
             ++i; // number of nodes in tree decomposition tree
         } // while(edges)
-        std::cout << "c FI_ub " << upper_bound+1 << "\n";
         _i = i;
 
         // move to tree_decomposition...
