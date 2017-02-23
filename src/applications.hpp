@@ -247,7 +247,7 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         }
     }
 
-    assert(treedec::validation::is_valid_clique(G, result));
+    // assert(treedec::validation::is_valid_clique(G, result));
 
     return max;
 }
@@ -385,7 +385,7 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
 
-	assert(treedec::validation::is_valid_independent_set(G, result));
+    // assert(treedec::validation::is_valid_independent_set(G, result));
 
     return max;
 }
@@ -546,7 +546,7 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
 
-    assert(treedec::validation::is_valid_vertex_cover(G, result));
+    // assert(treedec::validation::is_valid_vertex_cover(G, result));
 
     return max;
 }
@@ -925,7 +925,7 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
         treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, global_result, have_to_take);
     }
 
-    assert(treedec::validation::is_valid_dominating_set(G, result));
+    // assert(treedec::validation::is_valid_dominating_set(G, result));
 
     return (unsigned int) min;
 }
@@ -1194,7 +1194,7 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
         global_result[col].insert(inv_map[i]);
     }
 
-    assert(treedec::validation::is_valid_coloring(G, result));
+    // assert(treedec::validation::is_valid_coloring(G, result));
 
     return k;
 }
