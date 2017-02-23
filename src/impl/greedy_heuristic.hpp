@@ -28,7 +28,7 @@
 #error "not intended to be used like that."
 #endif
 
-#include "algo.hpp"
+#include "../algo.hpp"
 
 namespace treedec{ //
 
