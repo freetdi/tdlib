@@ -67,12 +67,12 @@ public:
 	virtual void do_it() = 0;
 
 protected:
-	void on(){
+	void timer_on(){
 		if(_timer){
 			_timer->start();
 		}
 	}
-	void off(){
+	void timer_off(){
 		if(_timer){
 			_timer->stop();
 		}

@@ -126,7 +126,7 @@ public:
 // private: // not yet.
     void do_it()
     {
-        on();
+        timer_on();
         trace2("MD", _iiv, _i);
         if(!boost::num_vertices(_g)){
             unreachable(); // caller cannot know yet.
@@ -239,7 +239,7 @@ public:
 
         trace1("MD done", upper_bound);
         _ub = upper_bound;
-        off();
+        timer_off();
     } // do_it
 public:
     void reset()
