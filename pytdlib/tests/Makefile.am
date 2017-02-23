@@ -14,7 +14,10 @@ TESTS = $(LONG_TESTS) \
 	test_sep.py
 
 LONG_TESTS = \
-test_long_approx_CFGs.py test_long_apps_CFGs.py test_long_lb_CFGs.py
+test_long_approx_CFGs.py test_long_apps_CFGs.py test_long_lb_CFGs.py test_long_approx_Dimacs.py test_long_lb_Dimacs.py
+
+EXTRALONG_TESTS = \
+test_long_fi_Dimacs.py
 
 # AM_PY_LOG_DRIVER_FLAGS=--short
 

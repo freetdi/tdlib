@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([tdlib], [0.8.7], [larisch@informatik.uni-frankfurt.de,felix@salfelder.org])
-AC_CONFIG_SRCDIR([src/misc.hpp])
+AC_CONFIG_SRCDIR([src/graph_traits.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 #AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([])
@@ -28,6 +28,10 @@ fi
 
 # Checks for programs.
 AC_PROG_CXX
+AC_LANG(C++)
+
+OLD_CXXFLAGS="CXXFLAGS"
+CXXFLAGS="$CXXFLAGS"
 
 # python stuff
 default_python_version=2.7
@@ -92,6 +96,10 @@ AS_IF([test "$python" != no], [
 # Checks for header files.
 
 AC_LANG_PUSH([C++])
+
+# unconditional c++11
+CXXFLAGS="$CXXFLAGS -std=c++11"
+
 AC_CHECK_HEADERS([stx/btree_set.h])
 AC_LANG_POP([C++])
 
@@ -130,4 +138,5 @@ AC_MSG_RESULT([
    prefix:     $prefix
    python:     $python
    CPPFLAGS:   $CPPFLAGS
+   CXXFLAGS:   $CXXFLAGS
 ])

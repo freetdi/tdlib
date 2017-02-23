@@ -7,10 +7,10 @@ if(len(sys.argv)<2 or sys.argv[1]!="long"):
     sys.exit(77)
 
 from graphs import *
-import CFGs
+import Dimacs
 
-PREFIX = "CFGs"
-COUNT = 1816
+PREFIX = "Dimacs"
+COUNT = 81
 
 def dump_td_as_dot(V_T, E_T, outname):
     fout = open(outname, 'w')
