@@ -1,12 +1,7 @@
+import base
 import tdlib
 import unittest
 import sys
-
-if(len(sys.argv)<2 or sys.argv[1]!="long"):
-	sys.exit(77)
-
-sys.argv=sys.argv[:1]
-
 from graphs import *
 import CFGs
 
@@ -28,25 +23,25 @@ def dump_td_as_dot(V_T, E_T, outname):
 
 class TestTdLib_packages(unittest.TestCase):
     #TODO: validation (is_clique, is_IS, is_VC,..) in tdlib?
-    def test_CFGs_max_clique(self):
+    def test_max_clique(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.max_clique_with_treedecomposition(G, T)
 
-    def test_CFGs_max_independent_set(self):
+    def test_max_independent_set(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.max_independent_set_with_treedecomposition(G, T)
 
-    def test_CFGs_min_vertex_cover(self):
+    def test_min_vertex_cover(self):
         for i in range(0, COUNT+1):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
 
-    def test_CFGs_min_dominating_set(self):
+    def test_min_dominating_set(self):
         for i in range(0, COUNT+1):
             if i == 999: #huge graph
                 continue;
@@ -55,7 +50,7 @@ class TestTdLib_packages(unittest.TestCase):
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_dominating_set_with_treedecomposition(G, T)
 
-    def test_CFGs_min_coloring(self):
+    def test_min_coloring(self):
         for i in range(0, COUNT+1):
             if i == 999: #huge graph
                 continue
