@@ -33,7 +33,7 @@ $(LONG_TESTS:%.py=%.log): AM_PY_LOG_DRIVER_FLAGS=
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
-    export PYTHONPATH='.:..';
+    export PYTHONPATH='.:..:$(top_srcdir)/pytdlib';
 
 EXTRA_DIST = \
 	$(TESTS) \
