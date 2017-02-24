@@ -39,10 +39,6 @@ EXTRA_DIST = \
 	$(TESTS) \
 	CFGs.py \
 	base.py \
-	Decomp.py \
-	dimacs.py \
-	graphs.py \
-	Graph.py \
 	RandomGNM_250_1000.py \
 	util.py
 
