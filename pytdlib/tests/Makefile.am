@@ -14,7 +14,11 @@ TESTS = $(LONG_TESTS) \
 	test_sep.py
 
 LONG_TESTS = \
-test_long_approx_CFGs.py test_long_apps_CFGs.py test_long_lb_CFGs.py test_long_approx_Dimacs.py test_long_lb_Dimacs.py
+	test_long_approx_CFGs.py \
+	test_long_apps_CFGs.py \
+	test_long_lb_CFGs.py \
+	test_long_approx_Dimacs.py \
+	test_long_lb_Dimacs.py
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py
@@ -33,16 +37,12 @@ $(LONG_TESTS:%.py=%.log): AM_PY_LOG_DRIVER_FLAGS=
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
-    export PYTHONPATH='.:..';
+    export PYTHONPATH='.:..:$(top_srcdir)/pytdlib';
 
 EXTRA_DIST = \
 	$(TESTS) \
 	CFGs.py \
 	base.py \
-	Decomp.py \
-	dimacs.py \
-	graphs.py \
-	Graph.py \
 	RandomGNM_250_1000.py \
 	util.py
 

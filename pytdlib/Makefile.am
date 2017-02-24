@@ -22,6 +22,9 @@ AM_CPPFLAGS = @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -omit-version
 
 EXTRA_DIST = \
+	graphs.py \
+	Graph.py \
+	Decomp.py \
 	python_tdlib.hpp \
 	tdlib.pxd \
 	tdlib.pyx
