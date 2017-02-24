@@ -70,6 +70,11 @@ class TestTdLib_pre(unittest.TestCase):
         G_, B, lb = tdlib.preprocessing(G)
         self.assertEqual(lb, 3)
 
+    def test_preprocessing_8(self):
+        G = Graph(V_GsF__dn_, E_GsF__dn_)
+        G_, B, lb = tdlib.preprocessing(G)
+        self.assertEqual(lb, 3)
+
     def test_preprocessing_GNP(self):
         for n in range(0, 13):
             for i in range(0, 10):
