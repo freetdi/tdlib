@@ -9,6 +9,9 @@ if(len(sys.argv)<2 or sys.argv[1]!="long"):
 from graphs import *
 import Dimacs
 
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
+
 PREFIX = "Dimacs"
 COUNT = 81
 

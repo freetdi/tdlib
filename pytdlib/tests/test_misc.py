@@ -1,8 +1,12 @@
 import base
+import sys
 import tdlib
 import unittest
 
 from graphs import *
+
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
 
 class TestTdLib_misc(unittest.TestCase):
     def test_conversion_0(self):
