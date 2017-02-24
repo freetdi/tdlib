@@ -315,7 +315,7 @@ void trivial_decomposition(G_t const &G, T_t &T){
 }
 
 template <typename T_t>
-size_t get_bagsize(T_t const &T){
+inline size_t get_bagsize(T_t const &T){
     size_t max = 0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
