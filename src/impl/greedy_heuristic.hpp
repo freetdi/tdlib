@@ -28,6 +28,8 @@
 #error "not intended to be used like that."
 #endif
 
+#include "../algo.hpp"
+
 namespace treedec{ //
 
 namespace impl{ //
@@ -41,7 +43,7 @@ namespace impl{ //
 
 // the minDegree heuristic.
 template <typename G_t, typename T_t, typename O_t>
-class minDegree{//
+class minDegree : public ::treedec::algo::draft::algo1 {
 public:
 //    typedef typename std::vector<typename boost::graph_traits<G>::vertex_descriptor> O_t;
     typedef typename treedec_chooser<G_t>::value_type my_vd;
@@ -53,7 +55,8 @@ public:
 
     minDegree(G_t &g, T_t *t, O_t *o,
                     unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
-        : _g(g), _t(t), _o(o), _own_o(!o), _ub_in(ub), _iiv(ignore_isolated_vertices),
+        : algo1("minDegree"),
+            _g(g), _t(t), _o(o), _own_o(!o), _ub_in(ub), _iiv(ignore_isolated_vertices),
          _degs(_g)
     {
         _i=0;
@@ -70,7 +73,8 @@ public:
         _o->resize(num_vert);
     }
 
-    minDegree(G_t &G, O_t& o, bool ignore_isolated_vertices):
+    minDegree(G_t &G, O_t& o, bool ignore_isolated_vertices)
+        : algo1("minDegree"),
         _g(G), _t(NULL), _o(&o), _own_o(false), _ub_in(-1u), _degs(_g)
     {
         if(!boost::num_vertices(_g)){
@@ -122,6 +126,7 @@ public:
 // private: // not yet.
     void do_it()
     {
+        timer_on();
         trace2("MD", _iiv, _i);
         if(!boost::num_vertices(_g)){
             unreachable(); // caller cannot know yet.
@@ -234,7 +239,7 @@ public:
 
         trace1("MD done", upper_bound);
         _ub = upper_bound;
-
+        timer_off();
     } // do_it
 public:
     void reset()

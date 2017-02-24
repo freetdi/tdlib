@@ -1,11 +1,14 @@
 import base
+import sys
 import tdlib
 import unittest
 
 from graphs import *
 
-class TestTdLib(unittest.TestCase):
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
 
+class TestTdLib(unittest.TestCase):
 
 ##############################################################
 ############ LOWER BOUNDS ####################################

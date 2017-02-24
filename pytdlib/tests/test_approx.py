@@ -1,9 +1,14 @@
 import base
+import sys
 import tdlib
 import unittest
 import util
 
 from graphs import *
+
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
+
 class TestTdLib(unittest.TestCase):
 
     def test_minDegree_decomp_0(self):

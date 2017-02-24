@@ -1,9 +1,13 @@
 import base
+import sys
 import tdlib
 import unittest
 import random
 
 from graphs import *
+
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
 
 class TestTdLib_app(unittest.TestCase):
     def test_max_clique_with_treedecomposition_0a(self):

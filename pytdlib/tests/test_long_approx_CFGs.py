@@ -1,13 +1,16 @@
 import base
+import sys
 import tdlib
 import unittest
-import sys
 
 if(len(sys.argv)<2 or sys.argv[1]!="long"):
     sys.exit(77)
 
 from graphs import *
 import CFGs
+
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
 
 PREFIX = "CFGs"
 COUNT = 1816

@@ -1,8 +1,12 @@
 import base
+import sys
 import tdlib
 import unittest
 
 from graphs import *
+
+#don't confuse python unittest
+sys.argv=sys.argv[:1]
 
 class TestTdLib_pre(unittest.TestCase):
     def test_PP_FI_0(self):
