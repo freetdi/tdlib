@@ -337,8 +337,9 @@ bool Simplicial(G_t &G,
         treedec::make_clique_and_detach(v, G, xbag);
         redegree(NULL, G, xbag, degs);
 
-        if (unsigned(low) > xbag.size()){
+        if (unsigned(low) < xbag.size()){ untested();
             low = xbag.size();
+        }else{ untested();
         }
 
         bags.push_back(boost::make_tuple(vd, MOVE(xbag)));
