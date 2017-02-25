@@ -25,8 +25,15 @@
 check_PROGRAMS = \
 	bmd \
 	bucket_sorter_1 \
+	bucket_sorter_2 \
+	bucket_sorter_2u \
 	common_out_edges \
 	vec2tree
+
+# these fail. known bug...
+XFAIL_TESTS = \
+	bucket_sorter_2 \
+	bucket_sorter_2u
 
 notyets = \
 	svbs_random \
