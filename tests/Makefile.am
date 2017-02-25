@@ -24,6 +24,7 @@
 
 check_PROGRAMS = \
 	bmd \
+	bucket_sorter_1 \
 	common_out_edges \
 	vec2tree
 

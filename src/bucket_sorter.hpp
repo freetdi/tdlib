@@ -21,6 +21,7 @@
 #include <vector>
 #include <cassert>
 #include <boost/limits.hpp>
+#include "trace.hpp"
 
 namespace boost {
 

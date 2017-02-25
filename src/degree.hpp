@@ -178,7 +178,11 @@ public: // queueing
         unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         _vals[pos] = d;
         trace2("reg", v, pos);
-        _degs.push(v); // updates reverse map. (necessary?!)
+        _degs.push(v);
+    }
+    void update(const vertex_descriptor& v)
+    { untested();
+        _degs.update(v);
     }
 
     void update_queued()
