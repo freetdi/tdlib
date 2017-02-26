@@ -71,6 +71,7 @@ class TestTdLib_misc(unittest.TestCase):
             V, E = randomGNP(20, 0.2)
             G = Graph(V, E)
             T, w = tdlib.PP_MD(G)
+            self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
             O = tdlib.treedec_to_ordering(T)
             T, w = tdlib.ordering_to_treedec(G, O)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
