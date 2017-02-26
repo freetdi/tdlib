@@ -1,5 +1,5 @@
 // Lukas Larisch, 2014 - 2016
-// Felix Salfelder, 2016
+// Felix Salfelder, 2016 - 2017
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -419,6 +419,7 @@ public:
             for(unsigned int j = 0; j < i; j++){
                 if(boost::edge(degree_sequence[i], degree_sequence[j], _g).second){
                     continue;
+                }else{ untested();
                 }
 
                 //gammaD-left heuristic
@@ -429,7 +430,7 @@ public:
 
                 _lb = (degree > _lb)? degree : _lb;
 
-                gammaD_left_recursion;
+                gammaD_left_recursion();
                 return;
             }
         }
@@ -1000,18 +1001,18 @@ struct CFG_LBN_deltaD{
 };
 
 template <typename G_t>
-int LBN_deltaD(const G_t &G){
+int LBN_deltaD(G_t &G)
+{ untested();
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }
-    else if(E == 0){
+    }else if(E == 0){
         return 0;
-    }
-    else if(2*E == V*(V-1u)){
+    }else if(2*E == V*(V-1u)){
         return V-1u;
+    }else{ untested();
     }
 
     impl::LB_improved_base<G_t, CFG_LBN_deltaD<G_t> > LBN_deltaD(G);
@@ -1019,7 +1020,12 @@ int LBN_deltaD(const G_t &G){
     return (int)LBN_deltaD.lower_bound_bagsize()-1;
 }
 
-
+template <typename G_t>
+int LBN_deltaD(G_t const&G)
+{ untested();
+    G_t H(G_t);
+    return LBN_deltaD(H);
+}
 
 template <typename G_t>
 struct CFG_LBN_deltaC{
@@ -1138,18 +1144,18 @@ struct CFG_LBNC_deltaD{
 };
 
 template <typename G_t>
-int LBNC_deltaD(const G_t &G){
+int LBNC_deltaD(G_t &G)
+{ untested();
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }
-    else if(E == 0){
+    }else if(E == 0){
         return 0;
-    }
-    else if(2*E == V*(V-1u)){
+    }else if(2*E == V*(V-1u)){
         return V-1u;
+    }else{
     }
 
     impl::LB_improved_contraction_base<G_t, CFG_LBNC_deltaD<G_t> > LBNC_deltaD(G);
@@ -1157,6 +1163,12 @@ int LBNC_deltaD(const G_t &G){
     return (int)LBNC_deltaD.lower_bound_bagsize()-1;
 }
 
+template <typename G_t>
+int LBNC_deltaD(G_t const&G)
+{ untested();
+    G_t H(G);
+    return LBNC_deltaD(H);
+}
 
 template <typename G_t>
 struct CFG_LBNC_deltaC{
@@ -1262,23 +1274,30 @@ struct CFG_LBP_deltaD{
 };
 
 template <typename G_t>
-int LBP_deltaD(const G_t &G){
+int LBP_deltaD(G_t &G)
+{ untested();
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }
-    else if(E == 0){
+    }else if(E == 0){
         return 0;
-    }
-    else if(2*E == V*(V-1u)){
+    }else if(2*E == V*(V-1u)){
         return V-1u;
+    }else{
     }
 
     impl::LB_improved_base<G_t, CFG_LBP_deltaD<G_t> > LBP_deltaD(G);
     LBP_deltaD.do_it();
     return (int)LBP_deltaD.lower_bound_bagsize()-1;
+}
+
+template <typename G_t>
+int LBP_deltaD(const G_t &G)
+{ untested();
+    G_t H(G);
+    return LBNC_deltaD(G);
 }
 
 
@@ -1337,17 +1356,16 @@ struct CFG_LBPC_deltaD{
 };
 
 template <typename G_t>
-int LBPC_deltaD(const G_t &G){
+int LBPC_deltaD(G_t &G)
+{ untested();
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
     if(V == 0){
         return -1;
-    }
-    else if(E == 0){
+    }else if(E == 0){
         return 0;
-    }
-    else if(2*E == V*(V-1u)){
+    }else if(2*E == V*(V-1u)){
         return V-1u;
     }
 
@@ -1356,6 +1374,12 @@ int LBPC_deltaD(const G_t &G){
     return (int)LBPC_deltaD.lower_bound_bagsize()-1;
 }
 
+template <typename G_t>
+int LBPC_deltaD(const G_t &G)
+{ untested();
+    G_t H(G); // does this work with all graphs?
+    return LBPC_deltaD(H);
+}
 
 template <typename G_t>
 struct CFG_LBPC_deltaC{
