@@ -524,7 +524,7 @@ void preprocessing(G_t &G, std::vector< boost::tuple<
             }
             goto ARBITRARY_DEGREE;
         }
-        else{
+        else{ untested();
             ARBITRARY_DEGREE:
 
             low = (low >= 4)? low : 4;
