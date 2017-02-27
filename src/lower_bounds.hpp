@@ -836,6 +836,7 @@ public:
             std::pair<vertex_descriptor, unsigned> min_pair;
             min_pair = degs.pick_min(min_ntd);
             min_ntd = min_pair.second;
+            trace2("dclc", min_pair.first, min_ntd);
 
             if(_lb < min_ntd){
                 _lb = min_ntd;
