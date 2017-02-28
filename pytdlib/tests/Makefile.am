@@ -18,7 +18,10 @@ LONG_TESTS = \
 	test_long_apps_CFGs.py \
 	test_long_lb_CFGs.py \
 	test_long_approx_Dimacs.py \
-	test_long_lb_Dimacs.py
+	test_long_lb_Dimacs.py \
+	test_long_approx_Zoo.py \
+	test_long_apps_Zoo.py \
+	test_long_lb_Zoo.py
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py
@@ -42,6 +45,8 @@ AM_TESTS_ENVIRONMENT = \
 EXTRA_DIST = \
 	$(TESTS) \
 	CFGs.py \
+	Dimacs.py \
+	Zoo.py \
 	base.py \
 	RandomGNM_250_1000.py \
 	util.py
