@@ -13,7 +13,7 @@ import Zoo
 sys.argv=sys.argv[:1]
 
 PREFIX = "Zoo"
-COUNT = 150
+COUNT = 149
 
 def dump_td_as_dot(V_T, E_T, outname):
     fout = open(outname, 'w')
@@ -31,37 +31,41 @@ def dump_td_as_dot(V_T, E_T, outname):
 class TestTdLib_packages(unittest.TestCase):
     #TODO: validation (is_clique, is_IS, is_VC,..) in tdlib?
     def test_max_clique(self):
+        print("---max_clique---")
         for i in range(0, COUNT+1):
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.max_clique_with_treedecomposition(G, T)
 
     def test_max_independent_set(self):
+        print("---independent_set---")
         for i in range(0, COUNT+1):
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.max_independent_set_with_treedecomposition(G, T)
 
     def test_min_vertex_cover(self):
+        print("---vertex_cover---")
         for i in range(0, COUNT+1):
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
 
     def test_min_dominating_set(self):
+        print("---dominating_set---")
         for i in range(0, COUNT+1):
-            if i == 999: #huge graph
-                continue;
-
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_dominating_set_with_treedecomposition(G, T)
 
     def test_min_coloring(self):
+        print("---coloring---")
         for i in range(0, COUNT+1):
-            if i == 999: #huge graph
-                continue
-
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_coloring_with_treedecomposition(G, T)
