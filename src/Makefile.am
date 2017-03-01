@@ -40,4 +40,5 @@ pkginclude_HEADERS = \
   overlay.hpp \
   validation.hpp \
   graph_traits.hpp \
-  convenience.hpp
+  convenience.hpp \
+  generic_elimination_search.hpp

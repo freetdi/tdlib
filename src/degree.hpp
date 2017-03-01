@@ -126,7 +126,7 @@ public: // construct
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){ itested();
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *vIt);
             assert(pos<_vals.size());
-            _vals[pos] = boost::degree(*vIt, g);
+            _vals[pos] = boost::out_degree(*vIt, g);
             trace2("deginit", pos, _vals[pos]);
             _degs.push(*vIt);
         }
@@ -154,7 +154,7 @@ public: // queueing
     }
     void unlink(const vertex_descriptor& v)
     {
-        size_t d=boost::degree(v,_g);
+        size_t d=boost::out_degree(v,_g);
         unlink(v,d);
     }
 
@@ -165,7 +165,7 @@ public: // queueing
     }
     void reg(const vertex_descriptor& v)
     {
-        size_t d=boost::degree(v,_g);
+        size_t d=boost::out_degree(v,_g);
         reg(v,d);
     }
     void reg(const vertex_descriptor& v, size_t d)
@@ -331,7 +331,7 @@ void redegree(U, G_t &G, B& neighborhood, D& degree)
 
         typename boost::graph_traits<G_t>::vertex_descriptor x=*I;
         assert(treedec::is_valid(x, G));
-        size_t deg = boost::degree(x, G);
+        size_t deg = boost::out_degree(x, G);
         degree.reg(x, deg);
     }
 }

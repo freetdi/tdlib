@@ -11,7 +11,8 @@ TESTS = $(LONG_TESTS) \
 	test_pp_md.py \
 	test_pp_fi.py \
 	test_pre.py \
-	test_sep.py
+	test_sep.py \
+	test_generic_search.py
 
 LONG_TESTS = \
 	test_long_approx_CFGs.py \

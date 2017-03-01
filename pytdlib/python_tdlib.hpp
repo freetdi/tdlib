@@ -116,3 +116,7 @@ int gc_validate_treedecomposition(std::vector<unsigned int> &V_G, std::vector<un
 
 int gc_get_width(std::vector<std::vector<int> > &V_T);
 
+
+/* Generic elimination search */
+
+void gc_generic_elimination_search(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype);

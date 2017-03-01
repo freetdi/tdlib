@@ -371,7 +371,8 @@ namespace detail{ //
 // Compute an elimination ordering according to minDegree heuristic.
 // optionally, treat isolated vertices as deleted.
 template<typename G_t>
-void minDegree_ordering(G_t& G,
+typename boost::graph_traits<G_t>::vertices_size_type
+  minDegree_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false)
 {
@@ -384,13 +385,15 @@ void minDegree_ordering(G_t& G,
     impl::minDegree<G_t, T, O_t> MD(G, elim_ordering, ignore_isolated_vertices);
     MD.do_it();
     MD.elimination_ordering();
+    return MD.get_bagsize();
 }
 
 }
 
 //Compute an elimination ordering according to minDegree heuristic.
 template<typename G_t, typename O_t>
-void minDegree_ordering(G_t& G, O_t& O)
+typename boost::graph_traits<G_t>::vertices_size_type
+ minDegree_ordering(G_t& G, O_t& O)
 {
     return detail::minDegree_ordering(G, O, false);
 }

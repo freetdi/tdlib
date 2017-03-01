@@ -91,7 +91,7 @@ public:
             _visited.resize(boost::num_vertices(G));
             typename boost::graph_traits<G_t>::vertex_iterator vit, vend;
             for(boost::tie(vit, vend) = boost::vertices(_g); vit != vend; vit++){
-                if(boost::degree(*vit, _g) == 0){
+                if(boost::out_degree(*vit, _g) == 0){
                     unsigned int pos = get_pos(*vit, _g);
                     _visited[pos] = true;
                 }else{
@@ -105,7 +105,7 @@ public:
             auto r=_o->begin();
             typename boost::graph_traits<G_t>::vertex_iterator vit, vend;
             for(boost::tie(vit, vend) = boost::vertices(_g); vit!=vend; ++vit){
-                if(boost::degree(*vit, _g) == 0){
+                if(boost::out_degree(*vit, _g) == 0){
                     *r = *vit;
                     ++r;
                     ++_i;
@@ -174,7 +174,7 @@ public:
                 --min_ntd;
             }
             boost::tie(c, min_ntd) = _degs.pick_min(min_ntd, num_vert);
-            assert(min_ntd == boost::degree(c, _g));
+            assert(min_ntd == boost::out_degree(c, _g));
 
             //Abort if the width of this decomposition would be larger than 'ub'.
             if(min_ntd >= _ub_in){ untested();
@@ -214,7 +214,7 @@ public:
 
             _degs.unlink(c, min_ntd);
 
-            assert(boost::degree(c, _g)==0);
+            assert(boost::out_degree(c, _g)==0);
 
             _degs.flush();
         }
@@ -363,7 +363,7 @@ public: // implementation
             _visited.resize(boost::num_vertices(G));
             typename boost::graph_traits<G_t>::vertex_iterator vit, vend;
             for(boost::tie(vit, vend) = boost::vertices(_g); vit != vend; vit++){
-                if(boost::degree(*vit, _g) == 0){
+                if(boost::out_degree(*vit, _g) == 0){
                     unsigned int pos = get_pos(*vit, _g);
                     _visited[pos] = true;
                 }else{
@@ -377,7 +377,7 @@ public: // implementation
             auto r=_elim_vertices.begin();
             typename boost::graph_traits<G_t>::vertex_iterator vit, vend;
             for(boost::tie(vit, vend) = boost::vertices(_g); vit!=vend; ++vit){
-                if(boost::degree(*vit, _g) == 0){
+                if(boost::out_degree(*vit, _g) == 0){
                     *r = *vit;
                     ++r;
                     ++_i;
@@ -435,7 +435,7 @@ public: // implementation
             _fill.check();
             assert(is_valid(v,_g));
 
-            BOOST_AUTO(deg, boost::degree(v, _g));
+            BOOST_AUTO(deg, boost::out_degree(v, _g));
 
             // can happen... if there is a clique and an isolated node.
             // assert(deg);
@@ -485,7 +485,7 @@ public: // implementation
             }else{
             }
 
-            assert(boost::degree(v, _g)==0);
+            assert(boost::out_degree(v, _g)==0);
             ++i; // number of nodes in tree decomposition tree
         } // while(edges)
         _i = i;

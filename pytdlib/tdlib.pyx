@@ -131,6 +131,9 @@ This module containes the following functions** :
     - get_width
         Returns the width of a given tree decomposition
 
+    - generic_elimination_search
+        ....
+
 AUTHOR: Lukas Larisch (now): Initial version
 -------
 """
@@ -1384,4 +1387,16 @@ def get_width(T):
     """
 
     return gc_get_width(T.vertices())
+
+
+def generic_elimination_search(G):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_generic_elimination_search(V_G, E_G, graphtype)
 
