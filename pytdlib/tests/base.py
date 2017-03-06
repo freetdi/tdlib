@@ -13,6 +13,7 @@ def print_graph_name(PREFIX, c):
 
 def skip(PREFIX, c, f):
     import Zoo
+    import Dimacs
     if f(len(eval(PREFIX+".V_"+str(c))), len(eval(PREFIX+".E_"+str(c)))):
         return True
     return False
