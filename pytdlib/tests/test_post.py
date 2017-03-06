@@ -23,13 +23,6 @@ class TestTdLib_post(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
-    def test_MSVS_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.trivial_decomposition(G)
-        T, w = tdlib.MSVS(G, T)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 4)
-
     def test_MSVS_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.trivial_decomposition(G)

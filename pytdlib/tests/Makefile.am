@@ -12,7 +12,8 @@ TESTS = $(LONG_TESTS) \
 	test_pp_fi.py \
 	test_pre.py \
 	test_sep.py \
-	test_generic_search.py
+	test_generic_search_CFG1.py \
+	test_generic_search_CFG2.py
 
 LONG_TESTS = \
 	test_long_approx_CFGs.py \
@@ -22,7 +23,8 @@ LONG_TESTS = \
 	test_long_lb_Dimacs.py \
 	test_long_approx_Zoo.py \
 	test_long_apps_Zoo.py \
-	test_long_lb_Zoo.py
+	test_long_lb_Zoo.py \
+        test_long_generic_search
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py
@@ -48,6 +50,7 @@ EXTRA_DIST = \
 	CFGs.py \
 	Dimacs.py \
 	Zoo.py \
+        Maxsat_small.py \
 	base.py \
 	RandomGNM_250_1000.py \
 	util.py

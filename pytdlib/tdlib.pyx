@@ -131,7 +131,16 @@ This module containes the following functions** :
     - get_width
         Returns the width of a given tree decomposition
 
-    - generic_elimination_search
+    - generic_elimination_search1 TODO: cleanup
+        ....
+
+    - generic_elimination_search2
+        ....
+
+    - generic_elimination_search3
+        ....
+
+    - generic_elimination_search4
         ....
 
 AUTHOR: Lukas Larisch (now): Initial version
@@ -1389,14 +1398,46 @@ def get_width(T):
     return gc_get_width(T.vertices())
 
 
-def generic_elimination_search(G):
+def generic_elimination_search1(G):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
     labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_generic_elimination_search1(V_G, E_G, graphtype)
+
+
+def generic_elimination_search2(G):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_generic_elimination_search(V_G, E_G, graphtype)
+    gc_generic_elimination_search2(V_G, E_G, graphtype)
+
+
+def generic_elimination_search3(G):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_generic_elimination_search3(V_G, E_G, graphtype)
+
+
+def generic_elimination_search4(G):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_generic_elimination_search4(V_G, E_G, graphtype)
 

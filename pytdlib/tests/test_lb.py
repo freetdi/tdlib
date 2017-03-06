@@ -102,23 +102,6 @@ class TestTdLib(unittest.TestCase):
         lb = tdlib.lower_bound(G, "LBPC_deltaC")
         self.assertEqual(lb, 1)
 
-    def test_lower_bounds_2(self):
-        G = Graph(V_K5, E_K5)
-        lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, 4)
-
     def test_lower_bounds_3(self):
         G = Graph(V_Petersen, E_Petersen)
         lb = tdlib.lower_bound(G, "deltaC_min_d")

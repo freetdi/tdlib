@@ -10,7 +10,6 @@ from graphs import *
 sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
-
     def test_minDegree_decomp_0(self):
         for V, E in cornercases:
             G = Graph(V, E)
@@ -22,12 +21,6 @@ class TestTdLib(unittest.TestCase):
         T, w = tdlib.minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
-
-    def test_minDegree_decomp_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.minDegree_decomp(G)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 4)
 
     def test_minDegree_decomp_3(self):
         G = Graph(V_Petersen, E_Petersen)
@@ -71,41 +64,49 @@ class TestTdLib(unittest.TestCase):
             G = Graph(V, E)
             O = tdlib.minDegree_ordering(G)
             self.assertEqual(len(O), len(G.vertices()))
+            self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_1(self):
         G = Graph(V_P6, E_P6)
         O = tdlib.minDegree_ordering(G)
         self.assertEqual(len(O), len(G.vertices()))
+        self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_2(self):
         G = Graph(V_K5, E_K5)
         O = tdlib.minDegree_ordering(G)
         self.assertEqual(len(O), len(G.vertices()))
+        self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_3(self):
         G = Graph(V_Petersen, E_Petersen)
         O = tdlib.minDegree_ordering(G)
+        self.assertEqual(len(O), len(G.vertices()))
         self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_4(self):
         G = Graph(V_Petersen_double, E_Petersen_double)
         O = tdlib.minDegree_ordering(G)
         self.assertEqual(len(O), len(G.vertices()))
+        #self.assertEqual(util.is_permutation(O), True) TODO: is_permutation for ids not in [n]
 
     def test_minDegree_ordering_5(self):
         G = Graph(V_Wagner, E_Wagner)
         O = tdlib.minDegree_ordering(G)
         self.assertEqual(len(O), len(G.vertices()))
+        self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_6(self):
         G = Graph(V_Pappus, E_Pappus)
         O = tdlib.minDegree_ordering(G)
+        self.assertEqual(len(O), len(G.vertices()))
         self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_7(self):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
         O = tdlib.minDegree_ordering(G)
         self.assertEqual(len(O), len(G.vertices()))
+        self.assertEqual(util.is_permutation(O), True)
 
     def test_minDegree_ordering_8(self):
         for i in range(0, 10):
@@ -113,6 +114,7 @@ class TestTdLib(unittest.TestCase):
             G = Graph(V, E)
             O = tdlib.minDegree_ordering(G)
             self.assertEqual(len(O), len(G.vertices()))
+            self.assertEqual(util.is_permutation(O), True)
 
 if __name__ == '__main__':
     unittest.main()

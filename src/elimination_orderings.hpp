@@ -152,7 +152,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     impl::minDegree<G_t, T_t, O_t> MD(G, &T, O, ub, ignore_isolated_vertices);
     MD.do_it();
     MD.tree_decomposition();
-    return MD.get_bagsize();
+    return MD.get_bagsize()-1;
 }
 
 template <typename G_t, typename T_t>
@@ -172,7 +172,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     impl::minDegree<G_t, T_t, O_t> MD(G, &T, (O_t*)NULL, -1u, false);
     MD.do_it();
     MD.tree_decomposition();
-    return MD.get_bagsize(); // FIXME: (still used!)
+    return MD.get_bagsize()-1;
 }
 
 
@@ -385,7 +385,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     impl::minDegree<G_t, T, O_t> MD(G, elim_ordering, ignore_isolated_vertices);
     MD.do_it();
     MD.elimination_ordering();
-    return MD.get_bagsize();
+    return MD.get_bagsize()-1;
 }
 
 }

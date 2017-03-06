@@ -21,12 +21,6 @@ class TestTdLib_pre(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
-    def test_PP_MD_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.PP_MD(G)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 4)
-
     def test_PP_MD_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.PP_MD(G)
