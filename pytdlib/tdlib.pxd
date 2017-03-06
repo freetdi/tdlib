@@ -103,3 +103,10 @@ cdef extern from "python_tdlib.hpp":
     int gc_get_width(vector[vector[int]] &V_T)
 
 
+##############################################################
+############ GENERIC ELIMINATION SEARCH ######################
+
+    void gc_generic_elimination_search1(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype)
+    void gc_generic_elimination_search2(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype)
+    void gc_generic_elimination_search3(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype)
+    void gc_generic_elimination_search4(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype)

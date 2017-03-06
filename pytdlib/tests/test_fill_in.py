@@ -22,12 +22,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
 
-    def test_fillIn_decomp_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.fillIn_decomp(G)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 4)
-
     def test_fillIn_decomp_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.fillIn_decomp(G)

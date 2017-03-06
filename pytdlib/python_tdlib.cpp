@@ -37,10 +37,12 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
+#include "generic_elimination_search.hpp"
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t; //type 0
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t; //type 1
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::directedS> TD_graph_directed_t; //type 2
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t; //type 3
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
 
@@ -120,7 +122,7 @@ void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
     std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     unsigned int id = 0;
-    
+
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id++));
         std::vector<int> bag;
@@ -129,7 +131,7 @@ void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
         }
         V_T.push_back(bag);
     }
-    
+
     typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(T); eIt != eEnd; eIt++){
         typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
@@ -1069,5 +1071,37 @@ int gc_get_width(std::vector<std::vector<int> > &V_T){
     }
     return width-1;
 }
+
+
+/* Generic elimination search */
+
+void gc_generic_elimination_search1(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::gen_search::generic_elimination_search_test1(G);
+}
+
+void gc_generic_elimination_search2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::gen_search::generic_elimination_search_test2(G);
+}
+
+void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::gen_search::generic_elimination_search_test3(G);
+}
+
+void gc_generic_elimination_search4(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::gen_search::generic_elimination_search_test4(G);
+}
+
 
 // vim:ts=8:sw=2:et

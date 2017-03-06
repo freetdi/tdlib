@@ -9,7 +9,6 @@ from graphs import *
 sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
-
     def test_boost_minDegree_decomp(self):
         G = Graph(V_RandomGNM_250_1000, E_RandomGNM_250_1000)
         T, w = tdlib.boost_minDegree_decomp(G)
@@ -27,12 +26,6 @@ class TestTdLib(unittest.TestCase):
         T, w = tdlib.boost_minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 1)
-
-    def test_boost_minDegree_decomp_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.boost_minDegree_decomp(G)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 4)
 
     def test_boost_minDegree_decomp_3(self):
         G = Graph(V_Petersen, E_Petersen)

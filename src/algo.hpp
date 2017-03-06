@@ -66,6 +66,15 @@ public:
 
 	virtual void do_it() = 0;
 
+//for now
+public:
+	double get_runtime(){
+            if(_timer){
+                return _timer->total();
+            }
+            return -1;
+        }
+
 protected:
 	void timer_on(){
 		if(_timer){
@@ -77,6 +86,7 @@ protected:
 			_timer->stop();
 		}
 	}
+
 private:
 	std::string _label;
 	TIMER_BASE* _timer;
