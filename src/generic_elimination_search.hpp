@@ -199,7 +199,7 @@ void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
     }
 
     if(baseclass::depth == boost::num_vertices(baseclass::G)){
-        if(local_ub < baseclass::global_ub){
+        if(local_ub < baseclass::global_ub){ //this should be always true?!
             //TODO: baseclass::best_ordering = local_ordering; TODO:propagate ordering
             std::cout << "found better ordering of width " << local_ub << std::endl;
             baseclass::global_ub = local_ub;
@@ -247,7 +247,7 @@ void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
             //std::cout << "depth: " << baseclass::depth << std::endl;
             //std::cout << "elim_vertex: " << elim_vertex << std::endl;
 
-            if(step_width <= baseclass::global_ub){
+            if(step_width < baseclass::global_ub){
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
 
                 //can be seen as a recursion
