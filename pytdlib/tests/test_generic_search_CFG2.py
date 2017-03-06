@@ -10,6 +10,8 @@ from graphs import *
 PREFIX = "Dimacs"
 COUNT = 81
 
+MAX_NODES = 10000
+
 #don't confuse python unittest
 sys.argv=sys.argv[:1]
 
@@ -18,37 +20,37 @@ class TestTdLib(unittest.TestCase):
         print("---cornercases---")
         for V, E in cornercases:
             G = Graph(V, E)
-            tdlib.generic_elimination_search2(G)
+            tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_1(self):
         print("---P6---")
         G = Graph(V_P6, E_P6)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_3(self):
         print("---Petersen---")
         G = Graph(V_Petersen, E_Petersen)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_4(self):
         print("---Petersen_double---")
         G = Graph(V_Petersen_double, E_Petersen_double)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_5(self):
         print("---Wagner---")
         G = Graph(V_Wagner, E_Wagner)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_6(self):
         print("---Pappus---")
         G = Graph(V_Pappus, E_Pappus)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_7(self):
         print("---Grid-5-5---")
         G = Graph(V_Grid_5_5, E_Grid_5_5)
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_8(self):
         print("---Dimacs7---")
@@ -57,7 +59,7 @@ class TestTdLib(unittest.TestCase):
         T, w = tdlib.minDegree_decomp(G)
         print("MD_width: " + str(w))
 
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_9(self):
         print("---Dimacs58---")
@@ -66,7 +68,7 @@ class TestTdLib(unittest.TestCase):
         T, w = tdlib.minDegree_decomp(G)
         print("MD_width: " + str(w))
 
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
     def test_11(self):
         print("---Dimacs2---")
@@ -75,7 +77,7 @@ class TestTdLib(unittest.TestCase):
         T, w = tdlib.minDegree_decomp(G)
         print("MD_width: " + str(w))
 
-        tdlib.generic_elimination_search2(G)
+        tdlib.generic_elimination_search2(G, MAX_NODES)
 
 if __name__ == '__main__':
     unittest.main()

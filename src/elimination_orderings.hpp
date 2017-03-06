@@ -403,7 +403,8 @@ namespace detail{ //
 //Compute an elimination ordering according to fillIn heuristic (version used
 //for postprocessing algorithms).
 template<typename G_t, typename O_t>
-void fillIn_ordering(G_t &G, O_t &elim_ordering, bool ignore_isolated_vertices=false)
+typename boost::graph_traits<G_t>::vertices_size_type
+  fillIn_ordering(G_t &G, O_t &elim_ordering, bool ignore_isolated_vertices=false)
 {
     trace3("fillIn_ordering", ignore_isolated_vertices, boost::num_vertices(G), elim_ordering.size());
 
@@ -412,17 +413,19 @@ void fillIn_ordering(G_t &G, O_t &elim_ordering, bool ignore_isolated_vertices=f
     FI.do_it();
     FI.elimination_ordering();
     assert(elim_ordering.size()==boost::num_vertices(G) || ignore_isolated_vertices);
+    return FI.get_bagsize()-1;
 }
 
 } //detail
 
 //Compute an elimination ordering according to fillIn heuristic.
 template<typename G_t>
-void fillIn_ordering(G_t& G,
+typename boost::graph_traits<G_t>::vertices_size_type
+ fillIn_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false /* fixme, not in frontend! */)
 {
-    detail::fillIn_ordering(G, elim_ordering, ignore_isolated_vertices);
+    return detail::fillIn_ordering(G, elim_ordering, ignore_isolated_vertices);
 }
 
 // incomplete: inefficient. see some.h

@@ -1409,7 +1409,7 @@ def generic_elimination_search1(G):
     gc_generic_elimination_search1(V_G, E_G, graphtype)
 
 
-def generic_elimination_search2(G):
+def generic_elimination_search2(G, max_nodes):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1417,10 +1417,12 @@ def generic_elimination_search2(G):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_generic_elimination_search2(V_G, E_G, graphtype)
+    cdef unsigned max_nodes_c = max_nodes
+
+    gc_generic_elimination_search2(V_G, E_G, graphtype, max_nodes_c)
 
 
-def generic_elimination_search3(G):
+def generic_elimination_search3(G, max_nodes):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1428,10 +1430,12 @@ def generic_elimination_search3(G):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_generic_elimination_search3(V_G, E_G, graphtype)
+    cdef unsigned max_nodes_c = max_nodes
+
+    gc_generic_elimination_search3(V_G, E_G, graphtype, max_nodes_c)
 
 
-def generic_elimination_search4(G):
+def generic_elimination_search4(G, max_nodes):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1439,5 +1443,7 @@ def generic_elimination_search4(G):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_generic_elimination_search4(V_G, E_G, graphtype)
+    cdef unsigned max_nodes_c = max_nodes
+
+    gc_generic_elimination_search4(V_G, E_G, graphtype, max_nodes_c)
 

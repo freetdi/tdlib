@@ -89,13 +89,12 @@ struct CFG_DFS_1{
 
 };
 
-
-/* AKA minDegree
-    -initial_lb_algo = NONE
-    -initial_ub_algo = NONE
+/*
+    -initial_lb_algo = deltaC_least_c
+    -initial_ub_algo = minDegree
     -lb_algo = NONE
     -ub_algo = NONE
-    -next = "minDegree"
+    -next = all nodes "from left to right"
 */
 template <typename G_t>
 struct CFG_DFS_2{
@@ -107,6 +106,111 @@ struct CFG_DFS_2{
     static const std::string name()
     {
         return "CFG_DFS_2";
+    }
+
+    static unsigned initial_lb_algo(G_t &G)
+    {
+        G_t H(G);
+        return treedec::lb::deltaC_least_c(H)+1;
+    }
+
+    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    {
+        G_t H(G);
+        return treedec::minDegree_ordering(H, O)+1;
+    }
+
+
+    static unsigned lb_algo(G_t &G){ //aka no lb algo
+        return 0;
+    }
+
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    {
+        for(; idx < active.size(); ++idx){
+            if(active[idx]){
+                return idx++;
+            }
+        }
+
+        //unreachable();
+        //std::cerr << "unreachable() in next() reached!" << std::endl;
+
+        return INVALID_VERTEX();
+    }
+
+};
+
+/*
+    -initial_lb_algo = deltaC_least_c
+    -initial_ub_algo = fillIn
+    -lb_algo = NONE
+    -ub_algo = NONE
+    -next = all nodes "from left to right"
+*/
+template <typename G_t>
+struct CFG_DFS_3{
+    static const unsigned INVALID_VERTEX()
+    {
+        return UINT_MAX;
+    }
+
+    static const std::string name()
+    {
+        return "CFG_DFS_3";
+    }
+
+    static unsigned initial_lb_algo(G_t &G)
+    {
+        G_t H(G);
+        return treedec::lb::deltaC_least_c(H)+1;
+    }
+
+    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    {
+        G_t H(G);
+        return treedec::fillIn_ordering(H, O)+1;
+    }
+
+
+    static unsigned lb_algo(G_t &G){ //aka no lb algo
+        return 0;
+    }
+
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    {
+        for(; idx < active.size(); ++idx){
+            if(active[idx]){
+                return idx++;
+            }
+        }
+
+        //unreachable();
+        //std::cerr << "unreachable() in next() reached!" << std::endl;
+
+        return INVALID_VERTEX();
+    }
+
+};
+
+
+/* AKA minDegree
+    -initial_lb_algo = NONE
+    -initial_ub_algo = NONE
+    -lb_algo = NONE
+    -ub_algo = NONE
+    -next = "minDegree"
+*/
+template <typename G_t>
+struct CFG_DFS_4{
+    static const unsigned INVALID_VERTEX()
+    {
+        return UINT_MAX;
+    }
+
+    static const std::string name()
+    {
+        return "CFG_DFS_4";
     }
 
     static unsigned initial_lb_algo(G_t &G)

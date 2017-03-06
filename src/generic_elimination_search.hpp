@@ -365,7 +365,7 @@ void generic_elimination_search_test1(G_t &G){
 }
 
 template <typename G_t>
-void generic_elimination_search_test2(G_t &G){
+void generic_elimination_search_test2(G_t &G, unsigned max_nodes){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
@@ -383,8 +383,8 @@ void generic_elimination_search_test2(G_t &G){
                0			//orderings generated
        );
 
-    generic_elim_DFS_test.set_max_nodes_generated(100000);
-    generic_elim_DFS_test.set_max_orderings_generated(100);
+    generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
+    generic_elim_DFS_test.set_max_orderings_generated(1000);
 
     generic_elim_DFS_test.do_it();
 
@@ -406,7 +406,7 @@ void generic_elimination_search_test2(G_t &G){
 }
 
 template <typename G_t>
-void generic_elimination_search_test3(G_t &G){
+void generic_elimination_search_test3(G_t &G, unsigned max_nodes){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
@@ -423,6 +423,9 @@ void generic_elimination_search_test3(G_t &G){
                1,			//nodes generated
                0			//orderings generated
        );
+
+    generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
+    generic_elim_DFS_test.set_max_orderings_generated(1000);
 
     generic_elim_DFS_test.do_it();
 
@@ -444,11 +447,11 @@ void generic_elimination_search_test3(G_t &G){
 }
 
 template <typename G_t>
-void generic_elimination_search_test4(G_t &G){
+void generic_elimination_search_test4(G_t &G, unsigned max_nodes){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
-    generic_elimination_search_DFS<G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, configs::CFG_DFS_3<G_t> > //TODO: constructor...
        generic_elim_DFS_test
               (G,
                ordering,
@@ -462,8 +465,8 @@ void generic_elimination_search_test4(G_t &G){
                0			//orderings generated
        );
 
-    generic_elim_DFS_test.set_max_nodes_generated(10000);
-    generic_elim_DFS_test.set_max_orderings_generated(100);
+    generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
+    generic_elim_DFS_test.set_max_orderings_generated(1000);
 
     generic_elim_DFS_test.do_it();
 
@@ -483,7 +486,6 @@ void generic_elimination_search_test4(G_t &G){
     std::cout << "width of elimination ordering (check): " << w+1 << std::endl;
     assert(w == generic_elim_DFS_test.global_upper_bound_bagsize());
 }
-
 
 } //namespace gen_search
 
