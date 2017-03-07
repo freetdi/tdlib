@@ -4,3 +4,4 @@
 - parallelize exact_cutset?
 - solvers as (callable/extensible) classes
 - more treedecomposition structures
+- make clean (e.g. grtd)
