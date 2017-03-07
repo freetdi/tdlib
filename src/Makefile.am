@@ -46,4 +46,6 @@ pkginclude_HEADERS = \
   marker.hpp \
   numbering.hpp \
   config_traits.hpp \
-  directed_view.hpp
+  directed_view.hpp \
+  copy.hpp \
+  treedec_traits.hpp
