@@ -48,4 +48,5 @@ pkginclude_HEADERS = \
   config_traits.hpp \
   directed_view.hpp \
   copy.hpp \
-  treedec_traits.hpp
+  treedec_traits.hpp \
+  grparse.h
