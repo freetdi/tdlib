@@ -45,4 +45,5 @@ pkginclude_HEADERS = \
   generic_elimination_search_configs.hpp \
   marker.hpp \
   numbering.hpp \
-  config_traits.hpp
+  config_traits.hpp \
+  directed_view.hpp
