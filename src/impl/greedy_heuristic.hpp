@@ -268,7 +268,7 @@ public:
     }
     vertices_size_type get_bagsize()
     {
-        return _ub;
+        return _ub+1;
     }
     O_t& elimination_ordering()
     {
@@ -503,7 +503,7 @@ public: // implementation
     vertices_size_type get_bagsize() const
     { untested();
         // if(!_done)do_it();?
-        return _upper_bound;
+        return _upper_bound+1;
     }
     T_t& tree_decomposition()
     {

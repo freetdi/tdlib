@@ -167,6 +167,10 @@ void undo_eliminate(
 template <typename G_t, typename CFG_t>
 void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
 {
+    if(baseclass::nodes_generated % 1000 == 0){
+        std::cout << "#: " << baseclass::nodes_generated << std::endl;
+    }
+
     baseclass::timer_on();
 
     //global_ub may have changes in the meantime, so we may cut of the search for this branch here
