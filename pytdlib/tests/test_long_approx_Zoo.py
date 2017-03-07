@@ -29,7 +29,6 @@ def dump_td_as_dot(V_T, E_T, outname):
     fout.close()
 
 class TestTdLib_packages(unittest.TestCase):
-    """
     def test_MD(self):
         print("---MD---")
         for i in range(0, COUNT+1):
