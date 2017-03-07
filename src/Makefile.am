@@ -42,4 +42,6 @@ pkginclude_HEADERS = \
   graph_traits.hpp \
   convenience.hpp \
   generic_elimination_search.hpp \
-  generic_elimination_search_configs.hpp
+  generic_elimination_search_configs.hpp \
+  marker.hpp \
+  numbering.hpp
