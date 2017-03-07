@@ -44,4 +44,5 @@ pkginclude_HEADERS = \
   generic_elimination_search.hpp \
   generic_elimination_search_configs.hpp \
   marker.hpp \
-  numbering.hpp
+  numbering.hpp \
+  config_traits.hpp
