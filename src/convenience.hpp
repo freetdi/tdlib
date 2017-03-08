@@ -50,7 +50,7 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
@@ -96,7 +96,7 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
@@ -139,7 +139,7 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, configs::CFG_DFS_3<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_3<G_t> > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
