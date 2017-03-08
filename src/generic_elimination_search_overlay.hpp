@@ -7,7 +7,7 @@ namespace treedec{
 
 namespace gen_search{
 
-template <typename UnderlyingG_t, typename OverlayG_t>
+template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
 class overlay{
 public:
     typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
@@ -31,6 +31,20 @@ public:
         return _active;
     }
 
+
+    /* TODO:
+        -actual degree as in DEGREE..
+        -Underlying should be const, vec and sorted
+        -N(elim_vertex) = N_U(elim_vertex) + N_O(elim_vertex)
+        -make clique:
+          -sort N(elim vertex)
+          - (binsearch in Underlying, linear in Overlay)
+          -> NOT deg-many binsearch on the whole outedgevec! (because N(elim_v) is sorted, the search range reduces!)
+        -add edges just in Overlay
+        -changes_container should be a stack of pair<uint, vec<uint> > with |vec<uint>| = actual_degree
+          -> meaning of pair<uint, vec<uint> >: first: modified vertex in overlay, second: #addition edges
+          -> undo is stack.back(), then resize overlay[pair.first] according to vec<uint>[i], then stack.pop()
+    */
     unsigned eliminate(vdU elim_vertex)
     {
         _active[elim_vertex]= false;
