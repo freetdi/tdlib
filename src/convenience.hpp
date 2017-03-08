@@ -48,11 +48,12 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
+    overlay<G_t, G_t> olay(G, active);
+
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
        generic_elim_DFS_test
-              (G,
+              (olay,
                ordering,
-               active,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
@@ -89,11 +90,12 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
+    overlay<G_t, G_t> olay(G, active);
+
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
        generic_elim_DFS_test
-              (G,
+              (olay,
                ordering,
-               active,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
@@ -129,11 +131,12 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
+    overlay<G_t, G_t> olay(G, active);
+
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_3<G_t> > //TODO: constructor...
        generic_elim_DFS_test
-              (G,
+              (olay,
                ordering,
-               active,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
