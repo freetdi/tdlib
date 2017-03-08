@@ -28,6 +28,7 @@
 
 #include "algo.hpp"
 #include "generic_elimination_search_configs.hpp"
+#include "generic_elimination_search_overlay.hpp"
 
 #include <iostream>
 
@@ -44,8 +45,11 @@ public:
                                     std::vector<bool> &active_input,
                                     unsigned g_lb, unsigned g_ub, unsigned depth_input, unsigned nodes_generated_input, unsigned orderings_generated_input)
       : algo1(CFG_t::name()), G(G_input), best_ordering(best_ordering_input), active(active_input),
-        global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input)
-    {}
+        global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input),
+        Overlay(G_input)
+    {
+        //Overlay.set_underlying(G_input);
+    }
 
     virtual void do_it() = 0;
     virtual void elimination_ordering(std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &ordering) = 0;
@@ -70,6 +74,7 @@ public:
 protected:
     unsigned nodes_generated;
     unsigned orderings_generated;
+    overlay<G_t, G_t> Overlay;
 };
 
 template <typename G_t, typename CFG_t>
