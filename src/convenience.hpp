@@ -1,6 +1,6 @@
 namespace treedec{
 
-/*
+/* TODO: cleanup?!
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_decomp(G_t &G, T_t &T,
@@ -46,7 +46,7 @@ namespace gen_search{
 
 template <typename G_t>
 void generic_elimination_search_test1(G_t &G){
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G), 9);
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
@@ -75,11 +75,8 @@ void generic_elimination_search_test1(G_t &G){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    //std::cout << "time: " << generic_elim_DFS_test.get_runtime() << std::endl << std::endl;
-
-    unsigned w = treedec::get_width_of_elimination_ordering(G, ordering);
-    std::cout << "width of elimination ordering (check): " << w+1 << std::endl;
-    assert(w == generic_elim_DFS_test.global_upper_bound_bagsize());
+    assert(treedec::get_width_of_elimination_ordering(G, ordering)
+            == generic_elim_DFS_test.global_upper_bound_bagsize());
 }
 
 
@@ -119,11 +116,8 @@ void generic_elimination_search_test2(G_t &G, unsigned max_nodes){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    //std::cout << "time: " << generic_elim_DFS_test.get_runtime() << std::endl << std::endl;
-
-    unsigned w = treedec::get_width_of_elimination_ordering(G, ordering);
-    std::cout << "width of elimination ordering (check): " << w+1 << std::endl;
-    assert(w == generic_elim_DFS_test.global_upper_bound_bagsize());
+    assert(treedec::get_width_of_elimination_ordering(G, ordering)
+            == generic_elim_DFS_test.global_upper_bound_bagsize());
 }
 
 
@@ -163,11 +157,9 @@ void generic_elimination_search_test3(G_t &G, unsigned max_nodes){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    //std::cout << "time: " << generic_elim_DFS_test.get_runtime() << std::endl << std::endl;
+    assert(treedec::get_width_of_elimination_ordering(G, ordering)
+            == generic_elim_DFS_test.global_upper_bound_bagsize());
 
-    unsigned w = treedec::get_width_of_elimination_ordering(G, ordering);
-    std::cout << "width of elimination ordering (check): " << w+1 << std::endl;
-    assert(w == generic_elim_DFS_test.global_upper_bound_bagsize());
 }
 
 
@@ -205,11 +197,8 @@ void generic_elimination_search_test4(G_t &G, unsigned max_nodes){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    //std::cout << "time: " << generic_elim_DFS_test.get_runtime() << std::endl << std::endl;
-
-    unsigned w = treedec::get_width_of_elimination_ordering(G, ordering);
-    std::cout << "width of elimination ordering (check): " << w+1 << std::endl;
-    assert(w == generic_elim_DFS_test.global_upper_bound_bagsize());
+    assert(treedec::get_width_of_elimination_ordering(G, ordering)
+            == generic_elim_DFS_test.global_upper_bound_bagsize());
 }
 
 } //namespace gen_search

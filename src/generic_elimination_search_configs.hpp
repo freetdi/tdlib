@@ -39,7 +39,6 @@ namespace configs{
     -initial_lb_algo = deltaC_least_c
     -initial_ub_algo = NONE
     -lb_algo = NONE
-    -ub_algo = NONE
     -next = all nodes "from left to right"
 */
 template <typename G_t>
@@ -81,9 +80,6 @@ struct CFG_DFS_1{
             }
         }
 
-        //unreachable();
-        //std::cerr << "unreachable() in next() reached!" << std::endl;
-
         return INVALID_VERTEX();
     }
 
@@ -93,7 +89,6 @@ struct CFG_DFS_1{
     -initial_lb_algo = deltaC_least_c
     -initial_ub_algo = minDegree
     -lb_algo = NONE
-    -ub_algo = NONE
     -next = all nodes "from left to right"
 */
 template <typename G_t>
@@ -133,9 +128,6 @@ struct CFG_DFS_2{
             }
         }
 
-        //unreachable();
-        //std::cerr << "unreachable() in next() reached!" << std::endl;
-
         return INVALID_VERTEX();
     }
 
@@ -145,7 +137,6 @@ struct CFG_DFS_2{
     -initial_lb_algo = deltaC_least_c
     -initial_ub_algo = fillIn
     -lb_algo = NONE
-    -ub_algo = NONE
     -next = all nodes "from left to right"
 */
 template <typename G_t>
@@ -185,13 +176,11 @@ struct CFG_DFS_3{
             }
         }
 
-        //unreachable();
-        //std::cerr << "unreachable() in next() reached!" << std::endl;
-
         return INVALID_VERTEX();
     }
 
 };
+
 
 
 /* AKA minDegree
@@ -201,6 +190,7 @@ struct CFG_DFS_3{
     -ub_algo = NONE
     -next = "minDegree"
 */
+/* this is just an example, to not use this - very inefficient
 template <typename G_t>
 struct CFG_DFS_4{
     static const unsigned INVALID_VERTEX()
@@ -270,12 +260,10 @@ struct CFG_DFS_4{
             }
         }
 
-        //unreachable();
-        //std::cerr << "unreachable() in next() reached!" << std::endl;
-
         return INVALID_VERTEX();
     }
 };
+*/
 
 
 } //namespace configs
