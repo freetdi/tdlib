@@ -78,8 +78,12 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
+/*
     assert(treedec::get_width_of_elimination_ordering(G, ordering)
             == generic_elim_DFS_test.global_upper_bound_bagsize());
+*/
+    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+
 }
 
 
@@ -120,9 +124,11 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
+    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+/*
     assert(treedec::get_width_of_elimination_ordering(G, ordering)
             == generic_elim_DFS_test.global_upper_bound_bagsize());
-
+*/
 }
 
 
@@ -160,6 +166,8 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
     for(unsigned i = 0; i < ordering.size(); ++i){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
+
+    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
 
     assert(treedec::get_width_of_elimination_ordering(G, ordering)
             == generic_elim_DFS_test.global_upper_bound_bagsize());
