@@ -2,6 +2,7 @@
 #define GENERIC_ELIMINATION_SEARCH_OVERLAY
 
 #include <boost/graph/adjacency_list.hpp>
+#include <stack>
 
 namespace treedec{
 
@@ -57,6 +58,8 @@ public:
     {
         _active[elim_vertex]= false;
 
+        _changes_container.push(std::vector<vdU>());
+
         unsigned actual_degree = 0;
 
         typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
@@ -97,8 +100,8 @@ public:
                 {
                     boost::add_edge(*nIt1, *nIt2, O);
                     boost::add_edge(*nIt2, *nIt1, O);
-                    _changes_container.push_back(*nIt1);
-                    _changes_container.push_back(*nIt2);
+                    _changes_container.top().push_back(*nIt1);
+                    _changes_container.top().push_back(*nIt2);
                 }
             }
         }
@@ -108,24 +111,24 @@ public:
     void undo_eliminate(vdU elim_vertex)
     {
         _active[elim_vertex]= true;
-        unsigned c = _changes_container.size() >> 1;
-        for(unsigned i = 0; i < c; ++i){
-            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v1 = _changes_container.back();
-            _changes_container.pop_back();
-            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v2 = _changes_container.back();
-            _changes_container.pop_back();
+        while(!_changes_container.top().empty()){
+            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v1 = _changes_container.top().back();
+            _changes_container.top().pop_back();
+            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v2 = _changes_container.top().back();
+            _changes_container.top().pop_back();
 
             boost::remove_edge(v1, v2, O);
             boost::remove_edge(v2, v1, O);
         }
+        _changes_container.pop();
     }
 
 private:
     const UnderlyingG_t &G;
     OverlayG_t O;
-    std::vector<bool> _active;
+    std::vector<bool> &_active;
 
-    std::vector<vdU> _changes_container;
+    std::stack<std::vector<vdU> > _changes_container;
 };
 
 } //namespace gen_search

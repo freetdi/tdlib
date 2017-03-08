@@ -161,17 +161,6 @@ void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
 
         //search starts here
         while(true){
-
-/*
-            //global_ub may have changes in the meantime, so we may cut of the search for this branch here
-            if(local_ub >= baseclass::global_ub || baseclass::global_lb == baseclass::global_ub){
-                std::cout << "local_ub: " << local_ub << std::endl;
-                std::cout << "global_ub: " << baseclass::global_ub << std::endl;
-                baseclass::timer_off();
-                break;
-            }
-*/
-
             typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = CFG_t::next(baseclass::Overlay.underlying(), baseclass::Overlay.active(), idx);
             if(elim_vertex == CFG_t::INVALID_VERTEX()){
                 break;
@@ -221,12 +210,10 @@ void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
                     baseclass::global_ub = nextStep.global_ub; //may have improved
                     baseclass::best_ordering[baseclass::depth] = elim_vertex;
 
-/*
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::global_ub || baseclass::global_lb == baseclass::global_ub){
                         break;
                     }
-*/
                 }
             }
             else{
