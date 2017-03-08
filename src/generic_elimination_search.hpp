@@ -184,7 +184,7 @@ void generic_elimination_search_DFS<G_t, CFG_t>::do_it()
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
 
-            unsigned step_width = baseclass::Overlay.eliminate(elim_vertex);
+            unsigned step_width = baseclass::Overlay.eliminate(elim_vertex)+1;
 
             //std::cout << "depth: " << baseclass::depth << std::endl;
             //std::cout << "elim_vertex: " << elim_vertex << std::endl;

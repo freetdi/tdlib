@@ -53,13 +53,13 @@ struct CFG_DFS_1{
         return "CFG_DFS_1";
     }
 
-    static unsigned initial_lb_algo(G_t &G)
+    static unsigned initial_lb_algo(const G_t &G)
     {
         G_t H(G);
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
     {
         for(unsigned i = 0; i < boost::num_vertices(G); ++i){
             O[i] = i;
@@ -68,11 +68,11 @@ struct CFG_DFS_1{
     }
 
 
-    static unsigned lb_algo(G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &G){ //aka no lb algo
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -103,24 +103,24 @@ struct CFG_DFS_2{
         return "CFG_DFS_2";
     }
 
-    static unsigned initial_lb_algo(G_t &G)
+    static unsigned initial_lb_algo(const G_t &G)
     {
         G_t H(G);
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
     {
         G_t H(G);
         return treedec::minDegree_ordering(H, O)+1;
     }
 
 
-    static unsigned lb_algo(G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &G){ //aka no lb algo
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -151,24 +151,24 @@ struct CFG_DFS_3{
         return "CFG_DFS_3";
     }
 
-    static unsigned initial_lb_algo(G_t &G)
+    static unsigned initial_lb_algo(const G_t &G)
     {
         G_t H(G);
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
     {
         G_t H(G);
         return treedec::fillIn_ordering(H, O)+1;
     }
 
 
-    static unsigned lb_algo(G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &G){ //aka no lb algo
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -203,22 +203,22 @@ struct CFG_DFS_4{
         return "CFG_DFS_4";
     }
 
-    static unsigned initial_lb_algo(G_t &G)
+    static unsigned initial_lb_algo(const G_t &G)
     {
         return 0;
     }
 
-    static unsigned initial_ub_algo(G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
     {
         return boost::num_vertices(G);
     }
 
 
-    static unsigned lb_algo(G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &G){ //aka no lb algo
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(G_t &G, std::vector<bool> &active, unsigned &idx)
+    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         unsigned min = UINT_MAX;
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

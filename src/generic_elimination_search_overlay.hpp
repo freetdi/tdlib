@@ -16,18 +16,26 @@ public:
       : G(G_input)
     {
         _active = std::vector<bool>(boost::num_vertices(G_input), true);
+        for(unsigned i = 0; i < boost::num_vertices(G_input); ++i)
+        {
+            boost::add_vertex(O);
+        }
     }
 
     overlay(UnderlyingG_t &G_input, std::vector<bool> &active_input) //e.g. after PP
       : G(G_input), _active(active_input)
     {
+        for(unsigned i = 0; i < boost::num_vertices(G_input); ++i)
+        {
+            boost::add_vertex(O);
+        }
     }
 
-    /*const*/ UnderlyingG_t &underlying(){
+    const UnderlyingG_t &underlying(){
         return G;
     }
 
-    std::vector<bool> &active(){
+    const std::vector<bool> &active(){
         return _active;
     }
 
@@ -51,8 +59,18 @@ public:
 
         unsigned actual_degree = 0;
 
-        typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator nIt1, nIt2, nEnd;
-        for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(elim_vertex, G); nIt1 != nEnd; ++nIt1){
+        typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
+        boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(elim_vertex, G);
+        boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
+
+        for(; nIt1 != nEnd2; ++nIt1){ //this just goes through N_G(elim) and than through N_O(elim), TODO: iterator
+            if(nIt1 == nEnd1){
+                boost::tie(nIt1, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
+                if(nIt1 == nEnd2){
+                    break;
+                }
+            }
+
             if(!_active[*nIt1]){
                 continue;
             }
@@ -61,13 +79,24 @@ public:
 
             nIt2 = nIt1;
             ++nIt2;
-            for(; nIt2 != nEnd; ++nIt2){
+
+            for(; nIt2 != nEnd2; ++nIt2){
+                if(nIt2 == nEnd1){
+                    boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
+                    if(nIt2 == nEnd2){
+                        break;
+                    }
+                }
+
                 if(!_active[*nIt2]){
                     continue;
                 }
-                if(!boost::edge(*nIt1, *nIt2, G).second){
-                    boost::add_edge(*nIt1, *nIt2, G);
-                    boost::add_edge(*nIt2, *nIt1, G);
+
+                //TODO: can be further improved..
+                if(!boost::edge(*nIt1, *nIt2, G).second && !boost::edge(*nIt1, *nIt2, O).second)
+                {
+                    boost::add_edge(*nIt1, *nIt2, O);
+                    boost::add_edge(*nIt2, *nIt1, O);
                     _changes_container.push_back(*nIt1);
                     _changes_container.push_back(*nIt2);
                 }
@@ -86,13 +115,13 @@ public:
             typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v2 = _changes_container.back();
             _changes_container.pop_back();
 
-            boost::remove_edge(v1, v2, G);
-            boost::remove_edge(v2, v1, G);
+            boost::remove_edge(v1, v2, O);
+            boost::remove_edge(v2, v1, O);
         }
     }
 
 private:
-    /*const*/ UnderlyingG_t &G;
+    const UnderlyingG_t &G;
     OverlayG_t O;
     std::vector<bool> _active;
 
