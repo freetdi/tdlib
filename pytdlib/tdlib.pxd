@@ -106,7 +106,6 @@ cdef extern from "python_tdlib.hpp":
 ##############################################################
 ############ GENERIC ELIMINATION SEARCH ######################
 
-    void gc_generic_elimination_search1(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype)
-    void gc_generic_elimination_search2(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes)
-    void gc_generic_elimination_search3(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes)
-    void gc_generic_elimination_search4(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes)
+    void gc_generic_elimination_search1(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings)
+    void gc_generic_elimination_search2(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings)
+    void gc_generic_elimination_search3(vector[unsigned int] &V_G, vector[unsigned int] &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings)

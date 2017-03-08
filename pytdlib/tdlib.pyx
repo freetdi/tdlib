@@ -1398,18 +1398,7 @@ def get_width(T):
     return gc_get_width(T.vertices())
 
 
-def generic_elimination_search1(G):
-    cdef vector[unsigned int] V_G, E_G, E_T
-    cdef vector[vector[int]] V_T
-
-    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
-
-    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
-
-    gc_generic_elimination_search1(V_G, E_G, graphtype)
-
-
-def generic_elimination_search2(G, max_nodes):
+def generic_elimination_search1(G, max_nodes, max_orderings):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1418,11 +1407,12 @@ def generic_elimination_search2(G, max_nodes):
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
     cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
 
-    gc_generic_elimination_search2(V_G, E_G, graphtype, max_nodes_c)
+    gc_generic_elimination_search1(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 
 
-def generic_elimination_search3(G, max_nodes):
+def generic_elimination_search2(G, max_nodes, max_orderings):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1431,11 +1421,12 @@ def generic_elimination_search3(G, max_nodes):
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
     cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
 
-    gc_generic_elimination_search3(V_G, E_G, graphtype, max_nodes_c)
+    gc_generic_elimination_search2(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 
 
-def generic_elimination_search4(G, max_nodes):
+def generic_elimination_search3(G, max_nodes, max_orderings):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1444,6 +1435,7 @@ def generic_elimination_search4(G, max_nodes):
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
     cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
 
-    gc_generic_elimination_search4(V_G, E_G, graphtype, max_nodes_c)
+    gc_generic_elimination_search3(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 

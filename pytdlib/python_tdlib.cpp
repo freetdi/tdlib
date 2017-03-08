@@ -1076,32 +1076,25 @@ int gc_get_width(std::vector<std::vector<int> > &V_T){
 
 /* Generic elimination search */
 
-void gc_generic_elimination_search1(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype){
+void gc_generic_elimination_search1(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_test1(G);
+    treedec::gen_search::generic_elimination_search_CFG1(G, max_nodes, max_orderings);
 }
 
-void gc_generic_elimination_search2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes){
+void gc_generic_elimination_search2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_test2(G, max_nodes);
+    treedec::gen_search::generic_elimination_search_CFG2(G, max_nodes, max_orderings);
 }
 
-void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes){
+void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_test3(G, max_nodes);
-}
-
-void gc_generic_elimination_search4(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes){
-    TD_graph_t G;
-    make_tdlib_graph(G, V_G, E_G);
-
-    treedec::gen_search::generic_elimination_search_test4(G, max_nodes);
+    treedec::gen_search::generic_elimination_search_CFG3(G, max_nodes, max_orderings);
 }
 
 

@@ -43,47 +43,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
 
 namespace gen_search{
 
-
 template <typename G_t>
-void generic_elimination_search_test1(G_t &G){
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
-    std::vector<bool> active(boost::num_vertices(G), true);
-
-    generic_elimination_search_DFS<G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
-       generic_elim_DFS_test
-              (G,
-               ordering,
-               active,
-               0,                         //global_lb
-               boost::num_vertices(G),    //global_ub
-               0,
-               0,
-               0,
-               1,                       //nodes generated
-               0                        //orderings generated
-       );
-
-    generic_elim_DFS_test.do_it();
-
-    std::cout << "lower bound: " << generic_elim_DFS_test.global_lower_bound_bagsize() << std::endl;
-    std::cout << "upper bound: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
-    std::cout << "nodes generated: " << generic_elim_DFS_test.get_nodes_generated() << std::endl;
-    std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
-
-    std::cout << "ordering: " << std::endl;
-    for(unsigned i = 0; i < ordering.size(); ++i){
-        std::cout << ordering[i] << " ";
-    } std::cout << std::endl;
-
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
-}
-
-
-
-
-template <typename G_t>
-void generic_elimination_search_test2(G_t &G, unsigned max_nodes){
+void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
@@ -102,7 +63,7 @@ void generic_elimination_search_test2(G_t &G, unsigned max_nodes){
        );
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
-    generic_elim_DFS_test.set_max_orderings_generated(1000);
+    generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
 
     generic_elim_DFS_test.do_it();
 
@@ -124,7 +85,7 @@ void generic_elimination_search_test2(G_t &G, unsigned max_nodes){
 
 
 template <typename G_t>
-void generic_elimination_search_test3(G_t &G, unsigned max_nodes){
+void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
@@ -143,7 +104,7 @@ void generic_elimination_search_test3(G_t &G, unsigned max_nodes){
        );
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
-    generic_elim_DFS_test.set_max_orderings_generated(1000);
+    generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
 
     generic_elim_DFS_test.do_it();
 
@@ -164,7 +125,7 @@ void generic_elimination_search_test3(G_t &G, unsigned max_nodes){
 
 
 template <typename G_t>
-void generic_elimination_search_test4(G_t &G, unsigned max_nodes){
+void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
@@ -183,7 +144,7 @@ void generic_elimination_search_test4(G_t &G, unsigned max_nodes){
        );
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
-    generic_elim_DFS_test.set_max_orderings_generated(1000);
+    generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
 
     generic_elim_DFS_test.do_it();
 
