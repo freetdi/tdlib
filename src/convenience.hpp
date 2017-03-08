@@ -1,4 +1,10 @@
+//TODO:guard
+
+#include <gala/graph.h>
+#include <gala/boost.h>
+
 namespace treedec{
+
 
 /* TODO: cleanup?!
 template <typename G_t, typename T_t>
@@ -94,9 +100,17 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<bool> active(boost::num_vertices(G), true);
 
-    overlay<G_t, G_t> olay(G, active);
+    typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
 
-    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
+    typedef G_t             Underlying_t;
+    typedef ssg_vec_vec32i  Overlay_t;
+
+
+//    overlay<G_t, G_t> olay(G, active);
+
+    overlay<Underlying_t, Overlay_t> olay(G, active);
+
+    generic_elimination_search_DFS<Underlying_t, Overlay_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
