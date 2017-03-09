@@ -39,51 +39,54 @@ namespace gen_search{
 template <typename G_t, typename Olay_t, typename CFG_t>
 class generic_elimination_search_base : public treedec::algo::draft::algo1{
 public:
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
     //TODO: better use iterators for elim_vertices
-    generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input, //TODO: fix this
-                                    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &best_ordering_input,
+    generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
+                                    std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub, unsigned depth_input, unsigned nodes_generated_input, unsigned orderings_generated_input)
       : algo1(CFG_t::name()), best_ordering(best_ordering_input),
         global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input),
-        Overlay(Overlay_input)
+        Overlay(Overlay_input), current_ordering(current_ordering_input)
     {}
 
     virtual void do_it() = 0;
 
-    void elimination_ordering(std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &ordering) { ordering = best_ordering; }
+    void elimination_ordering(std::vector<vd> &ordering) { ordering = best_ordering; }
 
     unsigned global_lower_bound(){ return global_lb; }
     unsigned global_upper_bound(){ return global_ub; }
 
+    unsigned get_nodes_generated(){ return nodes_generated; }
+    unsigned get_orderings_generated(){ return orderings_generated; }
+
 protected:
-    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &best_ordering;
+    overlay<G_t, Olay_t> &Overlay;
+    std::vector<vd> &best_ordering;
+    std::vector<vd> &current_ordering;
 
     unsigned global_lb; //lb for the original graph
     unsigned global_ub; //ub for the original graph
 
     unsigned depth;
 
-public:
-    unsigned get_nodes_generated(){ return nodes_generated; }
-    unsigned get_orderings_generated(){ return orderings_generated; }
-
-protected:
     unsigned nodes_generated;
     unsigned orderings_generated;
-    overlay<G_t, Olay_t> &Overlay;
 };
+
 
 template <typename G_t, typename Olay_t, typename CFG_t>
 class generic_elimination_search_DFS : public generic_elimination_search_base<G_t, Olay_t, CFG_t>{
     typedef generic_elimination_search_base<G_t, Olay_t, CFG_t> baseclass;
 
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+    typedef typename baseclass::vd vd;
 
 public:
-    generic_elimination_search_DFS(overlay<G_t, Olay_t> &Overlay_input, //TODO: fix this
-                                   std::vector<vd> &best_ordering_input,
+    generic_elimination_search_DFS(overlay<G_t, Olay_t> &Overlay_input,
+                                   std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
                                    unsigned g_lb, unsigned g_ub, unsigned l_lb, unsigned l_ub, unsigned depth_input, unsigned generated_nodes_input, unsigned generated_orderings_input)
-      : generic_elimination_search_base<G_t, Olay_t, CFG_t>(Overlay_input, best_ordering_input, g_lb, g_ub, depth_input, generated_nodes_input, generated_orderings_input),
+      : generic_elimination_search_base<G_t, Olay_t, CFG_t>(Overlay_input, best_ordering_input, current_ordering_input,
+                                                            g_lb, g_ub, depth_input, generated_nodes_input, generated_orderings_input),
         local_lb(l_lb), local_ub(l_ub), max_nodes_generated(UINT_MAX), max_orderings_generated(UINT_MAX){}
 
     void do_it();
@@ -94,7 +97,7 @@ public:
     unsigned global_lower_bound_bagsize(){ return baseclass::global_lb; }
     unsigned global_upper_bound_bagsize(){ return baseclass::global_ub; }
 
-private:
+protected:
     unsigned local_lb;  //lb for the current graph
     unsigned local_ub;  //ub for the current graph
 
@@ -112,10 +115,6 @@ void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
 
     baseclass::timer_on();
 
-    //std::cout << "depth: " << baseclass::depth << std::endl;
-    //std::cout << "local ub: " << local_ub << std::endl;
-    //std::cout << "global ub: " << baseclass::global_ub << std::endl;
-
     if(baseclass::depth == 0){
         unsigned tmp_global_lb = CFG_t::initial_lb_algo(baseclass::Overlay.underlying());
         baseclass::global_lb = (tmp_global_lb > baseclass::global_lb)? tmp_global_lb : baseclass::global_lb;
@@ -129,26 +128,36 @@ void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
         if(baseclass::global_lb == baseclass::global_ub){
             std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::orderings_generated; //not necessary..
-
-            baseclass::timer_off();
-            return;
+            //returns now
         }
     }
 
     if(baseclass::depth == boost::num_vertices(baseclass::Overlay.underlying())){
         if(local_ub < baseclass::global_ub){ //this should be always true?!
-            //TODO: baseclass::best_ordering = local_ordering; TODO:propagate ordering
             std::cout << "found better ordering of width " << local_ub << std::endl;
             baseclass::global_ub = local_ub;
-            std::cout << "updated global_ub to " << local_ub << std::endl;
+            baseclass::best_ordering = baseclass::current_ordering;
+            std::cout << "updated global_ub to " << baseclass::global_ub << std::endl;
 
             ++baseclass::orderings_generated; //ifdef stats?!
+
+            std::vector<vd> tmp_ordering(boost::num_vertices(baseclass::Overlay.underlying()));
+            unsigned ref_width = CFG_t::refiner(baseclass::Overlay.underlying(), baseclass::best_ordering, tmp_ordering);
+
+           if(ref_width < baseclass::global_ub){
+               std::cout << "found better ordering after refinement " << ref_width << std::endl;
+                baseclass::global_ub = ref_width;
+                baseclass::best_ordering = tmp_ordering;
+                std::cout << "updated global_ub to " << baseclass::global_ub << std::endl;
+           }
+
         }
         else{
             unreachable(); //should be the case?
         }
     }
     else{
+/*
         local_lb = CFG_t::lb_algo(baseclass::Overlay.underlying());
         if(local_lb > baseclass::global_ub){
             //can be seen as pruning this branch
@@ -156,12 +165,12 @@ void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
             baseclass::timer_off();
             return;
         }
-
+*/
         unsigned idx = 0;
 
         //search starts here
         while(true){
-            typename boost::graph_traits<G_t>::vertex_descriptor elim_vertex = CFG_t::next(baseclass::Overlay.underlying(), baseclass::Overlay.active(), idx);
+            vd elim_vertex = CFG_t::next(baseclass::Overlay.underlying(), baseclass::Overlay.active(), idx);
             if(elim_vertex == CFG_t::INVALID_VERTEX()){
                 break;
             }
@@ -180,15 +189,15 @@ void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
 
             unsigned step_width = baseclass::Overlay.eliminate(elim_vertex)+1;
 
-            //std::cout << "depth: " << baseclass::depth << std::endl;
-            //std::cout << "elim_vertex: " << elim_vertex << std::endl;
-
             if(step_width < baseclass::global_ub){
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
+
+                baseclass::current_ordering[baseclass::depth] = elim_vertex;
 
                 //can be seen as a recursion
                 generic_elimination_search_DFS nextStep(baseclass::Overlay,
                                                         baseclass::best_ordering,
+                                                        baseclass::current_ordering,
                                                         baseclass::global_lb,
                                                         baseclass::global_ub,
                                                         local_lb,
@@ -208,18 +217,18 @@ void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
 
                 if(nextStep.global_ub < baseclass::global_ub){
                     baseclass::global_ub = nextStep.global_ub; //may have improved
-                    baseclass::best_ordering[baseclass::depth] = elim_vertex;
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::global_ub || baseclass::global_lb == baseclass::global_ub){
-                        break;
+                        baseclass::Overlay.undo_eliminate(elim_vertex);
+                        break; //returns now
                     }
                 }
             }
             else{
                 //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
             }
-//            undo_eliminate(elim_vertex, baseclass::Overlay.underlying(), baseclass::active, changes_container);
+
             baseclass::Overlay.undo_eliminate(elim_vertex);
 
         }

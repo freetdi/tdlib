@@ -87,9 +87,17 @@ struct CFG_DFS_1{
         return INVALID_VERTEX();
     }
 
+/*
     static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
     {
         return boost::num_vertices(G);
+    }
+*/
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        G_t H(G);
+        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
     }
 
 };
@@ -142,9 +150,16 @@ struct CFG_DFS_2{
         return INVALID_VERTEX();
     }
 
-    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+/*
     {
         return boost::num_vertices(G);
+    }
+*/
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim)
+    {
+        G_t H(G);
+        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
     }
 };
 
@@ -196,9 +211,17 @@ struct CFG_DFS_3{
         return INVALID_VERTEX();
     }
 
+/*
     static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
     {
         return boost::num_vertices(G);
+    }
+*/
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        G_t H(G);
+        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
     }
 };
 
