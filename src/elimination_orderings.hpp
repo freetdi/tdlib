@@ -828,7 +828,7 @@ void LEX_M_fill_in(G_t &G,
 
 // TODO: what does this function do?
 template <typename G_t>
-void LEX_M_minimal_ordering(G_t &G,
+int LEX_M_minimal_ordering(const G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
 {
     unsigned int nv = boost::num_vertices(G);
@@ -851,7 +851,7 @@ void LEX_M_minimal_ordering(G_t &G,
 
     for(int i = boost::num_vertices(G)-1; i >= 0; i--){
         typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
-        unsigned int max = 0;
+        unsigned max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             unsigned int pos = get_pos(*vIt, G);
             if(!alpha_inv[pos]){
@@ -914,6 +914,14 @@ void LEX_M_minimal_ordering(G_t &G,
             k = (k > (unsigned int)label[j])? k : (unsigned int)label[j];
         }
     }
+
+
+    unsigned max = 0;
+    for(unsigned int j = 0; j < label.size(); j++){
+        max = (label[j] > max)? label[j] : max;
+    }
+
+    return (int)max-1; //width of new ordering
 }
 
 } //namespace treedec

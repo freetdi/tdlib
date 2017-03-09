@@ -26,6 +26,7 @@
 
 #include "lower_bounds.hpp"
 #include "elimination_orderings.hpp"
+#include "postprocessing.hpp"
 
 #include <iostream>
 
@@ -40,9 +41,12 @@ namespace configs{
     -initial_ub_algo = NONE
     -lb_algo = NONE
     -next = all nodes "from left to right"
+    -refiner = NONE
 */
 template <typename G_t>
 struct CFG_DFS_1{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
     static const unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -59,7 +63,7 @@ struct CFG_DFS_1{
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
         for(unsigned i = 0; i < boost::num_vertices(G); ++i){
             O[i] = i;
@@ -72,7 +76,7 @@ struct CFG_DFS_1{
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -81,6 +85,11 @@ struct CFG_DFS_1{
         }
 
         return INVALID_VERTEX();
+    }
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        return boost::num_vertices(G);
     }
 
 };
@@ -93,6 +102,8 @@ struct CFG_DFS_1{
 */
 template <typename G_t>
 struct CFG_DFS_2{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
     static const unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -109,7 +120,7 @@ struct CFG_DFS_2{
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
         G_t H(G);
         return treedec::minDegree_ordering(H, O)+1;
@@ -120,7 +131,7 @@ struct CFG_DFS_2{
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -131,6 +142,10 @@ struct CFG_DFS_2{
         return INVALID_VERTEX();
     }
 
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        return boost::num_vertices(G);
+    }
 };
 
 /*
@@ -141,6 +156,8 @@ struct CFG_DFS_2{
 */
 template <typename G_t>
 struct CFG_DFS_3{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
     static const unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -157,7 +174,7 @@ struct CFG_DFS_3{
         return treedec::lb::deltaC_least_c(H)+1;
     }
 
-    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
         G_t H(G);
         return treedec::fillIn_ordering(H, O)+1;
@@ -168,7 +185,7 @@ struct CFG_DFS_3{
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -179,6 +196,10 @@ struct CFG_DFS_3{
         return INVALID_VERTEX();
     }
 
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        return boost::num_vertices(G);
+    }
 };
 
 
@@ -193,6 +214,8 @@ struct CFG_DFS_3{
 /* this is just an example, to not use this - very inefficient
 template <typename G_t>
 struct CFG_DFS_4{
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
     static const unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -208,7 +231,7 @@ struct CFG_DFS_4{
         return 0;
     }
 
-    static unsigned initial_ub_algo(const G_t &G, std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
         return boost::num_vertices(G);
     }
@@ -218,7 +241,7 @@ struct CFG_DFS_4{
         return 0;
     }
 
-    static typename boost::graph_traits<G_t>::vertex_descriptor next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
     {
         unsigned min = UINT_MAX;
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -261,6 +284,11 @@ struct CFG_DFS_4{
         }
 
         return INVALID_VERTEX();
+    }
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    {
+        return boost::num_vertices(G);
     }
 };
 */

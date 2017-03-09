@@ -313,7 +313,7 @@ inline void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_t
  * possibly causes lower width than 'old_elimination_ordering'.
  */
 template <typename G_t>
-void minimalChordal(G_t &G,
+int minimalChordal(G_t &G,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &old_elimination_ordering,
                 typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &new_elimination_ordering)
 {
@@ -370,7 +370,7 @@ void minimalChordal(G_t &G,
             treedec::delete_edges(G, candidate);
         }
     }
-    treedec::LEX_M_minimal_ordering(G, new_elimination_ordering);
+    return treedec::LEX_M_minimal_ordering(G, new_elimination_ordering);
 }
 
 } //namespace treedec

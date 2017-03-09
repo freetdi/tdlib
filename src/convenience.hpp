@@ -82,8 +82,32 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
     assert(treedec::get_width_of_elimination_ordering(G, ordering)
             == generic_elim_DFS_test.global_upper_bound_bagsize());
 */
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+    G_t H(G);
 
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+        exit(-666);
+    }
 }
 
 
@@ -124,11 +148,34 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
-/*
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
-*/
+    G_t H(G);
+
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+
+        exit(-666);
+    }
+
 }
 
 
@@ -167,10 +214,34 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+    G_t H(G);
 
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+        exit(-666);
+    }
+
+
 }
 
 } //namespace gen_search
