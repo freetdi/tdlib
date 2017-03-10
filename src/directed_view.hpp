@@ -246,7 +246,7 @@ num_edges(treedec::draft::directed_view<G> const& g)
 template<class VD, class G>
 typename graph_traits<G>::vertices_size_type
 out_degree(VD v, treedec::draft::directed_view<G> const& g)
-{ untested();
+{
 	return out_degree(v, *g);
 }
 

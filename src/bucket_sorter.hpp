@@ -50,7 +50,7 @@ namespace boost {
     bucket_sorter(){untested();
     }
 
-    void remove(const value_type& x) { untested();
+    void remove(const value_type& x) {
       const size_type i = get(id, x);
       assert(x<size());
 #if 0
@@ -63,7 +63,7 @@ namespace boost {
       assert(prev_node!=i);
     
       //check if i is the end of the bucket list 
-      if ( next_node != invalid_value() ){ untested();
+      if ( next_node != invalid_value() ){
         assert(next_node != prev_node);
         prev[next_node] = prev_node; 
       }
@@ -71,9 +71,9 @@ namespace boost {
       if( prev_node == invalid_value() ){ untested();
         unreachable();
         // double remove?
-      }else if(prev_node>=size()){ untested();
+      }else if(prev_node>=size()){
         next[prev_node] = next_node;
-      }else{ untested();
+      }else{
         next[prev_node] = next_node;
       }
       if(next_node == prev_node){ untested();
@@ -104,20 +104,20 @@ namespace boost {
       (*this)[bucket[x]].push_back(x);
     }
 
-    void push(const value_type& x) { untested();
+    void push(const value_type& x) {
       assert(x<next.size());
       id_to_value[get(id, x)] = x;
       (*this)[bucket[x]].push(x);
     }
 #ifndef NDEBUG
-    bool is_known(const value_type& v) const { untested();
+    bool is_known(const value_type& v) const {
 
       //trace4("is_known", v, k, id_to_value[v], bucket[v]);
       //trace4("is_known", v, k, id_to_value[v], head[bucket[v]]);
       // if it exists, it is at the top, or
       // it has a predecessor.
       const const_stack& b = (*this)[bucket[v]];
-      if( prev[id_to_value[v]] < next.size()){ untested();
+      if( prev[id_to_value[v]] < next.size()){
         return true;
       }else if( b.empty()){ itested();
       //  trace3("empty", v, bucket[v], head[bucket[v]]);
@@ -131,7 +131,7 @@ namespace boost {
     }
 #endif
 
-    void update(const value_type& x) { untested();
+    void update(const value_type& x) {
       remove(x); // can kill head.
       (*this)[bucket[x]].push(x);
     }
@@ -155,7 +155,7 @@ namespace boost {
     //  private: 
     //    with KCC, the nested stack class is having access problems
     //    despite the friend decl.
-    static size_type invalid_value() { untested();
+    static size_type invalid_value() {
       return (std::numeric_limits<size_type>::max)();
     }
     
@@ -184,29 +184,29 @@ namespace boost {
            : s(p.s), b(p.b) {untested();}
         ~const_iterator(){}
       public:
-        const_iterator& operator=(const const_iterator& o){ untested();
+        const_iterator& operator=(const const_iterator& o){
           assert(&s==&o.s); // how to compile time check?!
                             // or just fallback to pointer?
           b = o.b;
           return *this;
         }
-        const_iterator& operator=(const const_iterator&& o){ untested();
+        const_iterator& operator=(const const_iterator&& o){
           assert(&s==&o.s); // how to compile time check?!
                             // or just fallback to pointer?
           b = o.b;
           return *this;
         }
-        value_type operator*() const{ untested();
+        value_type operator*() const{
           assert(b<s.size());
           return s.value[b];
         }
-        const_iterator& operator++(){ untested();
+        const_iterator& operator++(){
           assert(b!=invalid_value());
           assert(b!=s.next[b]);
           b = s.next[b];
           return *this;
         }
-        bool operator!=(const_iterator const& o){ untested();
+        bool operator!=(const_iterator const& o){
           return o.b!=b;
         }
         bool operator==(const_iterator const& o)
@@ -240,14 +240,14 @@ namespace boost {
       void push_back(const value_type& x) { untested();
         incomplete();
       }
-      void push(const value_type& x) { untested();
+      void push(const value_type& x) {
         const size_type new_head = get(id, x);
         assert(new_head < size());
         const size_type current = head[bucket_id];
         if(new_head == current){ untested();
 //          assert(false);
         }
-        if ( current != invalid_value() ){ untested();
+        if ( current != invalid_value() ){
           assert(current!=new_head);
           prev[current] = new_head;
         }
@@ -272,7 +272,7 @@ namespace boost {
       value_type& top() { return value[ head[bucket_id] ]; }
       bool empty() const { return head[bucket_id] == invalid_value(); }
     public: // iterator access
-      const_iterator begin() const{ untested();
+      const_iterator begin() const{
         return const_iterator(head[bucket_id], *this);
       }
       // BUG: template override in degree.hpp does not match (why?)
@@ -294,13 +294,13 @@ namespace boost {
     typedef stack_<Iter, IndexValueMap> stack;
     typedef stack_<ConstIter, ConstIndexValueMap> const_stack;
     
-    const_stack operator[](const bucket_type& i) const{ untested();
+    const_stack operator[](const bucket_type& i) const{
       assert(i < next.size());
 
       return const_stack(i, head, next.begin(), prev.begin(),
                    id_to_value.begin(), id);
     }
-    stack operator[](const bucket_type& i) { untested();
+    stack operator[](const bucket_type& i) {
       assert(i < next.size());
       return stack(i, head, next.begin(), prev.begin(),
                    id_to_value.begin(), id);
