@@ -226,10 +226,10 @@ public:
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
           _numbering(_g)
-    {
+    { untested();
         assert(_num_edges ^ 1);
         _num_edges /= 2;
-        _lb_tw=0;
+        _lb_bs = 1;
     }
 private:
     class ISNUM{
@@ -252,10 +252,16 @@ private:
         boost::remove_out_edge_if(v, [](edge_descriptor){ return true; }, _g);
     }
 public:
-    void set_treewidth(std::pair<int, int> p) { _lb_tw=p.first; }
-    void set_treewidth(int l, int){ _lb_tw=l; }
+    void set_treewidth(std::pair<int, int> p) { untested();
+        _lb_bs = p.first+1;
+    }
+    void set_treewidth(int l, int){ untested();
+        _lb_bs = l+1;
+    }
     void do_it();
-    size_t get_bagsize() const{ return _lb_tw+1; }
+    size_t get_bagsize() const{ untested();
+        return _lb_bs;
+    }
     void get_bags(BV_t& bags) { // for now
 
         auto b=_elims.begin();
@@ -314,7 +320,9 @@ public:
         gg=gr; //MOVE(gr);
         assert(boost::num_edges(gg)*2 == boost::num_edges(_g));
     }
-    int get_treewidth() { return _lb_tw; }
+    int get_treewidth() { untested();
+        return int(_lb_bs)-1;
+    }
     void isolate(vertex_descriptor v){ untested();
         unsigned deg = _degree[v];
         _num_edges -= deg;
@@ -589,7 +597,7 @@ private:
     degreemap_type _degreemap;
     degs_type _degs;
     std::deque<vertex_descriptor> _elims;
-    int _lb_tw; // BUG. use bagsize
+    unsigned _lb_bs;
     unsigned _num_edges;
     marker_type _marker;
     treedec::draft::sMARKER<vertices_size_type, vertices_size_type> _dormant;
@@ -732,9 +740,9 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
 
     assert(df==_degree[*f]);
 
-    if(_lb_tw < 1){ untested();
-        _lb_tw = 1;
-    }else{
+    if(_lb_bs < 2){ untested();
+        _lb_bs = 2;
+    }else{ untested();
     }
 }
 
@@ -785,8 +793,8 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         wake_up_node(*f);
     }
 
-    if(_lb_tw < 2){ untested();
-        _lb_tw = 2;
+    if(_lb_bs < 3){ untested();
+        _lb_bs = 3;
     }else{
     }
 }
@@ -833,9 +841,10 @@ bool preprocessing<G_t, CFG>::Buddy(
         redegree(v, 1);
 #endif
 
-
-
-        _lb_tw = (_lb_tw > 3)? _lb_tw : 3;
+        if(_lb_bs < 4){
+            _lb_bs = 4;
+        }else{
+        }
         return true;
     }else{ untested();
         return false;
@@ -954,8 +963,8 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
         wake_up_neighs(w);
         // wake_up_neighs(x); u,v,w
 
-        if(_lb_tw < 3){
-            _lb_tw = 3;
+        if(_lb_bs < 4){
+            _lb_bs = 4;
         }else{
         }
 
@@ -1228,8 +1237,8 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         }
         _num_edges -= _degree[v];
 
-        if (unsigned(_lb_tw) < deg){ untested();
-            _lb_tw = deg;
+        if (_lb_bs < 1+deg){ untested();
+            _lb_bs = 1+deg;
         }else{
         }
 
@@ -1241,9 +1250,9 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         // missing and multimissings are balanced.
         // it's almost simplicial.
         assert(deg);
-        assert(_lb_tw>=0);
+        assert(_lb_bs>=1);
 
-        if(deg <= (vertices_size_type)_lb_tw){ untested();
+        if(deg+1 <= _lb_bs){ untested();
             vd_type vd = get_vd(_g, v);
 
 #if 0
@@ -1291,8 +1300,8 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
             redegree(v);
 
             return true;
-        }else if(_lb_tw+1 < deg){ untested();
-            _lb_tw = deg-1;
+        }else if(_lb_bs < deg){ untested();
+            _lb_bs = deg;
             return true;
         }else{ untested();
             return false;
@@ -1341,8 +1350,8 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
         wake_up_neighs(N[1]);
         wake_up_neighs(N[2]);
 
-        if(_lb_tw<3){ untested();
-           _lb_tw=3;
+        if(_lb_bs<4){ untested();
+           _lb_bs = 4;
         }else{ untested();
         }
         assert(!_degs.is_reg(v));
@@ -1371,10 +1380,9 @@ void preprocessing<G_t, CFG>::do_it()
     trace1("", cdegs.size());
     assert(cdegs.size());
     if(!cdegs[0].empty()){ untested();
-        if (_lb_tw < 0){ untested();
-            _lb_tw = 0;
+        if (_lb_bs==0){ untested();
+            _lb_bs = 1;
         }else{ untested();
-
         }
     }else{
     }
@@ -1499,8 +1507,8 @@ void preprocessing<G_t, CFG>::do_it()
         }
         {
 
-            if (_lb_tw < 4){
-                _lb_tw = 4;
+            if (_lb_bs < 5){
+                _lb_bs = 5;
             }else{
             }
 
