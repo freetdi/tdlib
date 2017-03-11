@@ -9,19 +9,19 @@ namespace treedec{
 namespace gen_search{
 
 
-template<class iter1, class iter2>
+template<class iter1, class iter2> //TODO: fix this
 class concat_iterator{
 public:
     concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
      : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
 
-    bool operator!=(const concat_iterator& end){
+    bool operator!=(const iter2& end){
         // warning: only works if end==end_of range2.
 
-        return _i1!=_e1 && _i2 != _e2;
+        return !(_i1 ==_e1 && _i2 == _e2);
     }
 
-    concat_iterator& operator++(){
+    void operator++(){
         if(_i1!=_e1){
             // still busy with range 1
             ++_i1;
@@ -100,46 +100,39 @@ public:
 
         unsigned actual_degree = 0;
 
-        typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
+        typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
+        typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
+        adj1_iterator nIt1, nEnd1;
+        adj2_iterator nIt2, nEnd2;
         boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(elim_vertex, G);
         boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
 
-        for(; nIt1 != nEnd2; ++nIt1){ //this just goes through N_G(elim) and than through N_O(elim), TODO: iterator
-            if(nIt1 == nEnd1){
-                boost::tie(nIt1, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
-                if(nIt1 == nEnd2){
-                    break;
-                }
-            }
+        concat_iterator<adj1_iterator, adj2_iterator> cIt1(nIt1, nEnd1, nIt2, nEnd2);
+        concat_iterator<adj1_iterator, adj2_iterator> cIt2(nIt1, nEnd1, nIt2, nEnd2);
 
-            if(!_active[*nIt1]){
+        for(; cIt1 != nEnd2; ++cIt1){
+            if(!_active[*cIt1]){
                 continue;
             }
 
             ++actual_degree;
 
-            nIt2 = nIt1;
-            ++nIt2;
+            cIt2 = cIt1;
+            ++cIt2;
 
-            for(; nIt2 != nEnd2; ++nIt2){
-                if(nIt2 == nEnd1){
-                    boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
-                    if(nIt2 == nEnd2){
-                        break;
-                    }
-                }
-
-                if(!_active[*nIt2]){
+            for(; cIt2 != nEnd2; ++cIt2){
+                if(!_active[*cIt2]){
                     continue;
                 }
 
                 //TODO: can be further improved..
-                if(!boost::edge(*nIt1, *nIt2, G).second && !boost::edge(*nIt1, *nIt2, O).second)
+                //if cIt1 or cIt2 are not in G, than the first one (! bla) is always true
+                if(!boost::edge(*cIt1, *cIt2, G).second && !boost::edge(*cIt1, *cIt2, O).second)
                 {
-                    boost::add_edge(*nIt1, *nIt2, O);
-                    boost::add_edge(*nIt2, *nIt1, O);
-                    _changes_container.top().push_back(*nIt1);
-                    _changes_container.top().push_back(*nIt2);
+                    boost::add_edge(*cIt1, *cIt2, O);
+                    boost::add_edge(*cIt2, *cIt1, O);
+                    _changes_container.top().push_back(*cIt1);
+                    _changes_container.top().push_back(*cIt2);
                 }
             }
         }
