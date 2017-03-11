@@ -1,7 +1,7 @@
 //TODO:guard
 
-#include <gala/graph.h>
-#include <gala/boost.h>
+//#include <gala/graph.h>
+//#include <gala/boost.h>
 
 namespace treedec{
 
@@ -102,7 +102,7 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 
     typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
 
-    typedef G_t             Underlying_t;
+    typedef G_t Underlying_t;
     typedef ssg_vec_vec32i  Overlay_t;
 
 

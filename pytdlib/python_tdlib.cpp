@@ -37,8 +37,15 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
+#include <gala/graph.h> //TODO: now here
+#include <gala/boost.h>
+
 #include "generic_elimination_search.hpp"
+
+
 #include "convenience.hpp"
+
+
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t; //type 0
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t; //type 1

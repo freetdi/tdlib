@@ -17,19 +17,13 @@ public:
       : G(G_input)
     {
         _active = std::vector<bool>(boost::num_vertices(G_input), true);
-        for(unsigned i = 0; i < boost::num_vertices(G_input); ++i)
-        {
-            boost::add_vertex(O);
-        }
+        O(boost::num_vertices(G_input));
     }
 
     overlay(UnderlyingG_t &G_input, std::vector<bool> &active_input) //e.g. after PP
       : G(G_input), _active(active_input)
     {
-        for(unsigned i = 0; i < boost::num_vertices(G_input); ++i)
-        {
-            boost::add_vertex(O);
-        }
+        O(boost::num_vertices(G_input));
     }
 
     const UnderlyingG_t &underlying(){
@@ -63,6 +57,7 @@ public:
         unsigned actual_degree = 0;
 
         typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator nIt1, nIt2, nEnd1, nEnd2;
+//        auto nIt1, nIt2, nEnd1, nEnd2;
         boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(elim_vertex, G);
         boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
 
