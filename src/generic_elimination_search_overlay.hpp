@@ -55,13 +55,13 @@ public:
       : G(G_input)
     {
         _active = std::vector<bool>(boost::num_vertices(G_input), true);
-        O(boost::num_vertices(G_input));
+        O = OverlayG_t(boost::num_vertices(G_input));
     }
 
     overlay(UnderlyingG_t &G_input, std::vector<bool> &active_input) //e.g. after PP
       : G(G_input), _active(active_input)
     {
-        O(boost::num_vertices(G_input));
+        O = OverlayG_t(boost::num_vertices(G_input));
     }
 
     const UnderlyingG_t &underlying(){
