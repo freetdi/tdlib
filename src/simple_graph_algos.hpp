@@ -36,7 +36,7 @@ namespace treedec{
 
 //This function is used in the minimalChordal algorithm.
 template <typename G_t>
-void induced_subgraph_omit_edges(G_t &H, G_t &G,
+void induced_subgraph_omit_edges(G_t &H, const G_t &G,
                       typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
                       std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges,
                       typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)

@@ -373,7 +373,7 @@ private:
 //register a 1-neighborhood to DEGS
 template<class U, class G_t, class B, class D>
 void redegree(U, G_t const &G, B I, B E, D& degree)
-{ incomplete();
+{
     for(; I!=E; ++I){
         typename boost::graph_traits<G_t>::vertex_descriptor x=*I;
         assert(treedec::is_valid(x, G));

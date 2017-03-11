@@ -52,6 +52,8 @@ namespace gen_search{
 template <typename G_t>
 void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
+
     std::vector<bool> active(boost::num_vertices(G), true);
 
     overlay<G_t, G_t> olay(G, active);
@@ -60,6 +62,7 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
        generic_elim_DFS_test
               (olay,
                ordering,
+               cur_ordering,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
@@ -79,17 +82,39 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "nodes generated: " << generic_elim_DFS_test.get_nodes_generated() << std::endl;
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
+/*
     std::cout << "ordering: " << std::endl;
     for(unsigned i = 0; i < ordering.size(); ++i){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-/*
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
-*/
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+    G_t H(G);
 
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+        exit(-666);
+    }
+*/
 }
 
 
@@ -98,6 +123,8 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
 template <typename G_t>
 void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
+
     std::vector<bool> active(boost::num_vertices(G), true);
 
     typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
@@ -114,6 +141,7 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
        generic_elim_DFS_test
               (olay,
                ordering,
+               cur_ordering,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
@@ -133,15 +161,39 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "nodes generated: " << generic_elim_DFS_test.get_nodes_generated() << std::endl;
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
+/*
     std::cout << "ordering: " << std::endl;
     for(unsigned i = 0; i < ordering.size(); ++i){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
-/*
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
+    G_t H(G);
+
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+
+        exit(-666);
+    }
 */
 }
 
@@ -149,6 +201,8 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 template <typename G_t>
 void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
+
     std::vector<bool> active(boost::num_vertices(G), true);
 
     overlay<G_t, G_t> olay(G, active);
@@ -157,6 +211,7 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
        generic_elim_DFS_test
               (olay,
                ordering,
+               cur_ordering,
                0,                         //global_lb
                boost::num_vertices(G),    //global_ub
                0,
@@ -176,15 +231,39 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "nodes generated: " << generic_elim_DFS_test.get_nodes_generated() << std::endl;
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
+/*
     std::cout << "ordering: " << std::endl;
     for(unsigned i = 0; i < ordering.size(); ++i){
         std::cout << ordering[i] << " ";
     } std::cout << std::endl;
 
-    std::cout << "width of elimination ordering (check): " << treedec::get_width_of_elimination_ordering(G, ordering) << std::endl;
+    G_t H(G);
 
-    assert(treedec::get_width_of_elimination_ordering(G, ordering)
-            == generic_elim_DFS_test.global_upper_bound_bagsize());
+    int w1_check = treedec::get_width_of_elimination_ordering(H, ordering)+1;
+
+    std::cout << "width of elimination ordering (check): " << w1_check << std::endl;
+
+    std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering2(boost::num_vertices(G));
+
+    std::cout << "postrefiner..";
+
+    int w2 = treedec::minimalChordal(G, ordering, ordering2)+1;
+
+    std::cout << " done." << std::endl;
+
+    int w2_check = treedec::get_width_of_elimination_ordering(G, ordering2)+1;
+
+    std::cout << "width of elimination refined ordering: " << w2_check << std::endl;
+
+    if(w1_check != generic_elim_DFS_test.global_upper_bound_bagsize() || w2 != w2_check){
+        std::cout << "widthcheck error!!!!!" << std::endl;
+        std::cout << "w1: " << generic_elim_DFS_test.global_upper_bound_bagsize() << std::endl;
+        std::cout << "w1_check: " << w1_check << std::endl;
+        std::cout << "w2: " << w2 << std::endl;
+        std::cout << "w2_check: " << w2_check << std::endl;
+        exit(-666);
+    }
+*/
 }
 
 } //namespace gen_search
