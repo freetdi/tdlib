@@ -8,6 +8,44 @@ namespace treedec{
 
 namespace gen_search{
 
+
+template<class iter1, class iter2>
+class concat_iterator{
+public:
+    concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
+     : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
+
+    bool operator!=(const concat_iterator& end){
+        // warning: only works if end==end_of range2.
+
+        return _i1!=_e1 && _i2 != _e2;
+    }
+
+    concat_iterator& operator++(){
+        if(_i1!=_e1){
+            // still busy with range 1
+            ++_i1;
+        }
+        else{
+            ++_i2;
+        }
+    }
+
+    unsigned operator*(){
+        if(_i1!=_e1){
+            //still busy with range 1
+            return *_i1;
+        }
+
+        return *_i2;
+    }
+
+private:
+    iter1 _i1, _e1;
+    iter2 _i2, _e2;
+};
+
+
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
 class overlay{
 public:

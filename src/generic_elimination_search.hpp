@@ -45,9 +45,9 @@ public:
     generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
                                     std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub, unsigned depth_input, unsigned nodes_generated_input, unsigned orderings_generated_input)
-      : algo1(CFG_t::name()), best_ordering(best_ordering_input),
-        global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input),
-        Overlay(Overlay_input), current_ordering(current_ordering_input)
+      : algo1(CFG_t::name()), Overlay(Overlay_input),
+        best_ordering(best_ordering_input), current_ordering(current_ordering_input),
+        global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input)
     {}
 
     virtual void do_it() = 0;
