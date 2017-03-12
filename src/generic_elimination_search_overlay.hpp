@@ -99,6 +99,9 @@ public:
         adj1_iterator nIt1, nEnd1;
         adj2_iterator nIt2, nEnd2;
 
+        boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(elim_vertex, G);
+        boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
+
         concat_iterator<adj1_iterator, adj2_iterator> cIt1(nIt1, nEnd1, nIt2, nEnd2);
         concat_iterator<adj1_iterator, adj2_iterator> cIt2(nIt1, nEnd1, nIt2, nEnd2);
 
