@@ -81,13 +81,13 @@ namespace detail{
 
 
 //WARNING: untested
-//WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
+//WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above) if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 class skeleton{
 public:
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
-    skeleton(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n)
+    skeleton(G_t &G, T_t &T, B_t *B, O_t &O, unsigned n)
       : _g(G), _t(T), _b(B), _o(O), _n(n)
     {
         _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
@@ -121,11 +121,20 @@ public:
         for(unsigned u = 0; u < max; u++){
             unsigned min_index = max; //note: if there's an empty bag, we can glue
                                       //it toghether with an arbitrary bag.
-            for(typename bag_type::iterator bIt = _b[u].begin(); bIt != _b[u].end(); bIt++){
-                unsigned pos = get_pos(*bIt, _g);
-                unsigned index = _inv_o[pos];
-                if(index < min_index){
-                    min_index = index;
+
+            if(_b != NULL){
+                for(typename bag_type::iterator bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
+                    unsigned pos = get_pos(*bIt, _g);
+                    unsigned index = _inv_o[pos];
+                    min_index = (index < min_index)? index : min_index;
+                }
+            }
+            else{
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
+                    unsigned pos = get_pos(*nIt, _g);
+                    unsigned index = _inv_o[pos];
+                    min_index = (index < min_index)? index : min_index;
                 }
             }
             //(min_index, u) will lead to a connected directed graph, if G_t is
@@ -135,7 +144,15 @@ public:
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
-            bag(u, _t) = MOVE(_b[u]);
+            if(_b != NULL){
+                bag(u, _t) = MOVE((*_b)[u]);
+            }
+            else{
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
+                    insert(bag(u, _t), _o[u]);
+                }
+            }
             insert(bag(u, _t), _o[u]); //printer variant without this inserting?
         }
     }
@@ -143,7 +160,7 @@ public:
 private:
     G_t &_g;
     T_t &_t;
-    B_t &_b;
+    B_t *_b;
     O_t &_o;
     unsigned _n;
 
@@ -153,7 +170,7 @@ private:
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_){
-    skeleton<G_t, T_t, B_t, O_t> S(G, T, B, O, n_);
+    skeleton<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
     S.do_it();
 }
 
