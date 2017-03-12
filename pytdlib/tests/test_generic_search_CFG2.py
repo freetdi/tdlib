@@ -10,7 +10,7 @@ from graphs import *
 PREFIX = "Dimacs"
 COUNT = 81
 
-MAX_NODES = 10000
+MAX_NODES = 2500
 MAX_ORDERINGS = 1000
 
 #don't confuse python unittest
@@ -65,15 +65,6 @@ class TestTdLib(unittest.TestCase):
     def test_9(self):
         print("---Dimacs58---")
         G = Graph(Dimacs.V_58, Dimacs.E_58)
-
-        T, w = tdlib.minDegree_decomp(G)
-        print("MD_width: " + str(w))
-
-        tdlib.generic_elimination_search2(G, MAX_NODES, MAX_ORDERINGS)
-
-    def test_11(self):
-        print("---Dimacs2---")
-        G = Graph(Dimacs.V_2, Dimacs.E_2)
 
         T, w = tdlib.minDegree_decomp(G)
         print("MD_width: " + str(w))
