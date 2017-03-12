@@ -163,7 +163,7 @@ void gala_resize(G_t &G, VD_t v, unsigned num){
 
 
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
-class overlay_gala : overlay<UnderlyingG_t, OverlayG_t>{
+class overlay_gala : public overlay<UnderlyingG_t, OverlayG_t>{
 public:
     typedef overlay<UnderlyingG_t, OverlayG_t> baseclass;
 
@@ -247,7 +247,7 @@ public:
         baseclass::_active[elim_vertex]= true;
         for(unsigned i = 0; i < baseclass::_changes_container.top.size(); ++i){
             vdU v = baseclass::_changes_container.top()[i];
-            gala_resize(O, v, _changes_size.top()[v]);
+            gala_resize(baseclass::O, v, _changes_size.top()[v]);
         }
         baseclass::_changes_container.pop();
         _changes_size.pop();
