@@ -40,6 +40,10 @@ public:
         return *_i2;
     }
 
+    bool is_in_underlying(){
+        return _i1!=_e1;
+    }
+
 private:
     iter1 _i1, _e1;
     iter2 _i2, _e2;
@@ -122,7 +126,10 @@ public:
 
                 //TODO: can be further improved..
                 //if cIt1 or cIt2 are not in G, than the first one (! bla) is always true
-                if(!boost::edge(*cIt1, *cIt2, G).second && !boost::edge(*cIt1, *cIt2, O).second)
+                if(cIt1.is_in_underlying() && cIt2.is_in_underlying() && boost::edge(*cIt1, *cIt2, G).second){
+                    continue;
+                }
+                if(!boost::edge(*cIt1, *cIt2, O).second)
                 {
                     boost::add_edge(*cIt1, *cIt2, O);
                     boost::add_edge(*cIt2, *cIt1, O);
