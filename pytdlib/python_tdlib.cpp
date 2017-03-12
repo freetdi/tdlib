@@ -37,8 +37,8 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
-#ifdef HAVA_GALA
-#include <gala/graph.h> //TODO: now here
+#ifdef HAVE_GALA
+#include <gala/graph.h> //TODO: not here
 #include <gala/boost.h>
 #endif
 

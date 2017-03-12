@@ -79,53 +79,84 @@ namespace treedec{ //
 // or to greedy_heuristics class?
 namespace detail{
 
+
+//WARNING: untested
+//WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
-{
+class skeleton{
+public:
     typedef typename treedec_traits<T_t>::bag_type bag_type;
 
-    std::vector<unsigned int> inv_O(boost::num_vertices(G), n_+1);
-    for(unsigned u = 0; u < n_; u++){ itested();
-        typename treedec_chooser<G_t>::value_type e=O[u];
-        unsigned pos = get_pos(e, G);
-        inv_O[pos] = u;
+    skeleton(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n)
+      : _g(G), _t(T), _b(B), _o(O), _n(n)
+    {
+        _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
     }
 
-    if(n_==0){
-        return;
-    }
-
-    //Bag for the u-th elimination vertex will be stored in T[u].
-    for(unsigned u = 0; u < n_; u++){ itested();
-        boost::add_vertex(T);
-    }
-
-
-    //Since we made the neighbourhood N of the u-th vertex a clique,
-    //the bag of the neighbour of this vertex with lowest elimination index
-    //will have N as a subset.
-    unsigned max = n_-1u;
-    for(unsigned u = 0; u < max; u++){ itested();
-        unsigned min_index = max; //note: if there's an empty bag, we can glue
-                                  //it toghether with an arbitrary bag.
-        for(typename bag_type::iterator bIt = B[u].begin(); bIt != B[u].end(); bIt++){ itested();
-           unsigned pos = get_pos(*bIt, G);
-           unsigned index = inv_O[pos];
-           if(index < min_index){
-               min_index = index;
-           }
+    void inverse_ordering()
+    {
+        for(unsigned u = 0; u < _n; u++){
+            typename treedec_chooser<G_t>::value_type e=_o[u];
+            unsigned pos = get_pos(e, _g);
+            _inv_o[pos] = u;
         }
-        //(min_index, u) will lead to a connected directed graph, if G_t is
-        //directed.
-        boost::add_edge(min_index, u, T);
     }
 
-    //Bag for the u-th elimination vertex will be stored in T[u].
-    for(unsigned u = 0; u < n_; u++){ itested();
-        bag(u, T) = MOVE(B[u]);
-        insert(bag(u, T), O[u]); //printer variant without this inserting?
+    void do_it(){
+        if(_n == 0){
+            return;
+        }
+
+        inverse_ordering();
+
+        //Bag for the u-th elimination vertex will be stored in T[u].
+        for(unsigned u = 0; u < _n; u++){
+            boost::add_vertex(_t);
+        }
+
+        //Since we made the neighbourhood N of the u-th vertex a clique,
+        //the bag of the neighbour of this vertex with lowest elimination index
+        //will have N as a subset.
+        unsigned max = _n-1u;
+        for(unsigned u = 0; u < max; u++){
+            unsigned min_index = max; //note: if there's an empty bag, we can glue
+                                      //it toghether with an arbitrary bag.
+            for(typename bag_type::iterator bIt = _b[u].begin(); bIt != _b[u].end(); bIt++){
+                unsigned pos = get_pos(*bIt, _g);
+                unsigned index = _inv_o[pos];
+                if(index < min_index){
+                    min_index = index;
+                }
+            }
+            //(min_index, u) will lead to a connected directed graph, if G_t is
+            //directed.
+            boost::add_edge(min_index, u, _t);
+        }
+
+        //Bag for the u-th elimination vertex will be stored in T[u].
+        for(unsigned u = 0; u < _n; u++){
+            bag(u, _t) = MOVE(_b[u]);
+            insert(bag(u, _t), _o[u]); //printer variant without this inserting?
+        }
     }
+
+private:
+    G_t &_g;
+    T_t &_t;
+    B_t &_b;
+    O_t &_o;
+    unsigned _n;
+
+    std::vector<unsigned int> _inv_o;
+};
+
+
+template <typename G_t, typename T_t, typename B_t, typename O_t>
+void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_){
+    skeleton<G_t, T_t, B_t, O_t> S(G, T, B, O, n_);
+    S.do_it();
 }
+
 
 } //namespace detail
 
