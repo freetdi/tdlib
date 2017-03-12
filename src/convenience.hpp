@@ -133,7 +133,7 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
     typedef G_t Underlying_t;
     typedef ssg_vec_vec32i  Overlay_t;
 
-    overlay<Underlying_t, Overlay_t> olay(G, active);
+    overlay_gala<Underlying_t, Overlay_t> olay(G, active);
 
     generic_elimination_search_DFS<Underlying_t, Overlay_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
        generic_elim_DFS_test
