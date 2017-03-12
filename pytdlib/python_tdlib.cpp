@@ -37,8 +37,10 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
+#ifdef HAVA_GALA
 #include <gala/graph.h> //TODO: now here
 #include <gala/boost.h>
+#endif
 
 #include "generic_elimination_search.hpp"
 
