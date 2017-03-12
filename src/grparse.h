@@ -39,8 +39,6 @@
 #include <fstream>
 #include <iostream>
 #include "assert.h"
-//#include <gala/boost.h>
-//#include <gala/trace.h>
 
 static const unsigned BUFSIZE=256;
 

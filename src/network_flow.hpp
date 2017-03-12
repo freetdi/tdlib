@@ -112,7 +112,7 @@ void check_dis(D dis, size_t num)
 template <typename G_t>
 std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
           typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor>
-    make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
+    make_digraph_with_source_and_sink(G_t const &G, std::vector<BOOL> const &disabled,
                  unsigned num_dis,
                  typename graph_traits<G_t>::directed_overlay& diG,
                  /* FIXME: use property... */
@@ -363,7 +363,7 @@ static bool t_search_disjoint_ways(
 
 // compute disjoint ways in G \ { v | disabled[v] }
 template <typename G_t>
-bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
+bool disjoint_ways(G_t const &G, std::vector<BOOL> const &disabled,
         unsigned num_dis,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y,
@@ -445,7 +445,7 @@ bool disjoint_ways(G_t const &G, std::vector<bool> const &disabled,
 //exists or not.
 template <typename G_t, typename S_t>
 bool seperate_vertices(
-        G_t const &G, std::vector<bool> &disabled, unsigned &num_dis,
+        G_t const &G, std::vector<BOOL> &disabled, unsigned &num_dis,
         S_t const &X,
         S_t const &Y,
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S,
@@ -482,7 +482,7 @@ bool seperate_vertices(
 
 //Version that computes a X-Y-seperator S without aborting after k iterations (S really will be a seperator).
 template <typename G_t, typename S_t, typename Sep_t>
-void seperate_vertices(G_t &G, std::vector<bool> &disabled, unsigned num_dis,
+void seperate_vertices(G_t &G, std::vector<BOOL> &disabled, unsigned num_dis,
         S_t const &X,
         S_t const &Y,
         Sep_t &S,

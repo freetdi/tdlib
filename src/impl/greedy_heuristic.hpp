@@ -299,7 +299,7 @@ private:
     bool _iiv;
     size_t _i;
     std::vector<bag_type> _bags; // BUG. use _t;
-    std::vector<bool> _visited;
+    std::vector<BOOL> _visited;
     degs_type _degs;
 }; // minDegree
 
@@ -542,7 +542,7 @@ private: // data
     fill_type _fill;
     std::vector<bag_type> _bags; // BUG: what's this? (use tree?!)
     O_t _elim_vertices; // TODO: external?!
-    std::vector<bool> _visited;
+    std::vector<BOOL> _visited;
 }; // FillIn
 
 } // namespace impl

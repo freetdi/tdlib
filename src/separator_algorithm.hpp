@@ -144,7 +144,7 @@ inline bool this_intersection_thing(W_t const& W, S_t const& S, X_t const& X)
 //The sets X and Y are all possible disjoint subsets of W of size 1 to 2k.
 template <typename G_t, typename W_t, typename S_t, typename digraph_t>
 bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
-    std::vector<bool> const &disabled, unsigned num_dis, unsigned int k,
+    std::vector<BOOL> const &disabled, unsigned num_dis, unsigned int k,
     digraph_t* dg)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -201,7 +201,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                 for(; J!=e; ++J){
                     S.clear();
 
-                    std::vector<bool> disabled_(disabled);
+                    std::vector<BOOL> disabled_(disabled);
                     unsigned num_dis_(num_dis);
                     X_Y.clear();
 
@@ -295,7 +295,7 @@ bool sep_decomp(G_t const &G, T_t &T,
         W_t &W, // a vertex set
         P_t const &parent, // a vertex set
         V_t &vertices, // a vertex set
-        std::vector<bool> &disabled,
+        std::vector<BOOL> &disabled,
         unsigned int& num_dis,
         unsigned int k,
         digraph_t* dg)
@@ -364,7 +364,7 @@ bool sep_decomp(G_t const &G, T_t &T,
                            std::inserter(newW, newW.begin()));
 
             unsigned num_dis_ = boost::num_vertices(G);
-            std::vector<bool> disabled_(num_dis_, true);
+            std::vector<BOOL> disabled_(num_dis_, true);
             for(typename vertex_set::iterator sIt
                     = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++)
             {
@@ -409,7 +409,7 @@ void separator_algorithm(G_t const &G, T_t &T)
     }
 
     while(!finished){
-        std::vector<bool> disabled(boost::num_vertices(G), false);
+        std::vector<BOOL> disabled(boost::num_vertices(G), false);
         unsigned num_dis=0;
         vertex_set emptySet, parent;
         finished = sep_decomp(G, T, emptySet, parent, vertices, disabled, num_dis, k, &dw);

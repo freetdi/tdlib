@@ -142,7 +142,7 @@ namespace detail{
 
 // iterate through the connected components of a graph
 // THIS IMPLEMENTS A ONE-PASS ITERATOR
-template<class G, class VR, class BOOL=bool>
+template<class G, class VR, class BOOL_=bool>
 class components_iter{ //
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
@@ -153,7 +153,7 @@ public: // types
     typedef typename std::vector<adj_range> stack_type;
 
     typedef typename std::vector<adj_range> scratch_type;
-    typedef std::vector<BOOL> vis_t;
+    typedef std::vector<BOOL_> vis_t;
     class component_iter{ //
     public:
         component_iter(typename VR::first_type v, components_iter& cs)
@@ -471,7 +471,7 @@ namespace detail{
 
 // sort of bfs
 // THIS IMPLEMENTS A ONE-PASS ITERATOR
-template<class G, class VR, class BOOL=bool>
+template<class G, class VR, class BOOL_=bool>
 class bfs_iter{ //
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
@@ -483,7 +483,7 @@ public: // types
     typedef std::pair<bfs_iter, bfs_iter> bfs_range;
 
     typedef queue_type scratch_type;
-    typedef std::vector<BOOL> vis_t;
+    typedef std::vector<BOOL_> vis_t;
     class bfs_end{ //
     };
 
@@ -755,17 +755,17 @@ public:
 // typedef typename onion_iter<G, ORIP_, BOOL>::onion_range onion_range;
 // iterate through layers of graph induced by non-masked nodes connected to
 // vertex range *[i, e).
-template<class G, class VRI, /*class VRIE,*/ class BOOL>
-    typename detail::bfs_iter<G, ORIP_, BOOL>::bfs_range
+template<class G, class VRI, /*class VRIE,*/ class BOOL_>
+    typename detail::bfs_iter<G, ORIP_, BOOL_>::bfs_range
     make_bfs_range(
             VRI i, VRI e,
             G const& g,
-            std::vector<BOOL>* mask,
-            typename detail::bfs_iter<G, ORIP_, BOOL>::scratch_type* s=NULL)
+            std::vector<BOOL_>* mask,
+            typename detail::bfs_iter<G, ORIP_, BOOL_>::scratch_type* s=NULL)
 { untested();
     return std::make_pair(
-        detail::bfs_iter<G, ORIP_, BOOL>(std::make_pair(i, e), g, mask, s),
-        detail::bfs_iter<G, ORIP_, BOOL>(g));
+        detail::bfs_iter<G, ORIP_, BOOL_>(std::make_pair(i, e), g, mask, s),
+        detail::bfs_iter<G, ORIP_, BOOL_>(g));
 }
 #undef ORIP_
 
@@ -773,7 +773,7 @@ namespace detail{
 
 // sort of bfs
 // THIS IMPLEMENTS A ONE-PASS ITERATOR
-template<class G, class VR, class BOOL=bool>
+template<class G, class VR, class BOOL_=bool>
 class onion_iter{ //
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
@@ -785,7 +785,7 @@ public: // types
     typedef std::pair<onion_iter, onion_iter> onion_range;
 
     typedef queue_type scratch_type;
-    typedef std::vector<BOOL> vis_t;
+    typedef std::vector<BOOL_> vis_t;
     class layer_end{ //
     };
     class layer_iter{ //
@@ -1086,17 +1086,17 @@ private: // state
 // typedef typename onion_iter<G, ORIP_, BOOL>::onion_range onion_range;
 // iterate through layers of graph induced by non-masked nodes connected to
 // vertex range *[i, e).
-template<class G, class VRI, /*class VRIE,*/ class BOOL>
-    typename detail::onion_iter<G, ORIP_, BOOL>::onion_range
+template<class G, class VRI, /*class VRIE,*/ class BOOL_>
+    typename detail::onion_iter<G, ORIP_, BOOL_>::onion_range
     make_onion_range(
             VRI i, VRI e,
             G const& g,
-            std::vector<BOOL>* mask,
-            typename detail::onion_iter<G, ORIP_, BOOL>::scratch_type* s=NULL)
+            std::vector<BOOL_>* mask,
+            typename detail::onion_iter<G, ORIP_, BOOL_>::scratch_type* s=NULL)
 {
     return std::make_pair(
-        detail::onion_iter<G, ORIP_, BOOL>(std::make_pair(i, e), g, mask, s),
-        detail::onion_iter<G, ORIP_, BOOL>(g));
+        detail::onion_iter<G, ORIP_, BOOL_>(std::make_pair(i, e), g, mask, s),
+        detail::onion_iter<G, ORIP_, BOOL_>(g));
 }
 #undef ORIP_
 #undef COMMA
@@ -1625,7 +1625,7 @@ void assert_connected(G const & g)
     (void)g;
 #ifndef NDEBUG
 #if __cplusplus >= 201103L
-    std::vector<bool> mask(boost::num_vertices(g));
+    std::vector<BOOL> mask(boost::num_vertices(g));
     mask.assign(boost::num_vertices(g), false);
     auto b=boost::vertices(g).first;
     auto e=b; ++e;

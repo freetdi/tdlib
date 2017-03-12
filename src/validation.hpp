@@ -87,7 +87,7 @@ bool is_valid_dominating_set(G_t &G, typename treedec::treedec_traits<typename t
 template <typename G_t>
 bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<typename treedec::treedec_chooser<G_t>::type>::bag_type> &vec)
 {
-    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<BOOL> visited(boost::num_vertices(G), false);
     for(unsigned i = 0; i < vec.size(); i++){
         for(typename treedec::treedec_traits<typename treedec::treedec_chooser<G_t>::type>::bag_type::iterator sIt = vec[i].begin(); sIt != vec[i].end(); sIt++){
             unsigned pos = treedec::get_pos(*sIt, G);

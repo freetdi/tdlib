@@ -49,14 +49,14 @@
 #include "trace.hpp"
 #include "error.hpp"
 
-#ifndef HAVE_MYBOOL
-#define HAVE_MYBOOL
-class mybool{ //
+#ifndef HAVE_BOOL
+#define HAVE_BOOL
+class BOOL{ //
 public:
-	mybool() : value_(bool())
+	BOOL() : value_(bool())
 	{
 	}
-	/* explicit */ mybool(bool const& t): value_(t) {}
+	/* explicit */ BOOL(bool const& t): value_(t) {}
 	// /* explicit */ operator bool&() { return value_; }
 	/* explicit */ operator bool() const { return value_; }
 private:
@@ -286,7 +286,7 @@ struct outedge_set;
 template <typename G_t>
 std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
           typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor>
-    make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
+    make_digraph_with_source_and_sink(G_t const &G, std::vector<BOOL> const &disabled,
                  unsigned num_dis,
                  typename graph_traits<G_t>::directed_overlay& dg,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,

@@ -1042,7 +1042,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
                                        treedec::nice::get_forgotten_vertex(cur, T);
             unsigned int pos = get_pos(forgotten_vertex, G);
 
-            std::vector<bool> visited(results[child].size(), false);
+            std::vector<BOOL> visited(results[child].size(), false);
             unsigned int colorings_size = boost::num_vertices(G);
             for(unsigned int i = 0; i < results[child].size(); i++){
                 if(visited[i]){ continue; }

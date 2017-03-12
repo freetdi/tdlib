@@ -1228,7 +1228,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){
                     Y.insert(*nIt);
                 }
 
-                std::vector<bool> disabled(boost::num_vertices(G), false);
+                std::vector<BOOL> disabled(boost::num_vertices(G), false);
                 unsigned int pos1 = get_pos(*vIt1, G);
                 unsigned int pos2 = get_pos(*vIt2, G);
 

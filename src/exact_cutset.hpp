@@ -91,7 +91,7 @@ bool explore_cutsets(G_t &G,
         component_red.erase(candidates[i]);
 
 
-        std::vector<bool> visited(boost::num_vertices(G), true);
+        std::vector<BOOL> visited(boost::num_vertices(G), true);
         for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
               = component_red.begin(); sIt != component_red.end(); sIt++)
         {

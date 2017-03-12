@@ -54,11 +54,11 @@ public:
     overlay(UnderlyingG_t &G_input)
       : G(G_input)
     {
-        _active = std::vector<bool>(boost::num_vertices(G_input), true);
+        _active = std::vector<BOOL>(boost::num_vertices(G_input), true);
         O = OverlayG_t(boost::num_vertices(G_input));
     }
 
-    overlay(UnderlyingG_t &G_input, std::vector<bool> &active_input) //e.g. after PP
+    overlay(UnderlyingG_t &G_input, std::vector<BOOL> &active_input) //e.g. after PP
       : G(G_input), _active(active_input)
     {
         O = OverlayG_t(boost::num_vertices(G_input));
@@ -68,7 +68,7 @@ public:
         return G;
     }
 
-    const std::vector<bool> &active(){
+    const std::vector<BOOL> &active(){
         return _active;
     }
 
@@ -149,7 +149,7 @@ public:
 private:
     const UnderlyingG_t &G;
     OverlayG_t O;
-    std::vector<bool> &_active;
+    std::vector<BOOL> &_active;
 
     std::stack<std::vector<vdU> > _changes_container;
 };

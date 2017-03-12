@@ -530,7 +530,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
     auto invalid=num_vert;
     std::vector<unsigned> edges(num_vert-1u, invalid);
     assert(edges.size()==num_vert-1);
-//    std::vector<std::vector<bool> > bags(num_vert);
+//    std::vector<std::vector<BOOL> > bags(num_vert);
 //    typedef boost::adjacency_matrix<boost::undirectedS> bamu;
 
     for(unsigned i = 0; i < num_vert; i++){ itested();
@@ -698,7 +698,7 @@ void make_filled_graph(G_t &G,
     C.resize(elim_ordering.size());
     F.resize(elim_ordering.size());
 
-    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<BOOL> visited(boost::num_vertices(G), false);
 
     for(unsigned int i = 0; i < elim_ordering.size(); i++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -739,9 +739,9 @@ void LEX_M_fill_in(G_t &G,
      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &fill_in_edges)
 {
     unsigned int nv = boost::num_vertices(G);
-    std::vector<bool> visited(nv);
+    std::vector<BOOL> visited(nv);
     std::vector<float> label(nv);
-    std::vector<bool> alpha_inv(nv);
+    std::vector<BOOL> alpha_inv(nv);
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     //Initializing.
@@ -833,9 +833,9 @@ int LEX_M_minimal_ordering(const G_t &G,
 {
     unsigned int nv = boost::num_vertices(G);
     alpha.resize(boost::num_vertices(G));
-    std::vector<bool> visited(nv);
+    std::vector<BOOL> visited(nv);
     std::vector<float> label(nv);
-    std::vector<bool> alpha_inv(nv);
+    std::vector<BOOL> alpha_inv(nv);
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > reached_i(nv);
 
     unsigned int i = 0;

@@ -26,6 +26,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
 
+#include "graph.hpp"
 #include "algo.hpp"
 #include "generic_elimination_search_configs.hpp"
 #include "generic_elimination_search_overlay.hpp"

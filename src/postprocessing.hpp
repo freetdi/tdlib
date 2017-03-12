@@ -46,7 +46,7 @@ namespace treedec{
 //possible improvement.
 template <typename B_t, typename S_t, typename vd_t>
 bool is_improvement_bag(B_t const &H,
-                        std::vector<bool> &disabled,
+                        std::vector<BOOL> &disabled,
                         S_t &X,
                         S_t &Y,
                         vd_t a,
@@ -109,8 +109,8 @@ void MSVS(G_t const &G, T_t &T)
     typedef typename graph_traits<G_t>::immutable_type immutable_type;
     typedef typename boost::graph_traits<immutable_type>::vertex_descriptor imm_vertex_descriptor;
 
-    std::vector<bool> disabled;
-    std::vector<bool> disabled_;
+    std::vector<BOOL> disabled;
+    std::vector<BOOL> disabled_;
     unsigned width = treedec::get_width(T);
     std::set<vertex_descriptor> S;
     std::vector<imm_vertex_descriptor> X, Y;
@@ -178,7 +178,7 @@ void MSVS(G_t const &G, T_t &T)
         assert(HI);
 
 #ifndef NDEBUG
-        std::vector<bool>::const_iterator x=disabled.begin();
+        std::vector<BOOL>::const_iterator x=disabled.begin();
         unsigned num_dis=0;
         for(; x!=disabled.end(); ++x){
             if(*x) ++num_dis;
@@ -195,7 +195,7 @@ void MSVS(G_t const &G, T_t &T)
         map_descriptors(S_, S, *HI, vdMap);
 
         //Mark the vertices of the seperator as visited (used for computing connected components).
-        std::vector<bool> visited(boost::num_vertices(H), false);
+        std::vector<BOOL> visited(boost::num_vertices(H), false);
         BOOST_AUTO(sIt, S_.begin());
         for(; sIt!=S_.end(); ++sIt){
             unsigned int pos = get_pos(*sIt, *HI);

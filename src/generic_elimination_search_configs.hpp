@@ -76,7 +76,7 @@ struct CFG_DFS_1{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -139,7 +139,7 @@ struct CFG_DFS_2{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -200,7 +200,7 @@ struct CFG_DFS_3{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -264,7 +264,7 @@ struct CFG_DFS_4{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<bool> &active, unsigned &idx)
+    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
     {
         unsigned min = UINT_MAX;
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;

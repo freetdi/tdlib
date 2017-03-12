@@ -81,7 +81,7 @@ int is_valid_branchdecomposition(G_t &G, T_t &T)
         }
     }
 
-    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<BOOL> visited(boost::num_vertices(G), false);
 
     //Checks if the bags of the leafs of T are exactly the edges of G.
     for(eIter it = edges.begin(); it != edges.end(); it++){

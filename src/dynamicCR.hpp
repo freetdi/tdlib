@@ -49,7 +49,7 @@ void get_robber_components(G_t &G,
     typedef typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type bag_type;
 
     //G \ X
-    std::vector<bool> disabled(boost::num_vertices(G), false);
+    std::vector<BOOL> disabled(boost::num_vertices(G), false);
     for(typename bag_type::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         unsigned int pos = get_pos(*sIt, G);
         disabled[pos] = true;
