@@ -704,6 +704,68 @@ void make_symmetric(G&g, bool force_oriented=false)
         }
     }
 }
+
+namespace detail{
+
+template<class G, class X=void>
+struct edge_helper{
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    static size_type num(G const& g){ untested();
+        return boost::num_edges(g);
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+        add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
+
+    std::cout << std::is_convertible<
+        typename boost::graph_traits<G>::directed_category, boost::directed_tag>:: value << "\n";
+
+	return boost::add_edge(x, y, g);
+    }
+};
+
+template<class G>
+struct edge_helper<G, typename std::enable_if< std::is_convertible<
+                    typename boost::graph_traits<G>::directed_category*, boost::directed_tag*
+                    >::value, void>::type > {
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    typedef typename std::enable_if< std::is_same< boost::directed_tag,
+                                typename boost::graph_traits<G>::directed_category >::value, G >::type T;
+
+    static size_type num(G const& g){ untested();
+        assert(1 ^ boost::num_edges(g)) ;
+        return boost::num_edges(g)/2;
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+        add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
+
+	boost::add_edge(x, y, g);
+	boost::add_edge(y, x, g);
+    }
+};
+
+}
+
+template<class G>
+inline typename boost::graph_traits<G>::edges_size_type
+num_edges(G const& g)
+{ untested();
+    
+    return detail::edge_helper<G>::num(g);
+}
+
+template<class G>
+inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
+		   typename boost::graph_traits<G>::vertex_descriptor y, G& g)
+{ itested();
+    return detail::edge_helper<G>::add(x, y, g);
+}
+
+
 } // treedec
 
 

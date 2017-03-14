@@ -262,7 +262,8 @@ public:
     size_t get_bagsize() const{ untested();
         return _lb_bs;
     }
-    void get_bags(BV_t& bags) { // for now
+    template<class BAG_t>
+    void get_bags(BAG_t& bags) { // for now
 
         auto b=_elims.begin();
         for(; b!=_elims.end(); ++b){

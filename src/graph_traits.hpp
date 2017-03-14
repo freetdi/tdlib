@@ -241,6 +241,14 @@ struct graph_callback{ // fixme: union of the above?
     virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
 };
 
+template<class G>
+inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
+		   typename boost::graph_traits<G>::vertex_descriptor y, G& g);
+
+template<class G>
+inline typename boost::graph_traits<G>::edges_size_type num_edges(G const& g);
+
 } // treedec
 
 #endif
