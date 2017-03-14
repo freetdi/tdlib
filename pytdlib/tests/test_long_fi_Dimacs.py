@@ -23,8 +23,7 @@ class TestTdLib_packages(unittest.TestCase):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.fillIn_decomp(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-            break
-    """
+
     def test_PP_FI(self):
         print("---PP+FI---")
         for i in range(0, COUNT+1):
@@ -34,12 +33,12 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_FI_TM(self):
+        print("---PP+FI+TM---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.PP_FI_TM(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-    """
 
 if __name__ == '__main__':
     unittest.main()
