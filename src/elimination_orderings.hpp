@@ -356,19 +356,19 @@ typename boost::graph_traits<G_t>::vertices_size_type
 namespace impl{
 
 template <typename G_t, typename T_t>
-void fillIn_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX)
+void fillIn_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
 {
     assert(T);
     typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
-    fillIn<G_t, T_t, O_t> FI(G, T, (O_t*)NULL, ub);
+    fillIn<G_t, T_t, O_t> FI(G, T, (O_t*)NULL, ub, ignore_isolated);
     FI.do_it();
     FI.tree_decomposition();
 }
 
 template <typename G_t, typename T_t>
-void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
+void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
 {
-    return fillIn_decomp(G, &T, ub);
+    return fillIn_decomp(G, &T, ub, ignore_isolated);
 }
 
 
@@ -377,41 +377,14 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
 //Construct a tree decomposition from the elimination ordering obtained by the
 //fill-in heuristic.
 template <typename G_t, typename T_t>
-void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX)
+void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
 {
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
     }
 
-    typename treedec_traits<T_t>::bag_type B;
-    BOOST_AUTO(vIt, boost::vertices(G).first);
-    BOOST_AUTO(vEnd, boost::vertices(G).second);
-    for(; vIt != vEnd; vIt++){
-        if(boost::degree(*vIt, G) == 0){
-            typename treedec_traits<T_t>::vd_type vd=get_vd(G, *vIt);
-            insert(B, vd);
-        }
-    }
-
-    impl::fillIn_decomp(G, &T, ub);
-
-    auto f=boost::add_vertex(T);
-    if(boost::num_vertices(T)!=1){
-        boost::add_edge(f, *boost::vertices(T).first, T);
-    }
-
-    auto v=B.begin();
-    while(true){
-        if(v==B.end()){
-            break;
-        }
-        insert(bag(f, T), *v);
-        auto b=boost::add_vertex(T);
-        boost::add_edge(f, b, T);
-        f = b;
-        ++v;
-    }
+    impl::fillIn_decomp(G, &T, ub, ignore_isolated);
 }
 
 namespace detail{ //

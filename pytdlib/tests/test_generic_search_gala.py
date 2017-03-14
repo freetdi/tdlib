@@ -71,14 +71,5 @@ class TestTdLib(unittest.TestCase):
 
         tdlib.generic_elimination_search4(G, MAX_NODES, MAX_ORDERINGS)
 
-    def test_11(self):
-        print("---Dimacs2---")
-        G = Graph(Dimacs.V_2, Dimacs.E_2)
-
-        T, w = tdlib.minDegree_decomp(G)
-        print("MD_width: " + str(w))
-
-        tdlib.generic_elimination_search4(G, MAX_NODES, MAX_ORDERINGS)
-
 if __name__ == '__main__':
     unittest.main()

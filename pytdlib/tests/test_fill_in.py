@@ -107,7 +107,5 @@ class TestTdLib(unittest.TestCase):
             O = tdlib.fillIn_ordering(G)
             self.assertEqual(len(O), len(G.vertices()))
 
-
-
 if __name__ == '__main__':
     unittest.main()

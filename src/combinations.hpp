@@ -103,7 +103,7 @@ void PP_FI(G_t &G, T_t &T, int &low){
     treedec::preprocessing(G, bags, low);
     if(boost::num_edges(G) > 0){
         unsigned low2=-1;
-        treedec::impl::fillIn_decomp(G, T, low2);
+        treedec::impl::fillIn_decomp(G, T, low2, true); //ignore_isolated
         low = low2;
     }
     treedec::glue_bags(bags, T);
@@ -133,7 +133,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
 
         G_t H(G);
         //true = ignore isolated vertices
-        treedec::fillIn_ordering(G, old_elim_ordering, true);
+        treedec::fillIn_ordering(G, old_elim_ordering, true); //ignore isolated
         G = H; // reset
 
         treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
