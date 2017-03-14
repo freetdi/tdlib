@@ -17,18 +17,14 @@ template<class S, class T /* class M */>
 void copy_trace(const S& s, T& t /*, M map=identity */)
 {
     // TODO template metamagic...
-    if(boost::num_vertices(t)){
+    if(boost::num_vertices(t)){ untested();
         assert(false);
-    }
-    else if(!boost::is_multigraph<T>()){
+    }else if(!boost::is_multigraph<T>()){ untested();
         untested();
         boost::copy_graph(s, t);
-    }
-    else if(boost::is_directed(t)){
-        incomplete(); // what if s has multiedges?
+    }else if(boost::is_directed(t)){ untested();
         boost::copy_graph(s, t);
-    }
-    else{ untested();
+    }else{ untested();
         t = MOVE(T(boost::num_vertices(s)));
         auto b=boost::edges(s);
         for(; b.first!=b.second; ++b.first){

@@ -131,7 +131,7 @@ public:
             else if(_min > _ub){
                 _ub = _min;
             }
-            assert(bags_i);
+            // assert(bags_i);?!
 
             eliminate(c);
 
@@ -221,7 +221,7 @@ public:
     void eliminate(typename baseclass::vertex_descriptor v){
         typename baseclass::adjacency_iterator I, E;
         for(boost::tie(I, E) = boost::adjacent_vertices(v, baseclass::_g); I!=E; ++I){
-            assert(*I!=c); // no self loops...
+            assert(*I!=v); // no self loops...
             typename baseclass::vertex_descriptor w=*I;
             _degs.unlink(w);
         }

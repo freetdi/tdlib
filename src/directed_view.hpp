@@ -29,14 +29,21 @@ namespace treedec{
 
 namespace draft{
 
+namespace detail{
+
 template<class G, class X=void>
 struct dwt{
 	typedef typename graph_traits<G>::directed_type type;
 
 	static std::string dbg(){ return "wrap directed\n"; }
 
+	static size_t init(G const& g){ untested();
+		return boost::num_vertices(g);
+	}
+
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){
+	static void copy(GG const& g, H& h){ untested();
+		assert(boost::is_undirected(g));
 		auto p=boost::edges(g);
 		for(; p.first!=p.second; ++p.first){
 			auto V=boost::source(*p.first, g);
@@ -53,25 +60,29 @@ template<class G>
 struct dwt<G,
 	typename std::enable_if< std::is_convertible<
 	typename boost::graph_traits<G>::directed_category,
-  	boost::directed_tag>::value , G >::type >
+  	boost::directed_tag>::value, void >::type >
 {
 	typedef typename graph_traits<G>::directed_type& type;
 	static std::string dbg(){ return "dummy wrapper\n"; }
 
-	template<class GG, class H>
-	static void copy(GG const& g, H& h){
-		incomplete();
+	static G& init(G& g){ untested();
+		return g;
 	}
+
+	template<class GG, class H>
+	static void copy(GG const& g, H& h){ untested(); }
 };
+
+}
 
 template<class G>
 class directed_view{
 
 public:
-	typedef dwt<G> wrapper_help;
-	typedef typename dwt<G>::type wrapper_type;
+	typedef detail::dwt<G> wrapper_help;
+	typedef typename detail::dwt<G>::type backend_type;
+	typedef typename std::remove_reference<backend_type>::type wrapped_type;
 
-	typedef typename graph_traits<G>::directed_type wrapped_type;
 	typedef typename boost::graph_traits<wrapped_type> wrapped_traits;
 	typedef typename wrapped_traits::vertex_descriptor vertex_descriptor;
 	typedef typename wrapped_traits::edge_descriptor edge_descriptor;
@@ -87,15 +98,14 @@ public:
 	// this should always be "directed" hmmm
 	typedef typename wrapped_traits::directed_category directed_category;
 
-        typedef typename graph_traits<wrapped_type>::traversal_category traversal_category;
+	typedef typename wrapped_traits::traversal_category traversal_category;
 
 private:
 	directed_view(){ unreachable(); }
 	directed_view(const directed_view& ) { unreachable();}
 public:
 	directed_view(G& g, bool commit=false)
-	: _g(boost::num_vertices(g)), _commit(commit) {
-		assert(boost::is_undirected(g));
+	: _g(wrapper_help::init(g)), _commit(commit) { untested();
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge
@@ -103,19 +113,7 @@ public:
 		//
 		trace1("wrapping", wrapper_help::dbg());
 
-#if 0
-		auto p=boost::edges(g);
-		for(; p.first!=p.second; ++p.first){
-			auto V=boost::source(*p.first, g);
-			auto W=boost::target(*p.first, g);
-			boost::add_edge(V, W, _g);
-			boost::add_edge(W, V, _g);
-		}
-		assert(boost::num_edges(g)*2 == boost::num_edges(_g));
-#else
 		wrapper_help::copy(g, _g);
-#endif
-
 	}
 
 	~directed_view(){
@@ -145,7 +143,7 @@ public: // unnecessary
 		return boost::out_degree(v, *g);
 	}
 private:
-	wrapper_type _g;
+	backend_type _g;
 	bool _commit;
 };
 
@@ -158,7 +156,8 @@ namespace boost{
 template<class G>
 struct graph_traits<treedec::draft::directed_view<G> > {
 	typedef treedec::draft::directed_view<G> B;
-	typedef typename treedec::draft::directed_view<G>::wrapped_type W;
+	typedef typename treedec::draft::directed_view<G>::wrapped_type WW;
+	typedef typename std::remove_reference<WW>::type W;
 
 	typedef typename B::vertices_size_type vertices_size_type;
 	typedef typename B::degree_size_type degree_size_type;

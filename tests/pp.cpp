@@ -5,6 +5,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <tdlib/preprocessing.hpp>
 #include <tdlib/graph.hpp>
+#include <boost/graph/copy.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ALSVU;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> ALVVU;
@@ -27,7 +28,15 @@ int main()
 	assert(boost::num_edges(alvvd1)==6);
 	assert(treedec::num_edges(alvvd1)==3);
 
+	ALSVU alsvu1;
+	boost::copy_graph(alvvd1, alsvu1);
+	assert(boost::num_edges(alsvu1)==3);
+
 	// legacy interface (does it make sense?)
 	bags_type bags;
+	treedec::preprocessing(alsvu1, bags);
+	assert(bags.size()==2);
+	bags.clear();
 	treedec::preprocessing(alvvd1, bags);
+	assert(bags.size()==2);
 }

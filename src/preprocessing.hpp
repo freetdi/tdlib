@@ -313,7 +313,7 @@ public:
 #else
         boost::copy_graph(_g, gr);
 #endif
-        assert(boost::is_undirected(gr));
+        // assert(boost::is_undirected(gr)); no longer...
         trace2("", boost::num_edges(gr), boost::num_edges(_g));
         trace2("", boost::num_vertices(gr), boost::num_vertices(_g));
         assert(boost::num_vertices(gr) == boost::num_vertices(_g));

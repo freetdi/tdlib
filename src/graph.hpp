@@ -742,8 +742,8 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
         add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
 
-	boost::add_edge(x, y, g);
 	boost::add_edge(y, x, g);
+	return boost::add_edge(x, y, g);
     }
 };
 
