@@ -216,7 +216,7 @@ public:
 
     void tree_decomposition()
     {
-        treedec::detail::skeleton_to_treedec_vec(_g, *_t, _bags, *_o, _i);
+        treedec::detail::skeleton_to_treedec(_g, *_t, _bags, *_o, _i);
     }
 
     vertices_size_type get_bagsize()
