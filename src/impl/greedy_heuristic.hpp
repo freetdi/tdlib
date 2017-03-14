@@ -93,11 +93,7 @@ public:
 
     virtual void next(vertex_descriptor &c) = 0;
 
-    virtual void pre_eliminate_update(vertex_descriptor v) = 0;
-
     virtual void eliminate(vertex_descriptor v) = 0;
-
-    virtual void post_eliminate_update(vertex_descriptor v) = 0;
 
     virtual void postprocessing() = 0;
 
@@ -147,15 +143,7 @@ public:
             }
             assert(bags_i);
 
-            pre_eliminate_update(c);
-
             eliminate(c);
-
-#ifndef NDEBUG // safety net.
-            check(_g);
-#endif
-
-            post_eliminate_update(c);
 
             if(!_t){
                 _current_N->clear();
@@ -235,20 +223,24 @@ public:
         baseclass::_min = 1;
     }
 
-    void pre_eliminate_update(typename baseclass::vertex_descriptor v){
+    void next(typename baseclass::vertex_descriptor &c){
+        if(baseclass::_min>1){
+            --baseclass::_min;
+        }
+
+        boost::tie(c, baseclass::_min) = _degs.pick_min(baseclass::_min, baseclass::_num_vert);
+    }
+
+    void eliminate(typename baseclass::vertex_descriptor v){
         typename baseclass::adjacency_iterator I, E;
         for(boost::tie(I, E) = boost::adjacent_vertices(v, baseclass::_g); I!=E; ++I){
             assert(*I!=c); // no self loops...
             typename baseclass::vertex_descriptor w=*I;
             _degs.unlink(w);
         }
-    }
 
-    void eliminate(typename baseclass::vertex_descriptor v){
         make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N);
-    }
 
-    void post_eliminate_update(typename baseclass::vertex_descriptor v){
         redegree(NULL, baseclass::_g, *baseclass::_current_N, _degs);
         _degs.unlink(v, baseclass::_min);
         _degs.flush();
@@ -261,14 +253,6 @@ public:
         for(; it!=zerodegbag.end(); ++it){ untested();
             (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
         }
-    }
-
-    void next(typename baseclass::vertex_descriptor &c){
-        if(baseclass::_min>1){
-            --baseclass::_min;
-        }
-
-        boost::tie(c, baseclass::_min) = _degs.pick_min(baseclass::_min, baseclass::_num_vert);
     }
 
 private:
@@ -358,15 +342,11 @@ public: // implementation
         _fill.check();
     }
 
-    void pre_eliminate_update(typename baseclass::vertex_descriptor v){
-        _fill.mark_neighbors(v, baseclass::_min);
-    }
-
     void eliminate(typename baseclass::vertex_descriptor v){
-        make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N, &_cb);
-    }
+        _fill.mark_neighbors(v, baseclass::_min);
 
-    void post_eliminate_update(typename baseclass::vertex_descriptor v){
+        make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N, &_cb);
+
         _fill.unmark_neighbours(*baseclass::_current_N);
     }
 
