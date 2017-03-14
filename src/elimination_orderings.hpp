@@ -85,9 +85,9 @@ namespace detail{
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 class skeleton{
 public:
-    typedef typename treedec_traits<T_t>::bag_type bag_type;
+    typedef typename std::set<B_t> bag_type;
 
-    skeleton(G_t &G, T_t &T, B_t *B, O_t &O, unsigned n)
+    skeleton(G_t &G, T_t &T, typename std::vector<bag_type> *B, O_t &O, unsigned n)
       : _g(G), _t(T), _b(B), _o(O), _n(n)
     {
         _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
@@ -160,7 +160,7 @@ public:
 private:
     G_t &_g;
     T_t &_t;
-    B_t *_b;
+    std::vector<bag_type> *_b;
     O_t &_o;
     unsigned _n;
 
@@ -169,8 +169,104 @@ private:
 
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_){
+void skeleton_to_treedec(G_t &G, T_t &T, std::vector<std::set<B_t> > &B, O_t &O, unsigned n_){
     skeleton<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
+    S.do_it();
+}
+
+//WARNING: untested
+//WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above) if B is not provided
+template <typename G_t, typename T_t, typename B_t, typename O_t>
+class skeleton_vec{
+public:
+    typedef typename std::vector<B_t> bag_type;
+
+    skeleton_vec(G_t &G, T_t &T, typename std::vector<bag_type> *B, O_t &O, unsigned n)
+      : _g(G), _t(T), _b(B), _o(O), _n(n)
+    {
+        _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
+    }
+
+    void inverse_ordering()
+    {
+        for(unsigned u = 0; u < _n; u++){
+            typename treedec_chooser<G_t>::value_type e=_o[u];
+            unsigned pos = get_pos(e, _g);
+            _inv_o[pos] = u;
+        }
+    }
+
+    void do_it(){
+        if(_n == 0){
+            return;
+        }
+
+        inverse_ordering();
+
+        //Bag for the u-th elimination vertex will be stored in T[u].
+        for(unsigned u = 0; u < _n; u++){
+            boost::add_vertex(_t);
+        }
+
+        //Since we made the neighbourhood N of the u-th vertex a clique,
+        //the bag of the neighbour of this vertex with lowest elimination index
+        //will have N as a subset.
+        unsigned max = _n-1u;
+        for(unsigned u = 0; u < max; u++){
+            unsigned min_index = max; //note: if there's an empty bag, we can glue
+                                      //it toghether with an arbitrary bag.
+
+            if(_b != NULL){
+                for(typename bag_type::iterator bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
+                    unsigned pos = get_pos(*bIt, _g);
+                    unsigned index = _inv_o[pos];
+                    min_index = (index < min_index)? index : min_index;
+                }
+            }
+            else{
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
+                    unsigned pos = get_pos(*nIt, _g);
+                    unsigned index = _inv_o[pos];
+                    min_index = (index < min_index)? index : min_index;
+                }
+            }
+            //(min_index, u) will lead to a connected directed graph, if G_t is
+            //directed.
+            boost::add_edge(min_index, u, _t);
+        }
+
+        //Bag for the u-th elimination vertex will be stored in T[u].
+        for(unsigned u = 0; u < _n; u++){
+            if(_b != NULL){
+                for(typename bag_type::iterator bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
+                    insert(bag(u, _t), *bIt);
+                }
+            }
+            else{
+                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
+                    insert(bag(u, _t), _o[u]);
+                }
+            }
+            insert(bag(u, _t), _o[u]); //printer variant without this inserting?
+        }
+    }
+
+private:
+    G_t &_g;
+    T_t &_t;
+    std::vector<bag_type> *_b;
+    O_t &_o;
+    unsigned _n;
+
+    std::vector<unsigned int> _inv_o;
+};
+
+
+template <typename G_t, typename T_t, typename B_t, typename O_t>
+void skeleton_to_treedec_vec(G_t &G, T_t &T, std::vector<std::vector<B_t> > &B, O_t &O, unsigned n_){
+    skeleton_vec<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
     S.do_it();
 }
 

@@ -183,11 +183,151 @@ protected:
 
 };
 
+template <typename G_t, typename T_t, typename O_t>
+class greedy_heuristic_base_vec : public ::treedec::algo::draft::algo1{
+public:
+    typedef typename treedec_chooser<G_t>::value_type my_vd;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+    typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
+    typedef typename std::vector<vertex_descriptor> bag_type;
+
+    greedy_heuristic_base_vec(G_t &G, T_t *T, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
+      : algo1("."), _g(G), _t(T), _o(O), _own_o(!O), _ub_in(ub), _iiv(ignore_isolated_vertices), _i(0), _min(0), _current_N(&bag_i), _num_vert(boost::num_vertices(_g))
+    {
+        if(_own_o){
+            _o = new O_t;
+        }
+
+        //the following seems to be unnecessary
+        if(_t){
+            _bags.resize(_num_vert);
+        }
+        _o->resize(_num_vert);
+    }
+
+
+    ~greedy_heuristic_base_vec()
+    {
+        if(_own_o){
+            delete _o;
+        }
+    }
+
+    void tree_decomposition()
+    {
+        treedec::detail::skeleton_to_treedec_vec(_g, *_t, _bags, *_o, _i);
+    }
+
+    vertices_size_type get_bagsize()
+    {
+        return _ub+1;
+    }
+
+    O_t& elimination_ordering()
+    {
+        return *_o;
+    }
+
+    virtual void initialize() = 0;
+
+    virtual void next(vertex_descriptor &c) = 0;
+
+    virtual void eliminate(vertex_descriptor v) = 0;
+
+    virtual void postprocessing() = 0;
+
+    void do_it()
+    {
+        timer_on();
+
+        if(!_num_vert){
+            timer_off();
+            return;
+        }
+
+        assert(_o);
+        O_t& elim_vertices = *_o;
+
+#ifndef NDEBUG
+        check(_g);
+#endif
+
+        initialize();
+
+        _o->resize(_num_vert);
+
+        assert(elim_vertices.size() == _num_vert);
+
+        while(boost::num_edges(_g) > 0){
+            INTERRUPTION_POINT;
+
+            // recompute ntd can only increase from here
+            vertex_descriptor c;
+
+            next(c);
+
+            //Abort if the width of this decomposition would be larger than 'ub'.
+            if(_min >= _ub_in){
+                _t->clear(); //could be also not the case
+                throw exception_unsuccessful();
+            }
+
+            elim_vertices[_i] = get_vd(_g, c);
+
+            if(_t){
+                _current_N = &_bags[_i];
+            }
+            else if(_min > _ub){
+                _ub = _min;
+            }
+            assert(bags_i);
+
+            eliminate(c);
+
+            if(!_t){
+                _current_N->clear();
+            }
+
+            ++_i;
+        }
+
+        postprocessing();
+
+        assert(_i == num_vert); //or _i-1==num_vert?!
+
+        timer_off();
+
+    } // do_it
+
+
+protected:
+    G_t &_g;
+    T_t* _t;
+    O_t* _o;
+    bool _own_o;
+
+    vertices_size_type _ub_in;
+    bool _iiv;
+    size_t _i;
+    unsigned _min;
+
+    std::vector<bag_type> _bags; // BUG. use _t;
+
+    vertices_size_type _ub;
+
+    bag_type bag_i;
+    bag_type* _current_N;
+
+    unsigned _num_vert;
+
+};
+
 
 template <typename G_t, typename T_t, typename O_t>
-class minDegree : public greedy_heuristic_base<G_t, T_t, O_t>{
+class minDegree : public greedy_heuristic_base_vec<G_t, T_t, O_t>{
 public:
-    typedef greedy_heuristic_base<G_t, T_t, O_t> baseclass;
+    typedef greedy_heuristic_base_vec<G_t, T_t, O_t> baseclass;
 
     typedef typename deg_chooser<G_t>::type degs_type;
 
@@ -238,6 +378,8 @@ public:
             typename baseclass::vertex_descriptor w=*I;
             _degs.unlink(w);
         }
+
+        baseclass::_current_N->resize(boost::out_degree(v, baseclass::_g));
 
         make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N);
 

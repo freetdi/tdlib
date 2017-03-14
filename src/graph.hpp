@@ -356,11 +356,83 @@ struct deg_chooser { //
 // isolate c in g
 // return bag
 // optionally: pass pointer to bag for storage.
+
 //TODO: not here.
-template<class G, class B>
+template<class G_t, class B_t>
 inline void detach_neighborhood(
-        typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, B& bag);
+        typename boost::graph_traits<G_t>::vertex_descriptor c,
+        G_t& g, typename std::set<B_t> &bag)
+{
+    assert(boost::is_undirected(g));
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
+    {
+        bag.insert(get_vd(g, *nIt1));
+    }
+    boost::clear_vertex(c, g);
+}
+
+//TODO: not here.
+template<class G_t, class B_t>
+inline void detach_neighborhood(
+        typename boost::graph_traits<G_t>::vertex_descriptor c,
+        G_t& g, typename std::vector<B_t> &bag)
+{
+    assert(boost::is_undirected(g));
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+
+    unsigned i = 0;
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
+    {
+        bag[i++] = get_vd(g, *nIt1);
+    }
+    boost::clear_vertex(c, g);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // count number of edges missing in 1-neighborhood of v
 template <typename G_t>
