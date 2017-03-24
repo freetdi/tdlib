@@ -90,7 +90,7 @@ public: // construct
         for(boost::tie(vIt, vEnd) = boost::vertices(g); vIt != vEnd; ++vIt){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *vIt);
             (void) pos;
-            if(boost::degree(*vIt, g)){
+            if(boost::out_degree(*vIt, g)){
                 size_t missing_edges=-1;
 
                 if(foundzero){
@@ -223,7 +223,7 @@ public: // O(1) neighbor stuff.
         typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
         unsigned int posc = boost::get(boost::get(boost::vertex_index, _g), c);
         (void) posc;
-        vertices_size_type degc=boost::degree(c, _g);
+        vertices_size_type degc=boost::out_degree(c, _g);
         typename boost::graph_traits<G_t>::adjacency_iterator n, nEnd;
 
         boost::tie(n, nEnd) = boost::adjacent_vertices(c, _g);
@@ -240,7 +240,7 @@ public: // O(1) neighbor stuff.
             long old_fill=_vals[pos].value;
             assert(old_fill>=0);
 
-            vertices_size_type degn=boost::degree(*n, _g);
+            vertices_size_type degn=boost::out_degree(*n, _g);
             if(degn>=degc){
                 long X = degn - degc;
                 long new_fill = old_fill - cfill - X;
@@ -301,12 +301,6 @@ public: // picking
             if(_vals[pos].is_unknown()){
                 // unknown...
                 missing_edges = treedec::count_missing_edges(*qi, _g);
-            }else{
-                assert(missing_edges == treedec::count_missing_edges(*qi, _g));
-            }
-            if(!missing_edges && erase){
-                 // shortcut...?
-                 // see below...
             }
             assert(missing_edges>=0);
             reg(*qi, missing_edges);
@@ -331,20 +325,19 @@ public: // picking
             if(missing_edges == -1u){
                 // unknown...
                 missing_edges = treedec::count_missing_edges(v, _g);
-            }else{
-                assert(missing_edges == treedec::count_missing_edges(v, _g));
             }
             if(missing_edges){
-            }else if(erase){
+            }
+            else if(erase){
                  // shortcut...
                 _vals[pos].queued = false;
                 return std::make_pair(v, 0);
-            }else{ untested();
             }
             reg(v, missing_edges);
         }
 #endif
-        }else{
+        }
+        else{
             // no need to process q. it's already there
         }
 

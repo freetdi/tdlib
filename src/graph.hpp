@@ -237,7 +237,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     boost::tie(vIt, vEnd) = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt++;
     for(; vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         if(degree <= min_degree){
             if(ignore_isolated_vertices && degree == 0){ continue; }
             min_degree = degree;
@@ -261,13 +261,13 @@ inline void make_degree_sequence(const G_t &G,
     unsigned int max_degree = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         max_degree = (degree>max_degree)? degree : max_degree;
     }
 
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         if(degree > 0){
             buckets[degree].push_back(*vIt);
         }

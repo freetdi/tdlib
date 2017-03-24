@@ -506,7 +506,7 @@ public: // types
 
        trace1("new bfs", count_range(v));
        for(; v.first!=v.second; ++v.first){ untested();
-           trace2("base node", *v.first, boost::degree(*v.first, _g));
+           trace2("base node", *v.first, boost::out_degree(*v.first, _g));
            maybe_push_back(boost::adjacent_vertices(*v.first, _g));
        }
 
@@ -612,7 +612,7 @@ private:
                 maybe_push_back(av);
                 trace2("found new", pos, count_range(av));
                 trace2("found new", pos, count_range(_q.back()));
-                assert(count_range(av)==boost::degree(v, _g));
+                assert(count_range(av)==boost::out_degree(v, _g));
                 return;
             }
             ++front_range().first;
@@ -907,7 +907,7 @@ public: // types
                     BOOST_AUTO(av, boost::adjacent_vertices(v, _onion._g));
                     assert(av.first!=av.second);
                     _onion.maybe_push_back(av);
-                    assert(count_range(av)==boost::degree(v, _onion._g));
+                    assert(count_range(av)==boost::out_degree(v, _onion._g));
                     return;
                 }
                 ++front_range().first;

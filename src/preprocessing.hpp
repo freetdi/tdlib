@@ -123,9 +123,9 @@ V deg_vector_init(V const&, N n, G const& g, M const& m)
     for (boost::tie(I, vend)=boost::vertices(g); I!=vend; ++I) {
         assert(m[*I]==i);
         assert(i<v.size());
-        trace2("i", i, boost::degree(*I, g));
+        trace2("i", i, boost::out_degree(*I, g));
 
-        v[i++] = boost::degree(*I, g);
+        v[i++] = boost::out_degree(*I, g);
     }
     return v;
 }
@@ -616,7 +616,7 @@ void Islet(G_t &G, B_t &bags, int &low_td)
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
-        if(boost::degree(*vIt, G) == 0){ untested();
+        if(boost::out_degree(*vIt, G) == 0){ untested();
             typename treedec_traits<T_t>::vd_type vd=get_vd(G, *vIt);
             typename treedec_traits<T_t>::bag_type emptybag;
 
@@ -1496,7 +1496,7 @@ void preprocessing<G_t, CFG>::do_it()
                     }else if(Simplicial(*it)){
                         std::cout<< "s" << *it << "\n";
                         std::cout<< "d" << _degree[*it] << "\n";
-                        std::cout<< "d" << boost::degree(*it, _g) << "\n";
+                        std::cout<< "d" << boost::out_degree(*it, _g) << "\n";
                       //  assert(false);
                         goto NEXT_ITER;
                     }
@@ -1505,7 +1505,7 @@ void preprocessing<G_t, CFG>::do_it()
                     else if(AlmostSimplicial(*it)){
                         std::cout<< "a" << *it << "\n";
                         std::cout<< "d" << _degree[*it] << "\n";
-                        std::cout<< "d" << boost::degree(*it, _g) << "\n";
+                        std::cout<< "d" << boost::out_degree(*it, _g) << "\n";
                       //  assert(false);
                         goto NEXT_ITER;
                     }
