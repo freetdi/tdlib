@@ -111,7 +111,7 @@ void make_python_graph(G_t &G, std::vector<unsigned int> &V_G, std::vector<unsig
 {
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(ignore_isolated_vertices && boost::degree(*vIt, G) == 0){
+        if(ignore_isolated_vertices && boost::out_degree(*vIt, G) == 0){
             continue;
         }
         V_G.push_back(*vIt);
