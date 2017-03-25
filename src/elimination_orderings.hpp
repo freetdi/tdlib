@@ -465,7 +465,7 @@ int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
     int width = -1;
 
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){ untested();
-        unsigned deg=boost::degree(elimination_ordering[i], G);
+        unsigned deg=boost::out_degree(elimination_ordering[i], G);
 
         typename graph_traits<G_t>::outedge_set_type xbag;
         treedec::make_clique_and_detach(elimination_ordering[i], G, xbag);
@@ -650,7 +650,7 @@ void treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
+        if(boost::out_degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -664,7 +664,7 @@ void treedec_to_ordering(T_t &T,
 
         typename treedec_traits<T_t>::bag_type difference;
 
-        if(boost::degree(leaf, T) == 1){
+        if(boost::out_degree(leaf, T) == 1){
             if(!std::includes(bag(parent, T).begin(),
                               bag(parent, T).end(),
                               bag(leaf, T).begin(),

@@ -216,7 +216,7 @@ void MSVS(G_t const &G, T_t &T)
 
         //Store the (neighbours of 'refinement_vertex' in T) in 'oldN'.
         typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
-        oldN.resize(boost::degree(refinement_vertex, T));
+        oldN.resize(boost::out_degree(refinement_vertex, T));
         unsigned int c = 0;
         for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_vertex, T);
               t_nIt != t_nEnd; t_nIt++){

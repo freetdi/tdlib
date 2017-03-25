@@ -364,7 +364,7 @@ void make_small(T_t &T){
                     child = *tIt;
                     parent = *nIt;
 
-                    N.resize(boost::degree(*tIt, T)-1);
+                    N.resize(boost::out_degree(*tIt, T)-1);
                     unsigned int c = 0;
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
                     for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){

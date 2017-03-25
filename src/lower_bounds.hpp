@@ -668,7 +668,7 @@ public:
                 }
             }
 
-            contract_edge(min_vertex, w, _g, false);
+            contract_edge(min_vertex, w, _g);
         }
 
         timer_off();
@@ -739,7 +739,7 @@ public:
                 }
             }
 
-            contract_edge(min_vertex, w, _g, false);
+            contract_edge(min_vertex, w, _g);
         }
 
         timer_off();
@@ -853,7 +853,7 @@ public:
 
             //Contract the edge between min_vertex into w.
             //Clear min_vertex and rearrange degs through callback.
-            contract_edge(min_vertex, w, _g, false, &cb);
+            contract_edge(min_vertex, w, _g, &cb);
 
             degs.reg(w);
         }
@@ -1097,7 +1097,7 @@ public:
                 typename boost::graph_traits<G_t>::vertex_descriptor w =
                               get_least_common_vertex(min_vertex, H);
 
-                contract_edge(min_vertex, w, H, false);
+                contract_edge(min_vertex, w, H);
 
                 CFG_t::improvement_algo(H, lb+1);
             }
