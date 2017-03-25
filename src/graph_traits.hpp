@@ -97,8 +97,12 @@ namespace detail{
 
 template<class G_t>
 struct default_directed_select{
-   typedef typename boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> type;
-	// typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::directedS> type;
+   typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> type;
+};
+
+template<class X, class Y, class Z>
+struct default_directed_select< boost::adjacency_list<X, Y, boost::directedS, Z> >{
+   typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
 };
 
 } // detail

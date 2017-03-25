@@ -5,3 +5,4 @@
 - solvers as (callable/extensible) classes
 - more treedecomposition structures
 - make clean (e.g. grtd)
+- use "using" instead of typedef for types that should not be exported
