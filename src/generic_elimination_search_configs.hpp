@@ -173,7 +173,7 @@ template <typename G_t>
 struct CFG_DFS_3{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
-    static const unsigned INVALID_VERTEX()
+    static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
     }

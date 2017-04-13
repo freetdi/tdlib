@@ -89,24 +89,41 @@ void PP_MD(G_t &G, T_t &T, int &low){
 //current tree decomposition this version applies the minDegree-heuristic on
 //not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
-void PP_FI(G_t &G, T_t &T, int &low){
-    if(boost::num_vertices(G) == 0){
+void PP_FI(G_t &G, T_t &T, int &low_tw){
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
+    }else{ untested();
     }
 
+#ifndef NOBAGS
     std::vector<boost::tuple<
         typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
         typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
-    treedec::preprocessing(G, bags, low);
-    if(boost::num_edges(G) > 0){
+    treedec::preprocessing(G, bags, low_tw);
+#else
+    impl::preprocessing<G_t> A(G);
+    A.set_treewidth(low_tw, -1u);
+    A.do_it();
+    low_tw = A.get_treewidth();
+    // A.get_bags(bags); // we don't need them!
+    A.get_graph(G);
+#endif
+
+    if(boost::num_edges(G) > 0){ untested();
         unsigned low2=-1;
         treedec::impl::fillIn_decomp(G, T, low2, true); //ignore_isolated
-        low = low2;
+        low_tw = low2;
+    }else{ untested();
     }
+#ifndef NOBAGS
     treedec::glue_bags(bags, T);
+#else
+    skeleton<...> S(...)
+    S.do_it();
+#endif
 }
 
 

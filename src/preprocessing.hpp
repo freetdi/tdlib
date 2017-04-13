@@ -42,7 +42,7 @@
 
 // TODO:
 //  - switch to bs
-//  - skeletal?
+//  - skeletal? WIP
 //  - dormant on?
 //  - mass elimination
 

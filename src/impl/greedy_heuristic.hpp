@@ -46,55 +46,51 @@ public:
       : algo1("."), _g(G), _t(T), _o(O), _own_o(!O), _ub_in(ub), _iiv(ignore_isolated_vertices), _i(0),
         _min(0), _current_N(&bag_i), _num_vert(boost::num_vertices(_g))
     {
-        if(_own_o){
+        if(_own_o){ untested();
             _o = new O_t;
+        }else{ untested();
         }
 
         //the following seems to be unnecessary
         if(_t){
             _bags.resize(_num_vert);
+        }else{ untested();
         }
         _o->resize(_num_vert);
     }
 
 
-    ~greedy_heuristic_base()
-    {
-        if(_own_o){
+    ~greedy_heuristic_base(){
+        if(_own_o){ untested();
             delete _o;
+        }else{ untested();
         }
     }
 
-    void tree_decomposition()
-    {
+    void tree_decomposition(){
         treedec::detail::skeleton_to_treedec(_g, *_t, _bags, *_o, _i);
     }
 
-    vertices_size_type get_bagsize()
-    {
+    vertices_size_type get_bagsize(){
         return _ub+1;
     }
 
-    O_t& elimination_ordering()
-    {
+    O_t& elimination_ordering() {
         return *_o;
     }
 
     virtual void initialize() = 0;
-
     virtual void next(vertex_descriptor &c) = 0;
-
     virtual void eliminate(vertex_descriptor v) = 0;
-
     virtual void postprocessing() = 0;
 
-    void do_it()
-    {
+    void do_it(){
         timer_on();
 
         if(!_num_vert){
             timer_off();
             return;
+        }else{ untested();
         }
 
         assert(_o);
@@ -118,9 +114,11 @@ public:
             next(c);
 
             //Abort if the width of this decomposition would be larger than 'ub'.
-            if(_min >= _ub_in){
+            if(_min >= _ub_in){ untested();
+                assert(_t); // ouch?
                 _t->clear(); //could be also not the case
                 throw exception_unsuccessful();
+            }else{ untested();
             }
 
             elim_vertices[_i] = get_vd(_g, c);
@@ -254,24 +252,20 @@ private:
 // the fillIn heuristic.
 template <typename G_t, typename T_t, typename O_t>
 class fillIn : public greedy_heuristic_base<G_t, T_t, O_t>{
-public:
+public: //types
     typedef greedy_heuristic_base<G_t, T_t, O_t> baseclass;
-
     typedef typename fill_chooser<G_t>::type fill_type;
 
-
-    struct fill_update_cb : public graph_callback<G_t>{ //
+    struct fill_update_cb : public graph_callback<G_t>{
         typedef typename baseclass::vertex_descriptor vertex_descriptor;
 
         fill_update_cb(fill_type* d, G_t const& g) :
             _fill(d), G(g){}
 
-        void operator()(vertex_descriptor v)
-        {
+        void operator()(vertex_descriptor v){
             _fill->q_eval(v);
         }
-        void operator()(vertex_descriptor s, vertex_descriptor t)
-        {
+        void operator()(vertex_descriptor s, vertex_descriptor t) {
             assert(s < t); // likely not. is this necessary below?
             // e has just been inserted.
             BOOST_AUTO(cni, common_out_edges(s, t, G));
@@ -293,7 +287,7 @@ public:
         G_t const& G;
     }; // update_cb
 
-
+public: // construct
     fillIn(G_t &g, T_t *t, O_t *o,
                     unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, t, o, ub, ignore_isolated_vertices),
@@ -307,10 +301,7 @@ public:
     {
     }
 
-
-
 public: // implementation
-
     void initialize(){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
@@ -351,7 +342,6 @@ public: // implementation
 private:
     fill_type _fill;
     fill_update_cb _cb;
-
 }; // fillIn
 
 } // namespace impl

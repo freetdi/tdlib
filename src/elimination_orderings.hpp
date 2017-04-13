@@ -79,7 +79,8 @@ namespace treedec{ //
 // or to greedy_heuristics class?
 namespace detail{
 
-//WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above) if B is not provided
+// NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
+// if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 class skeleton{
 public:
@@ -156,7 +157,7 @@ public:
             }else{ untested();
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
-                    insert(bag(u, _t), _o[u]);
+                    insert(bag(u, _t), _o[u]); // BUG?!
                 }
             }
             insert(bag(u, _t), _o[u]); //printer variant without this inserting?
@@ -164,7 +165,7 @@ public:
     }
 
 private:
-    G_t &_g;
+    G_t const &_g;
     T_t &_t;
     B_t *_b;
     O_t &_o;
