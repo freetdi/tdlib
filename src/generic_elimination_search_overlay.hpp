@@ -15,7 +15,7 @@ public:
     concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
      : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
 
-    bool operator!=(const iter2& end){
+    bool operator!=(const iter2& /*end*/){
         // warning: only works if end==end_of range2.
 
         return !(_i1 ==_e1 && _i2 == _e2);

@@ -47,7 +47,7 @@ template <typename G_t>
 struct CFG_DFS_1{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
-    static const unsigned INVALID_VERTEX()
+    static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
     }
@@ -76,7 +76,7 @@ struct CFG_DFS_1{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -112,7 +112,7 @@ template <typename G_t>
 struct CFG_DFS_2{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
-    static const unsigned INVALID_VERTEX()
+    static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
     }
@@ -139,7 +139,7 @@ struct CFG_DFS_2{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -200,7 +200,7 @@ struct CFG_DFS_3{
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){

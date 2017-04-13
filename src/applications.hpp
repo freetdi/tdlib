@@ -219,7 +219,7 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         //Search for a clique of size at least 'size' by inspecting all subsets
         //of size exactly 'size' for size = max+1,max+2,..
         for(unsigned int size = max+1; size <= bag(*vIt, T).size(); size++){
-            BOOST_AUTO(P, make_subsets_iter(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
+            BOOST_AUTO(P, make_subsets_range(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
             BOOST_AUTO(I, P.first);
             bool changed = false;
 

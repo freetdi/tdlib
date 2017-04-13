@@ -162,9 +162,10 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 
     for(unsigned s=1; s<=2*k; ++s){
         #if __cplusplus >= 201103L
-        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s, &scratch1));
+        BOOST_AUTO(P, make_subsets_range(W.begin(), W.end(), s, s, &scratch1));
         #else
-        BOOST_AUTO(P, make_subsets_iter(W.begin(), W.end(), s, s));
+        unreachable();
+        BOOST_AUTO(P, make_subsets_range(W.begin(), W.end(), s, s));
         #endif
 
         BOOST_AUTO(I, P.first);
@@ -186,11 +187,12 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 
             for(unsigned Js=1; Js<=2*k; ++Js){
                 #if __cplusplus >= 201103L
-                BOOST_AUTO(PP, make_subsets_iter(
+                BOOST_AUTO(PP, make_subsets_range(
                         difference.begin(), difference.end(), Js, Js, &scratch2
                                                 ));
                 #else
-                BOOST_AUTO(PP, make_subsets_iter(
+                unreachable();
+                BOOST_AUTO(PP, make_subsets_range(
                         difference.begin(), difference.end(), Js, Js
                                                 ));
                 #endif

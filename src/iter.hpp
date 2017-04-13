@@ -42,25 +42,25 @@
 #ifndef NDEBUG
 template<class S, class T>
 size_t count_range(S i, T const& e)
-{
+{ untested();
     unsigned ii=0;
     for(;i!=e;++i) ++ii;
     return ii;
 }
 template<class P>
 size_t count_range(P const& p)
-{
+{ untested();
     return count_range(p.first, p.second);
 }
 #else
 template<class P>
 size_t count_range(P const&)
-{
+{ untested();
     return 99;
 }
 template<class S, class T>
 size_t count_range(S i, T const& e)
-{
+{ untested();
     return 88;
 }
 #endif
@@ -74,33 +74,33 @@ public:
 //	{ untested();
 //	}
 	skip_it(I& i, I const& e, const ref& what): I(i), _skip(what), _end(e)
-	{
+	{ untested();
 		skip();
 	}
 	skip_it& operator++()
-	{
+	{ untested();
 		if (I(*this)==(_end)){ untested();
-		}else{
+		}else{ untested();
 			I::operator++();
 			skip();
 		}
 		return *this;
 	}
 	bool operator==(const I& i) const
-	{
+	{ untested();
 		return I(*this)==(i);
 	}
 	bool operator!=(const I& i) const
-	{
+	{ untested();
 		return I(*this)!=(i);
 	}
 
 private:
 	void skip()
-	{
-		if (I(*this)==(_end)){
-		}else if (I::operator*() != _skip){
-		}else{
+	{ untested();
+		if (I(*this)==(_end)){ untested();
+		}else if (I::operator*() != _skip){ untested();
+		}else{ untested();
 			I::operator++();
 		}
 	}
@@ -110,7 +110,7 @@ private:
 
 template<class I, class S>
 inline skip_it<I,S> make_skip_it(I b, I e, S s)
-{
+{ untested();
 	return skip_it<I,S>(b, e, s);
 }
 
@@ -124,9 +124,9 @@ inline skip_it<C,B> make_skip_it(C c, B b)
 
 template<class A>
 void debug_count(A i, A e, unsigned s)
-{
+{ untested();
     unsigned c=0;
-    for(; i!=e; ++i){
+    for(; i!=e; ++i){ untested();
         ++c;
     }
     assert(c==s);
@@ -156,87 +156,95 @@ public: // types
     typedef std::vector<BOOL_> vis_t;
     class component_iter{ //
     public:
-        component_iter(typename VR::first_type v, components_iter& cs)
+        component_iter(typename VR::first_type v, components_iter& cs, bool visit=true)
            : _v(v) /* necessary? */, _cs(cs)
-        {
-            assert(cs._c.size()==0);
-            if(v==_cs._range.second){
-            }else{
-                // unsigned p=treedec::get_pos(*_v, _cs._g);
-                // trace3("cmpiter", *_v, p, *_cs._range.first);
-                // assert(!cs._visited[p]); // no.
-                // can happen if first component is 0 2 4, second component is 1 3 5
-                // then the end iterator for the second component is 2...
+        { untested();
+            // assert(cs._stack.size()==0);
+            if(v==_cs._range.second){ untested();
+            }else{ untested();
+                auto pos=treedec::get_pos(*_v, _cs._g);
+                if(visit){ untested();
+                    _cs._visited[pos]=visit;
+                }
             }
         }
     public: // ops
         vertex_descriptor operator*()
-        {
+        { untested();
             vertex_descriptor v;
-            if(_cs._c.size()){
-                v = *(_cs._c.back().first);
-            }else{
+            if(_cs._stack.size()){ untested();
+                v = *(_cs._stack.back().first);
+            }else{ untested();
                 v = *_v;
             }
             return v;
         }
         component_iter& operator++()
-        {
+        { untested();
             vertex_descriptor pre=**this;
             size_t pos=treedec::get_pos(pre, _cs._g);
             // trace1("cmp++ ", pos);
-            assert(!_cs._visited[pos]);
+            assert(_cs._visited[pos]);
             _cs._visited[pos] = true;
 
             BOOST_AUTO(p, boost::adjacent_vertices(pre, _cs._g));
-            _cs._c.push_back(p);
+            _cs._stack.push_back(p);
 
             // DFS
-            while(true){
-                BOOST_AUTO(& candi, _cs._c.back());
-                if(candi.first==candi.second){
-                    _cs._c.pop_back();
+            while(true){ untested();
+                BOOST_AUTO(& candi, _cs._stack.back());
+                if(candi.first==candi.second){ untested();
+                    _cs._stack.pop_back();
 
-                    if(_cs._c.size()){
+                    if(_cs._stack.size()){ untested();
                         // incomplete?
-                    }else{
-                        ++_v;
+                    }else{ untested();
+                        assert(treedec::is_valid(*_v, _cs._g));
+                        _v = _cs._range.second; // indicate eoc
+
+                        if(_v!=_cs._range.second){ untested();
+                            // auto pos=treedec::get_pos(*_v, _cs._g);
+                        //    _cs._visited[pos] = true;
+                        }else{ untested();
+                        }
                         return *this;
                     }
-                }else{
+                }else{ untested();
                     unsigned pos=treedec::get_pos(*candi.first, _cs._g);
-                    if (!_cs._visited[pos]){
+                    if (!_cs._visited[pos]){ untested();
+                        // trace1("visiting", pos);
+                        _cs._visited[pos] = true;
                         break;
-                    }else{
+                    }else{ untested();
                     }
                 }
 
-                next_nonvisited_or_end(_cs._c.back());
+                next_nonvisited_or_end(_cs._stack.back());
             }
 
             return *this;
         }
 #if 1
         bool operator!=(const component_iter& other) const
-        {
-            if(_v != other._v){
-            }else{
+        { untested();
+            if(_v != other._v){ untested();
+            }else{ untested();
             }
             return _v != other._v;
         }
 #else
         bool operator!=(const component_iter& other) const
         { untested();
-            if(_cs._c.size()){ untested();
-                return _cs._c.back() != other._cs._c.back();
+            if(_cs._stack.size()){ untested();
+                return _cs._stack.back() != other._cs._stack.back();
             }else{ untested();
                 return true;
             }
         }
         bool operator==(const component_iter& other) const
         { untested();
-            if(_cs._c.size()){ untested();
-                return _cs._c.back() == other._cs._c.back();
+            if(_cs._stack.size()){ untested();
+                return _cs._stack.back() == other._cs._stack.back();
             }else{untested();
                 return false;
             }
@@ -246,19 +254,19 @@ public: // types
     private:
         template<class T>
         void next_nonvisited_or_end(T& p)
-        {
-            while(true){
-                if(p.first==p.second){
+        { untested();
+            while(true){ untested();
+                if(p.first==p.second){ untested();
                     break;
-                }else{
+                }else{ untested();
                 }
 
                 BOOST_AUTO(f, *p.first);
                 unsigned pos=treedec::get_pos(f, _cs._g);
                 assert(pos<_cs._visited.size());
-                if(!_cs._visited[pos]){
+                if(!_cs._visited[pos]){ untested();
                     return;
-                }else{
+                }else{ untested();
                     ++p.first;
                 }
             }
@@ -272,24 +280,24 @@ public: // construct
 //    components_iter(vertex_iterator v, G const& g)
 //        : _base(v),
 //          _g(g),
-//          _c(0)
+//          _stack(0)
 //    { untested();
 //        _visited.assign(boost::num_vertices(_g), false);
 //    }
    components_iter(VR v, G const& g, vis_t* vis, scratch_type* c=NULL)
        : _range(v),
          _visited(vis?(*vis):(*(new vis_t(0)))), _vv(&_visited),
-         _c(c?(*c):(*(new scratch_type(0)))), _cc(&_c),
+         _stack(c?(*c):(*(new scratch_type(0)))), _cc(&_stack),
          _g(g)
    { untested();
-       if(vis){
+       if(vis){ untested();
            _vv = NULL;
-       }else{
+       }else{ untested();
            incomplete();
        }
        if(c){ untested();
            _cc = NULL;
-           _c.resize(0);
+           _stack.resize(0);
        }else{ untested();
        }
        // trace3("cmpsiter", *v.first, visited, v.first==v.second);
@@ -299,12 +307,12 @@ public: // construct
    components_iter(VR v, G const& g, scratch_type* c=NULL)
        : _range(v),
          _visited(*(new vis_t(0))), _vv(&_visited),
-         _c(c?(*c):(*(new scratch_type(0)))), _cc(&_c),
+         _stack(c?(*c):(*(new scratch_type(0)))), _cc(&_stack),
          _g(g)
    { untested();
        if(c){ untested();
            _cc = NULL;
-           _c.resize(0);
+           _stack.resize(0);
        }else{ untested();
        }
    }
@@ -313,14 +321,14 @@ public: // copy
    components_iter(components_iter const& p)
        : _range(p._range),
          _visited(*(new vis_t(p._visited))), _vv(&_visited),
-         _c(*(new scratch_type(p._c))), _cc(&_c),
+         _stack(*(new scratch_type(p._stack))), _cc(&_stack),
          _g(p._g)
    { untested();
    }
    components_iter(components_iter const&& p)
        : _range(p._range),
          _visited(p._visited), _vv(p._vv),
-         _c(p._c), _cc(p._cc),
+         _stack(p._stack), _cc(p._cc),
          _g(p._g)
    { untested();
        p._cc = NULL;
@@ -329,14 +337,14 @@ public: // copy
 #endif
    ~components_iter()
    { untested();
-       if(_vv){
+       if(_vv){ untested();
            // incomplete();
            delete(&_visited);
        }
-       if(_cc){
-           assert(_cc=&_c);
-           delete(&_c);
-       }else{
+       if(_cc){ untested();
+           assert(_cc=&_stack);
+           delete(&_stack);
+       }else{ untested();
        }
    }
 public: // ass
@@ -360,35 +368,37 @@ public: // ops
     bool operator!=(const vertex_iterator& other)
     { untested();
         if(_range.first != other){ untested();
-        }else{
+        }else{ untested();
         }
-        return _range.first != other;;
+        return _range.first != other;
     }
     bool operator==(const components_iter& other) const
     { untested();
         return _range.first == other._range.first;
     }
     bool operator!=(const components_iter& other) const
-    {
-        if( _range.first != other._range.first){
-        }else{
+    { untested();
+        if( _range.first != other._range.first){ untested();
+        }else{ untested();
         }
         return _range.first != other._range.first;
     }
     components_iter& operator++()
-    {
+    { untested();
         unsigned p=-1;
-        while(true){
+        while(true){ untested();
+            if(_range.first==_range.second){ untested();
+                break;
+            }
             p = treedec::get_pos(*_range.first, _g);
             // trace1("cmps++ ", p);
-            assert(p<_visited.size()
-                  || _range.first==_range.second);
-            if(_range.first==_range.second){
+            assert(p<_visited.size());
+            if(_range.first==_range.second){ untested();
                 break;
-            }else if(_visited[p]){
+            }else if(_visited[p]){ untested();
                 assert(_range.first!=_range.second);
                 ++_range.first;
-            }else{
+            }else{ untested();
                 break;
             }
         }
@@ -397,25 +407,25 @@ public: // ops
         return *this;
     }
     std::pair<component_iter, component_iter> operator*()
-    {
+    { untested();
         BOOST_AUTO(p, treedec::get_pos(*_range.first, _g));
         (void)p;
         // trace2("op*", *_range.first,  _visited[p]);
-        assert(!_visited[p] || _range.first==_range.second);
+        assert(_range.first==_range.second || !_visited[p]);
 
         BOOST_AUTO(second, _range.first);
-        if(_range.first!=_range.second){
+        if(_range.first!=_range.second){ untested();
             ++second;
         }else{ untested();
         }
         return std::make_pair(component_iter(_range.first, *this),
-                              component_iter(second, *this));
+                              component_iter(_range.second, *this, false));
     }
 private: // state
     VR _range;
     vis_t& _visited;
     mutable vis_t* _vv; // bool?
-    stack_type& _c;
+    stack_type& _stack;
     mutable stack_type* _cc; // bool?
     G const& _g;
 }; // components_iter
@@ -427,15 +437,17 @@ private: // state
 #define VRP_ std::pair< \
 typename boost::graph_traits<G>::vertex_iterator COMMA \
 typename boost::graph_traits<G>::vertex_iterator >
-template<class G, class BOOL>
+template<class G, class BOOL=bool>
 std::pair<detail::components_iter<G, VRP_, BOOL>,
           detail::components_iter<G, VRP_, BOOL> >
-    make_components_range(G const& g, BOOL b,
-        typename detail::components_iter<G, VRP_, BOOL>::scratch_type* s=NULL)
+    make_components_range(G const& g,
+        typename detail::components_iter<G, VRP_, BOOL>::scratch_type* s=NULL,
+            BOOL b=true
+        )
 { untested();
     BOOST_AUTO(p, boost::vertices(g));
     return std::make_pair(
-        detail::components_iter<G, VRP_, BOOL>(p, g, s),
+        detail::components_iter<G, VRP_, BOOL>(p, g, g, s),
         detail::components_iter<G, VRP_, BOOL>(std::make_pair(p.second, p.second), g)); // FIXME
 }
 #undef VRP_
@@ -445,19 +457,25 @@ std::pair<detail::components_iter<G, VRP_, BOOL>,
 
 // iterate through components of graph induced by non-masked nodes that
 // intersect with a vertex range *[i, e).
-template<class G, class VRI, /*class VRIE,*/ class V, class BOOL>
+template<class G, class VRI, /*class VRIE,*/ class V, class BOOL=bool>
 std::pair<detail::components_iter<G, VRIP_, BOOL>,
           detail::components_iter<G, VRIEP_, BOOL> >
     make_components_range(
             VRI i, VRI e,
-            G const& g, BOOL,
+            G const& g,
             V* mask,
-            typename detail::components_iter<G, VRIP_, BOOL>::scratch_type* s=NULL)
-{
-    while( (*mask)[treedec::get_pos(*i, g)] && i!=e ){
-        ++i;
+            typename detail::components_iter<G, VRIP_, BOOL>::scratch_type* s=NULL,
+            BOOL=true)
+{ untested();
+    assert(i==e || treedec::is_valid(*i, g));
+    while( i!=e ){ untested();
+        assert(treedec::is_valid(*i, g));
+        if((*mask)[treedec::get_pos(*i, g)]){ untested();
+            ++i;
+        }else{ untested();
+            break;
+        }
     }
-    assert(!(*mask)[treedec::get_pos(*i, g)] || i==e);
     if(i==e){untested();
     }
     return std::make_pair(
@@ -494,7 +512,7 @@ public: // types
          _g(g)
    { untested();
        if(!vis){ incomplete();
-       }else{
+       }else{ untested();
            // use external
            _vv = NULL;
        }
@@ -530,7 +548,7 @@ private:
             }
 
             if (front_range().first == front_range().second ){ untested();
-                _q.pop_front();
+                pop_q();
             }else if (front_range().first != front_range().second ){ untested();
                 trace2("?!", count_range(front_range()), _q.size());
                 ++_q.front().first;
@@ -538,9 +556,17 @@ private:
             }
         }
     }
+    void pop_q(){ untested();
+        _q.pop_front();
+        //if(_layerend == _q.begin()){ untested();
+        //    ++_layer;
+        //    _layerend = _q.end();
+        //}else{ untested();
+        //}
+    }
 public: // ops
     vertex_descriptor operator*()
-    {
+    { untested();
         if(_q.front().first!=_q.front().second){ untested();
         }else{ untested();
         }
@@ -561,11 +587,11 @@ public: // ops
         return *this;
     }
     bool operator==(const bfs_iter&e) const
-    {
+    { untested();
         return !operator!=(e);
     }
     bool operator!=(const bfs_iter&) const
-    {
+    { untested();
         if(_q.empty()){ untested();
             trace1("layer atend", _q.size());
             return false;
@@ -578,21 +604,21 @@ public: // ops
 
 private:
     void set_visited(unsigned pos)
-    {
+    { untested();
         _visited[pos] = true;
     }
     BOOL visited(unsigned pos) const
-    {
+    { untested();
         assert(pos<_visited.size());
         return _visited[pos];
     }
     typename queue_type::value_type const& front_range() const
-    {
+    { untested();
         assert(_q.begin() != _q.end());
         return _q.front();
     }
     typename queue_type::value_type& front_range()
-    {
+    { untested();
         assert(_q.begin() != _q.end());
         return _q.front();
     }
@@ -637,11 +663,11 @@ public: // construct
 
    template<class T>
    void maybe_push_back(T x)
-   {
+   { untested();
        if(x.first==x.second){ untested();
            //reachable?!
            return;
-       }else{
+       }else{ untested();
        }
        while(true){ itested();
            BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
@@ -695,7 +721,7 @@ public: // copy
    }
 public: // assign
     bfs_iter& operator=(const bfs_iter& other)
-    {
+    { untested();
         (void) other;
         assert(0);
         assert(&_g == &other._g);
@@ -731,10 +757,10 @@ public: // destroy
            delete(_vv);
        }else{ untested();
        }
-       if(_qq){
+       if(_qq){ untested();
            assert(_qq==&_q);
            delete(_qq);
-       }else{
+       }else{ untested();
        }
    }
 private: // state
@@ -802,7 +828,7 @@ public: // types
     private:
         // skip to next nonvisited
         void skip_and_visit()
-        {
+        { untested();
             trace3("skip_and_visit", _onion._layerend - _onion._q.begin(),  _onion._q.size(),
                    count_range(front_range())  );
             assert(_onion._q.begin() != _onion._layerend);
@@ -833,7 +859,7 @@ public: // types
         }
     public: // ops
         vertex_descriptor operator*()
-        {
+        { untested();
             if(_onion._q.front().first!=_onion._q.front().second){ untested();
             }else{ untested();
             }
@@ -860,11 +886,11 @@ public: // types
             return true; // dont know how to do that.
         }
         bool operator==(const layer_end&e) const
-        {
+        { untested();
             return !operator!=(e);
         }
         bool operator!=(const layer_end&) const
-        {
+        { untested();
             if(_onion._q.empty()){ untested();
                 trace1("layer atend", _onion._q.size());
                 return false;
@@ -879,18 +905,18 @@ public: // types
 
     private:
         BOOL& visited(unsigned pos)
-        {
+        { untested();
             assert(pos<_onion._visited.size());
             return _onion._visited[pos];
         }
         typename queue_type::value_type const& front_range() const
-        {
+        { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
         }
         typename queue_type::value_type& front_range()
-        {
+        { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
@@ -939,7 +965,7 @@ public: // construct
          _g(g)
    { untested();
        if(!vis){ incomplete();
-       }else{
+       }else{ untested();
            // use external
            _vv = NULL;
        }
@@ -950,7 +976,7 @@ public: // construct
        }
 
        trace1("new onion", count_range(v));
-       for(; v.first!=v.second; ++v.first){
+       for(; v.first!=v.second; ++v.first){ untested();
            maybe_push_back(boost::adjacent_vertices(*v.first, _g));
        }
 
@@ -959,7 +985,7 @@ public: // construct
 
    template<class T>
    void maybe_push_back(T x)
-   {
+   { untested();
        assert(x.first!=x.second);
        while(true){ untested();
            BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
@@ -1019,15 +1045,15 @@ public: // copy
            delete(_vv);
        }else{ untested();
        }
-       if(_qq){
+       if(_qq){ untested();
            assert(_qq==&_q);
            delete(_qq);
-       }else{
+       }else{ untested();
        }
    }
 public: // ass
     onion_iter& operator=(const onion_iter& other)
-    {
+    { untested();
         (void) other;
         incomplete();
         assert(&_g == &other._g);
@@ -1035,7 +1061,7 @@ public: // ass
     }
 #if __cplusplus >= 201103L
     onion_iter& operator=(const onion_iter&& other)
-    {
+    { untested();
         (void) other;
         incomplete();
         assert(&_g == &other._g);
@@ -1054,7 +1080,7 @@ public: // ops
         return _q.size();
     }
     onion_iter& operator++()
-    {
+    { untested();
         trace1("next layer", _q.size());
         if(_q.empty()){untested();
             // happens if the last layer is empty but had iterators.
@@ -1093,7 +1119,7 @@ template<class G, class VRI, /*class VRIE,*/ class BOOL_>
             G const& g,
             std::vector<BOOL_>* mask,
             typename detail::onion_iter<G, ORIP_, BOOL_>::scratch_type* s=NULL)
-{
+{ untested();
     return std::make_pair(
         detail::onion_iter<G, ORIP_, BOOL_>(std::make_pair(i, e), g, mask, s),
         detail::onion_iter<G, ORIP_, BOOL_>(g));
@@ -1126,7 +1152,7 @@ public: // types
    public:
       subset_iter(typename std::vector<T>::const_iterator const & i)
           : std::vector<T>::const_iterator(i)
-      {
+      { untested();
       }
       subset_iter(typename std::vector<T> const & t)
           : std::vector<T>::const_iterator(t.begin())
@@ -1139,7 +1165,7 @@ public: // types
       }
    public: // ops
       typename T::value_type const& operator*()
-      {
+      { untested();
          return *std::vector<T>::const_iterator::operator*();
       }
       bool operator!=(const T& other)
@@ -1156,14 +1182,14 @@ public: // construct
        : _tt(NULL),
          _t(p._t),
          _i(p._i), _e(p._e), _l(p._l), _u(p._u)
-   {
+   { untested();
    }
 #if __cplusplus >= 201103L
    subsets_iter(const subsets_iter&& p)
        : _tt(p._tt),
          _t(p._t),
          _i(p._i), _e(p._e), _l(p._l), _u(p._u)
-   {
+   { untested();
        p._tt = NULL;
    }
 #endif
@@ -1171,13 +1197,13 @@ public: // construct
        : _tt(NULL),
          _t(t?(*t):(*(new scratch_type))),
          _i(i), _e(e), _l(min), _u(max)
-   {
+   { untested();
 #if __cplusplus >= 201103L
-      if(t){
+      if(t){ untested();
           t->resize(0);
           // use external scratch
           _tt = NULL;
-      }else{
+      }else{ untested();
           // own scratch. record it.
           _tt = &_t;
       }
@@ -1185,11 +1211,11 @@ public: // construct
       assert(_l<=_u);
       fill();
    }
-   ~subsets_iter(){
-      if(_tt){
+   ~subsets_iter(){ untested();
+      if(_tt){ untested();
           // own scratch. delete it.
           delete(&_t);
-      }else{
+      }else{ untested();
       }
    }
 public: // assign
@@ -1214,18 +1240,18 @@ public: // assign
    }
 public: // ops
    bool operator==(const T& other)
-   {
+   { untested();
       if(!_t.size()){ untested();
          // BUG?
          return false;
-      }else if(_t.size()){
+      }else if(_t.size()){ untested();
          return *_t.begin() == other;
       }else{ untested();
          return false;
       }
    }
    bool operator!=(const T& other)
-   {
+   { untested();
       return !operator==(other);
    }
    bool operator==(const subsets_iter& other)
@@ -1242,41 +1268,41 @@ public: // ops
       return !operator==(other._i);
    }
    subsets_iter operator++()
-   {
+   { untested();
       if(_t.size()==0){ untested();
          _t.push_back(_i);
-         assert(_i!=_e);
+//         assert(_i!=_e); why not?!
          if(_u==0){ untested();
             _t.back()=_e;
          }else{untested();
          }
-      }else if(_t.size()<=_u){
+      }else if(_t.size()<=_u){ untested();
          BOOST_AUTO(back, _t.back());
          ++back;
-         if(back!=_e){
-            if(_t.size()==_u){
+         if(back!=_e){ untested();
+            if(_t.size()==_u){ untested();
                ++_t.back();
-            }else{
+            }else{ untested();
                _t.push_back(back);
             }
          }else if(_t.back()==_e){ untested();
             unreachable();
          }else if(_t.size()==0){ untested();
             unreachable();
-         }else if(_t.size()==1){
+         }else if(_t.size()==1){ untested();
             ++_t.back();
-         }else if(_t.size()==_l){
+         }else if(_t.size()==_l){ untested();
              BOOST_AUTO(back2, _t.back());
              carry(back2);
-             if(_t.size()<_l){
+             if(_t.size()<_l){ untested();
                  _t[0]=_e;
-             }else{
+             }else{ untested();
              }
-         }else{
+         }else{ untested();
             _t.pop_back();
             BOOST_AUTO(back2, _t.back());
             ++back2;
-            if(back2!=_e){
+            if(back2!=_e){ untested();
                ++_t.back();
             }else{ unreachable();
             }
@@ -1290,44 +1316,44 @@ public: // ops
       return *this;
    }
    void carry(T end)
-   {
+   { untested();
        BOOST_AUTO(b, _t.back());
        ++b;
-       if(_t.size() == 1){
+       if(_t.size() == 1){ untested();
            ++_t.back();
-       }else if(_t.back() == end){
+       }else if(_t.back() == end){ untested();
            _t.pop_back();
            BOOST_AUTO(newend, _t.back());
            ++newend;
-           if(newend==end){
+           if(newend==end){ untested();
                newend=_t.back();
-           }else{
+           }else{ untested();
            }
            carry(newend);
 
            b = _t.back();
            ++b;
-           if(_t.back()!=end){
+           if(_t.back()!=end){ untested();
                _t.push_back(b);
            }
-       }else{
+       }else{ untested();
            assert(b==end);
            ++_t.back();
        }
 
    }
    void fill()
-   {
-      while(_t.size() < _l){
-         if(!_t.size()){
+   { untested();
+      while(_t.size() < _l){ untested();
+         if(!_t.size()){ untested();
             _t.push_back(_i);
-         }else{
+         }else{ untested();
             BOOST_AUTO(back, _t.back());
             if(back==_e){ itested();
                break;
-            }else{
+            }else{ untested();
                ++back;
-               if(back==_e){
+               if(back==_e){ untested();
                    _t[0] = _e;
                    break;
                }
@@ -1339,7 +1365,7 @@ public: // ops
       assert(_t.size()>=_l || _t[0] == _e);
    }
    std::pair<subset_iter, subset_iter> operator*()
-   {
+   { untested();
       return std::make_pair(subset_iter(_t.begin()),
                             subset_iter(_t.end()));
    }
@@ -1358,9 +1384,9 @@ private: // state
 
 template<class A>
 std::pair<subsets_iter<A>, subsets_iter<A> >
-    make_subsets_iter(A a, A b, unsigned l, unsigned u,
+    make_subsets_range(A a, A b, unsigned l, unsigned u,
           typename subsets_iter<A>::scratch_type* s=NULL)
-{
+{ untested();
    return std::make_pair(
        subsets_iter<A>(a,b,l,u,s),
        subsets_iter<A>(b,b));
@@ -1391,13 +1417,13 @@ public: // construct
          _a(a?(*a):(*(new scratch_type(size)))),
          _aa(&_a),
          _g(g), _include_base(incb)
-    {
+    { untested();
 #if __cplusplus >= 201103L
-        if(a){
+        if(a){ untested();
             a->resize(size);
             // use external scratch
             _aa = NULL;
-        }else{
+        }else{ untested();
             // own scratch. initialized above
             assert(_aa == &_a);
         }
@@ -1405,22 +1431,22 @@ public: // construct
         // ignore external scratch
         assert(_aa == &_a);
 #endif
-        if(b==e){
+        if(b==e){ untested();
             assert(size==0);
             return;
-        }else{
+        }else{ untested();
         }
 
         bool found=false;
 
-        if(_include_base){
+        if(_include_base){ untested();
             _v = *_i;
-        }else{
+        }else{ untested();
             A ii(_b);
-            for(; ii!=_e; ++ii){
+            for(; ii!=_e; ++ii){ untested();
                 // just take one.... (inefficient)
                 if(boost::adjacent_vertices(*ii, g).first
-                 !=boost::adjacent_vertices(*ii, g).second){
+                 !=boost::adjacent_vertices(*ii, g).second){ untested();
                     _v = *boost::adjacent_vertices(*ii, g).first;
                     found = true;
                     break;
@@ -1430,31 +1456,31 @@ public: // construct
 
         A ii(_b);
         unsigned n=0;
-        for(; ii!=_e; ++ii){
+        for(; ii!=_e; ++ii){ untested();
             assert(!size || n<size);
             if(!size){ untested();
                 _a.push_back(boost::adjacent_vertices(*ii, g).first);
-            }else{
+            }else{ untested();
                 _a[n] = boost::adjacent_vertices(*ii, g).first;
             }
 
             if(_a[n] == boost::adjacent_vertices(*ii, g).second){ untested();
-            }else if(*(_a[n])<_v){
+            }else if(*(_a[n])<_v){ untested();
                 _v = *_a[n];
                 found = true;
-            }else{
+            }else{ untested();
             }
             ++n;
         }
-        if(_include_base==bEXCLUDE){
+        if(_include_base==bEXCLUDE){ untested();
             incomplete();
-        }else if(_include_base==bINCLUDE){
-        }else if(!found){
+        }else if(_include_base==bINCLUDE){ untested();
+        }else if(!found){ untested();
             _b = _e;
         }
     }
     neighbourhood01_iter& operator=(const neighbourhood01_iter& x)
-    {
+    { untested();
         incomplete();
         return *this;
     }
@@ -1464,7 +1490,7 @@ public: // construct
           _a(*(new scratch_type(x._a))), _aa(&_a),
           _v(x._v),
           _g(x._g), _include_base(x._include_base)
-    {
+    { untested();
         assert(_aa == &_a);
     }
 #if __cplusplus >= 201103L
@@ -1477,85 +1503,85 @@ public: // construct
           _v((x._v)),
           _g(x._g),
           _include_base(x._include_base)
-    {
+    { untested();
         x._aa = NULL;
         assert(_aa == NULL || _aa == &_a);
     }
     neighbourhood01_iter& operator=(const neighbourhood01_iter&& x)
-    {
+    { untested();
         incomplete();
         return *this;
     }
 #endif
 
     ~neighbourhood01_iter()
-    {
-        if(_aa){
+    { untested();
+        if(_aa){ untested();
             // own scratch. delete it.
             delete(&_a);
-        }else{
+        }else{ untested();
         }
     }
 public: // ops
     bool operator!=(const neighbourhood01_iter& p) const
-    {
+    { untested();
         return _b != p._b;
     }
     bool operator==(const neighbourhood01_iter& p) const
-    {
+    { untested();
         return(_b == p._b);
     }
     neighbourhood01_iter& operator++()
-    {
+    { untested();
         if(_b==_e){ untested();
             return *this;
-        }else{
+        }else{ untested();
         }
         vertex_descriptor previous = _v;
         bool found = false;
-        if(_include_base){
+        if(_include_base){ untested();
             found = update(_i, _e, previous, _v);
-        }else{
+        }else{ untested();
         }
         A ii(_b);
         unsigned n=0;
-        for(; ii!=_e; ++ii){
+        for(; ii!=_e; ++ii){ untested();
             BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
             found |= update(_a[n], aend, previous, _v);
             ++n;
         }
-        if(!found){
+        if(!found){ untested();
             _b = _e;
-        }else{
+        }else{ untested();
             assert(_v>previous);
         }
         return *this;
     }
     const vertex_descriptor& operator*()
-    {
+    { untested();
         return _v;
     }
 private: // impl
     template<class iter>
     bool update(iter& i, iter e, vertex_descriptor previous, vertex_descriptor& v)
-    {
-        if(i==e){
+    { untested();
+        if(i==e){ untested();
             return false;
-        }else if(*i==previous){
+        }else if(*i==previous){ untested();
             ++i;
-            if(i==e){
+            if(i==e){ untested();
                 return false;
             }
-        }else{
+        }else{ untested();
             assert(*i>previous);
         }
 
-        if(v==previous){
+        if(v==previous){ untested();
             v = *i;
-        }else if(*i<v){
+        }else if(*i<v){ untested();
             assert(*i>previous);
             v = *i;
-        }else{
+        }else{ untested();
         }
         return true;
     }
@@ -1591,7 +1617,7 @@ std::pair<detail::neighbourhood01_iter<A, G>,
 inline make_neighbourhood01_range(A b, A e, G const& g, unsigned size=0,
         base_t include_base=bINCLUDE,
         typename detail::neighbourhood01_iter<A,G>::scratch_type* nrs=NULL)
-{
+{ untested();
     typedef detail::neighbourhood01_iter<A, G> nIter;
     return std::make_pair(
             nIter(b, e, size, g, include_base, nrs),
@@ -1602,7 +1628,7 @@ template<class A, class G>
 inline
 typename detail::neighbourhood01_iter<A,G>::scratch_type*
 new_neighbourhood_range_scratch(A const, G const&, unsigned size=0)
-{
+{ untested();
     return new typename detail::neighbourhood01_iter<A,G>::scratch_type(size);
 }
 
@@ -1612,8 +1638,209 @@ std::pair<detail::neighbourhood01_iter<A, G>,
 inline make_neighbourhood_range(A b, A e, G const& g, unsigned size=0,
         base_t include_base=bINCLUDE,
         typename detail::neighbourhood01_iter<A,G>::scratch_type* nrs=NULL)
-{
+{ untested();
     return make_neighbourhood01_range(b, e, g, size, include_base, nrs);
+}
+
+#define first_adj(i) \
+    boost::adjacent_vertices(i,_g).first
+#define second_adj(i) \
+    boost::adjacent_vertices(i,_g).second
+
+
+namespace detail{
+template<class A, class G, class V>
+class neighbourhood_visitor { //
+public: // types
+    typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+public: // construct
+    neighbourhood_visitor(const neighbourhood_visitor& p) :
+        _i(p._i), _e(p._e),
+        _g(p._g),
+        _current(p._current),
+        _visited(p._visited),
+        _isatend(p._isatend)
+    { untested();
+        // trace3("copy", &p, p._e-p._i, _e-_i);
+    }
+    neighbourhood_visitor(const neighbourhood_visitor&& p) :
+        _i(p._i), _e(p._e),
+        _g(p._g),
+        _current(p._current),
+        _visited(p._visited),
+        _isatend(p._isatend)
+    { untested();
+    }
+    neighbourhood_visitor(A i, A const& e, G const& g, V const& v) :
+        _i(i), _e(e),
+        _g(g),
+        _visited(v),
+        _isatend(false)
+    { untested();
+        // trace3("NV", this, _e-_i, (_e-_i)?boost::degree(*_i,_g):-1);
+        if (_i==_e){ untested();
+            _isatend=true;
+            return;
+        }else{ untested();
+            assert(treedec::is_valid(*_i,_g));
+            auto P=boost::adjacent_vertices(*_i,_g);
+            unsigned t=0;
+            unsigned v=0;
+            for(;P.first!=P.second;++P.first){ untested();
+                ++t;
+                auto p=treedec::get_pos(*P.first, _g);
+                if(!_visited[p]){ untested();
+                    ++v;
+                }
+            }
+        }
+        _current = first_adj(*_i);
+
+        // skip to next valid neighbour.
+        while(_current==second_adj(*_i)){ untested();
+            ++_i;
+            assert(size_t(_e-_i)<=boost::num_vertices(_g));
+            if(_i==_e){ untested();
+                trace1("initial isatend", 1);
+                _isatend=true;
+                return;
+            }else{ untested();
+            }
+            _current = first_adj(*_i);
+        }
+        assert(size_t(_e-_i)<=boost::num_vertices(_g));
+        // then increment if visited.
+        if(visited()){ untested();
+            operator++();
+        }else{ untested();
+        }
+        assert(size_t(_e-_i)<=boost::num_vertices(_g));
+    }
+    neighbourhood_visitor& operator=(const neighbourhood_visitor& x)
+    { untested();
+        if(x._e==x._i){ untested();
+            _i=x._i;
+        }else{ untested();
+            assert(0); //incomplete?;
+        }
+        return *this;
+    }
+public: // ops
+    bool operator==(const neighbourhood_visitor& x) const
+    { untested();
+        return !operator!=(x);
+    }
+    bool operator<(const neighbourhood_visitor& x) const
+    { incomplete();
+        if(_i < x._i){ untested();
+            return true;
+        }else if(_i==_e){untested();
+            return false;
+        }else if(x._i==x._e){untested();
+            unreachable(); //?
+            return true;
+        }else{untested();
+            // HACK HACK
+            return &_current<&x._current;
+        }
+        return _isatend; // hack
+    }
+    bool operator!=(const neighbourhood_visitor& x) const
+    { untested();
+
+//        x.update(); ?!
+
+        if(x._i != _i){ untested();
+        }else if(x._i==x._e){ untested();
+            return false;
+        }else{untested();
+            // assert(!visited()); externally modified!
+            // assert(!x.visited()); same!
+            return x._current!=_current;
+        }
+        return !_isatend; // hack
+    }
+    neighbourhood_visitor& operator++()
+    { untested();
+        assert(_i!=_e);
+        assert(!_isatend);
+        assert(size_t(_e-_i)<=boost::num_vertices(_g));
+        assert(_current!=second_adj(*_i));
+        // assert(visited()); // no, externally modified?
+        assert(_current!=second_adj(*_i));
+        assert(treedec::is_valid(*_current, _g));
+
+        ++_current;
+        if(_current==second_adj(*_i)) { untested();
+        }else if(!visited()) { untested();
+            // trace2("skip to", _e-_i, *_current);
+            return *this;
+        }else{ untested();
+        }
+
+        while(true){ untested();
+            assert(_i!=_e);
+            if(_current==second_adj(*_i)){ untested();
+                ++_i;
+                assert(size_t(_e-_i)<=boost::num_vertices(_g));
+                if(_i==_e){ untested();
+                    _isatend = true;
+                    return *this;
+                }else{ untested();
+                    assert(treedec::is_valid(*_i, _g));
+                    assert(_i!=_e);
+                    trace2("hmm", *_i, boost::num_vertices(_g));
+                    _current = first_adj(*_i);
+                    if(_current == second_adj(*_i)){ untested();
+                    }
+                }
+            }else{ untested();
+                assert(treedec::is_valid(*_current, _g));
+            }
+            assert(_current!=second_adj(*_i));
+            assert(treedec::is_valid(*_current, _g));
+            if(!visited()) { untested();
+                return *this;
+            }else{ untested();
+            }
+            ++_current;
+        }
+        untested();
+    }
+    const vertex_descriptor operator*()
+    { untested();
+        assert(!_isatend);
+        assert(_i!=_e);
+        assert(size_t(_e-_i)<=boost::num_vertices(_g));
+        return *_current;
+    }
+private: // impl
+    bool visited() const
+    { untested();
+        assert(treedec::is_valid(*_current, _g));
+        auto p=treedec::get_pos(*_current, _g);
+        return _visited[p];
+    }
+private: // data
+    A _i;
+    A const& _e;
+    G const& _g;
+    adjacency_iterator _current;
+    V const& _visited;
+    bool _isatend;
+};
+} // detail
+
+template<class A, class G, class V>
+std::pair<detail::neighbourhood_visitor<A, G, V>,
+          detail::neighbourhood_visitor<A, G, V> >
+inline make_neighbourhood_range(A b, A const& e, G const& g, V const& visited)
+{ untested();
+    typedef detail::neighbourhood_visitor<A, G, V> nIter;
+    return std::make_pair(
+            nIter(b, e, g, visited),
+            nIter(e, e, g, visited) );
 }
 
 
@@ -1621,7 +1848,7 @@ namespace treedec{
 // TODO: where?
 template<class G>
 void assert_connected(G const & g)
-{
+{ untested();
     (void)g;
 #ifndef NDEBUG
 #if __cplusplus >= 201103L
@@ -1632,7 +1859,7 @@ void assert_connected(G const & g)
     auto BFS=make_bfs_range(b, e, g, &mask);
 
     unsigned nv=0;
-    for(;BFS.first!=BFS.second;++(BFS.first)){
+    for(;BFS.first!=BFS.second;++(BFS.first)){ untested();
         ++nv;
     }
 

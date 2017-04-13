@@ -336,6 +336,7 @@ public:
     }
     void redegree(vertex_descriptor v, unsigned mark_needs_update=0)
     { // call degree.hpp redegree?
+        (void)mark_needs_update;
         auto p=adjacent_vertices(v);
         for(; p.first!=p.second; ++p.first){
             auto n = *p.first;

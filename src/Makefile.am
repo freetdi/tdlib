@@ -14,6 +14,7 @@ pkginclude_HEADERS = \
   fill.hpp \
   dynamicCR.hpp \
   elimination_orderings.hpp \
+  exact.hpp \
   exact_cutset.hpp \
   iter.hpp \
   lower_bounds.hpp \
@@ -48,5 +49,6 @@ pkginclude_HEADERS = \
   config_traits.hpp \
   directed_view.hpp \
   copy.hpp \
+  treedec.hpp \
   treedec_traits.hpp \
   grparse.h

@@ -182,7 +182,7 @@ public:
     }
 
 public: // queueing
-    void unlink(const vertex_descriptor& v, size_t x)
+    void unlink(const vertex_descriptor& v, size_t /*x*/)
     {
         assert(treedec::is_valid(v, _g));
 #ifndef NDEBUG
