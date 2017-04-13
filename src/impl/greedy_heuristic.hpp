@@ -239,7 +239,7 @@ public:
         auto zerodegbag=MOVE(_degs.detach_bag(0));
         BOOST_AUTO(it, zerodegbag.begin());
 
-        for(; it!=zerodegbag.end(); ++it){ untested();
+        for(; it!=zerodegbag.end(); ++it){
             (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
         }
     }

@@ -224,18 +224,18 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     }
 
     //Preprocessing.
-    int low = -1;
+    int low_tw = -1;
 
     std::vector<boost::tuple<
         typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
         typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
          > > bags;
 
-    treedec::preprocessing(G, bags, low);
+    treedec::preprocessing(G, bags, low_tw);
 
     if(boost::num_edges(G) == 0){
         treedec::glue_bags(bags, T);
-        if(low <= k){
+        if(low_tw <= k){
             return true;
         }
         return false;
@@ -245,11 +245,15 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     G_t H(G);
     int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
-    int lb = low;
-    lb = (lb_deltaC > lb)? lb_deltaC : lb;
+    int lb = low_tw;
+    if(lb_deltaC > lb){ untested();
+        lb = lb_deltaC;
+    }else{ untested();
+    }
 
-    if(lb > k){
+    if(lb > k){ untested();
         return false;
+    }else{ untested();
     }
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.

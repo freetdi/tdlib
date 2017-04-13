@@ -79,8 +79,6 @@ namespace treedec{ //
 // or to greedy_heuristics class?
 namespace detail{
 
-
-//WARNING: untested
 //WARNING: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above) if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 class skeleton{
@@ -91,8 +89,7 @@ public:
         _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
     }
 
-    void inverse_ordering()
-    {
+    void inverse_ordering(){
         for(unsigned u = 0; u < _n; u++){
             typename treedec_chooser<G_t>::value_type e=_o[u];
             unsigned pos = get_pos(e, _g);
@@ -101,7 +98,7 @@ public:
     }
 
     template <typename X_t>
-    void bag_to_treedec(std::set<X_t> &b, T_t &T, unsigned idx){
+    void bag_to_treedec(std::set<X_t> &b, T_t &T, unsigned idx){ untested();
         bag(idx, T) = MOVE(b);
     }
 
@@ -113,8 +110,9 @@ public:
     }
 
     void do_it(){
-        if(_n == 0){
+        if(_n == 0){ untested();
             return;
+        }else{
         }
 
         inverse_ordering();
@@ -138,8 +136,7 @@ public:
                     unsigned index = _inv_o[pos];
                     min_index = (index < min_index)? index : min_index;
                 }
-            }
-            else{
+            }else{ untested();
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
                     unsigned pos = get_pos(*nIt, _g);
@@ -156,8 +153,7 @@ public:
         for(unsigned u = 0; u < _n; u++){
             if(_b != NULL){
                 bag_to_treedec((*_b)[u], _t, u);
-            }
-            else{
+            }else{ untested();
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
                     insert(bag(u, _t), _o[u]);
@@ -179,7 +175,8 @@ private:
 
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_){
+void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
+{
     skeleton<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
     S.do_it();
 }
@@ -481,7 +478,7 @@ namespace impl{
 
 template <typename G_t, typename V_t, typename T_t>
 void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
-{
+{ untested();
     unsigned n = O.size();
 
     typename std::vector<typename treedec_traits<T_t>::bag_type> bags(n);

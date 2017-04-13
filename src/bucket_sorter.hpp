@@ -256,13 +256,13 @@ namespace boost {
         next[new_head] = current;
         head[bucket_id] = new_head;
       }
-      void pop() { untested();
+      void pop() {
         assert(bucket_id<size());
         size_type current = head[bucket_id];
         size_type next_node = next[current];
         head[bucket_id] = next_node;
         // prev[bucket_id] = bucket_id + (head - prev);
-        if ( next_node != invalid_value() ){ untested();
+        if ( next_node != invalid_value() ){
           assert(next_node != prev[current]);
           prev[next_node] = bucket_id + (head - next);
         }

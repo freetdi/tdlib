@@ -337,7 +337,7 @@ public:
     void redegree(vertex_descriptor v, unsigned mark_needs_update=0)
     { // call degree.hpp redegree?
         auto p=adjacent_vertices(v);
-        for(; p.first!=p.second; ++p.first){ untested();
+        for(; p.first!=p.second; ++p.first){
             auto n = *p.first;
             assert(_numbering.is_not_numbered(n));
 
@@ -689,14 +689,14 @@ bool preprocessing<G_t, CFG>::check_twins_3(
             ++Ia;
             // aA?
             // ?xx
-            if(*Ia==*Ib){ untested();
+            if(*Ia==*Ib){
                 // aA=
                 // =xx
                 ++Ib;
                 if(a==*Ib){ untested();
                     ++Ib;
                     ret = A==*Ib;
-                }else if(A==*Ib){ untested();
+                }else if(A==*Ib){
                     ++Ib;
                     ret = a==*Ib;
                 }else{ untested();
@@ -1246,14 +1246,14 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         return true;
     }else if(disable_almost_simplicial){ untested();
         return false;
-    }else if( balance==-2 || edges_size_type(balance)==deg ){ untested();
+    }else if( balance==-2 || edges_size_type(balance)==deg ){
         trace1(">>>>>>>>>> AlmostSimplicial", v);
         // missing and multimissings are balanced.
         // it's almost simplicial.
         assert(deg);
         assert(_lb_bs>=1);
 
-        if(deg+1 <= _lb_bs){ untested();
+        if(deg+1 <= _lb_bs){
             vd_type vd = get_vd(_g, v);
 
 #if 0
@@ -1265,7 +1265,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
             assert(_numbering.is_numbered(v));
             unsigned check=0;
             auto Is=adjacent_vertices(special);
-            for(; Is.first!=Is.second; ++Is.first){ untested();
+            for(; Is.first!=Is.second; ++Is.first){
                 _marker.unmark(*Is.first);
                 trace1("unmark sneigh", *Is.first);
                 if(*Is.first==v){ untested();
@@ -1279,10 +1279,10 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
             // edge from still marked v-neighbours to special
             trace3("need edges", check, balance, _degree[v]);
             auto Iv=adjacent_vertices(v);
-            for(; Iv.first!=Iv.second; ++Iv.first){ untested();
+            for(; Iv.first!=Iv.second; ++Iv.first){
                 auto n=*Iv.first;
                 trace2("adj v", n, _marker.is_marked(n));
-                if(_marker.is_marked(n)){ untested();
+                if(_marker.is_marked(n)){
                     assert(n!=special);
                     assert(!boost::edge(n, special, _g).second);
                     boost::add_edge(n, special, _g);
@@ -1292,7 +1292,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
                     ++_degree[n];
                     ++_degree[special];
                     increment_edges();
-                }else{ untested();
+                }else{
                 }
             }
 

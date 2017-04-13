@@ -37,12 +37,12 @@ struct dwt{
 
 	static std::string dbg(){ return "wrap directed\n"; }
 
-	static size_t init(G const& g){ untested();
+	static size_t init(G const& g){
 		return boost::num_vertices(g);
 	}
 
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){ untested();
+	static void copy(GG const& g, H& h){
 		assert(boost::is_undirected(g));
 		auto p=boost::edges(g);
 		for(; p.first!=p.second; ++p.first){
@@ -105,7 +105,7 @@ private:
 	directed_view(const directed_view& ) { unreachable();}
 public:
 	directed_view(G& g, bool commit=false)
-	: _g(wrapper_help::init(g)), _commit(commit) { untested();
+	: _g(wrapper_help::init(g)), _commit(commit) {
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge
