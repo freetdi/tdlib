@@ -93,7 +93,7 @@ void PP_FI(G_t &G, T_t &T, int &low_tw){
     if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
-    }else{ untested();
+    }else{
     }
 
 #ifndef NOBAGS
@@ -112,7 +112,7 @@ void PP_FI(G_t &G, T_t &T, int &low_tw){
     A.get_graph(G);
 #endif
 
-    if(boost::num_edges(G) > 0){ untested();
+    if(boost::num_edges(G) > 0){
         unsigned low2=-1;
         treedec::impl::fillIn_decomp(G, T, low2, true); //ignore_isolated
         low_tw = low2;
@@ -263,14 +263,14 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
     int lb = low_tw;
-    if(lb_deltaC > lb){ untested();
+    if(lb_deltaC > lb){
         lb = lb_deltaC;
-    }else{ untested();
+    }else{
     }
 
     if(lb > k){ untested();
         return false;
-    }else{ untested();
+    }else{
     }
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.

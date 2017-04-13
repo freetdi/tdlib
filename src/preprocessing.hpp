@@ -324,12 +324,12 @@ public:
     int get_treewidth() {
         return int(_lb_bs)-1;
     }
-    void isolate(vertex_descriptor v){ untested();
+    void isolate(vertex_descriptor v){
         unsigned deg = _degree[v];
         _num_edges -= deg;
 
         auto p=adjacent_vertices(v);
-        for(; p.first!=p.second; ++p.first){ untested();
+        for(; p.first!=p.second; ++p.first){
             remove_edge(*p.first, v);
         }
         assert(deg == _degree[v]);
@@ -456,12 +456,12 @@ private:
             return 0;
         }
     }
-    bool is_numbered(vertex_descriptor v){ untested();
+    bool is_numbered(vertex_descriptor v){
         return _numbering.is_numbered(v);
     }
-    void unlink_1_neighbourhood(vertex_descriptor v){ untested();
+    void unlink_1_neighbourhood(vertex_descriptor v){
         auto pp=adjacent_vertices(v);
-        for(; pp.first!=pp.second; ++pp.first){ untested();
+        for(; pp.first!=pp.second; ++pp.first){
             _degs.unlink(*pp.first);
         }
     }
@@ -547,7 +547,7 @@ private:
     void addtoelims(vertex_descriptor v){
 #ifndef NDEBUG
         if(_degs.is_reg(v)){
-        }else{ untested();
+        }else{
             assert(!(disable_cube && disable_triangle && disable_buddy));
             //
         }
@@ -681,7 +681,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
                 if(*Ia==*Ib){
                     ++Ib;
                     ret = a==*Ib;
-                }else{ untested();
+                }else{
                     ret = false;
                 }
             }
@@ -700,7 +700,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
                 }else if(A==*Ib){
                     ++Ib;
                     ret = a==*Ib;
-                }else{ untested();
+                }else{
                     ret = false;
                 }
             }else{
@@ -810,7 +810,7 @@ bool preprocessing<G_t, CFG>::Buddy(
 {
     assert(_degree[v]==3);
     assert(_degree[w]==3);
-    if(check_twins_3(v, w)){ untested();
+    if(check_twins_3(v, w)){
         assert(!is_numbered(v));
         assert(!is_numbered(w));
         unlink_1_neighbourhood(v);
@@ -1239,7 +1239,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         }
         _num_edges -= _degree[v];
 
-        if (_lb_bs < 1+deg){ untested();
+        if (_lb_bs < 1+deg){
             _lb_bs = 1+deg;
         }else{
         }
@@ -1305,7 +1305,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         }else if(_lb_bs < deg){ untested();
             _lb_bs = deg;
             return true;
-        }else{ untested();
+        }else{
             return false;
         }
     }else{ itested();
@@ -1469,7 +1469,7 @@ void preprocessing<G_t, CFG>::do_it()
                     }
 #endif
                     if(disable_buddy){ untested();
-                    }else if(Buddy(*it1, *it2)){ untested();
+                    }else if(Buddy(*it1, *it2)){
                         trace1("==============buddy", *it1);
                         goto NEXT_ITER;
                     }else{

@@ -955,7 +955,7 @@ class exact_cutset { // baseclass?
 public:
     exact_cutset(G_t const& g)
         : _g(g) {}
-    ~exact_cutset() { untested();
+    ~exact_cutset() {
     }
 public:
     template<class T_t>

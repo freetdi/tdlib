@@ -68,7 +68,7 @@ namespace boost {
         prev[next_node] = prev_node; 
       }
       //check if i is the begin of the bucket list
-      if( prev_node == invalid_value() ){ untested();
+      if( prev_node == invalid_value() ){
         unreachable();
         // double remove?
       }else if(prev_node>=size()){
@@ -76,7 +76,7 @@ namespace boost {
       }else{
         next[prev_node] = next_node;
       }
-      if(next_node == prev_node){ untested();
+      if(next_node == prev_node){
         // double remove?
       }
 

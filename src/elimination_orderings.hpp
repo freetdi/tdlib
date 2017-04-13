@@ -99,7 +99,7 @@ public:
     }
 
     template <typename X_t>
-    void bag_to_treedec(std::set<X_t> &b, T_t &T, unsigned idx){ untested();
+    void bag_to_treedec(std::set<X_t> &b, T_t &T, unsigned idx){
         bag(idx, T) = MOVE(b);
     }
 
@@ -479,7 +479,7 @@ namespace impl{
 
 template <typename G_t, typename V_t, typename T_t>
 void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
-{ untested();
+{
     unsigned n = O.size();
 
     typename std::vector<typename treedec_traits<T_t>::bag_type> bags(n);
