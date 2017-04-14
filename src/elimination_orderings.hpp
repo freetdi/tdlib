@@ -462,7 +462,7 @@ int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
 {
     int width = -1;
 
-    for(unsigned int i = 0; i < elimination_ordering.size(); i++){ untested();
+    for(unsigned int i = 0; i < elimination_ordering.size(); i++){
         unsigned deg=boost::out_degree(elimination_ordering[i], G);
 
         typename graph_traits<G_t>::outedge_set_type xbag;

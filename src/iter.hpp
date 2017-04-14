@@ -1199,7 +1199,7 @@ public: // construct
          _i(i), _e(e), _l(min), _u(max)
    {
 #if __cplusplus >= 201103L
-      if(t){ untested();
+      if(t){
           t->resize(0);
           // use external scratch
           _tt = NULL;
@@ -1289,7 +1289,7 @@ public: // ops
             unreachable();
          }else if(_t.size()==0){ untested();
             unreachable();
-         }else if(_t.size()==1){ untested();
+         }else if(_t.size()==1){
             ++_t.back();
          }else if(_t.size()==_l){
              BOOST_AUTO(back2, _t.back());
@@ -1353,7 +1353,7 @@ public: // ops
                break;
             }else{
                ++back;
-               if(back==_e){ untested();
+               if(back==_e){
                    _t[0] = _e;
                    break;
                }
@@ -1417,13 +1417,13 @@ public: // construct
          _a(a?(*a):(*(new scratch_type(size)))),
          _aa(&_a),
          _g(g), _include_base(incb)
-    { untested();
+    {
 #if __cplusplus >= 201103L
         if(a){ untested();
             a->resize(size);
             // use external scratch
             _aa = NULL;
-        }else{ untested();
+        }else{
             // own scratch. initialized above
             assert(_aa == &_a);
         }
@@ -1431,15 +1431,15 @@ public: // construct
         // ignore external scratch
         assert(_aa == &_a);
 #endif
-        if(b==e){ untested();
+        if(b==e){
             assert(size==0);
             return;
-        }else{ untested();
+        }else{
         }
 
         bool found=false;
 
-        if(_include_base){ untested();
+        if(_include_base){
             _v = *_i;
         }else{ untested();
             A ii(_b);
@@ -1456,25 +1456,25 @@ public: // construct
 
         A ii(_b);
         unsigned n=0;
-        for(; ii!=_e; ++ii){ untested();
+        for(; ii!=_e; ++ii){
             assert(!size || n<size);
             if(!size){ untested();
                 _a.push_back(boost::adjacent_vertices(*ii, g).first);
-            }else{ untested();
+            }else{
                 _a[n] = boost::adjacent_vertices(*ii, g).first;
             }
 
-            if(_a[n] == boost::adjacent_vertices(*ii, g).second){ untested();
-            }else if(*(_a[n])<_v){ untested();
+            if(_a[n] == boost::adjacent_vertices(*ii, g).second){
+            }else if(*(_a[n])<_v){
                 _v = *_a[n];
                 found = true;
-            }else{ untested();
+            }else{
             }
             ++n;
         }
         if(_include_base==bEXCLUDE){ untested();
             incomplete();
-        }else if(_include_base==bINCLUDE){ untested();
+        }else if(_include_base==bINCLUDE){
         }else if(!found){ untested();
             _b = _e;
         }
@@ -1490,7 +1490,7 @@ public: // construct
           _a(*(new scratch_type(x._a))), _aa(&_a),
           _v(x._v),
           _g(x._g), _include_base(x._include_base)
-    { untested();
+    {
         assert(_aa == &_a);
     }
 #if __cplusplus >= 201103L
@@ -1503,7 +1503,7 @@ public: // construct
           _v((x._v)),
           _g(x._g),
           _include_base(x._include_base)
-    { untested();
+    {
         x._aa = NULL;
         assert(_aa == NULL || _aa == &_a);
     }
@@ -1515,73 +1515,73 @@ public: // construct
 #endif
 
     ~neighbourhood01_iter()
-    { untested();
-        if(_aa){ untested();
+    {
+        if(_aa){
             // own scratch. delete it.
             delete(&_a);
-        }else{ untested();
+        }else{
         }
     }
 public: // ops
     bool operator!=(const neighbourhood01_iter& p) const
-    { untested();
+    {
         return _b != p._b;
     }
     bool operator==(const neighbourhood01_iter& p) const
-    { untested();
+    {
         return(_b == p._b);
     }
     neighbourhood01_iter& operator++()
-    { untested();
+    {
         if(_b==_e){ untested();
             return *this;
-        }else{ untested();
+        }else{
         }
         vertex_descriptor previous = _v;
         bool found = false;
-        if(_include_base){ untested();
+        if(_include_base){
             found = update(_i, _e, previous, _v);
         }else{ untested();
         }
         A ii(_b);
         unsigned n=0;
-        for(; ii!=_e; ++ii){ untested();
+        for(; ii!=_e; ++ii){
             BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
             found |= update(_a[n], aend, previous, _v);
             ++n;
         }
-        if(!found){ untested();
+        if(!found){
             _b = _e;
-        }else{ untested();
+        }else{
             assert(_v>previous);
         }
         return *this;
     }
     const vertex_descriptor& operator*()
-    { untested();
+    {
         return _v;
     }
 private: // impl
     template<class iter>
     bool update(iter& i, iter e, vertex_descriptor previous, vertex_descriptor& v)
-    { untested();
-        if(i==e){ untested();
+    {
+        if(i==e){
             return false;
-        }else if(*i==previous){ untested();
+        }else if(*i==previous){
             ++i;
-            if(i==e){ untested();
+            if(i==e){
                 return false;
             }
-        }else{ untested();
+        }else{
             assert(*i>previous);
         }
 
-        if(v==previous){ untested();
+        if(v==previous){
             v = *i;
-        }else if(*i<v){ untested();
+        }else if(*i<v){
             assert(*i>previous);
             v = *i;
-        }else{ untested();
+        }else{
         }
         return true;
     }
@@ -1617,7 +1617,7 @@ std::pair<detail::neighbourhood01_iter<A, G>,
 inline make_neighbourhood01_range(A b, A e, G const& g, unsigned size=0,
         base_t include_base=bINCLUDE,
         typename detail::neighbourhood01_iter<A,G>::scratch_type* nrs=NULL)
-{ untested();
+{
     typedef detail::neighbourhood01_iter<A, G> nIter;
     return std::make_pair(
             nIter(b, e, size, g, include_base, nrs),
@@ -1638,7 +1638,7 @@ std::pair<detail::neighbourhood01_iter<A, G>,
 inline make_neighbourhood_range(A b, A e, G const& g, unsigned size=0,
         base_t include_base=bINCLUDE,
         typename detail::neighbourhood01_iter<A,G>::scratch_type* nrs=NULL)
-{ untested();
+{
     return make_neighbourhood01_range(b, e, g, size, include_base, nrs);
 }
 
