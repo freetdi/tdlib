@@ -55,7 +55,7 @@ class overlay{
 public:
     typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
 
-    overlay(UnderlyingG_t &G_input)
+    overlay(UnderlyingG_t const &G_input)
       : G(G_input)
     {
         _active = std::vector<BOOL>(boost::num_vertices(G_input), true);
@@ -161,6 +161,7 @@ private:
     OverlayG_t O;
     std::vector<BOOL> &_active;
 
+	 // BUG: inefficient.
     std::stack<std::vector<vdU> > _changes_container;
 };
 

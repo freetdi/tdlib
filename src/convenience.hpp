@@ -14,7 +14,7 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_1<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, configs::CFG_DFS_1> //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
@@ -54,7 +54,7 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
@@ -99,7 +99,7 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
 
     overlay<G_t, G_t> olay(G, active);
 
-    generic_elimination_search_DFS<G_t, G_t, configs::CFG_DFS_3<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<G_t, configs::CFG_DFS_3 > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,
@@ -135,7 +135,7 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
 
     std::vector<BOOL> active(boost::num_vertices(G), true);
 
-#ifdef HAVE_GALA
+#ifdef HAVE_GALA_NOTYET
     typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
 
     typedef G_t Underlying_t;
@@ -149,7 +149,7 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
     overlay<Underlying_t, Overlay_t> olay(G, active);
 #endif
 
-    generic_elimination_search_DFS<Underlying_t, Overlay_t, configs::CFG_DFS_2<G_t> > //TODO: constructor...
+    generic_elimination_search_DFS<Underlying_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
                ordering,

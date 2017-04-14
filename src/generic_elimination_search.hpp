@@ -37,10 +37,12 @@ namespace treedec{
 
 namespace gen_search{
 
-template <typename G_t, typename Olay_t, typename CFG_t>
+template <typename G_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_base : public treedec::algo::draft::algo1{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+	 typedef typename treedec::config::get::olay<CFGT_t<G_t>, G_t>::type Olay_t;
+	 typedef CFGT_t<G_t> CFG_t;
 
     //TODO: better use iterators for elim_vertices
     generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
@@ -49,7 +51,14 @@ public:
       : algo1(CFG_t::name()), Overlay(Overlay_input),
         best_ordering(best_ordering_input), current_ordering(current_ordering_input),
         global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input)
-    {}
+    { untested();
+#ifdef DEBUG_NOTYET
+		 auto p=boost::vertices(Overlay); // not implemented
+		 for(; p.first!=p.second; ++p.first){
+			 /// test self loops? no. only G.
+		 }
+#endif
+	 }
 
     virtual void do_it() = 0;
 
@@ -76,19 +85,19 @@ protected:
 };
 
 
-template <typename G_t, typename Olay_t, typename CFG_t>
-class generic_elimination_search_DFS : public generic_elimination_search_base<G_t, Olay_t, CFG_t>{
-    typedef generic_elimination_search_base<G_t, Olay_t, CFG_t> baseclass;
-
+template <typename G_t, template<class G, class ...> class CFGT_t>
+class generic_elimination_search_DFS : public generic_elimination_search_base<G_t, CFGT_t>{
+	 typedef CFGT_t<G_t> CFG_t;
+    typedef generic_elimination_search_base<G_t, CFGT_t> baseclass;
     typedef typename baseclass::vd vd;
 
 public:
-    generic_elimination_search_DFS(overlay<G_t, Olay_t> &Overlay_input,
+    generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay_input,
                                    std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
                                    unsigned g_lb, unsigned g_ub, unsigned l_lb, unsigned l_ub, unsigned depth_input, unsigned generated_nodes_input, unsigned generated_orderings_input)
-      : generic_elimination_search_base<G_t, Olay_t, CFG_t>(Overlay_input, best_ordering_input, current_ordering_input,
-                                                            g_lb, g_ub, depth_input, generated_nodes_input, generated_orderings_input),
-        local_lb(l_lb), local_ub(l_ub), max_nodes_generated(UINT_MAX), max_orderings_generated(UINT_MAX){}
+      : baseclass(Overlay_input, best_ordering_input, current_ordering_input,
+		  g_lb, g_ub, depth_input, generated_nodes_input, generated_orderings_input),
+		  local_lb(l_lb), local_ub(l_ub), max_nodes_generated(UINT_MAX), max_orderings_generated(UINT_MAX){}
 
     void do_it();
 
@@ -107,8 +116,8 @@ protected:
 };
 
 
-template <typename G_t, typename Olay_t, typename CFG_t>
-void generic_elimination_search_DFS<G_t, Olay_t, CFG_t>::do_it()
+template <typename G_t, template<class G, class...> class CFGT_t>
+void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
 {
     if(baseclass::nodes_generated % 1000 == 0){
         std::cout << "#: " << baseclass::nodes_generated << std::endl;
