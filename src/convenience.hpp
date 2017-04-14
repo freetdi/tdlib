@@ -79,7 +79,14 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_width_of_elimination_ordering(H, ordering)+1);
+    size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
+	 size_t B=treedec::get_width_of_elimination_ordering(H, ordering)+1;
+    if(A != B){
+		 unreachable();
+		 std::cerr << A << " vs " << B << "\n";
+	 }else{
+	//	 std::cerr << "ok: " << A << " vs " << B << "\n";
+	 }
 }
 
 
