@@ -8,10 +8,7 @@ namespace treedec{
 
 namespace gen_search{
 
-
-
-
-template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
+template <typename UnderlyingG_t, typename OverlayG_t>
 class overlay{
 public:
     typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
@@ -51,57 +48,6 @@ public:
           -> meaning of pair<uint, vec<uint> >: first: modified vertex in overlay, second: #addition edges
           -> undo is stack.back(), then resize overlay[pair.first] according to vec<uint>[i], then stack.pop()
     */
-    unsigned eliminate(vdU elim_vertex)
-    {
-		 using draft::concat_iterator;
-        _active[elim_vertex]= false;
-
-        _changes_container.push(std::vector<vdU>());
-
-        unsigned actual_degree = 0;
-
-        typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
-        typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
-        adj1_iterator nIt1, nEnd1;
-        adj2_iterator nIt2, nEnd2;
-
-        boost::tie(nIt1, nEnd1) = boost::adjacent_vertices(elim_vertex, G);
-        boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(elim_vertex, O);
-
-        concat_iterator<adj1_iterator, adj2_iterator> cIt1(nIt1, nEnd1, nIt2, nEnd2);
-        concat_iterator<adj1_iterator, adj2_iterator> cIt2(nIt1, nEnd1, nIt2, nEnd2);
-
-        for(; cIt1 != nEnd2; ++cIt1){
-            if(!_active[*cIt1]){
-                continue;
-            }
-
-            ++actual_degree;
-
-            cIt2 = cIt1;
-            ++cIt2;
-
-            for(; cIt2 != nEnd2; ++cIt2){
-                if(!_active[*cIt2]){
-                    continue;
-                }
-
-                //TODO: can be further improved..
-                //if cIt1 or cIt2 are not in G, than the first one (! bla) is always true
-                if(cIt1.is_in_underlying() && cIt2.is_in_underlying() && boost::edge(*cIt1, *cIt2, G).second){
-                    continue;
-                }
-                if(!boost::edge(*cIt1, *cIt2, O).second)
-                {
-                    boost::add_edge(*cIt1, *cIt2, O);
-                    boost::add_edge(*cIt2, *cIt1, O);
-                    _changes_container.top().push_back(*cIt1);
-                    _changes_container.top().push_back(*cIt2);
-                }
-            }
-        }
-        return actual_degree;
-    }
 
     void undo_eliminate(vdU elim_vertex)
     {
@@ -119,21 +65,24 @@ public:
     }
 
 private:
+public: /// bug. accessed from outside.
     const UnderlyingG_t &G;
     OverlayG_t O;
+public: // BUG. wrong class
     std::vector<BOOL> &_active;
 
-	 // BUG: inefficient.
+public: /// bug. accessed from outside.
+	 // BUG: inefficient. part of overlay?
     std::stack<std::vector<vdU> > _changes_container;
 };
 
 
+#if 0
 template <typename G_t, typename VD_t>
 void gala_resize(G_t &G, VD_t v, unsigned num){
     auto &g = G.vertices();
     g[v].resize(g[v].size()-num);
 }
-
 
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
 class overlay_gala : public overlay<UnderlyingG_t, OverlayG_t>{
@@ -232,6 +181,7 @@ public:
 private:
     std::stack<std::vector<unsigned> > _changes_size;
 };
+#endif
 
 } //namespace gen_search
 

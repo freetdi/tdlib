@@ -1,6 +1,5 @@
 // Lukas Larisch, 2014 - 2017
-//
-// (c) 2014-2016 Goethe-Universität Frankfurt
+// Felix Salfelder 2017
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -39,10 +38,13 @@ namespace gen_search{
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_base : public treedec::algo::draft::algo1{
-public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+protected:
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+public:
 	 typedef typename treedec::config::get::olay<CFGT_t<G_t>, G_t>::type Olay_t;
 	 typedef CFGT_t<G_t> CFG_t;
+public: // construct
 
     //TODO: better use iterators for elim_vertices
     generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
@@ -71,6 +73,13 @@ public:
     unsigned get_orderings_generated(){ return orderings_generated; }
 
 protected:
+	 // vertices_size_type?
+	 unsigned eliminate(vertex_descriptor v);
+	 void undo_eliminate(vertex_descriptor v){
+		 //  BUG. "Overlay" is a graph...
+		 return Overlay.undo_eliminate(v);
+	 }
+protected:
     overlay<G_t, Olay_t> &Overlay;
     std::vector<vd> &best_ordering;
     std::vector<vd> &current_ordering;
@@ -82,14 +91,68 @@ protected:
 
     unsigned nodes_generated;
     unsigned orderings_generated;
-};
+}; // generic_elimination_search_base
+
+template <typename G_t, template<class G, class ...> class CFGT_t>
+unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
+		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
+{
+	using draft::concat_iterator;
+	Overlay._active[elim_vertex]= false;
+
+	Overlay._changes_container.push(std::vector<vertex_descriptor>());
+
+	unsigned actual_degree = 0;
+
+	// fixme: replace.
+	auto p=boost::adjacent_vertices(elim_vertex, Overlay.G);
+	auto nIt1=p.first;
+	auto nEnd1=p.second;
+	auto q=boost::adjacent_vertices(elim_vertex, Overlay.O);
+	auto nIt2=q.first;
+	auto nEnd2=q.second;
+	auto cIt1=draft::make_concat_iterator(nIt1, nEnd1, nIt2, nEnd2);
+	auto cIt2=draft::make_concat_iterator(nIt1, nEnd1, nIt2, nEnd2);
+
+	for(; cIt1 != nEnd2; ++cIt1){
+		if(!Overlay._active[*cIt1]){
+			continue;
+		}
+
+		++actual_degree;
+
+		cIt2 = cIt1;
+		++cIt2;
+
+		for(; cIt2 != nEnd2; ++cIt2){
+			if(!Overlay._active[*cIt2]){
+				continue;
+			}
+
+			//TODO: can be further improved..
+			//if cIt1 or cIt2 are not in G, than the first one (! bla) is always true
+			if(cIt1.is_in_underlying() && cIt2.is_in_underlying() 
+					&& boost::edge(*cIt1, *cIt2, Overlay.G).second){
+				continue;
+			}
+			if(!boost::edge(*cIt1, *cIt2, Overlay.O).second)
+			{
+				boost::add_edge(*cIt1, *cIt2, Overlay.O);
+				boost::add_edge(*cIt2, *cIt1, Overlay.O);
+				Overlay._changes_container.top().push_back(*cIt1);
+				Overlay._changes_container.top().push_back(*cIt2);
+			}
+		}
+	}
+	return actual_degree;
+}
 
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_DFS : public generic_elimination_search_base<G_t, CFGT_t>{
 	 typedef CFGT_t<G_t> CFG_t;
     typedef generic_elimination_search_base<G_t, CFGT_t> baseclass;
-    typedef typename baseclass::vd vd;
+    typedef typename baseclass::vertex_descriptor vd;
 
 public:
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay_input,
@@ -197,7 +260,7 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
 
-            unsigned step_width = baseclass::Overlay.eliminate(elim_vertex)+1;
+            unsigned step_width = baseclass::eliminate(elim_vertex)+1;
 
             if(step_width < baseclass::global_ub){
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
@@ -230,7 +293,7 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::global_ub || baseclass::global_lb == baseclass::global_ub){
-                        baseclass::Overlay.undo_eliminate(elim_vertex);
+                        baseclass::undo_eliminate(elim_vertex);
                         break; //returns now
                     }
                 }
@@ -239,7 +302,7 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
                 //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
             }
 
-            baseclass::Overlay.undo_eliminate(elim_vertex);
+            baseclass::undo_eliminate(elim_vertex);
 
         }
     }
@@ -252,3 +315,4 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
 } //namespace treedec
 
 #endif //TD_GENERIC_ELIM_SEARCH
+//vim:ts=8:sw=4:et

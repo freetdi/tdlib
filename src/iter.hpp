@@ -1914,6 +1914,12 @@ private:
     iter2 _i2, _e2;
 };
 
+template<class i1, class i2>
+concat_iterator<i1, i2> make_concat_iterator(i1 a, i1 b, i2 c, i2 d)
+{ untested();
+    return concat_iterator<i1, i2>(a, b, c, d);
+}
+
 } // draft
 
 } // treedec
