@@ -75,10 +75,7 @@ public: // construct
 protected:
 	 // vertices_size_type?
 	 unsigned eliminate(vertex_descriptor v);
-	 void undo_eliminate(vertex_descriptor v){
-		 //  BUG. "Overlay" is a graph...
-		 return Overlay.undo_eliminate(v);
-	 }
+	 void undo_eliminate(vertex_descriptor v);
 protected:
     overlay<G_t, Olay_t> &Overlay;
     std::vector<vd> &best_ordering;
@@ -125,6 +122,7 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
 		++cIt2;
 
 		for(; cIt2 != nEnd2; ++cIt2){
+			assert(*cIt2!=*cIt1);
 			if(!Overlay._active[*cIt2]){
 				continue;
 			}
@@ -145,6 +143,27 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
 		}
 	}
 	return actual_degree;
+}
+
+template <typename G_t, template<class G, class ...> class CFGT_t>
+void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
+		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
+{
+	Overlay._active[elim_vertex]= true;
+
+	// FIXME: rewrite.
+	// Overlay::pop?
+
+	while(!Overlay._changes_container.top().empty()){
+		auto v1=Overlay._changes_container.top().back();
+		Overlay._changes_container.top().pop_back();
+		auto v2= Overlay._changes_container.top().back();
+		Overlay._changes_container.top().pop_back();
+
+		boost::remove_edge(v1, v2, Overlay.O);
+		boost::remove_edge(v2, v1, Overlay.O);
+	}
+	Overlay._changes_container.pop();
 }
 
 

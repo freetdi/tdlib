@@ -49,21 +49,6 @@ public:
           -> undo is stack.back(), then resize overlay[pair.first] according to vec<uint>[i], then stack.pop()
     */
 
-    void undo_eliminate(vdU elim_vertex)
-    {
-        _active[elim_vertex]= true;
-        while(!_changes_container.top().empty()){
-            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v1 = _changes_container.top().back();
-            _changes_container.top().pop_back();
-            typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor v2 = _changes_container.top().back();
-            _changes_container.top().pop_back();
-
-            boost::remove_edge(v1, v2, O);
-            boost::remove_edge(v2, v1, O);
-        }
-        _changes_container.pop();
-    }
-
 private:
 public: /// bug. accessed from outside.
     const UnderlyingG_t &G;
@@ -72,7 +57,7 @@ public: // BUG. wrong class
     std::vector<BOOL> &_active;
 
 public: /// bug. accessed from outside.
-	 // BUG: inefficient. part of overlay?
+	 // BUG: inefficient.
     std::stack<std::vector<vdU> > _changes_container;
 };
 
