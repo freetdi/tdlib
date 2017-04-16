@@ -9,45 +9,6 @@ namespace treedec{
 namespace gen_search{
 
 
-template<class iter1, class iter2> //TODO: fix this
-class concat_iterator{
-public:
-    concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
-     : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
-
-    bool operator!=(const iter2& /*end*/){
-        // warning: only works if end==end_of range2.
-
-        return !(_i1 ==_e1 && _i2 == _e2);
-    }
-
-    void operator++(){
-        if(_i1!=_e1){
-            // still busy with range 1
-            ++_i1;
-        }
-        else{
-            ++_i2;
-        }
-    }
-
-    unsigned operator*(){
-        if(_i1!=_e1){
-            //still busy with range 1
-            return *_i1;
-        }
-
-        return *_i2;
-    }
-
-    bool is_in_underlying(){
-        return _i1!=_e1;
-    }
-
-private:
-    iter1 _i1, _e1;
-    iter2 _i2, _e2;
-};
 
 
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
@@ -92,6 +53,7 @@ public:
     */
     unsigned eliminate(vdU elim_vertex)
     {
+		 using draft::concat_iterator;
         _active[elim_vertex]= false;
 
         _changes_container.push(std::vector<vdU>());
@@ -175,6 +137,9 @@ void gala_resize(G_t &G, VD_t v, unsigned num){
 
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
 class overlay_gala : public overlay<UnderlyingG_t, OverlayG_t>{
+private:
+	template<class i1, class i2>
+	using concat_iterator=draft::concat_iterator<i1, i2>;
 public:
     typedef overlay<UnderlyingG_t, OverlayG_t> baseclass;
 

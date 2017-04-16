@@ -435,10 +435,12 @@ public:
             for(; Ii!=Is.second; ++Ii){
                 assert(*Is.first != *Ii);
                 if(!_marker.is_marked(*Ii)){ untested();
+                    // not a neighbour.
                 }else{
-                    // hmm how to avoid this?
+                    // need to avoid is_edge here..
                     assert(boost::edge(*Is.first, *Ii, _g).second
                             == boost::edge(*Ii, *Is.first, _g).second);
+                    // BUG what if it is already there?!
                     add_edge(*Is.first, *Ii);
                     _num_edges += add_edge(*Ii, *Is.first);
                 }
