@@ -47,13 +47,14 @@ public:
 
     virtual void do_it() = 0;
 
-    void elimination_ordering(std::vector<vd> &ordering) { ordering = best_ordering; }
+	 std::vector<vd> const& ordering() { return _best_ordering; }
+    void elimination_ordering(std::vector<vd> &ordering) { ordering = _best_ordering; }
 
-    unsigned global_lower_bound() const{ return global_lb; }
-    unsigned global_upper_bound() const{ return global_ub; }
+    unsigned global_lower_bound() const{ return _global_lb; }
+    unsigned global_upper_bound() const{ return _global_ub; }
 
-    unsigned get_nodes_generated() const{ return nodes_generated; }
-    unsigned get_orderings_generated() const{ return orderings_generated; }
+    unsigned get_nodes_generated() const{ return _nodes_generated; }
+    unsigned get_orderings_generated() const{ return _orderings_generated; }
 protected:
     struct active_filter{
         active_filter(std::vector<BOOL> const & v) : _v(v) {}
@@ -86,18 +87,18 @@ protected:
 		 return _active;
 	 }
 protected:
-    internal_graph_type &Overlay; // BUG.
+    internal_graph_type &_g;
     std::vector<BOOL>& _active; // hmm.
-    std::vector<vd> &best_ordering;
-    std::vector<vd> &current_ordering;
+    std::vector<vd> &_best_ordering;
+    std::vector<vd> &_current_ordering;
 
-    unsigned global_lb; //lb for the original graph
-    unsigned global_ub; //ub for the original graph
+    unsigned _global_lb; //lb for the original graph
+    unsigned _global_ub; //ub for the original graph
 
-    unsigned depth;
+    unsigned _depth;
 
-    unsigned nodes_generated;
-    unsigned orderings_generated;
+    unsigned _nodes_generated;
+    unsigned _orderings_generated;
 
 private:
     marker_type _marker;
