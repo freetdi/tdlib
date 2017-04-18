@@ -15,6 +15,9 @@ namespace gen_search {
 template<class A, class B>
 class overlay;
 
+// implements graph whitelist + elim + undo_elim.
+// what is CFGT_t?
+// rearrange...?!
 template <typename G_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_base : public treedec::algo::draft::algo1{
 	typedef treedec::algo::draft::algo1 baseclass;
@@ -43,7 +46,6 @@ public: // construct
 protected: // recursion.
     generic_elimination_search_base(generic_elimination_search_base& o);
 public:
-
 
     virtual void do_it() = 0;
 

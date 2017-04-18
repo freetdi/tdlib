@@ -137,29 +137,32 @@ void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
     active()[elim_vertex] = true;
 }
 
-
+// BUG: CFG_t is a generic_search config...
+// FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
+// http://www.gotw.ca/publications/mill07.htm
 template <typename G_t, template<class G, class ...> class CFGT_t>
-class generic_elimination_search_DFS : public generic_elimination_search_base<G_t, CFGT_t>{
-	 typedef CFGT_t<G_t> CFG_t;
+class generic_elimination_search_DFS
+    : public generic_elimination_search_base<G_t, CFGT_t> {
+private:
+    typedef CFGT_t<G_t> CFG_t;
     typedef generic_elimination_search_base<G_t, CFGT_t> baseclass;
     typedef typename baseclass::vertex_descriptor vd;
 
 public:
-    // BUG, too messy
+    // BUG, too many args
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay_input,
             std::vector<BOOL>& active,
-            std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
-            unsigned g_lb, unsigned g_ub, unsigned l_lb,
-            unsigned l_ub, unsigned depth_input,
-            unsigned generated_nodes_input, unsigned generated_orderings_input)
+            std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input)
       : baseclass(Overlay_input,
               active,
                   best_ordering_input,
                   current_ordering_input,
-		  g_lb, g_ub, depth_input,
-                  generated_nodes_input,
-                  generated_orderings_input),
-		  local_lb(l_lb), local_ub(l_ub), max_nodes_generated(UINT_MAX),
+		  0,
+                  boost::num_vertices(Overlay_input),
+                  0, 0, 0),
+		  local_lb(0),
+                  local_ub(0),
+                  max_nodes_generated(1),
                   max_orderings_generated(UINT_MAX)
     { untested();
     }
@@ -196,6 +199,7 @@ template <typename G_t, template<class G, class...> class CFGT_t>
 void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
 {
     if(baseclass::_nodes_generated % 1000 == 0){
+        // if trace?
         std::cout << "#: " << baseclass::_nodes_generated << std::endl;
     }
 
@@ -207,6 +211,7 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
             baseclass::_global_lb = tmp_global_lb;
         }else{ untested();
         }
+        // if trace?
         std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
 
         unsigned tmp_global_ub = CFG_t::initial_ub_algo(baseclass::_g.underlying(), baseclass::_best_ordering);
@@ -216,10 +221,12 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
             baseclass::_global_ub = tmp_global_ub;
         }else{
         }
+        // if trace?
         std::cout << "initial ub: " << baseclass::_global_ub << std::endl;
 
         // baseclass::bagsize_range().size()==1...?
         if(baseclass::_global_lb == baseclass::_global_ub){
+            // if trace?
             std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::_orderings_generated; //not necessary..
             //returns now
@@ -320,6 +327,14 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
     }
 
     baseclass::timer_off();
+
+    /// if OPTIONS::verbosity>K
+    {
+        std::cout << "lower bound: " << global_lower_bound_bagsize() << std::endl;
+        std::cout << "upper bound: " << global_upper_bound_bagsize() << std::endl;
+        std::cout << "nodes generated: " << baseclass::_nodes_generated << std::endl;
+        std::cout << "orderings generated: " << baseclass::_orderings_generated << std::endl;
+    }
 }
 
 
