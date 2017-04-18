@@ -43,10 +43,9 @@ public: // construct
     }
 #endif
 
-    overlay(UnderlyingG_t &G_input, std::vector<BOOL> &active_input) //e.g. after PP
+    overlay(UnderlyingG_t &G_input) // (, std::vector<BOOL> &active_input) //e.g. after PP
       : _g(G_input),
-        _og(boost::num_vertices(G_input)),
-        _active(active_input) // here?!
+        _og(boost::num_vertices(G_input))
     {
         commit();
 	assert(_changes_container.size()==1);
@@ -56,7 +55,6 @@ public: // construct
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
-          _active(o._active), // here?!
           _changes_container(o.changes_container)
     { untested();
             assert(_changes_container.size()==1);
@@ -126,7 +124,6 @@ private:
 public: /// bug. accessed from outside.
     const UnderlyingG_t &_g;
     OverlayG_t _og;
-    std::vector<BOOL> &_active; //??
 private:
     std::stack<std::vector<vdU> > _changes_container;
 }; // overlay

@@ -42,7 +42,7 @@ namespace gen_search {
 template <typename G_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::
     generic_elimination_search_base(internal_graph_type &Overlay_input, // BUG: exposes graph type
-        //    std::vector<BOOL>& active,
+            std::vector<BOOL>& active, // BUG need normal constructor
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
@@ -50,7 +50,7 @@ generic_elimination_search_base<G_t, CFGT_t>::
                                     unsigned orderings_generated_input)
       : algo1(CFG_t::name()),
         Overlay(Overlay_input),
-       // _active(active),
+        _active(active),
         best_ordering(best_ordering_input),
         current_ordering(current_ordering_input),
         global_lb(g_lb), global_ub(g_ub), depth(depth_input),
@@ -71,7 +71,7 @@ generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFGT_t>& o)
     : baseclass(o),
     Overlay(o.Overlay),
-    // _active(o._active), //?
+    _active(o._active),
     best_ordering(o.best_ordering),
     current_ordering(o.current_ordering),
     global_lb(o.global_lb),
@@ -144,13 +144,13 @@ class generic_elimination_search_DFS : public generic_elimination_search_base<G_
 public:
     // BUG, too messy
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay_input,
-        //    std::vector<BOOL>& active,
+            std::vector<BOOL>& active,
             std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
             unsigned g_lb, unsigned g_ub, unsigned l_lb,
             unsigned l_ub, unsigned depth_input,
             unsigned generated_nodes_input, unsigned generated_orderings_input)
       : baseclass(Overlay_input,
-             // active,
+              active,
                   best_ordering_input,
                   current_ordering_input,
 		  g_lb, g_ub, depth_input,

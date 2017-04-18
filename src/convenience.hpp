@@ -16,12 +16,12 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
 
     std::vector<BOOL> active(boost::num_vertices(G), true); // BUG.
 
-    overlay<G_t, G_t> olay(G, active);
+    overlay<G_t, G_t> olay(G);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_1> //TODO: constructor...
        generic_elim_DFS_test
               (olay,
-					// active, // BUG: optional.
+					active, // BUG: optional.
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -58,12 +58,12 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 
     std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
-    overlay<G_t, G_t> olay(G, active);
+    overlay<G_t, G_t> olay(G);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
-					// active,
+					active,
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -105,12 +105,12 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
 
     std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
-    overlay<G_t, G_t> olay(G, active);
+    overlay<G_t, G_t> olay(G);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_3 > //TODO: constructor...
        generic_elim_DFS_test
               (olay, // FIXME: whitelist?!
-					// active,
+					active,
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -156,13 +156,13 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
     typedef G_t Underlying_t;
     typedef G_t Overlay_t;
 
-    overlay<Underlying_t, Overlay_t> olay(G, active);
+    overlay<Underlying_t, Overlay_t> olay(G);
 #endif
 
     generic_elimination_search_DFS<Underlying_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
               (olay, // FIXME.
-					// active,
+					active,
                ordering,
                cur_ordering,
                0,                         //global_lb

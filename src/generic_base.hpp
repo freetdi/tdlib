@@ -33,7 +33,7 @@ public: // construct
     //TODO: better use iterators for elim_vertices
 	 //BUG: exposing overlay_type.
     generic_elimination_search_base(internal_graph_type &Overlay_input,
-	//		 std::vector<BOOL>& active, // here?
+		 std::vector<BOOL>& active, // here?
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
@@ -80,14 +80,14 @@ protected:
 	 unsigned eliminate(vertex_descriptor v);
 	 void undo_eliminate(vertex_descriptor v);
 	 const std::vector<BOOL> &active() const{
-		 return Overlay._active;
+		 return _active;
 	 }
 	 std::vector<BOOL>& active(){
-		 return Overlay._active;
+		 return _active;
 	 }
 protected:
     internal_graph_type &Overlay; // BUG.
-    // std::vector<BOOL>& _active; // hmm.
+    std::vector<BOOL>& _active; // hmm.
     std::vector<vd> &best_ordering;
     std::vector<vd> &current_ordering;
 
