@@ -24,13 +24,14 @@ protected:
     typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 public:
     typedef CFGT_t<G_t> CFG_t;
-    typedef typename treedec::config::get::olay<CFG_t, G_t>::type Olay_t;
-    typedef overlay<G_t, Olay_t> overlay_type; // BUG. Olay_t vs overlay_type
-//    typedef typename overlay_type::vertex_iterator base_iterator; incomplete
-    typedef typename overlay_type::adjacency_iterator overlay_adjacency_iterator;
+    typedef overlay<G_t, G_t> default_overlay_type;
+    typedef typename treedec::config::get::edge_overlay_graph<CFG_t, default_overlay_type>::type
+		               internal_graph_type;
+    typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
 public: // construct
     //TODO: better use iterators for elim_vertices
-    generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
+	 //BUG: exposing overlay_type.
+    generic_elimination_search_base(internal_graph_type &Overlay_input,
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
@@ -72,7 +73,7 @@ protected:
 	 unsigned eliminate(vertex_descriptor v);
 	 void undo_eliminate(vertex_descriptor v);
 protected:
-    overlay<G_t, Olay_t> &Overlay;
+    internal_graph_type &Overlay; // BUG.
     std::vector<vd> &best_ordering;
     std::vector<vd> &current_ordering;
 

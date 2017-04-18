@@ -41,7 +41,7 @@ namespace gen_search {
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::
-    generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
+    generic_elimination_search_base(internal_graph_type &Overlay_input, // BUG: exposes graph type
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
@@ -53,13 +53,14 @@ generic_elimination_search_base<G_t, CFGT_t>::
         nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input),
         _marker(boost::num_vertices(Overlay_input))
     {
-#ifdef DEBUG_NOTYET
-		 auto p=boost::vertices(Overlay); // not implemented
-		 for(; p.first!=p.second; ++p.first){
-			 /// test self loops? no. only G.
-		 }
+#ifdef DEBUG_NOTYET // perhaps not here.
+        auto p=boost::edges(Overlay); // not implemented
+        for(; p.first!=p.second; ++p.first){
+            /// test self loops? no. only G.
+            // assert(source!=target)...
+        }
 #endif
-	 }
+    }
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
