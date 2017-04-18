@@ -134,4 +134,4 @@ namespace detail{//
 
 #endif
 
-// vim:ts=8:sw=2:et
+// vim:ts=8:sw=4:et

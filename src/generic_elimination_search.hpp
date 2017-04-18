@@ -39,6 +39,34 @@ namespace treedec {
 
 namespace gen_search {
 
+template <typename G_t, template<class G, class ...> class CFGT_t>
+generic_elimination_search_base<G_t, CFGT_t>::
+    generic_elimination_search_base(G_t const &g,
+                                    unsigned g_lb, unsigned g_ub,
+                                    unsigned depth, unsigned nodes_generated,
+                                    unsigned orderings_generated)
+      : algo1(CFG_t::name()), // BUG. abuse
+        _g(*new internal_graph_type(g)),
+        _active(*new std::vector<BOOL>(boost::num_vertices(g), true)),
+        _best_ordering    (*new std::vector<vd>  (boost::num_vertices(g))),
+        _current_ordering (*new std::vector<vd>  (boost::num_vertices(g))),
+        _global_lb(g_lb),
+        _global_ub(g_ub),
+        _depth(depth),
+        _nodes_generated(nodes_generated),
+        _orderings_generated(orderings_generated),
+        _marker(boost::num_vertices(g)),
+        _need_cleanup(3)
+{
+#ifdef DEBUG
+    auto p=boost::edges(g);
+    for(; p.first!=p.second; ++p.first){
+        /// test self loops? no. only G.
+        // assert(source!=target)...
+    }
+#endif
+}
+
 // strange: still takes overlay as arg..
 template <typename G_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::
@@ -48,7 +76,7 @@ generic_elimination_search_base<G_t, CFGT_t>::
                                     unsigned orderings_generated)
       : algo1(CFG_t::name()),
         _g(Overlay),
-        _active(*(new std::vector<BOOL>(boost::num_vertices(Overlay)))),
+        _active(*(new std::vector<BOOL>(boost::num_vertices(Overlay), true))),
         _best_ordering    (*(new std::vector<vd>  (boost::num_vertices(Overlay)))),
         _current_ordering (*(new std::vector<vd>  (boost::num_vertices(Overlay)))),
         _global_lb(g_lb),
@@ -57,7 +85,7 @@ generic_elimination_search_base<G_t, CFGT_t>::
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
         _marker(boost::num_vertices(Overlay)),
-        _need_cleanup(true)
+        _need_cleanup(1)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
     auto p=boost::edges(_g); // not implemented
@@ -89,7 +117,7 @@ generic_elimination_search_base<G_t, CFGT_t>::
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
         _marker(boost::num_vertices(Overlay)),
-        _need_cleanup(false)
+        _need_cleanup(0)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
     auto p=boost::edges(_g); // not implemented
@@ -104,7 +132,7 @@ generic_elimination_search_base<G_t, CFGT_t>::
 template <typename G_t, template<class G, class...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFGT_t>& o)
-    : baseclass(o),
+    : baseclass(o), // good idea?!
       _g(o._g),
       _active(o._active),
       _best_ordering(o._best_ordering),
@@ -115,7 +143,7 @@ generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
       _nodes_generated(o._nodes_generated),
       _orderings_generated(o._orderings_generated),
       _marker(boost::num_vertices(o._g)),
-      _need_cleanup(false)
+      _need_cleanup(0)
 { untested();
 }
 
@@ -210,13 +238,21 @@ public:
                   max_orderings_generated(UINT_MAX)
     { untested();
     }
+    generic_elimination_search_DFS(G_t const &g)
+      : baseclass(g, 0, boost::num_vertices(g),
+                  0, 0, 0),
+		  local_lb(0),
+                  local_ub(0),
+                  max_nodes_generated(1),
+                  max_orderings_generated(UINT_MAX)
+    { untested();
+    }
 private: // recursion
-    generic_elimination_search_DFS(baseclass& base, unsigned a, unsigned b)
-        : baseclass(base), local_lb(a), local_ub(b),
+    generic_elimination_search_DFS(baseclass& base, unsigned lb, unsigned ub)
+        : baseclass(base), local_lb(lb), local_ub(ub),
           max_nodes_generated(UINT_MAX),
           max_orderings_generated(UINT_MAX)
     { untested();
-
         ++baseclass::_depth;
         ++baseclass::_nodes_generated;
     }

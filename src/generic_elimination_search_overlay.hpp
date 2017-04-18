@@ -43,9 +43,9 @@ public: // construct
     }
 #endif
 
-    overlay(UnderlyingG_t &G_input) // (, std::vector<BOOL> &active_input) //e.g. after PP
-      : _g(G_input),
-        _og(boost::num_vertices(G_input))
+    overlay(UnderlyingG_t const& g) // (, std::vector<BOOL> &active_input) //e.g. after PP
+      : _g(g),
+        _og(boost::num_vertices(g))
     {
         commit();
 	assert(_changes_container.size()==1);
@@ -55,7 +55,7 @@ public: // construct
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
-          _changes_container(o.changes_container)
+          _changes_container(o._changes_container)
     { untested();
             assert(_changes_container.size()==1);
     }

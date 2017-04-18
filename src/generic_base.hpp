@@ -19,8 +19,9 @@ class overlay;
 // what is CFGT_t?
 // rearrange...?!
 template <typename G_t, template<class G, class ...> class CFGT_t>
-class generic_elimination_search_base : public treedec::algo::draft::algo1{
-	typedef treedec::algo::draft::algo1 baseclass;
+class generic_elimination_search_base
+  : public treedec::algo::draft::algo1 {
+	 typedef treedec::algo::draft::algo1 baseclass;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 protected:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -32,29 +33,38 @@ public:
     typedef typename treedec::config::get::edge_overlay_graph<CFG_t, default_overlay_type>::type
 		               internal_graph_type;
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
+
+//	typedef typename detail::eot<G_t, internal_graph_type>::type backend_type;
 protected: // construct
     //TODO: better use iterators for elim_vertices
-	 //BUG: exposing overlay_type.
-    generic_elimination_search_base(internal_graph_type &Overlay_input,
-		 std::vector<BOOL>& active, // here?
+    generic_elimination_search_base(internal_graph_type&,
+		                              std::vector<BOOL>& active, // here?
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth_input, unsigned nodes_generated_input,
                                     unsigned orderings_generated_input);
 
-    generic_elimination_search_base(internal_graph_type &Overlay_input,
+    generic_elimination_search_base(internal_graph_type&,
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth_input, unsigned nodes_generated_input,
                                     unsigned orderings_generated_input);
 
+    generic_elimination_search_base(G_t const &g,
+                                    unsigned g_lb, unsigned g_ub,
+                                    unsigned depth_input, unsigned nodes_generated_input,
+                                    unsigned orderings_generated_input);
 
     ~generic_elimination_search_base(){
-		 if(_need_cleanup){ untested();
+		 if(_need_cleanup & 1u){ untested();
 			 delete &_active;
 			 delete &_best_ordering;
 			 delete &_current_ordering;
 		 }else{ untested();
+		 }
+		 if(_need_cleanup & 2u){ untested();
+			 delete &_g;
+		 }else{
 		 }
 	 }
 protected: // recursion.
@@ -103,8 +113,8 @@ protected:
 		 return _active;
 	 }
 protected:
-    internal_graph_type &_g;
-    std::vector<BOOL>& _active; // hmm.
+    internal_graph_type& _g;
+    std::vector<BOOL>& _active; // active and current_ordering -> numbering.
     std::vector<vd> &_best_ordering;
     std::vector<vd> &_current_ordering;
 
@@ -118,7 +128,7 @@ protected:
 
 private:
     marker_type _marker;
-	 bool _need_cleanup;
+	 unsigned char _need_cleanup; // yuck. ugly
 }; // generic_elimination_search_base
 
 } // gen_search

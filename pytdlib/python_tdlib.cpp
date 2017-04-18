@@ -1113,5 +1113,4 @@ void gc_generic_elimination_search4(std::vector<unsigned int> &V_G, std::vector<
     treedec::generic_elimination_search_CFG4(G, max_nodes, max_orderings);
 }
 
-
-// vim:ts=8:sw=2:et
+// vim:ts=8:sw=4:et
