@@ -31,19 +31,22 @@ public:
     typedef draft::concat_iterator<adj1_iterator, adj2_iterator> adjacency_iterator;
 
 public: // construct
+#if 0 // not yet.
     overlay(UnderlyingG_t const &G_input)
       : _g(G_input),
-        _og(boost::num_vertices(G_input))
+        _og(boost::num_vertices(G_input)),
+        _active(active) // BUG
     {
         _active = std::vector<BOOL>(boost::num_vertices(G_input), true);
         commit();
 	assert(_changes_container.size()==1);
     }
+#endif
 
     overlay(UnderlyingG_t &G_input, std::vector<BOOL> &active_input) //e.g. after PP
       : _g(G_input),
         _og(boost::num_vertices(G_input)),
-		_active(active_input) // BUG/
+        _active(active_input) // here?!
     {
         commit();
 	assert(_changes_container.size()==1);
@@ -53,7 +56,7 @@ public: // construct
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
-          _active(o._active),
+          _active(o._active), // here?!
           _changes_container(o.changes_container)
     { untested();
             assert(_changes_container.size()==1);
@@ -104,10 +107,6 @@ public:
         return _g;
     }
 
-    const std::vector<BOOL> &active() const{
-        return _active;
-    }
-
 
     /* TODO:
         -actual degree as in DEGREE..
@@ -127,9 +126,7 @@ private:
 public: /// bug. accessed from outside.
     const UnderlyingG_t &_g;
     OverlayG_t _og;
-public: // BUG. wrong class
-    std::vector<BOOL> &_active;
-
+    std::vector<BOOL> &_active; //??
 private:
     std::stack<std::vector<vdU> > _changes_container;
 }; // overlay

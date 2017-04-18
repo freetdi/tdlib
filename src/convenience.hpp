@@ -7,20 +7,21 @@
 
 namespace treedec{
 
-namespace gen_search{
+namespace gen_search{ // really?
 
 template <typename G_t>
 void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_orderings){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
 
-    std::vector<BOOL> active(boost::num_vertices(G), true);
+    std::vector<BOOL> active(boost::num_vertices(G), true); // BUG.
 
     overlay<G_t, G_t> olay(G, active);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_1> //TODO: constructor...
        generic_elim_DFS_test
               (olay,
+					// active, // BUG: optional.
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -55,13 +56,14 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
 
-    std::vector<BOOL> active(boost::num_vertices(G), true);
+    std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
     overlay<G_t, G_t> olay(G, active);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
               (olay,
+					// active,
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -86,12 +88,13 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
 	 size_t B=treedec::get_bagsize_of_elimination_ordering(H, ordering);
-    if(A != B){
-		 unreachable();
-		 std::cerr << A << " vs " << B << "\n";
-	 }else{
-	//	 std::cerr << "ok: " << A << " vs " << B << "\n";
-	 }
+	 if(A != B){
+                unreachable();
+                std::cerr << A << " vs " << B << "\n";
+        }else{
+       //       std::cerr << "ok: " << A << " vs " << B << "\n";
+        }
+
 }
 
 
@@ -100,13 +103,14 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ordering(boost::num_vertices(G));
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> cur_ordering(boost::num_vertices(G));
 
-    std::vector<BOOL> active(boost::num_vertices(G), true);
+    std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
     overlay<G_t, G_t> olay(G, active);
 
     generic_elimination_search_DFS<G_t, configs::CFG_DFS_3 > //TODO: constructor...
        generic_elim_DFS_test
-              (olay,
+              (olay, // FIXME: whitelist?!
+					// active,
                ordering,
                cur_ordering,
                0,                         //global_lb
@@ -157,7 +161,8 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
 
     generic_elimination_search_DFS<Underlying_t, configs::CFG_DFS_2 > //TODO: constructor...
        generic_elim_DFS_test
-              (olay,
+              (olay, // FIXME.
+					// active,
                ordering,
                cur_ordering,
                0,                         //global_lb

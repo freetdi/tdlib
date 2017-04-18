@@ -17,6 +17,7 @@ class overlay;
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_base : public treedec::algo::draft::algo1{
+	typedef treedec::algo::draft::algo1 baseclass;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 protected:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -32,24 +33,30 @@ public: // construct
     //TODO: better use iterators for elim_vertices
 	 //BUG: exposing overlay_type.
     generic_elimination_search_base(internal_graph_type &Overlay_input,
+	//		 std::vector<BOOL>& active, // here?
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth_input, unsigned nodes_generated_input,
                                     unsigned orderings_generated_input);
 
+protected: // recursion.
+    generic_elimination_search_base(generic_elimination_search_base& o);
+public:
+
+
     virtual void do_it() = 0;
 
     void elimination_ordering(std::vector<vd> &ordering) { ordering = best_ordering; }
 
-    unsigned global_lower_bound(){ return global_lb; }
-    unsigned global_upper_bound(){ return global_ub; }
+    unsigned global_lower_bound() const{ return global_lb; }
+    unsigned global_upper_bound() const{ return global_ub; }
 
-    unsigned get_nodes_generated(){ return nodes_generated; }
-    unsigned get_orderings_generated(){ return orderings_generated; }
+    unsigned get_nodes_generated() const{ return nodes_generated; }
+    unsigned get_orderings_generated() const{ return orderings_generated; }
 protected:
     struct active_filter{
-        active_filter(std::vector<BOOL>& v) : _v(v) {}
+        active_filter(std::vector<BOOL> const & v) : _v(v) {}
         bool operator()(vertex_descriptor v) const{
             return _v[v];
         }
@@ -72,8 +79,15 @@ protected:
 	 // vertices_size_type?
 	 unsigned eliminate(vertex_descriptor v);
 	 void undo_eliminate(vertex_descriptor v);
+	 const std::vector<BOOL> &active() const{
+		 return Overlay._active;
+	 }
+	 std::vector<BOOL>& active(){
+		 return Overlay._active;
+	 }
 protected:
     internal_graph_type &Overlay; // BUG.
+    // std::vector<BOOL>& _active; // hmm.
     std::vector<vd> &best_ordering;
     std::vector<vd> &current_ordering;
 
@@ -84,6 +98,7 @@ protected:
 
     unsigned nodes_generated;
     unsigned orderings_generated;
+
 private:
     marker_type _marker;
 }; // generic_elimination_search_base
