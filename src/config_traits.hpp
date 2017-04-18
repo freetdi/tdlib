@@ -28,7 +28,7 @@ struct what<CFG, fallback, typename tovoid<typename DC(CFG, what, _type) >::type
 DECLARE_CONFIG_GETTER(degree);
 DECLARE_CONFIG_GETTER(degs);
 DECLARE_CONFIG_GETTER(kernel);
-DECLARE_CONFIG_GETTER(olay);
+DECLARE_CONFIG_GETTER(edge_overlay_graph); // yuck
 /*--------------------------------------------------------------------------*/
 #undef DC
 #undef DECLARE_CONFIG_GETTER

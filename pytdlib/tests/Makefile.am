@@ -1,5 +1,8 @@
 
 TESTS = $(LONG_TESTS) \
+	test_generic_search_CFG1.py \
+	test_generic_search_CFG2.py \
+	test_generic_search_gala.py \
 	test_approx.py \
 	test_apps.py \
 	test_bmd.py \
@@ -11,10 +14,7 @@ TESTS = $(LONG_TESTS) \
 	test_pp_md.py \
 	test_pp_fi.py \
 	test_pre.py \
-	test_sep.py \
-	test_generic_search_CFG1.py \
-	test_generic_search_CFG2.py \
-	test_generic_search_gala.py
+	test_sep.py
   
 
 LONG_TESTS = \

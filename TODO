@@ -6,3 +6,12 @@
 - more treedecomposition structures
 - make clean (e.g. grtd)
 - use "using" instead of typedef for types that should not be exported
+
+- dann PP+generic_search mit
+  - initialem FI+TM als ub
+  - initialem LBP(C)_deltaC
+  - deltaC_least_c als lb
+  - TM als refiner
+- underlying backend gala sorted
+- overlay muss noch ausprobiert werden
+- (squashen vom overlay)

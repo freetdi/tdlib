@@ -28,6 +28,7 @@
 #include <map>
 
 #include <boost/graph/adjacency_list.hpp>
+#include "generic_base.hpp"
 #include "graph.hpp"
 #include "preprocessing.hpp"
 #include "combinations.hpp"
@@ -42,7 +43,6 @@
 #include <gala/boost.h>
 #endif
 
-#include "generic_elimination_search.hpp"
 
 
 #include "convenience.hpp"
@@ -1089,28 +1089,28 @@ void gc_generic_elimination_search1(std::vector<unsigned int> &V_G, std::vector<
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_CFG1(G, max_nodes, max_orderings);
+    treedec::generic_elimination_search_CFG1(G, max_nodes, max_orderings);
 }
 
 void gc_generic_elimination_search2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_CFG2(G, max_nodes, max_orderings);
+    treedec::generic_elimination_search_CFG2(G, max_nodes, max_orderings);
 }
 
 void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_CFG3(G, max_nodes, max_orderings);
+    treedec::generic_elimination_search_CFG3(G, max_nodes, max_orderings);
 }
 
 void gc_generic_elimination_search4(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::gen_search::generic_elimination_search_CFG4(G, max_nodes, max_orderings);
+    treedec::generic_elimination_search_CFG4(G, max_nodes, max_orderings);
 }
 
 

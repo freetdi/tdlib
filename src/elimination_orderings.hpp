@@ -475,6 +475,13 @@ int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
     return width;
 }
 
+// incomplete: inefficient. see some.h
+template <typename G_t, typename O_t>
+unsigned get_bagsize_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
+{
+    return get_width_of_elimination_ordering(G, elimination_ordering)+1;
+}
+
 namespace impl{
 
 template <typename G_t, typename V_t, typename T_t>

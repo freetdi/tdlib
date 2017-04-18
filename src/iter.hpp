@@ -1880,7 +1880,14 @@ public:
     concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
      : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
 
-    bool operator!=(const iter2& /*end*/){
+    bool operator==(const concat_iterator& o) const{ itested();
+        return _i1==o._i1 && _i2==o._i2;
+    }
+    bool operator!=(const concat_iterator& o) const{
+        return !operator==(o);
+    }
+
+    bool operator!=(const iter2& /*end*/) const{
         // warning: only works if end==end_of range2.
 
         return !(_i1 ==_e1 && _i2 == _e2);
@@ -1896,7 +1903,7 @@ public:
         }
     }
 
-    unsigned operator*(){
+    unsigned operator*() const{
         if(_i1!=_e1){
             //still busy with range 1
             return *_i1;
@@ -1923,6 +1930,17 @@ concat_iterator<i1, i2> make_concat_iterator(i1 a, i1 b, i2 c, i2 d)
 } // draft
 
 } // treedec
+
+namespace std{
+    // incomplete.
+    template<class A, class B>
+    struct iterator_traits<treedec::draft::concat_iterator<A, B> >{
+        typedef typename A::value_type value_type;
+        typedef typename A::difference_type difference_type;
+        typedef typename A::reference reference;
+        typedef typename std::forward_iterator_tag iterator_category;
+    };
+}
 
 #endif
 
