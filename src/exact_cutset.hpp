@@ -47,6 +47,7 @@
 #include "lower_bounds.hpp"
 #include "treedec.hpp"
 #include "overlay.hpp"
+#include "container_traits.hpp"
 
 #include <stx/btree_set>
 #include <boost/container/flat_set.hpp>
