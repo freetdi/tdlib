@@ -10,6 +10,7 @@ namespace treedec{
 
 namespace gen_search{
 
+// BUG: inefficient.
 template <typename UnderlyingG_t, typename OverlayG_t>
 class overlay{
 public:
@@ -35,6 +36,8 @@ public: // construct
         _og(boost::num_vertices(G_input))
     {
         _active = std::vector<BOOL>(boost::num_vertices(G_input), true);
+        commit();
+	assert(_changes_container.size()==1);
     }
 
     overlay(UnderlyingG_t &G_input, std::vector<BOOL> &active_input) //e.g. after PP
@@ -42,6 +45,18 @@ public: // construct
         _og(boost::num_vertices(G_input)),
 		_active(active_input) // BUG/
     {
+        commit();
+	assert(_changes_container.size()==1);
+    }
+
+    // private: // BUG
+    overlay(const overlay&o)
+        : _g(o._g),
+          _og(o._og),
+          _active(o._active),
+          _changes_container(o.changes_container)
+    { untested();
+            assert(_changes_container.size()==1);
     }
 
 public:
@@ -57,8 +72,15 @@ public:
     }
     std::pair<edge_descriptor, bool> add_edge(vertex_descriptor a, vertex_descriptor b){
         auto e=boost::add_edge(a, b, _og);
+
+        _changes_container.top().push_back(a);
+        _changes_container.top().push_back(b);
         return std::make_pair(std::make_pair(a, b), e.second);
     }
+    void commit(){
+        _changes_container.emplace(0);
+    }
+    void reset(unsigned ref=0);
 public:
 	std::pair<adjacency_iterator, adjacency_iterator>
 	adjacent_vertices(vertex_descriptor v) const{
@@ -108,10 +130,31 @@ public: /// bug. accessed from outside.
 public: // BUG. wrong class
     std::vector<BOOL> &_active;
 
-public: /// bug. accessed from outside.
-	 // BUG: inefficient.
+private:
     std::stack<std::vector<vdU> > _changes_container;
 }; // overlay
+
+template<class A, class B>
+void treedec::gen_search::overlay<A, B>::reset(unsigned i)
+{
+    assert(i==1); // for now.
+    assert(_changes_container.size());
+    assert(_changes_container.top().empty()); // for now
+    _changes_container.pop();
+    assert(_changes_container.size());
+
+    while(!_changes_container.top().empty()){
+        auto v1=_changes_container.top().back();
+        _changes_container.top().pop_back();
+        auto v2=_changes_container.top().back();
+        _changes_container.top().pop_back();
+
+        assert(boost::edge(v1, v2, _og).second);
+        assert(boost::edge(v2, v1, _og).second);
+        boost::remove_edge(v1, v2, _og);
+        boost::remove_edge(v2, v1, _og);
+    }
+}
 
 } // gen_search
 

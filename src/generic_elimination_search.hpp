@@ -69,7 +69,6 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
 	using draft::concat_iterator;
 	Overlay._active[elim_vertex]= false;
 
-	Overlay._changes_container.push(std::vector<vertex_descriptor>());
 
 	unsigned actual_degree = 0;
 
@@ -94,17 +93,16 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
                     }else{
                         // std::cerr << "ae " << *p.first << *q.first << "\n";
                         assert(!edge(*p.first, *q.first, Overlay).second);
-                        add_edge(*p.first, *q.first, Overlay);
+                        Overlay.add_edge(*p.first, *q.first);
 
                         // treedec graph iface enforces this. (.. should)
                         assert(edge(*p.first, *q.first, Overlay).second);
                         assert(edge(*q.first, *p.first, Overlay).second);
-
-                        Overlay._changes_container.top().push_back(*p.first);
-                        Overlay._changes_container.top().push_back(*q.first);
                     }
 		}
 	}
+
+	Overlay.commit();
 	return actual_degree;
 }
 
@@ -112,22 +110,7 @@ template <typename G_t, template<class G, class ...> class CFGT_t>
 void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
 		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
 {
-//    incomplete(); ... later
-    // FIXME: rewrite.
-    // Overlay::pop?
-
-    while(!Overlay._changes_container.top().empty()){
-        auto v1=Overlay._changes_container.top().back();
-        Overlay._changes_container.top().pop_back();
-        auto v2=Overlay._changes_container.top().back();
-        Overlay._changes_container.top().pop_back();
-
-        assert(boost::edge(v1, v2, Overlay._og).second);
-        assert(boost::edge(v2, v1, Overlay._og).second);
-        boost::remove_edge(v1, v2, Overlay._og);
-        boost::remove_edge(v2, v1, Overlay._og);
-    }
-    Overlay._changes_container.pop();
+    Overlay.reset(1);
     Overlay._active[elim_vertex] = true;
 
 }
