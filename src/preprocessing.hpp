@@ -696,7 +696,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
                 // aA=
                 // =xx
                 ++Ib;
-                if(a==*Ib){ untested();
+                if(a==*Ib){
                     ++Ib;
                     ret = A==*Ib;
                 }else if(A==*Ib){

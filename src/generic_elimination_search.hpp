@@ -17,43 +17,42 @@
 //
 //
 
-#ifndef TD_GENERIC_ELIM_SEARCH
-#define TD_GENERIC_ELIM_SEARCH
+#ifndef TD_GENERIC_ELIM_SEARCH_H
+#define TD_GENERIC_ELIM_SEARCH_H
 
 #include <vector>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
 
-#include "graph.hpp"
-#include "algo.hpp"
-#include "generic_elimination_search_configs.hpp"
+#include "generic_base.hpp"
 #include "generic_elimination_search_overlay.hpp"
+#include "graph.hpp"
+
+#include "generic_elimination_search_configs.hpp"
+#include "marker_util.hpp"
 
 #include <iostream>
 
-namespace treedec{
 
-namespace gen_search{
+namespace treedec {
+
+namespace gen_search {
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
-class generic_elimination_search_base : public treedec::algo::draft::algo1{
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
-protected:
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
-public:
-	 typedef typename treedec::config::get::olay<CFGT_t<G_t>, G_t>::type Olay_t;
-	 typedef CFGT_t<G_t> CFG_t;
-public: // construct
-
-    //TODO: better use iterators for elim_vertices
+generic_elimination_search_base<G_t, CFGT_t>::
     generic_elimination_search_base(overlay<G_t, Olay_t> &Overlay_input,
-                                    std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input,
-                                    unsigned g_lb, unsigned g_ub, unsigned depth_input, unsigned nodes_generated_input, unsigned orderings_generated_input)
+                                    std::vector<vd> &best_ordering_input,
+                                    std::vector<vd> &current_ordering_input,
+                                    unsigned g_lb, unsigned g_ub,
+                                    unsigned depth_input, unsigned nodes_generated_input,
+                                    unsigned orderings_generated_input)
       : algo1(CFG_t::name()), Overlay(Overlay_input),
         best_ordering(best_ordering_input), current_ordering(current_ordering_input),
-        global_lb(g_lb), global_ub(g_ub), depth(depth_input), nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input)
-    { untested();
+        global_lb(g_lb), global_ub(g_ub), depth(depth_input),
+        nodes_generated(nodes_generated_input), orderings_generated(orderings_generated_input),
+        _marker(boost::num_vertices(Overlay_input))
+    {
 #ifdef DEBUG_NOTYET
 		 auto p=boost::vertices(Overlay); // not implemented
 		 for(; p.first!=p.second; ++p.first){
@@ -61,34 +60,6 @@ public: // construct
 		 }
 #endif
 	 }
-
-    virtual void do_it() = 0;
-
-    void elimination_ordering(std::vector<vd> &ordering) { ordering = best_ordering; }
-
-    unsigned global_lower_bound(){ return global_lb; }
-    unsigned global_upper_bound(){ return global_ub; }
-
-    unsigned get_nodes_generated(){ return nodes_generated; }
-    unsigned get_orderings_generated(){ return orderings_generated; }
-
-protected:
-	 // vertices_size_type?
-	 unsigned eliminate(vertex_descriptor v);
-	 void undo_eliminate(vertex_descriptor v);
-protected:
-    overlay<G_t, Olay_t> &Overlay;
-    std::vector<vd> &best_ordering;
-    std::vector<vd> &current_ordering;
-
-    unsigned global_lb; //lb for the original graph
-    unsigned global_ub; //ub for the original graph
-
-    unsigned depth;
-
-    unsigned nodes_generated;
-    unsigned orderings_generated;
-}; // generic_elimination_search_base
 
 template <typename G_t, template<class G, class ...> class CFGT_t>
 unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
@@ -101,45 +72,36 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
 
 	unsigned actual_degree = 0;
 
-	// fixme: replace.
-	auto p=boost::adjacent_vertices(elim_vertex, Overlay.G);
-	auto nIt1=p.first;
-	auto nEnd1=p.second;
-	auto q=boost::adjacent_vertices(elim_vertex, Overlay.O);
-	auto nIt2=q.first;
-	auto nEnd2=q.second;
-	auto cIt1=draft::make_concat_iterator(nIt1, nEnd1, nIt2, nEnd2);
-	auto cIt2=draft::make_concat_iterator(nIt1, nEnd1, nIt2, nEnd2);
-
-	for(; cIt1 != nEnd2; ++cIt1){
-		if(!Overlay._active[*cIt1]){
-			continue;
-		}
+	// auto p=boost::adjacent_vertices(elim_vertex, *this);
+	auto p=adjacent_vertices(elim_vertex);
+	for(; p.first!=p.second; ++p.first){
+		assert(Overlay._active[*p.first]);
 
 		++actual_degree;
 
-		cIt2 = cIt1;
-		++cIt2;
+		_marker.clear();
+                // mark_smaller_neighbours(_marker, *p.first, *this); doesntwork
+                mark_smaller_neighbours(_marker, *p.first, Overlay, Overlay._active);
 
-		for(; cIt2 != nEnd2; ++cIt2){
-			assert(*cIt2!=*cIt1);
-			if(!Overlay._active[*cIt2]){
-				continue;
-			}
+                auto q=adjacent_vertices(elim_vertex);
+                for(; q.first!=q.second; ++q.first){
+                    assert(Overlay._active[*q.first]);
+                    if(*q.first>=*p.first){
+                        // skip. TODO: more efficient skip
+                    }else if(_marker.is_marked(*q.first)){
+                        // done.
+                    }else{
+                        // std::cerr << "ae " << *p.first << *q.first << "\n";
+                        assert(!edge(*p.first, *q.first, Overlay).second);
+                        add_edge(*p.first, *q.first, Overlay);
 
-			//TODO: can be further improved..
-			//if cIt1 or cIt2 are not in G, than the first one (! bla) is always true
-			if(cIt1.is_in_underlying() && cIt2.is_in_underlying() 
-					&& boost::edge(*cIt1, *cIt2, Overlay.G).second){
-				continue;
-			}
-			if(!boost::edge(*cIt1, *cIt2, Overlay.O).second)
-			{
-				boost::add_edge(*cIt1, *cIt2, Overlay.O);
-				boost::add_edge(*cIt2, *cIt1, Overlay.O);
-				Overlay._changes_container.top().push_back(*cIt1);
-				Overlay._changes_container.top().push_back(*cIt2);
-			}
+                        // treedec graph iface enforces this. (.. should)
+                        assert(edge(*p.first, *q.first, Overlay).second);
+                        assert(edge(*q.first, *p.first, Overlay).second);
+
+                        Overlay._changes_container.top().push_back(*p.first);
+                        Overlay._changes_container.top().push_back(*q.first);
+                    }
 		}
 	}
 	return actual_degree;
@@ -149,21 +111,24 @@ template <typename G_t, template<class G, class ...> class CFGT_t>
 void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
 		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
 {
-	Overlay._active[elim_vertex]= true;
+//    incomplete(); ... later
+    // FIXME: rewrite.
+    // Overlay::pop?
 
-	// FIXME: rewrite.
-	// Overlay::pop?
+    while(!Overlay._changes_container.top().empty()){
+        auto v1=Overlay._changes_container.top().back();
+        Overlay._changes_container.top().pop_back();
+        auto v2=Overlay._changes_container.top().back();
+        Overlay._changes_container.top().pop_back();
 
-	while(!Overlay._changes_container.top().empty()){
-		auto v1=Overlay._changes_container.top().back();
-		Overlay._changes_container.top().pop_back();
-		auto v2= Overlay._changes_container.top().back();
-		Overlay._changes_container.top().pop_back();
+        assert(boost::edge(v1, v2, Overlay._og).second);
+        assert(boost::edge(v2, v1, Overlay._og).second);
+        boost::remove_edge(v1, v2, Overlay._og);
+        boost::remove_edge(v2, v1, Overlay._og);
+    }
+    Overlay._changes_container.pop();
+    Overlay._active[elim_vertex] = true;
 
-		boost::remove_edge(v1, v2, Overlay.O);
-		boost::remove_edge(v2, v1, Overlay.O);
-	}
-	Overlay._changes_container.pop();
 }
 
 
@@ -329,9 +294,28 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
     baseclass::timer_off();
 }
 
+
+template <typename G_t, template<class G, class...> class CFGT_t>
+typename generic_elimination_search_base<G_t, CFGT_t>::adj_range
+inline generic_elimination_search_base<G_t, CFGT_t>::adjacent_vertices(
+        typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor v) const
+{
+        active_filter p(Overlay._active);
+        std::pair<overlay_adjacency_iterator, overlay_adjacency_iterator>
+            q=boost::adjacent_vertices(v, Overlay);
+        overlay_adjacency_iterator f=q.first;
+        overlay_adjacency_iterator s=q.second;
+        typedef boost::filter_iterator<active_filter, overlay_adjacency_iterator> FilterIter;
+        FilterIter b(p, f, s);
+        FilterIter e(p, s, s);
+
+        return std::make_pair(b, e);
+    }
+
 } //namespace gen_search
 
 } //namespace treedec
 
-#endif //TD_GENERIC_ELIM_SEARCH
-//vim:ts=8:sw=4:et
+
+#endif //TD_GENERIC_ELIM_SEARCH_H
+// vim:ts=8:sw=4:et

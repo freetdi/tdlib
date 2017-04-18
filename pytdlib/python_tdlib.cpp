@@ -28,6 +28,7 @@
 #include <map>
 
 #include <boost/graph/adjacency_list.hpp>
+#include "generic_base.hpp"
 #include "graph.hpp"
 #include "preprocessing.hpp"
 #include "combinations.hpp"
@@ -42,7 +43,6 @@
 #include <gala/boost.h>
 #endif
 
-#include "generic_elimination_search.hpp"
 
 
 #include "convenience.hpp"

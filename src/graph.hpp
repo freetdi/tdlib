@@ -48,21 +48,10 @@
 #include "random_generators.hpp"
 #include "trace.hpp"
 #include "error.hpp"
+#include "bits/bool.hpp"
 
-#ifndef HAVE_BOOL
-#define HAVE_BOOL
-class BOOL{ //
-public:
-	BOOL() : value_(bool())
-	{
-	}
-	/* explicit */ BOOL(bool const& t): value_(t) {}
-	// /* explicit */ operator bool&() { return value_; }
-	/* explicit */ operator bool() const { return value_; }
-private:
-	char value_;
-};
-#endif
+#include "generic_elimination_search_overlay.hpp"
+
 
 namespace treedec{
 
@@ -575,10 +564,10 @@ struct edge_helper{
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-        add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
+        add(vertex_descriptor x, vertex_descriptor y, G& g){
 
-    std::cout << std::is_convertible<
-        typename boost::graph_traits<G>::directed_category, boost::directed_tag>:: value << "\n";
+    //std::cout << std::is_convertible<
+    //    typename boost::graph_traits<G>::directed_category, boost::directed_tag>:: value << "\n";
 
 	return boost::add_edge(x, y, g);
     }
@@ -620,7 +609,7 @@ template<class G>
 inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
 add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
 		   typename boost::graph_traits<G>::vertex_descriptor y, G& g)
-{ itested();
+{
     return detail::edge_helper<G>::add(x, y, g);
 }
 

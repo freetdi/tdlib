@@ -1,6 +1,10 @@
 #ifndef CONVENIENCE
 #define CONVENIENCE
 
+// BUG: inclusion is upside down.
+#include "generic_base.hpp"
+#include "generic_elimination_search.hpp"
+
 namespace treedec{
 
 namespace gen_search{
@@ -39,7 +43,8 @@ void generic_elimination_search_CFG1(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl; //bug: is not propagated
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_width_of_elimination_ordering(H, ordering)+1);
+    assert(generic_elim_DFS_test.global_upper_bound_bagsize()
+			 ==treedec::get_bagsize_of_elimination_ordering(H, ordering));
 }
 
 
@@ -80,7 +85,7 @@ void generic_elimination_search_CFG2(G_t &G, unsigned max_nodes, unsigned max_or
 
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
-	 size_t B=treedec::get_width_of_elimination_ordering(H, ordering)+1;
+	 size_t B=treedec::get_bagsize_of_elimination_ordering(H, ordering);
     if(A != B){
 		 unreachable();
 		 std::cerr << A << " vs " << B << "\n";
@@ -124,7 +129,8 @@ void generic_elimination_search_CFG3(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_width_of_elimination_ordering(H, ordering)+1);
+    assert(generic_elim_DFS_test.global_upper_bound_bagsize()
+           ==treedec::get_bagsize_of_elimination_ordering(H, ordering)+1);
 }
 
 
@@ -174,7 +180,7 @@ void generic_elimination_search_CFG4(G_t &G, unsigned max_nodes, unsigned max_or
     std::cout << "orderings generated: " << generic_elim_DFS_test.get_orderings_generated() << std::endl;
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_width_of_elimination_ordering(H, ordering)+1);
+    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_bagsize_of_elimination_ordering(H, ordering));
 }
 
 

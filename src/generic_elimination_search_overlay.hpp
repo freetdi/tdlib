@@ -1,8 +1,10 @@
-#ifndef GENERIC_ELIMINATION_SEARCH_OVERLAY
-#define GENERIC_ELIMINATION_SEARCH_OVERLAY
+#ifndef GENERIC_ELIMINATION_SEARCH_OVERLAY_H
+#define GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 
 #include <boost/graph/adjacency_list.hpp>
 #include <stack>
+
+#include "iter.hpp"
 
 namespace treedec{
 
@@ -11,26 +13,76 @@ namespace gen_search{
 template <typename UnderlyingG_t, typename OverlayG_t>
 class overlay{
 public:
-    typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
+    typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
+    typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
 
+    typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
+    typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vertex_descriptor;
+    typedef std::pair<vertex_descriptor, vertex_descriptor> edge_descriptor;
+
+    typedef typename OverlayG_t::directed_category      directed_category;
+    typedef typename OverlayG_t::edge_parallel_category edge_parallel_category;
+    typedef typename OverlayG_t::traversal_category     traversal_category;
+
+    template<class i1, class i2>
+    using concat_iterator=draft::concat_iterator<i1, i2>;
+
+    typedef draft::concat_iterator<adj1_iterator, adj2_iterator> adjacency_iterator;
+
+public: // construct
     overlay(UnderlyingG_t const &G_input)
-      : G(G_input)
+      : _g(G_input),
+        _og(boost::num_vertices(G_input))
     {
         _active = std::vector<BOOL>(boost::num_vertices(G_input), true);
-        O = OverlayG_t(boost::num_vertices(G_input));
     }
 
     overlay(UnderlyingG_t &G_input, std::vector<BOOL> &active_input) //e.g. after PP
-      : G(G_input), _active(active_input)
+      : _g(G_input),
+        _og(boost::num_vertices(G_input)),
+		_active(active_input) // BUG/
     {
-        O = OverlayG_t(boost::num_vertices(G_input));
     }
 
-    const UnderlyingG_t &underlying(){
-        return G;
+public:
+    unsigned num_vertices() const{return boost::num_vertices(_g);}
+    std::pair<edge_descriptor, bool> edge(vertex_descriptor a, vertex_descriptor b) const{
+        auto e=boost::edge(a, b, _g);
+        auto P=std::make_pair(a,b);
+        if(e.second){ untested();
+            return std::make_pair(P, true);
+        }else{
+            return std::make_pair(P, boost::edge(a, b, _og).second);
+        }
+    }
+    std::pair<edge_descriptor, bool> add_edge(vertex_descriptor a, vertex_descriptor b){
+        auto e=boost::add_edge(a, b, _og);
+        return std::make_pair(std::make_pair(a, b), e.second);
+    }
+public:
+	std::pair<adjacency_iterator, adjacency_iterator>
+	adjacent_vertices(vertex_descriptor v) const{
+            using draft::concat_iterator;
+		auto p=boost::adjacent_vertices(v, _g);
+		auto q=boost::adjacent_vertices(v, _og);
+#if 0 //not yet
+		auto j=boost::range::join(p,q);
+		auto i=j.begin();
+		auto e=j.end();
+#else
+		typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
+		typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
+		auto i=concat_iterator<adj1_iterator, adj2_iterator>(p.first, p.second, q.first, q.second);
+      auto e=concat_iterator<adj1_iterator, adj2_iterator>(p.second, p.second, q.second, q.second);
+#endif
+		return std::make_pair(i, e);
+	}
+
+    const UnderlyingG_t &underlying() const{
+        return _g;
     }
 
-    const std::vector<BOOL> &active(){
+    const std::vector<BOOL> &active() const{
         return _active;
     }
 
@@ -51,16 +103,59 @@ public:
 
 private:
 public: /// bug. accessed from outside.
-    const UnderlyingG_t &G;
-    OverlayG_t O;
+    const UnderlyingG_t &_g;
+    OverlayG_t _og;
 public: // BUG. wrong class
     std::vector<BOOL> &_active;
 
 public: /// bug. accessed from outside.
 	 // BUG: inefficient.
     std::stack<std::vector<vdU> > _changes_container;
-};
+}; // overlay
 
+} // gen_search
+
+} // treedec
+
+namespace boost {
+
+template<class A, class B>
+std::pair<typename treedec::gen_search::overlay<A, B>::adjacency_iterator,
+          typename treedec::gen_search::overlay<A, B>::adjacency_iterator>
+adjacent_vertices(
+          //typename treedec::gen_search::overlay<A, B>::vertex_descriptor v,
+          unsigned v,
+          treedec::gen_search::overlay<A, B> const& o)
+{
+	return o.adjacent_vertices(v);
+}
+
+template<class A, class B>
+std::pair<typename treedec::gen_search::overlay<A, B>::edge_descriptor, bool>
+edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B> const& o)
+{
+	return o.edge(a, b);
+}
+
+template<class A, class B>
+std::pair<typename treedec::gen_search::overlay<A, B>::edge_descriptor, bool>
+add_edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B>& o)
+{
+    return o.add_edge(a, b);
+}
+
+template<class A, class B>
+unsigned num_vertices(treedec::gen_search::overlay<A, B> const& o)
+{
+	return o.num_vertices();
+}
+
+
+} // boost
+
+namespace treedec {
+
+namespace gen_search {
 
 #if 0
 template <typename G_t, typename VD_t>
@@ -173,3 +268,5 @@ private:
 } //namespace treedec
 
 #endif //guard
+
+// vim:ts=8:sw=4:et
