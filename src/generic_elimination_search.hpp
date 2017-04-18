@@ -39,26 +39,25 @@ namespace treedec {
 
 namespace gen_search {
 
+// strange: still takes overlay as arg..
 template <typename G_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::
-    generic_elimination_search_base(internal_graph_type &Overlay_input, // BUG: exposes graph type
-            std::vector<BOOL>& active, // BUG need normal constructor
-                                    std::vector<vd> &best_ordering_input,
-                                    std::vector<vd> &current_ordering_input,
+    generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
                                     unsigned g_lb, unsigned g_ub,
-                                    unsigned depth_input, unsigned nodes_generated_input,
-                                    unsigned orderings_generated_input)
+                                    unsigned depth, unsigned nodes_generated,
+                                    unsigned orderings_generated)
       : algo1(CFG_t::name()),
-        _g(Overlay_input),
-        _active(active),
-        _best_ordering(best_ordering_input),
-        _current_ordering(current_ordering_input),
+        _g(Overlay),
+        _active(*(new std::vector<BOOL>(boost::num_vertices(Overlay)))),
+        _best_ordering    (*(new std::vector<vd>  (boost::num_vertices(Overlay)))),
+        _current_ordering (*(new std::vector<vd>  (boost::num_vertices(Overlay)))),
         _global_lb(g_lb),
         _global_ub(g_ub),
-        _depth(depth_input),
-        _nodes_generated(nodes_generated_input),
-        _orderings_generated(orderings_generated_input),
-        _marker(boost::num_vertices(Overlay_input))
+        _depth(depth),
+        _nodes_generated(nodes_generated),
+        _orderings_generated(orderings_generated),
+        _marker(boost::num_vertices(Overlay)),
+        _need_cleanup(true)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
     auto p=boost::edges(_g); // not implemented
@@ -69,6 +68,39 @@ generic_elimination_search_base<G_t, CFGT_t>::
 #endif
 }
 
+// BUG: optional active etc.
+template <typename G_t, template<class G, class ...> class CFGT_t>
+generic_elimination_search_base<G_t, CFGT_t>::
+    generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
+            std::vector<BOOL>& active, // BUG need normal constructor
+                                    std::vector<vd> &best_ordering,
+                                    std::vector<vd> &current_ordering,
+                                    unsigned g_lb, unsigned g_ub,
+                                    unsigned depth, unsigned nodes_generated,
+                                    unsigned orderings_generated)
+      : algo1(CFG_t::name()),
+        _g(Overlay),
+        _active(active),
+        _best_ordering(best_ordering),
+        _current_ordering(current_ordering),
+        _global_lb(g_lb),
+        _global_ub(g_ub),
+        _depth(depth),
+        _nodes_generated(nodes_generated),
+        _orderings_generated(orderings_generated),
+        _marker(boost::num_vertices(Overlay)),
+        _need_cleanup(false)
+{
+#ifdef DEBUG_NOTYET // perhaps not here.
+    auto p=boost::edges(_g); // not implemented
+    for(; p.first!=p.second; ++p.first){
+        /// test self loops? no. only G.
+        // assert(source!=target)...
+    }
+#endif
+}
+
+// recursion.
 template <typename G_t, template<class G, class...> class CFGT_t>
 generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFGT_t>& o)
@@ -82,7 +114,8 @@ generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
       _depth(o._depth), // ??
       _nodes_generated(o._nodes_generated),
       _orderings_generated(o._orderings_generated),
-      _marker(boost::num_vertices(o._g))
+      _marker(boost::num_vertices(o._g)),
+      _need_cleanup(false)
 { untested();
 }
 
@@ -150,15 +183,26 @@ private:
 
 public:
     // BUG, too many args
-    generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay_input,
+    generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay,
             std::vector<BOOL>& active,
-            std::vector<vd> &best_ordering_input, std::vector<vd> &current_ordering_input)
-      : baseclass(Overlay_input,
+            std::vector<vd> &best_ordering, std::vector<vd> &current_ordering)
+      : baseclass(Overlay,
               active,
-                  best_ordering_input,
-                  current_ordering_input,
+                  best_ordering,
+                  current_ordering,
 		  0,
-                  boost::num_vertices(Overlay_input),
+                  boost::num_vertices(Overlay),
+                  0, 0, 0),
+		  local_lb(0),
+                  local_ub(0),
+                  max_nodes_generated(1),
+                  max_orderings_generated(UINT_MAX)
+    { untested();
+    }
+    generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay)
+      : baseclass(Overlay,
+		  0,
+                  boost::num_vertices(Overlay),
                   0, 0, 0),
 		  local_lb(0),
                   local_ub(0),

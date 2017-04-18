@@ -32,7 +32,7 @@ public:
     typedef typename treedec::config::get::edge_overlay_graph<CFG_t, default_overlay_type>::type
 		               internal_graph_type;
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
-public: // construct
+protected: // construct
     //TODO: better use iterators for elim_vertices
 	 //BUG: exposing overlay_type.
     generic_elimination_search_base(internal_graph_type &Overlay_input,
@@ -43,6 +43,20 @@ public: // construct
                                     unsigned depth_input, unsigned nodes_generated_input,
                                     unsigned orderings_generated_input);
 
+    generic_elimination_search_base(internal_graph_type &Overlay_input,
+                                    unsigned g_lb, unsigned g_ub,
+                                    unsigned depth_input, unsigned nodes_generated_input,
+                                    unsigned orderings_generated_input);
+
+
+    ~generic_elimination_search_base(){
+		 if(_need_cleanup){ untested();
+			 delete &_active;
+			 delete &_best_ordering;
+			 delete &_current_ordering;
+		 }else{ untested();
+		 }
+	 }
 protected: // recursion.
     generic_elimination_search_base(generic_elimination_search_base& o);
 public:
@@ -104,6 +118,7 @@ protected:
 
 private:
     marker_type _marker;
+	 bool _need_cleanup;
 }; // generic_elimination_search_base
 
 } // gen_search
