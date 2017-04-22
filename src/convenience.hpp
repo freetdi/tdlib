@@ -3,7 +3,7 @@
 
 // BUG: inclusion is upside down.
 #include "generic_base.hpp"
-#include "generic_elimination_search.hpp"
+#include "generic_elimination_search_configs.hpp"
 
 // TODO: what's this? move to test?
 
@@ -14,7 +14,7 @@ namespace treedec{
 template <typename G_t>
 void generic_elimination_search_CFG1(G_t const &G, unsigned max_nodes, unsigned max_orderings)
 {
-    gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_1>
+    gen_search::configs::CFG_DFS_1<G_t, algo::default_config>
        generic_elim_DFS_test (G);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
@@ -36,15 +36,16 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
 
     std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
-    gen_search::overlay<G_t, G_t> olay(G);
+    gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
+       generic_elim_DFS_test (G);
 
-    gen_search::generic_elimination_search_DFS<G_t,
-        gen_search::configs::CFG_DFS_2 > //TODO: constructor...
-       generic_elim_DFS_test
-              (olay,
-               active,
-               ordering,
-               cur_ordering);
+//    gen_search::generic_elimination_search_DFS<G_t,
+//        gen_search::configs::CFG_DFS_2 > //TODO: constructor...
+//       generic_elim_DFS_test
+//              (olay,
+//               active,
+//               ordering,
+//               cur_ordering);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
     generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
@@ -54,7 +55,7 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
 
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
-	 size_t B=treedec::get_bagsize_of_elimination_ordering(H, ordering);
+	 size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
 	 if(A != B){
                 unreachable();
                 std::cerr << A << " vs " << B << "\n";
@@ -71,9 +72,8 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
 {
     gen_search::overlay<G_t, G_t> olay(G);
 
-    //TODO: constructor...
-    gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_3 >
-       generic_elim_DFS_test (olay);
+    gen_search::configs::CFG_DFS_3<G_t, algo::default_config>
+       generic_elim_DFS_test (G);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
     generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
@@ -109,13 +109,15 @@ void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned 
     gen_search::overlay<Underlying_t, Overlay_t> olay(G);
 #endif
 
-    //TODO: constructor...
-    gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_2 >
-       generic_elim_DFS_test
-              (olay, // FIXME.
-               active,
-               ordering,
-               cur_ordering);
+    gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
+       generic_elim_DFS_test (G /* ... more? */);
+
+    //gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_2 >
+    //   generic_elim_DFS_test
+    //          (olay, // FIXME.
+    //           active,
+    //           ordering,
+    //           cur_ordering);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
     generic_elim_DFS_test.set_max_orderings_generated(max_orderings);

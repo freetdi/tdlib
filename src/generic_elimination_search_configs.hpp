@@ -27,14 +27,26 @@
 #include "lower_bounds.hpp"
 #include "elimination_orderings.hpp"
 #include "postprocessing.hpp"
+#include "generic_elimination_search.hpp"
 
 #include <iostream>
+
+// "virtual overloads" for algos derived from gen_search_base.
 
 namespace treedec{
 
 namespace gen_search{
 
 namespace configs{
+using treedec::gen_search::generic_elimination_search_DFS;
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_1;
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_2;
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_3;
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_4;
 
 /*
     -initial_lb_algo = deltaC_least_c
@@ -43,8 +55,14 @@ namespace configs{
     -next = all nodes "from left to right"
     -refiner = NONE
 */
-template <typename G_t>
-struct CFG_DFS_1{
+
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> {
+    typedef generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> baseclass;
+    CFG_DFS_1(G_t const& G) : baseclass(G)
+    {untested();
+    }
+
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
     static unsigned INVALID_VERTEX()
@@ -108,8 +126,15 @@ struct CFG_DFS_1{
     -lb_algo = NONE
     -next = all nodes "from left to right"
 */
-template <typename G_t>
-struct CFG_DFS_2{
+template <typename G_t, template<class G, class ...> class CFGT>
+struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFGT> {
+    typedef generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFGT> baseclass;
+    CFG_DFS_2(G_t const& G) : baseclass(G)
+    {untested();
+    }
+    CFG_DFS_2(G_t const& G, unsigned m, unsigned n) : baseclass(G, m, n)
+    {untested();
+    }
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
     static unsigned INVALID_VERTEX()
@@ -169,9 +194,13 @@ struct CFG_DFS_2{
     -lb_algo = NONE
     -next = all nodes "from left to right"
 */
-template <typename G_t>
-struct CFG_DFS_3{
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg> {
+    typedef generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg> baseclass;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+    CFG_DFS_3(G_t const& G) : baseclass(G)
+    {untested();
+    }
 
     static unsigned INVALID_VERTEX()
     {
@@ -235,8 +264,8 @@ struct CFG_DFS_3{
     -next = "minDegree"
 */
 /* this is just an example, to not use this - very inefficient
-template <typename G_t>
-struct CFG_DFS_4{
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_4 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
     static const unsigned INVALID_VERTEX()
@@ -324,3 +353,4 @@ struct CFG_DFS_4{
 } //namespace treedec
 
 #endif //TD_GENERIC_ELIM_SEARCH
+// vim:ts=8:sw=4:et

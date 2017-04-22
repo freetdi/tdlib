@@ -18,7 +18,7 @@ class overlay;
 // implements graph whitelist + elim + undo_elim.
 // what is CFGT_t?
 // rearrange...?!
-template <typename G_t, template<class G, class ...> class CFGT_t>
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_base
   : public treedec::algo::draft::algo1 {
 	 typedef treedec::algo::draft::algo1 baseclass;
@@ -28,9 +28,9 @@ protected:
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 public:
-    typedef CFGT_t<G_t> CFG_t;
+    typedef CFGT_t<G_t> UC; // user config
     typedef overlay<G_t, G_t> default_overlay_type;
-    typedef typename treedec::config::get::edge_overlay_graph<CFG_t, default_overlay_type>::type
+    typedef typename treedec::config::get::edge_overlay_graph<UC, default_overlay_type>::type
 		               internal_graph_type;
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
 
@@ -137,12 +137,12 @@ private:
 
 namespace boost {
 
-template<class A, template<class G, class ...> class B>
-std::pair<typename treedec::gen_search::generic_elimination_search_base<A, B>::adjacency_iterator,
-          typename treedec::gen_search::generic_elimination_search_base<A, B>::adjacency_iterator>
+template<class A, class O, template<class G, class ...> class B>
+std::pair<typename treedec::gen_search::generic_elimination_search_base<A, O, B>::adjacency_iterator,
+          typename treedec::gen_search::generic_elimination_search_base<A, O, B>::adjacency_iterator>
 adjacent_vertices(
-          typename treedec::gen_search::generic_elimination_search_base<A, B>::vertex_descriptor v,
-			 treedec::gen_search::generic_elimination_search_base<A, B> const& o)
+          typename treedec::gen_search::generic_elimination_search_base<A, O, B>::vertex_descriptor v,
+			 treedec::gen_search::generic_elimination_search_base<A, O, B> const& o)
 {
 	return o.adjacent_vertices(v);
 }

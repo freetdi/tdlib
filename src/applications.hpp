@@ -857,7 +857,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                  *(boost::adjacent_vertices(cur, T).first);
 
-        typename boost::graph_traits<G_t>::vertex_descriptor introduced_vertex =
+//        typename boost::graph_traits<G_t>::vertex_descriptor introduced_vertex =
                                  treedec::nice::get_introduced_vertex(cur, T);
 
         std::vector<int> next_htt(boost::get<1>(results[cur][have_to_take]));

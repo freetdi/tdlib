@@ -204,7 +204,8 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     components_t components;
     treedec::get_components(G, components);
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
+    // root
+    boost::add_vertex(T);
 
     typename components_t::iterator i = components.begin();
     for(; i!=components.end(); ++i){
@@ -277,7 +278,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
     treedec::get_components(G, components);
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
+    // root
+    boost::add_vertex(T);
 
     for(unsigned int i = 0; i < components.size(); i++){
         //Ignore isolated vertices (already included in 'bags').
@@ -334,7 +336,8 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
         return;
     }
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(T);
+    // root
+    boost::add_vertex(T);
 
     for(unsigned int i = 0; i < components.size(); i++){
         //Ignore isolated vertices (already included in 'bags').

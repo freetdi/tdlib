@@ -29,7 +29,7 @@
 #include "generic_elimination_search_overlay.hpp"
 #include "graph.hpp"
 
-#include "generic_elimination_search_configs.hpp"
+//#include "generic_elimination_search_configs.hpp"
 #include "marker_util.hpp"
 
 #include <iostream>
@@ -39,13 +39,13 @@ namespace treedec {
 
 namespace gen_search {
 
-template <typename G_t, template<class G, class ...> class CFGT_t>
-generic_elimination_search_base<G_t, CFGT_t>::
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
+generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
     generic_elimination_search_base(G_t const &g,
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth, unsigned nodes_generated,
                                     unsigned orderings_generated)
-      : algo1(CFG_t::name()), // BUG. abuse
+      : algo1(CFG_t::name()),
         _g(*new internal_graph_type(g)),
         _active(*new std::vector<BOOL>(boost::num_vertices(g), true)),
         _best_ordering    (*new std::vector<vd>  (boost::num_vertices(g))),
@@ -68,8 +68,8 @@ generic_elimination_search_base<G_t, CFGT_t>::
 }
 
 // strange: still takes overlay as arg..
-template <typename G_t, template<class G, class ...> class CFGT_t>
-generic_elimination_search_base<G_t, CFGT_t>::
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
+generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
     generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth, unsigned nodes_generated,
@@ -97,8 +97,8 @@ generic_elimination_search_base<G_t, CFGT_t>::
 }
 
 // BUG: optional active etc.
-template <typename G_t, template<class G, class ...> class CFGT_t>
-generic_elimination_search_base<G_t, CFGT_t>::
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
+generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
     generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
             std::vector<BOOL>& active, // BUG need normal constructor
                                     std::vector<vd> &best_ordering,
@@ -129,9 +129,9 @@ generic_elimination_search_base<G_t, CFGT_t>::
 }
 
 // recursion.
-template <typename G_t, template<class G, class...> class CFGT_t>
-generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
-    generic_elimination_search_base<G_t, CFGT_t>& o)
+template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
+generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_base(
+    generic_elimination_search_base<G_t, CFG_t, CFGT_t>& o)
     : baseclass(o), // good idea?!
       _g(o._g),
       _active(o._active),
@@ -147,9 +147,9 @@ generic_elimination_search_base<G_t, CFGT_t>::generic_elimination_search_base(
 { untested();
 }
 
-template <typename G_t, template<class G, class ...> class CFGT_t>
-unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
-		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
+unsigned generic_elimination_search_base<G_t, CFG_t, CFGT_t>::eliminate(
+		typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
 {
 	using draft::concat_iterator;
 	active()[elim_vertex] = false;
@@ -190,9 +190,9 @@ unsigned generic_elimination_search_base<G_t, CFGT_t>::eliminate(
 	return actual_degree;
 }
 
-template <typename G_t, template<class G, class ...> class CFGT_t>
-void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
-		typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor elim_vertex)
+template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
+void generic_elimination_search_base<G_t, CFG_t, CFGT_t>::undo_eliminate(
+        typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
 {
     _g.reset(1);
     active()[elim_vertex] = true;
@@ -201,12 +201,13 @@ void generic_elimination_search_base<G_t, CFGT_t>::undo_eliminate(
 // BUG: CFG_t is a generic_search config...
 // FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
 // http://www.gotw.ca/publications/mill07.htm
-template <typename G_t, template<class G, class ...> class CFGT_t>
+template <typename G_t, class OC, template<class G, class ...> class CFGT_t>
 class generic_elimination_search_DFS
-    : public generic_elimination_search_base<G_t, CFGT_t> {
+    : public generic_elimination_search_base<G_t, OC, CFGT_t> {
 private:
-    typedef CFGT_t<G_t> CFG_t;
-    typedef generic_elimination_search_base<G_t, CFGT_t> baseclass;
+    // typedef CFG_t UC?
+    typedef CFGT_t<G_t> UC;
+    typedef generic_elimination_search_base<G_t, OC, CFGT_t> baseclass;
     typedef typename baseclass::vertex_descriptor vd;
 
 public:
@@ -275,8 +276,8 @@ protected:
 };
 
 
-template <typename G_t, template<class G, class...> class CFGT_t>
-void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
+template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
+void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 {
     if(baseclass::_nodes_generated % 1000 == 0){
         // if trace?
@@ -418,10 +419,10 @@ void generic_elimination_search_DFS<G_t, CFGT_t>::do_it()
 }
 
 
-template <typename G_t, template<class G, class...> class CFGT_t>
-typename generic_elimination_search_base<G_t, CFGT_t>::adj_range
-inline generic_elimination_search_base<G_t, CFGT_t>::adjacent_vertices(
-        typename generic_elimination_search_base<G_t, CFGT_t>::vertex_descriptor v) const
+template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
+typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adj_range
+inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
+        typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor v) const
 {
         active_filter p(active());
         std::pair<overlay_adjacency_iterator, overlay_adjacency_iterator>
