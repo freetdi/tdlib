@@ -33,7 +33,6 @@ check_PROGRAMS = \
 
 # these fail. known bug...
 XFAIL_TESTS = \
-	bucket_sorter_2 \
 	bucket_sorter_2u
 
 notyets = \
