@@ -348,8 +348,6 @@ adjacent_vertices(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		treedec::draft::directed_view<G> const& g)
 {
-	typename treedec::draft::directed_view<G>::adjacency_iterator a=
-	 g.adjacent_vertices(v).first;
 	return g.adjacent_vertices(v);
 }
 

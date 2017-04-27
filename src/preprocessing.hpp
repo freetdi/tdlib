@@ -818,7 +818,6 @@ bool preprocessing<G_t, CFG>::Buddy(
         unlink_1_neighbourhood(v);
         _degs.unlink(w, 3);
 
-        vd_type vd1 = get_vd(_g, v);
         vd_type vd2 = get_vd(_g, w);
 
         make_neigh_clique(v);
@@ -1206,7 +1205,6 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
      && !balance){
         // did not find any missing.
         // it's a clique!
-        vd_type vd = get_vd(_g, v);
 
         // hmm redegree can be faster.
         // unlink_1_neighbourhood(v);
@@ -1257,7 +1255,6 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         assert(_lb_bs>=1);
 
         if(deg+1 <= _lb_bs){
-            vd_type vd = get_vd(_g, v);
 
 #if 0
             make_neigh_clique(v);
