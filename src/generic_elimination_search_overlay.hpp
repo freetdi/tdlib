@@ -85,8 +85,7 @@ void delete_top_edges(G_t &G, VD_t v, unsigned howmany){
 } // detail
 
 
-// BUG: inefficient.
-template <typename UnderlyingG_t, typename OverlayG_tt>
+template <typename UnderlyingG_t, typename OverlayG_tt, class ACTMAP>
 class overlay{
 public:
 
@@ -115,11 +114,11 @@ public:
     using concat_iterator=draft::concat_iterator<i1, i2>;
 
     struct active_filter{
-        active_filter(std::vector<BOOL> const & v) : _v(v) {}
+        active_filter(ACTMAP const & v) : _v(v) {}
         bool operator()(vertex_descriptor v) const{
             return _v[v];
         }
-        std::vector<BOOL> const& _v;
+        ACTMAP const& _v;
     };
     typedef boost::filter_iterator<active_filter, all_adj_it> adjacency_iterator;
 
@@ -135,11 +134,20 @@ public: // construct
 	assert(_changes_container.size()==1);
     }
 #endif
+//    overlay(UnderlyingG_t const& g) // (, std::vector<BOOL> &active_input) //e.g. after PP
+//      : _g(g),
+//        _og(boost::num_vertices(g)),
+//        _active(boost::num_vertices(g)),
+//        _degree(boost::num_vertices(g)),
+//        _marker(boost::num_vertices(g))
+//    {
+//        incomplete();
+//    }
 
-    overlay(UnderlyingG_t const& g) // (, std::vector<BOOL> &active_input) //e.g. after PP
+    overlay(UnderlyingG_t const& g, ACTMAP m) // (, std::vector<BOOL> &active_input) //e.g. after PP
       : _g(g),
         _og(boost::num_vertices(g)),
-        _active(boost::num_vertices(g), true),
+        _active(m),
         _degree(boost::num_vertices(g)),
         _marker(boost::num_vertices(g))
     {
@@ -152,7 +160,7 @@ public: // construct
         }
     }
 
-    // private: // BUG
+    private: // BUG
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
@@ -256,7 +264,7 @@ public:
         return _degree[v];
     }
 private:
-    std::vector<BOOL>& active(){
+    ACTMAP& active(){
         return _active;
     }
 private:
@@ -266,13 +274,13 @@ private:
 private:
     std::stack<std::vector<vdU> > _changes_container;
     std::stack<long> _elim_stack; // need union {descr, degree}
-    std::vector<BOOL> _active; // active and current_ordering -> numbering.
+    ACTMAP _active; // active and current_ordering -> numbering.
     std::vector<vertices_size_type> _degree; // active and current_ordering -> numbering.
     marker_type _marker;
 }; // overlay
 
-template<class A, class B>
-void treedec::gen_search::overlay<A, B>::reset(unsigned i)
+template<class A, class B, class C>
+void treedec::gen_search::overlay<A, B, C>::reset(unsigned i)
 { untested();
     assert(i==1); // for now.
     assert(_changes_container.size());
@@ -293,8 +301,8 @@ void treedec::gen_search::overlay<A, B>::reset(unsigned i)
     }
 }
 
-template<class A, class B>
-void treedec::gen_search::overlay<A, B>::reset_neigh(vertex_descriptor v)
+template<class A, class B, class C>
+void treedec::gen_search::overlay<A, B, C>::reset_neigh(vertex_descriptor v)
 { untested();
 #if OLDSTUFF
     while(!_changes_container.top().empty()){
@@ -317,8 +325,6 @@ void treedec::gen_search::overlay<A, B>::reset_neigh(vertex_descriptor v)
         auto howmany=_elim_stack.top();
         _elim_stack.pop();
         reverse.push_back(howmany);
-
-        std::cerr << "reset " << *p.first << " " << howmany << "\n";
     }
     assert(_degree[v]==reverse.size());
 
@@ -342,33 +348,33 @@ void treedec::gen_search::overlay<A, B>::reset_neigh(vertex_descriptor v)
 
 namespace boost {
 
-template<class A, class B>
-std::pair<typename treedec::gen_search::overlay<A, B>::adjacency_iterator,
-          typename treedec::gen_search::overlay<A, B>::adjacency_iterator>
+template<class A, class B, class C>
+std::pair<typename treedec::gen_search::overlay<A, B, C>::adjacency_iterator,
+          typename treedec::gen_search::overlay<A, B, C>::adjacency_iterator>
 adjacent_vertices(
-          //typename treedec::gen_search::overlay<A, B>::vertex_descriptor v,
+          //typename treedec::gen_search::overlay<A, B, C>::vertex_descriptor v,
           unsigned v,
-          treedec::gen_search::overlay<A, B> const& o)
+          treedec::gen_search::overlay<A, B, C> const& o)
 {
 	return o.adjacent_vertices(v);
 }
 
-template<class A, class B>
-std::pair<typename treedec::gen_search::overlay<A, B>::edge_descriptor, bool>
-edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B> const& o)
+template<class A, class B, class C>
+std::pair<typename treedec::gen_search::overlay<A, B, C>::edge_descriptor, bool>
+edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B, C> const& o)
 {
 	return o.edge(a, b);
 }
 
-template<class A, class B>
-std::pair<typename treedec::gen_search::overlay<A, B>::edge_descriptor, bool>
-add_edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B>& o)
+template<class A, class B, class C>
+std::pair<typename treedec::gen_search::overlay<A, B, C>::edge_descriptor, bool>
+add_edge(unsigned a, unsigned b, treedec::gen_search::overlay<A, B, C>& o)
 {
     return o.add_edge(a, b);
 }
 
-template<class A, class B>
-unsigned num_vertices(treedec::gen_search::overlay<A, B> const& o)
+template<class A, class B, class C>
+unsigned num_vertices(treedec::gen_search::overlay<A, B, C> const& o)
 {
 	return o.num_vertices();
 }
@@ -481,13 +487,13 @@ private:
 };
 #endif
 
-template <class A, class B>
-void overlay<A, B>::eliminate(
-        typename overlay<A, B>::vertex_descriptor elim_vertex)
+template <class A, class B, class C>
+void overlay<A, B, C>::eliminate(
+        typename overlay<A, B, C>::vertex_descriptor elim_vertex)
 {
-    auto nv=boost::num_vertices(_g);
+    auto nv=boost::num_vertices(_g); (void)nv;
     auto olddegree=_degree; // hmm.
-    assert(active()[elim_vertex]);
+    assert(_active[elim_vertex]);
     active()[elim_vertex] = false;
     (void)degree(elim_vertex);
 
@@ -504,7 +510,7 @@ void overlay<A, B>::eliminate(
         _marker.clear();
         // mark_smaller_neighbours(_marker, *p.first, *this); doesntwork
         auto cnt=mark_smaller_neighbours(_marker, *p.first, *this, active());
-        assert(cnt<=_degree[*p.first]);
+        assert(cnt<=_degree[*p.first]); (void)cnt;
 
         --_degree[*p.first];
         assert(_degree[*p.first]<nv);
@@ -556,8 +562,8 @@ void overlay<A, B>::eliminate(
 }
 
 // YUCK. this whole eliminationj stuff should happen in generic_base
-template <class A, class B>
-typename overlay<A,B>::vertex_descriptor overlay<A, B>::undo_eliminate()
+template <class A, class B, class C>
+typename overlay<A, B, C>::vertex_descriptor overlay<A, B, C>::undo_eliminate()
 { untested();
     assert(!_elim_stack.empty());
     auto elim_vertex=_elim_stack.top();
@@ -568,7 +574,6 @@ typename overlay<A,B>::vertex_descriptor overlay<A, B>::undo_eliminate()
 
 #ifndef NDEBUG
     auto p=boost::vertices(_g);
-    unsigned cnt=0;
     for(; p.first!=p.second; ++p.first){
         degree(*p.first);
     }

@@ -6,13 +6,30 @@
 #include "marker.hpp"
 #include "config_traits.hpp"
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/property_map/property_map.hpp>
 //#include "generic_elimination_search_overlay.hpp"
 
 namespace treedec{
 
 namespace gen_search {
 
-template<class A, class B>
+#if 0
+template<class V>
+struct mapwrap{
+	mapwrap(size_t){untested();
+	}
+
+	typedef typename V::key_type K;
+	typedef typename V::value_type B;
+
+	B& operator[](K k){return v[k];}
+	B const & operator[](K k) const {return v[k];}
+
+	V const& v;
+};
+#endif
+
+template<class A, class B, class C=std::vector<BOOL> >
 class overlay;
 
 // implements graph whitelist + elim + undo_elim.
@@ -28,7 +45,8 @@ protected:
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 public:
     typedef CFGT_t<G_t> UC; // user config
-    typedef overlay<G_t, G_t> default_overlay_type;
+    typedef overlay<G_t, G_t, boost::iterator_property_map<BOOL*,
+				boost::identity_property_map> > default_overlay_type;
     typedef typename treedec::config::get::edge_overlay_graph<UC, default_overlay_type>::type
 		               internal_graph_type;
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
@@ -113,8 +131,8 @@ protected:
 		 return _active;
 	 }
 protected:
-    internal_graph_type& _g;
     std::vector<BOOL> &_active;
+    internal_graph_type& _g;
     std::vector<vd> &_best_ordering;
     std::vector<vd> &_current_ordering;
 

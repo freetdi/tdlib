@@ -24,6 +24,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
+#include <boost/property_map/property_map.hpp>
 
 #include "generic_base.hpp"
 #include "generic_elimination_search_overlay.hpp"
@@ -46,8 +47,10 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
                                     unsigned depth, unsigned nodes_generated,
                                     unsigned orderings_generated)
       : algo1(CFG_t::name()),
-        _g(*new internal_graph_type(g)),
         _active(*new std::vector<BOOL>(boost::num_vertices(g), true)),
+        _g(*new internal_graph_type(g,
+                    boost::make_iterator_property_map(&_active[0],
+                               boost::typed_identity_property_map<vertex_descriptor>() ))),
         _best_ordering    (*new std::vector<vd>  (boost::num_vertices(g))),
         _current_ordering (*new std::vector<vd>  (boost::num_vertices(g))),
         _global_lb(g_lb),
