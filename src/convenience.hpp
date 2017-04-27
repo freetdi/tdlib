@@ -5,6 +5,9 @@
 #include "generic_base.hpp"
 #include "generic_elimination_search_configs.hpp"
 
+#include <gala/graph.h>
+#include <gala/boost.h>
+
 // TODO: what's this? move to test?
 
 namespace treedec{

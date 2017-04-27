@@ -1,34 +1,127 @@
 #ifndef GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 #define GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 
+#include <gala/boost.h>
 #include <boost/graph/adjacency_list.hpp>
 #include <stack>
 
 #include "iter.hpp"
+#include "trace.hpp"
 
 namespace treedec{
 
 namespace gen_search{
 
+namespace detail {
+
+struct pcnt{
+    pcnt(size_t x)
+        : _cnt(1+x)
+    {
+    }
+    template<class T>
+    bool operator()(T){
+        // trace1("", t);
+        if(_cnt){ untested();
+            --_cnt;
+        }else{ untested();
+        }
+        return !_cnt;
+    }
+    size_t _cnt;
+};
+
+template<class G>
+struct outedge_resize{
+    static void do_it(typename boost::graph_traits<G>::vertex_descriptor x,
+                     size_t size, G& g)
+    { untested();
+        static_assert(sizeof(G)==0);
+    }
+};
+
+// TODO:: more generic.
+template<class G>
+struct dvv_config : public gala::graph_cfg_default<G> {
+	static constexpr bool is_directed=true;
+};
+typedef gala::graph<std::vector, std::vector, uint32_t, dvv_config> gdvv;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> baluo;
+
+
+template<>
+struct outedge_resize<gdvv>{
+    static void do_it(typename boost::graph_traits<gdvv>::vertex_descriptor x,
+                     size_t size, gdvv& g)
+    { untested();
+        g.out_edges(x).resize(size);
+    }
+};
+
+template<>
+struct outedge_resize<baluo>{
+static void do_it(typename boost::graph_traits<baluo>::vertex_descriptor x,
+		 size_t size, baluo& g)
+{ untested();
+    auto deg = boost::out_degree(x, g);
+    assert(deg>=size);
+    auto P=pcnt(size);
+    boost::remove_out_edge_if(x, P, g);
+    assert( size == boost::out_degree(x, g));
+}
+};
+
+template <typename G_t, typename VD_t>
+void delete_top_edges(G_t &G, VD_t v, unsigned howmany){
+    auto deg = boost::out_degree(v, G);
+    assert(howmany<=deg);
+    assert(howmany>=0);
+    outedge_resize<G_t>::do_it(v, deg - howmany, G);
+
+    assert( deg-howmany == boost::out_degree(v, G));
+
+}
+
+} // detail
+
+
 // BUG: inefficient.
-template <typename UnderlyingG_t, typename OverlayG_t>
+template <typename UnderlyingG_t, typename OverlayG_tt>
 class overlay{
 public:
+
+#if 1
+    typedef detail::gdvv OverlayG_t;
+#else
+    typedef detail::baluo OverlayG_t;
+#endif
+
     typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
     typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
+    typedef draft::concat_iterator<adj1_iterator, adj2_iterator> all_adj_it;
 
     typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vdU;
     typedef typename boost::graph_traits<UnderlyingG_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<UnderlyingG_t>::vertices_size_type vertices_size_type;
     typedef std::pair<vertex_descriptor, vertex_descriptor> edge_descriptor;
 
-    typedef typename OverlayG_t::directed_category      directed_category;
-    typedef typename OverlayG_t::edge_parallel_category edge_parallel_category;
-    typedef typename OverlayG_t::traversal_category     traversal_category;
+    typedef typename boost::graph_traits<UnderlyingG_t>::directed_category      directed_category;
+    typedef typename boost::graph_traits<UnderlyingG_t>::edge_parallel_category edge_parallel_category;
+    typedef typename boost::graph_traits<UnderlyingG_t>::traversal_category     traversal_category;
+
+    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 
     template<class i1, class i2>
     using concat_iterator=draft::concat_iterator<i1, i2>;
 
-    typedef draft::concat_iterator<adj1_iterator, adj2_iterator> adjacency_iterator;
+    struct active_filter{
+        active_filter(std::vector<BOOL> const & v) : _v(v) {}
+        bool operator()(vertex_descriptor v) const{
+            return _v[v];
+        }
+        std::vector<BOOL> const& _v;
+    };
+    typedef boost::filter_iterator<active_filter, all_adj_it> adjacency_iterator;
 
 public: // construct
 #if 0 // not yet.
@@ -45,24 +138,39 @@ public: // construct
 
     overlay(UnderlyingG_t const& g) // (, std::vector<BOOL> &active_input) //e.g. after PP
       : _g(g),
-        _og(boost::num_vertices(g))
+        _og(boost::num_vertices(g)),
+        _active(boost::num_vertices(g), true),
+        _degree(boost::num_vertices(g)),
+        _marker(boost::num_vertices(g))
     {
         commit();
 	assert(_changes_container.size()==1);
+        auto vs=boost::vertices(g);
+        for(; vs.first!=vs.second; ++vs.first){
+            _degree[*vs.first]=boost::out_degree(*vs.first, _g);
+            std::cout << "degreeinit " << *vs.first << " " << _degree[*vs.first] << "\n";
+        }
     }
 
     // private: // BUG
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
-          _changes_container(o._changes_container)
+          _changes_container(o._changes_container),
+          _active(o._active),
+          _degree(o._degree),
+          _marker(o._marker)
     { untested();
-            assert(_changes_container.size()==1);
+        unreachable();
+            assert(_changes_container.size()==1); // for now
     }
 
 public:
     unsigned num_vertices() const{return boost::num_vertices(_g);}
-    std::pair<edge_descriptor, bool> edge(vertex_descriptor a, vertex_descriptor b) const{
+    std::pair<edge_descriptor, bool> edge(vertex_descriptor a, vertex_descriptor b) const{ untested();
+        assert(_active[a]);
+        assert(_active[b]);
+
         auto e=boost::edge(a, b, _g);
         auto P=std::make_pair(a,b);
         if(e.second){ untested();
@@ -71,35 +179,48 @@ public:
             return std::make_pair(P, boost::edge(a, b, _og).second);
         }
     }
-    std::pair<edge_descriptor, bool> add_edge(vertex_descriptor a, vertex_descriptor b){
+    std::pair<edge_descriptor, bool> add_edge(vertex_descriptor a, vertex_descriptor b){ untested();
+        incomplete();
+        assert(_active[a]);
+        assert(_active[b]);
         auto e=boost::add_edge(a, b, _og);
 
         _changes_container.top().push_back(a);
         _changes_container.top().push_back(b);
         return std::make_pair(std::make_pair(a, b), e.second);
     }
-    void commit(){
+    void commit(){ untested();
         _changes_container.emplace(0);
     }
     void reset(unsigned ref=0);
+private:
+    void reset_neigh(vertex_descriptor v);
 public:
-	std::pair<adjacency_iterator, adjacency_iterator>
-	adjacent_vertices(vertex_descriptor v) const{
-            using draft::concat_iterator;
-		auto p=boost::adjacent_vertices(v, _g);
-		auto q=boost::adjacent_vertices(v, _og);
+    std::pair<adjacency_iterator, adjacency_iterator>
+    adjacent_vertices(vertex_descriptor v) const{
+        using draft::concat_iterator;
+        auto p=boost::adjacent_vertices(v, _g);
+        auto q=boost::adjacent_vertices(v, _og);
 #if 0 //not yet
-		auto j=boost::range::join(p,q);
-		auto i=j.begin();
-		auto e=j.end();
+        auto j=boost::range::join(p,q);
+        auto i=j.begin();
+        auto e=j.end();
 #else
-		typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
-		typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
-		auto i=concat_iterator<adj1_iterator, adj2_iterator>(p.first, p.second, q.first, q.second);
-      auto e=concat_iterator<adj1_iterator, adj2_iterator>(p.second, p.second, q.second, q.second);
+//        typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
+//        typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
+        auto i=all_adj_it(p.first, p.second, q.first, q.second);
+        auto e=all_adj_it(p.second, p.second, q.second, q.second);
 #endif
-		return std::make_pair(i, e);
-	}
+//        return std::make_pair(i, e);
+
+        typedef boost::filter_iterator<active_filter, all_adj_it> FilterIter;
+        active_filter fP(_active);
+
+        FilterIter fb(fP, i, e);
+        FilterIter fe(fP, e, e);
+
+        return std::make_pair(fb, fe);
+}
 
     const UnderlyingG_t &underlying() const{
         return _g;
@@ -119,18 +240,40 @@ public:
           -> meaning of pair<uint, vec<uint> >: first: modified vertex in overlay, second: #addition edges
           -> undo is stack.back(), then resize overlay[pair.first] according to vec<uint>[i], then stack.pop()
     */
-
+    void eliminate(vertex_descriptor g);
+     // can only undo the previous elimination.
+    vertex_descriptor undo_eliminate();
+    vertices_size_type degree(vertex_descriptor v)const{
+#ifndef NDEBUG
+        auto p=adjacent_vertices(v);
+        unsigned cnt=0;
+        for(; p.first!=p.second; ++p.first){
+            assert(_active[*p.first]);
+            ++cnt;
+        }
+        assert(!_active[v] || cnt==_degree[v]);
+#endif
+        return _degree[v];
+    }
 private:
-public: /// bug. accessed from outside.
+    std::vector<BOOL>& active(){
+        return _active;
+    }
+private:
+//public: /// bug. accessed from outside.
     const UnderlyingG_t &_g;
     OverlayG_t _og;
 private:
     std::stack<std::vector<vdU> > _changes_container;
+    std::stack<long> _elim_stack; // need union {descr, degree}
+    std::vector<BOOL> _active; // active and current_ordering -> numbering.
+    std::vector<vertices_size_type> _degree; // active and current_ordering -> numbering.
+    marker_type _marker;
 }; // overlay
 
 template<class A, class B>
 void treedec::gen_search::overlay<A, B>::reset(unsigned i)
-{
+{ untested();
     assert(i==1); // for now.
     assert(_changes_container.size());
     assert(_changes_container.top().empty()); // for now
@@ -149,6 +292,49 @@ void treedec::gen_search::overlay<A, B>::reset(unsigned i)
         boost::remove_edge(v2, v1, _og);
     }
 }
+
+template<class A, class B>
+void treedec::gen_search::overlay<A, B>::reset_neigh(vertex_descriptor v)
+{ untested();
+#if OLDSTUFF
+    while(!_changes_container.top().empty()){
+        auto v1=_changes_container.top().back();
+        _changes_container.top().pop_back();
+        auto v2=_changes_container.top().back();
+        _changes_container.top().pop_back();
+
+        assert(boost::edge(v1, v2, _og).second);
+        assert(boost::edge(v2, v1, _og).second);
+        boost::remove_edge(v1, v2, _og);
+        boost::remove_edge(v2, v1, _og);
+    }
+#endif
+    auto p=adjacent_vertices(v);
+    std::vector<long> reverse;
+
+    for(; p.first!=p.second; ++p.first){
+        assert(!_elim_stack.empty());
+        auto howmany=_elim_stack.top();
+        _elim_stack.pop();
+        reverse.push_back(howmany);
+
+        std::cerr << "reset " << *p.first << " " << howmany << "\n";
+    }
+    assert(_degree[v]==reverse.size());
+
+    auto nv=boost::num_vertices(_g);
+    auto reverseit=reverse.rbegin();
+    auto p2=adjacent_vertices(v); // bug. use p2...
+    for(; p2.first!=p2.second; ++p2.first){ untested();
+        assert(*reverseit+1>=0);
+        auto olddegree=boost::out_degree(*p2.first, _og);
+        detail::delete_top_edges(_og, *p2.first, *reverseit + 1);
+        assert(boost::out_degree(*p2.first, _og) == olddegree - *reverseit - 1);
+        _degree[*p2.first] -= *reverseit;
+        assert(_degree[*p2.first]<nv);
+        ++reverseit;
+    }
+} // reset;
 
 } // gen_search
 
@@ -195,11 +381,6 @@ namespace treedec {
 namespace gen_search {
 
 #if 0
-template <typename G_t, typename VD_t>
-void gala_resize(G_t &G, VD_t v, unsigned num){
-    auto &g = G.vertices();
-    g[v].resize(g[v].size()-num);
-}
 
 template <typename UnderlyingG_t, typename OverlayG_t> //UnderlyingG_t should be gala_vec_sorted, Overlay should be gala_vec_unsorted
 class overlay_gala : public overlay<UnderlyingG_t, OverlayG_t>{
@@ -284,7 +465,7 @@ public:
         return actual_degree;
     }
 
-    void undo_eliminate(vdU elim_vertex)
+    vertex_descriptor undo_eliminate()
     {
         baseclass::_active[elim_vertex]= true;
         for(unsigned i = 0; i < baseclass::_changes_container.top.size(); ++i){
@@ -299,6 +480,103 @@ private:
     std::stack<std::vector<unsigned> > _changes_size;
 };
 #endif
+
+template <class A, class B>
+void overlay<A, B>::eliminate(
+        typename overlay<A, B>::vertex_descriptor elim_vertex)
+{
+    auto nv=boost::num_vertices(_g);
+    auto olddegree=_degree; // hmm.
+    assert(active()[elim_vertex]);
+    active()[elim_vertex] = false;
+    (void)degree(elim_vertex);
+
+    unsigned actual_degree = 0; // recompute degree of center vertex?
+
+    // auto p=boost::adjacent_vertices(elim_vertex, *this);
+    auto p=adjacent_vertices(elim_vertex);
+    for(; p.first!=p.second; ++p.first){
+        assert(actual_degree<_degree[elim_vertex]);
+        assert(*p.first<nv);
+        assert(*p.first != elim_vertex);
+        assert(active()[*p.first]);
+
+        _marker.clear();
+        // mark_smaller_neighbours(_marker, *p.first, *this); doesntwork
+        auto cnt=mark_smaller_neighbours(_marker, *p.first, *this, active());
+        assert(cnt<=_degree[*p.first]);
+
+        --_degree[*p.first];
+        assert(_degree[*p.first]<nv);
+
+        auto q=adjacent_vertices(elim_vertex);
+        for(; q.first!=q.second; ++q.first){
+            assert(active()[*q.first]);
+            if(*q.first>=*p.first){
+                // skip. TODO: more efficient skip
+            }else if(_marker.is_marked(*q.first)){
+                // done.
+            }else{
+                ++_degree[*p.first];
+                ++_degree[*q.first];
+                assert(_degree[*p.first]<nv);
+                assert(_degree[*q.first]<nv);
+                assert(!boost::edge(*p.first, *q.first, _og).second);
+                treedec::add_edge(*p.first, *q.first, _og);
+
+                // treedec graph iface enforces this. (.. should)
+                assert(boost::edge(*p.first, *q.first, _og).second);
+                assert(boost::edge(*q.first, *p.first, _og).second);
+            }
+        }
+        assert(_degree[elim_vertex]<nv);
+        ++actual_degree;
+    }
+
+    assert(_degree[elim_vertex]==actual_degree);
+
+
+    auto p2=adjacent_vertices(elim_vertex);
+    for(; p2.first!=p2.second; ++p2.first){
+        // YUCK. mixing vertex_descriptor and vertices_size_t.
+        long delta = _degree[*p2.first] - olddegree[*p2.first];
+        _elim_stack.push(delta);
+    }
+
+    _elim_stack.push(elim_vertex);
+
+#ifndef NDEBUG
+    auto p3=boost::vertices(_g);
+    for(; p3.first!=p3.second; ++p3.first){
+        // std::cerr << "node " << *p3.first << " deg " << degree(*p3.first) << "\n";
+    }
+#endif
+
+//    return actual_degree;
+}
+
+// YUCK. this whole eliminationj stuff should happen in generic_base
+template <class A, class B>
+typename overlay<A,B>::vertex_descriptor overlay<A, B>::undo_eliminate()
+{ untested();
+    assert(!_elim_stack.empty());
+    auto elim_vertex=_elim_stack.top();
+    assert(!active()[elim_vertex]);
+    active()[elim_vertex] = true;
+    _elim_stack.pop();
+    reset_neigh(elim_vertex);
+
+#ifndef NDEBUG
+    auto p=boost::vertices(_g);
+    unsigned cnt=0;
+    for(; p.first!=p.second; ++p.first){
+        degree(*p.first);
+    }
+#endif
+
+    return elim_vertex;
+}
+
 
 } //namespace gen_search
 

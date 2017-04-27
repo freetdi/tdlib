@@ -55,7 +55,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(g)),
         _need_cleanup(3)
 {
 #ifdef DEBUG
@@ -84,7 +83,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(Overlay)),
         _need_cleanup(1)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
@@ -116,7 +114,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(Overlay)),
         _need_cleanup(0)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
@@ -142,61 +139,10 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_
       _depth(o._depth), // ??
       _nodes_generated(o._nodes_generated),
       _orderings_generated(o._orderings_generated),
-      _marker(boost::num_vertices(o._g)),
       _need_cleanup(0)
 { untested();
 }
 
-template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
-unsigned generic_elimination_search_base<G_t, CFG_t, CFGT_t>::eliminate(
-		typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
-{
-	using draft::concat_iterator;
-	active()[elim_vertex] = false;
-
-	unsigned actual_degree = 0;
-
-	// auto p=boost::adjacent_vertices(elim_vertex, *this);
-	auto p=adjacent_vertices(elim_vertex);
-	for(; p.first!=p.second; ++p.first){
-		assert(active()[*p.first]);
-
-		++actual_degree;
-
-		_marker.clear();
-                // mark_smaller_neighbours(_marker, *p.first, *this); doesntwork
-                mark_smaller_neighbours(_marker, *p.first, _g, active());
-
-                auto q=adjacent_vertices(elim_vertex);
-                for(; q.first!=q.second; ++q.first){
-                    assert(active()[*q.first]);
-                    if(*q.first>=*p.first){
-                        // skip. TODO: more efficient skip
-                    }else if(_marker.is_marked(*q.first)){
-                        // done.
-                    }else{
-                        // std::cerr << "ae " << *p.first << *q.first << "\n";
-                        assert(!edge(*p.first, *q.first, _g).second);
-                        _g.add_edge(*p.first, *q.first);
-
-                        // treedec graph iface enforces this. (.. should)
-                        assert(edge(*p.first, *q.first, _g).second);
-                        assert(edge(*q.first, *p.first, _g).second);
-                    }
-		}
-	}
-
-	_g.commit();
-	return actual_degree;
-}
-
-template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
-void generic_elimination_search_base<G_t, CFG_t, CFGT_t>::undo_eliminate(
-        typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
-{
-    _g.reset(1);
-    active()[elim_vertex] = true;
-}
 
 // BUG: CFG_t is a generic_search config...
 // FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
@@ -369,7 +315,8 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
 
-            unsigned step_width = baseclass::eliminate(elim_vertex)+1;
+            baseclass::eliminate(elim_vertex);
+            unsigned step_width = baseclass::degree(elim_vertex)+1;
 
             if(step_width < baseclass::_global_ub){
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
@@ -394,7 +341,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::_global_ub || baseclass::_global_lb == baseclass::_global_ub){
-                        baseclass::undo_eliminate(elim_vertex);
+                        baseclass::undo_eliminate();
                         break; //returns now
                     }
                 }
@@ -402,7 +349,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
             }
 
-            baseclass::undo_eliminate(elim_vertex);
+            baseclass::undo_eliminate();
 
         }
     }
@@ -419,6 +366,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 }
 
 
+#if 0
 template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adj_range
 inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
@@ -435,6 +383,7 @@ inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
 
         return std::make_pair(b, e);
 }
+#endif
 
 
 } //namespace gen_search
