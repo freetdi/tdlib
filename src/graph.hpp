@@ -153,7 +153,7 @@ void insert_neighbours(B_t &B, V_t v, V_t w, G_t const &G)
 
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
-{ untested();
+{
     insert_neighbours(B, v, w, G);
     insert_neighbours(B, x, G);
 }
@@ -449,7 +449,6 @@ void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
         for(unsigned i=0; i<boost::num_vertices(g); ++i){
             boost::clear_vertex(i, ig);
         }
-    }else{ untested();
     }
 
     std::vector<unsigned> inverse_ordering(boost::num_vertices(g));
@@ -488,7 +487,6 @@ public:
     {
         assert(vd1!=vd2);
         if(vd1<vd2){
-        }else{ untested();
         }
 
         typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
@@ -583,12 +581,12 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
     typedef typename std::enable_if< std::is_same< boost::directed_tag,
                                 typename boost::graph_traits<G>::directed_category >::value, G >::type T;
 
-    static size_type num(G const& g){ untested();
+    static size_type num(G const& g){
         assert(1 ^ boost::num_edges(g)) ;
         return boost::num_edges(g)/2;
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-        add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
+        add(vertex_descriptor x, vertex_descriptor y, G& g){
 
 	boost::add_edge(y, x, g);
 	return boost::add_edge(x, y, g);
@@ -599,8 +597,8 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
 
 template<class G>
 inline typename boost::graph_traits<G>::edges_size_type
-num_edges(G const& g)
-{ untested();
+  num_edges(G const& g)
+{
     
     return detail::edge_helper<G>::num(g);
 }

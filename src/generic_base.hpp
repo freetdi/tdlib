@@ -73,15 +73,13 @@ protected: // construct
                                     unsigned orderings_generated_input);
 
     ~generic_elimination_search_base(){
-		 if(_need_cleanup & 1u){ untested();
+		 if(_need_cleanup & 1u){
 			 delete &_active;
 			 delete &_best_ordering;
 			 delete &_current_ordering;
-		 }else{ untested();
 		 }
-		 if(_need_cleanup & 2u){ untested();
+		 if(_need_cleanup & 2u){
 			 delete &_g;
-		 }else{
 		 }
 	 }
 protected: // recursion.
