@@ -185,6 +185,8 @@ unsigned generic_elimination_search_base<G_t, CFG_t, CFGT_t>::eliminate(
 		}
 	}
 
+        assert(actual_degree == boost::degree(elim_vertex, _g.underlying()) + boost::degree(elim_vertex, _g._og)); 
+
 	_g.commit();
 	return actual_degree;
 }
@@ -321,11 +323,16 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
             ++baseclass::_orderings_generated; //ifdef stats?!
 
+            G_t H(baseclass::_g.underlying());
+            size_t w = treedec::get_bagsize_of_elimination_ordering(H, baseclass::_best_ordering);
+
+            std::cout << "bagsize check " << w << std::endl;
+
             std::vector<vd> tmp_ordering(boost::num_vertices(baseclass::_g.underlying()));
             unsigned ref_width = CFG_t::refiner(baseclass::_g.underlying(), baseclass::_best_ordering, tmp_ordering);
 
-           if(ref_width < baseclass::_global_ub){
-               std::cout << "found better ordering after refinement " << ref_width << std::endl;
+            if(ref_width < baseclass::_global_ub){
+                std::cout << "found better ordering after refinement " << ref_width << std::endl;
                 baseclass::_global_ub = ref_width;
                 baseclass::_best_ordering = tmp_ordering;
                 std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
@@ -368,6 +375,8 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
 
             unsigned step_width = baseclass::eliminate(elim_vertex)+1;
+            std::cout << "depth: " << baseclass::_depth << std::endl;
+            std::cout << "step width: " << step_width << std::endl;
 
             if(step_width < baseclass::_global_ub){
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
@@ -398,6 +407,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 }
             }else{
                 //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
+                std::cout << "prune" << std::endl;
             }
 
             baseclass::undo_eliminate(elim_vertex);
