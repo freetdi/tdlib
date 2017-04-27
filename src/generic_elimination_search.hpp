@@ -144,8 +144,7 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_
       _orderings_generated(o._orderings_generated),
       _marker(boost::num_vertices(o._g)),
       _need_cleanup(0)
-{ untested();
-}
+{}
 
 template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
 unsigned generic_elimination_search_base<G_t, CFG_t, CFGT_t>::eliminate(
@@ -226,8 +225,8 @@ public:
                   local_ub(0),
                   max_nodes_generated(1),
                   max_orderings_generated(UINT_MAX)
-    { untested();
-    }
+    {}
+
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay)
       : baseclass(Overlay,
 		  0,
@@ -237,8 +236,8 @@ public:
                   local_ub(0),
                   max_nodes_generated(1),
                   max_orderings_generated(UINT_MAX)
-    { untested();
-    }
+    {}
+
     generic_elimination_search_DFS(G_t const &g)
       : baseclass(g, 0, boost::num_vertices(g),
                   0, 0, 0),
@@ -246,17 +245,18 @@ public:
                   local_ub(0),
                   max_nodes_generated(1),
                   max_orderings_generated(UINT_MAX)
-    { untested();
-    }
+    {}
+
 private: // recursion
     generic_elimination_search_DFS(baseclass& base, unsigned lb, unsigned ub)
         : baseclass(base), local_lb(lb), local_ub(ub),
           max_nodes_generated(UINT_MAX),
           max_orderings_generated(UINT_MAX)
-    { untested();
+    {
         ++baseclass::_depth;
         ++baseclass::_nodes_generated;
     }
+
 public:
 
     void do_it();
@@ -288,19 +288,17 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
     if(baseclass::_depth == 0){
         unsigned tmp_global_lb = CFG_t::initial_lb_algo(baseclass::_g.underlying());
-        if(tmp_global_lb > baseclass::_global_lb){ untested();
+        if(tmp_global_lb > baseclass::_global_lb){
             baseclass::_global_lb = tmp_global_lb;
-        }else{ untested();
         }
         // if trace?
         std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
 
         unsigned tmp_global_ub = CFG_t::initial_ub_algo(baseclass::_g.underlying(), baseclass::_best_ordering);
 
-    // TODO: proper range container...
+        // TODO: proper range container...
         if(tmp_global_ub < baseclass::_global_ub){
             baseclass::_global_ub = tmp_global_ub;
-        }else{
         }
         // if trace?
         std::cout << "initial ub: " << baseclass::_global_ub << std::endl;
@@ -410,6 +408,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
     baseclass::timer_off();
 
     /// if OPTIONS::verbosity>K
+    if(false)
     {
         std::cout << "lower bound: " << global_lower_bound_bagsize() << std::endl;
         std::cout << "upper bound: " << global_upper_bound_bagsize() << std::endl;

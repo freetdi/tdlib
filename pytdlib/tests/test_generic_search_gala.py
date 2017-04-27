@@ -17,6 +17,7 @@ MAX_ORDERINGS = 1000
 sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
+    """
     def test_0(self):
         print("---cornercases---")
         for V, E in cornercases:
@@ -28,11 +29,13 @@ class TestTdLib(unittest.TestCase):
         G = Graph(V_P6, E_P6)
         tdlib.generic_elimination_search4(G, MAX_NODES, MAX_ORDERINGS)
 
+    """
     def test_3(self):
         print("---Petersen---")
         G = Graph(V_Petersen, E_Petersen)
         tdlib.generic_elimination_search4(G, MAX_NODES, MAX_ORDERINGS)
 
+    """
     def test_4(self):
         print("---Petersen_double---")
         G = Graph(V_Petersen_double, E_Petersen_double)
@@ -70,6 +73,7 @@ class TestTdLib(unittest.TestCase):
         print("MD_width: " + str(w))
 
         tdlib.generic_elimination_search4(G, MAX_NODES, MAX_ORDERINGS)
+    """
 
 if __name__ == '__main__':
     unittest.main()
