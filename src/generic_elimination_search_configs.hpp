@@ -60,8 +60,7 @@ template <typename G_t, template<class G, class ...> class cfg>
 struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> {
     typedef generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> baseclass;
     CFG_DFS_1(G_t const& G) : baseclass(G)
-    {untested();
-    }
+    {}
 
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
@@ -130,11 +129,11 @@ template <typename G_t, template<class G, class ...> class CFGT>
 struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFGT> {
     typedef generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFGT> baseclass;
     CFG_DFS_2(G_t const& G) : baseclass(G)
-    {untested();
-    }
+    {}
+
     CFG_DFS_2(G_t const& G, unsigned m, unsigned n) : baseclass(G, m, n)
-    {untested();
-    }
+    {}
+
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
     static unsigned INVALID_VERTEX()
@@ -199,8 +198,7 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
     typedef generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg> baseclass;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
     CFG_DFS_3(G_t const& G) : baseclass(G)
-    {untested();
-    }
+    {}
 
     static unsigned INVALID_VERTEX()
     {

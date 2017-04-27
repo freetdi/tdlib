@@ -39,11 +39,12 @@ namespace draft{
 template<class O>
 O* clone(O const* o)
 {
-	if(o){ untested();
-		return o->clone();
-	}else{ untested();
-		return NULL;
-	}
+    if(o){
+        return o->clone();
+    }
+    else{
+        return NULL;
+    }
 }
 
 class algo1{
