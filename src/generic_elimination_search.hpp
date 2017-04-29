@@ -311,10 +311,12 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
 
-            baseclass::eliminate(elim_vertex);
-            unsigned step_width = baseclass::degree(elim_vertex)+1;
+//            baseclass::eliminate(elim_vertex);
+//            unsigned step_width = baseclass::degree(elim_vertex)+1;
+            unsigned step_width = baseclass::_g.degree(elim_vertex)+1;
 
             if(step_width < baseclass::_global_ub){
+                baseclass::eliminate(elim_vertex);
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
 
                 baseclass::_current_ordering[baseclass::_depth] = elim_vertex;
@@ -332,6 +334,8 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 baseclass::_nodes_generated = nextStep._nodes_generated; //ifdef stats?!
                 baseclass::_orderings_generated = nextStep._orderings_generated;
 
+ //               baseclass::undo_eliminate();
+
                 if(nextStep._global_ub < baseclass::_global_ub){
                     baseclass::_global_ub = nextStep._global_ub; //may have improved
 
@@ -345,8 +349,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             else{
                 //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
             }
-
-            baseclass::undo_eliminate();
         }
     }
 
