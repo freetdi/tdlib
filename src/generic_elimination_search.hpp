@@ -256,10 +256,12 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         if(baseclass::_global_lb == baseclass::_global_ub){
             std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::_orderings_generated; //not necessary..
-            //returns now
+
+            baseclass::timer_off();
+            return;
         }
     }
-
+    
     if(baseclass::_depth == boost::num_vertices(baseclass::_g.underlying())){
         if(local_ub < baseclass::_global_ub){ //this should be always true?!
             std::cout << "found better ordering of width " << local_ub << std::endl;
