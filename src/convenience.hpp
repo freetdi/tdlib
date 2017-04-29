@@ -84,7 +84,7 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
 
 
 template <typename G_t>
-void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned max_orderings)
+void generic_elimination_search_p17(G_t const &G, unsigned max_nodes, unsigned max_orderings)
 {
     typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ord_type;
     ord_type ordering(boost::num_vertices(G));
@@ -104,7 +104,7 @@ void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned 
 //    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
 #endif
 
-    gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
+    gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
        generic_elim_DFS_test (G /* ... more? */);
 
     //gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_2 >

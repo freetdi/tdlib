@@ -404,8 +404,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
 {
     if(ignore_isolated_vertices){ untested();
         // this is not in use... yet?
-    }else{
     }
+
     typedef typename treedec::graph_traits<G_t>::treedec_type T;
     typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
     impl::minDegree<G_t, T, O_t> MD(G, elim_ordering, ignore_isolated_vertices);

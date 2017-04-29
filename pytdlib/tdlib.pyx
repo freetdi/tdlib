@@ -1440,7 +1440,7 @@ def generic_elimination_search3(G, max_nodes, max_orderings):
     gc_generic_elimination_search3(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 
 
-def generic_elimination_search4(G, max_nodes, max_orderings):
+def generic_elimination_search_p17(G, max_nodes, max_orderings):
     cdef vector[unsigned int] V_G, E_G, E_T
     cdef vector[vector[int]] V_T
 
@@ -1451,5 +1451,5 @@ def generic_elimination_search4(G, max_nodes, max_orderings):
     cdef unsigned max_nodes_c = max_nodes
     cdef unsigned max_orderings_c = max_orderings
 
-    gc_generic_elimination_search4(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+    gc_generic_elimination_search_p17(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 

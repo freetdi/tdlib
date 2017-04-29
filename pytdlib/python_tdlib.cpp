@@ -1106,11 +1106,11 @@ void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<
     treedec::generic_elimination_search_CFG3(G, max_nodes, max_orderings);
 }
 
-void gc_generic_elimination_search4(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+void gc_generic_elimination_search_p17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
-    treedec::generic_elimination_search_CFG4(G, max_nodes, max_orderings);
+    treedec::generic_elimination_search_p17(G, max_nodes, max_orderings);
 }
 
 // vim:ts=8:sw=4:et

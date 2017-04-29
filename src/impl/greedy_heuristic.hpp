@@ -44,18 +44,17 @@ public:
 
     greedy_heuristic_base(G_t &G, T_t *T, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
       : algo1("."), _g(G), _t(T), _o(O), _own_o(!O), _ub_in(ub), _iiv(ignore_isolated_vertices), _i(0),
-        _min(0), _current_N(&bag_i), _num_vert(boost::num_vertices(_g))
+        _min(0), _ub(0), _current_N(&bag_i), _num_vert(boost::num_vertices(_g))
     {
         if(_own_o){
             _o = new O_t;
-        }else{
         }
 
         //the following seems to be unnecessary
         if(_t){
             _bags.resize(_num_vert);
-        }else{
         }
+
         _o->resize(_num_vert);
     }
 
@@ -63,7 +62,6 @@ public:
     ~greedy_heuristic_base(){
         if(_own_o){
             delete _o;
-        }else{
         }
     }
 
@@ -90,7 +88,6 @@ public:
         if(!_num_vert){
             timer_off();
             return;
-        }else{
         }
 
         assert(_o);
@@ -107,9 +104,6 @@ public:
         assert(elim_vertices.size() == _num_vert);
 
         while(boost::num_edges(_g) > 0){
-            CFGT_t<G_t>::interruption_point();
-            INTERRUPTION_POINT;
-
             vertex_descriptor c;
 
             next(c);
@@ -119,7 +113,6 @@ public:
                 assert(_t); // ouch?
                 _t->clear(); //could be also not the case
                 throw exception_unsuccessful();
-            }else{
             }
 
             elim_vertices[_i] = get_vd(_g, c);
@@ -127,9 +120,9 @@ public:
             if(_t){
                 _current_N = &_bags[_i];
             }
-            else if(_min > _ub){
-                _ub = _min;
-            }
+
+            _ub = (_min>_ub)?_min:_ub;
+
             // assert(bags_i);?!
 
             eliminate(c);

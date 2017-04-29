@@ -45,8 +45,12 @@ template <typename G_t, template<class G, class ...> class cfg>
 struct CFG_DFS_2;
 template <typename G_t, template<class G, class ...> class cfg>
 struct CFG_DFS_3;
+
 template <typename G_t, template<class G, class ...> class cfg>
-struct CFG_DFS_4;
+struct CFG_DFS_p17;
+
+
+
 
 /*
     -initial_lb_algo = deltaC_least_c
@@ -239,37 +243,43 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
 };
 
 
-
-/* AKA minDegree
-    -initial_lb_algo = NONE
-    -initial_ub_algo = NONE
+/* PACE 2017 config
+    -initial_lb_algo = deltaC_least_c
+    -initial_ub_algo = minDegree
     -lb_algo = NONE
-    -ub_algo = NONE
-    -next = "minDegree"
+    -next = all nodes "from left to right"
 */
-/* this is just an example, to not use this - very inefficient
-template <typename G_t, template<class G, class ...> class cfg>
-struct CFG_DFS_4 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg> {
+template <typename G_t, template<class G, class ...> class CFGT>
+struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>, CFGT> {
+    typedef generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>, CFGT> baseclass;
+    CFG_DFS_p17(G_t const& G) : baseclass(G)
+    {}
+
+    CFG_DFS_p17(G_t const& G, unsigned m, unsigned n) : baseclass(G, m, n)
+    {}
+
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
-    static const unsigned INVALID_VERTEX()
+    static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
     }
 
     static const std::string name()
     {
-        return "CFG_DFS_4";
+        return "CFG_DFS_p17";
     }
 
     static unsigned initial_lb_algo(const G_t &G)
     {
-        return 0;
+        G_t H(G);
+        return treedec::lb::deltaC_least_c(H)+1;
     }
 
     static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
-        return boost::num_vertices(G);
+        G_t H(G);
+        return treedec::minDegree_ordering(H, O)+1;
     }
 
 
@@ -277,44 +287,10 @@ struct CFG_DFS_4 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t &G, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
     {
-        unsigned min = UINT_MAX;
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(!active[*vIt]){
-                continue;
-            }
-
-            unsigned deg = 0;
-
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-                if(!active[*nIt]){
-                    continue;
-                }
-                ++deg;
-            }
-
-            min = (min < deg)? min : deg;
-        }
-
         for(; idx < active.size(); ++idx){
-            if(!active[idx]){
-                continue;
-            }
-
-            unsigned deg = 0;
-
-            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(idx, G); nIt != nEnd; nIt++){
-                if(!active[*nIt]){
-                    continue;
-                }
-                ++deg;
-            }
-
-            if(deg == min){
+            if(active[idx]){
                 return idx++;
             }
         }
@@ -322,13 +298,14 @@ struct CFG_DFS_4 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return INVALID_VERTEX();
     }
 
-    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim)
     {
-        return boost::num_vertices(G);
+        G_t H(G);
+        treedec::minimalChordal(H, orig_elim, new_elim);
+        G_t H2(G);
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
     }
 };
-*/
-
 
 } //namespace configs
 

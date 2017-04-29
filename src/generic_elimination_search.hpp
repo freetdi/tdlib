@@ -249,6 +249,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         if(tmp_global_ub < baseclass::_global_ub){
             baseclass::_global_ub = tmp_global_ub;
         }
+
         std::cout << "initial ub: " << baseclass::_global_ub << std::endl;
 
         // baseclass::bagsize_range().size()==1...?
@@ -280,6 +281,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
         }
         else{
+            std::cout << "ran into unreachable!!!!!!!!!!!!!!!!!" << std::endl;
             unreachable(); //should be the case?
         }
     }
