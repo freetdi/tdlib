@@ -4,6 +4,9 @@ import tdlib
 import unittest
 import util
 
+if(len(sys.argv)<2 or sys.argv[1]!="long"):
+    sys.exit(77)
+
 import Dimacs
 from graphs import *
 
