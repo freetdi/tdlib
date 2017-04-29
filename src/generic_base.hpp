@@ -1,5 +1,6 @@
 #ifndef TD_GENERIC_BASE_H
 #define TD_GENERIC_BASE_H
+
 // TODO: cleanup. sort out etc.
 #include "bits/bool.hpp"
 #include "algo.hpp"
@@ -52,8 +53,8 @@ public:
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
 
 //	typedef typename detail::eot<G_t, internal_graph_type>::type backend_type;
+
 protected: // construct
-    //TODO: better use iterators for elim_vertices
     generic_elimination_search_base(internal_graph_type&,
                                     std::vector<BOOL> &active,
                                     std::vector<vd> &best_ordering_input,
@@ -73,15 +74,15 @@ protected: // construct
                                     unsigned orderings_generated_input);
 
     ~generic_elimination_search_base(){
-		 if(_need_cleanup & 1u){
-			 delete &_active;
-			 delete &_best_ordering;
-			 delete &_current_ordering;
-		 }
-		 if(_need_cleanup & 2u){
-			 delete &_g;
-		 }
-	 }
+        if(_need_cleanup & 1u){
+            delete &_active;
+            delete &_best_ordering;
+            delete &_current_ordering;
+        }
+        if(_need_cleanup & 2u){
+            delete &_g;
+        }
+    }
 
 protected: // recursion.
     generic_elimination_search_base(generic_elimination_search_base& o);
@@ -90,7 +91,7 @@ public:
 
     virtual void do_it() = 0;
 
-	 std::vector<vd> const& ordering() { return _best_ordering; }
+	std::vector<vd> const& ordering() { return _best_ordering; }
     void elimination_ordering(std::vector<vd> &ordering) { ordering = _best_ordering; }
 
     unsigned global_lower_bound() const{ return _global_lb; }
