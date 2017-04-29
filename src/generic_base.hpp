@@ -6,13 +6,30 @@
 #include "marker.hpp"
 #include "config_traits.hpp"
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/property_map/property_map.hpp>
 //#include "generic_elimination_search_overlay.hpp"
 
 namespace treedec{
 
 namespace gen_search {
 
-template<class A, class B>
+#if 0
+template<class V>
+struct mapwrap{
+	mapwrap(size_t){untested();
+	}
+
+	typedef typename V::key_type K;
+	typedef typename V::value_type B;
+
+	B& operator[](K k){return v[k];}
+	B const & operator[](K k) const {return v[k];}
+
+	V const& v;
+};
+#endif
+
+template<class A, class B, class C=std::vector<BOOL> >
 class overlay;
 
 // implements graph whitelist + elim + undo_elim.
@@ -26,10 +43,10 @@ class generic_elimination_search_base
 protected:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
-    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 public:
     typedef CFGT_t<G_t> UC; // user config
-    typedef overlay<G_t, G_t> default_overlay_type;
+    typedef overlay<G_t, G_t, boost::iterator_property_map<BOOL*,
+				boost::identity_property_map> > default_overlay_type;
     typedef typename treedec::config::get::edge_overlay_graph<UC, default_overlay_type>::type
 		               internal_graph_type;
     typedef typename internal_graph_type::adjacency_iterator overlay_adjacency_iterator;
@@ -38,7 +55,7 @@ public:
 protected: // construct
     //TODO: better use iterators for elim_vertices
     generic_elimination_search_base(internal_graph_type&,
-		                              std::vector<BOOL>& active, // here?
+                                    std::vector<BOOL> &active,
                                     std::vector<vd> &best_ordering_input,
                                     std::vector<vd> &current_ordering_input,
                                     unsigned g_lb, unsigned g_ub,
@@ -65,8 +82,10 @@ protected: // construct
 			 delete &_g;
 		 }
 	 }
+
 protected: // recursion.
     generic_elimination_search_base(generic_elimination_search_base& o);
+
 public:
 
     virtual void do_it() = 0;
@@ -79,16 +98,9 @@ public:
 
     unsigned get_nodes_generated() const{ return _nodes_generated; }
     unsigned get_orderings_generated() const{ return _orderings_generated; }
+
 protected:
-    struct active_filter{
-        active_filter(std::vector<BOOL> const & v) : _v(v) {}
-        bool operator()(vertex_descriptor v) const{
-            return _v[v];
-        }
-        std::vector<BOOL> const& _v;
-    };
-    typedef boost::filter_iterator<active_filter, overlay_adjacency_iterator> adj_it;
-    typedef std::pair<adj_it, adj_it> adj_range;
+//    typedef std::pair<adj_it, adj_it> adj_range;
 #if 0 //incomplete
     std::pair<boost::filter_iterator<active_filter, base_iterator>,
               boost::filter_iterator<active_filter, base_iterator> >
@@ -99,20 +111,31 @@ protected:
                               filter_iter_first(p, q.second, q.second));
     }
 #endif
-	 adj_range adjacent_vertices(vertex_descriptor v) const;
+
+protected: // forward to overlay.
+	 void eliminate(vertex_descriptor v){
+		 _g.eliminate(v);
+		 _active[v] = false;
+	 }
+	 void undo_eliminate(){
+		 auto v=_g.undo_eliminate();
+		 _active[v] = true;
+	 }
+	 vertices_size_type degree(vertex_descriptor v) const{
+		 return _g.degree(v);
+	 }
+
 protected:
-	 // vertices_size_type?
-	 unsigned eliminate(vertex_descriptor v);
-	 void undo_eliminate(vertex_descriptor v);
 	 const std::vector<BOOL> &active() const{
 		 return _active;
 	 }
 	 std::vector<BOOL>& active(){
 		 return _active;
 	 }
+
 protected:
+    std::vector<BOOL> &_active;
     internal_graph_type& _g;
-    std::vector<BOOL>& _active; // active and current_ordering -> numbering.
     std::vector<vd> &_best_ordering;
     std::vector<vd> &_current_ordering;
 
@@ -125,8 +148,8 @@ protected:
     unsigned _orderings_generated;
 
 private:
-    marker_type _marker;
     unsigned char _need_cleanup; // yuck. ugly
+
 }; // generic_elimination_search_base
 
 } // gen_search
@@ -146,4 +169,5 @@ adjacent_vertices(
 }
 
 } // boost
+
 #endif

@@ -104,17 +104,12 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return INVALID_VERTEX();
     }
 
-/*
-    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
-    {
-        return boost::num_vertices(G);
-    }
-*/
-
     static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
     {
         G_t H(G);
-        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
+        treedec::minimalChordal(H, orig_elim, new_elim);
+        G_t H2(G);
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
     }
 
 };
@@ -174,16 +169,12 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
         return INVALID_VERTEX();
     }
 
-/*
-    {
-        return boost::num_vertices(G);
-    }
-*/
-
     static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim)
     {
         G_t H(G);
-        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
+        treedec::minimalChordal(H, orig_elim, new_elim);
+        G_t H2(G);
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
     }
 };
 
@@ -238,17 +229,12 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
         return INVALID_VERTEX();
     }
 
-/*
-    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
-    {
-        return boost::num_vertices(G);
-    }
-*/
-
     static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim) //aka no refiner
     {
         G_t H(G);
-        return treedec::minimalChordal(H, orig_elim, new_elim)+1;
+        treedec::minimalChordal(H, orig_elim, new_elim);
+        G_t H2(G);
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
     }
 };
 

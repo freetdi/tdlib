@@ -19,18 +19,22 @@ void mark_smaller_neighbours(M& marker, V v, G const& g)
 // FIXME: obsolete, use without mask
 // mark neighbours of v up to v.
 template<class M, typename V, class G, class MASK>
-void mark_smaller_neighbours(M& marker, V v, G const& g, MASK const& m)
+size_t mark_smaller_neighbours(M& marker, V v, G const& g, MASK const& m)
 {
+	size_t cnt=0;
 	//std::cerr << "marking for " << v << "\n";
     auto pp=boost::adjacent_vertices(v, g);
     for(; pp.first!=pp.second; ++pp.first){
+		 assert(*pp.first!=v);
 		 if(!m[*pp.first]){
 			 // masked...
 		 }else if(*pp.first>=v){
 			 // break; // need sorting...
 		 }else{
-			 //std::cerr << "marking " << *pp.first << "\n";
+			 // std::cerr << "marking " << *pp.first << "\n";
 			 marker.mark(*pp.first);
+			 ++cnt;
 		 }
     }
+	 return cnt;
 }

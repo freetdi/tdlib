@@ -5,6 +5,9 @@
 #include "generic_base.hpp"
 #include "generic_elimination_search_configs.hpp"
 
+#include <gala/graph.h>
+#include <gala/boost.h>
+
 // TODO: what's this? move to test?
 
 namespace treedec{
@@ -23,8 +26,9 @@ void generic_elimination_search_CFG1(G_t const &G, unsigned max_nodes, unsigned 
     generic_elim_DFS_test.do_it();
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize()
-             ==treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering()));
+    size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
+    size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
+    assert(A == B);
 }
 
 template <typename G_t>
@@ -37,7 +41,7 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
     std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
 
     gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
-       generic_elim_DFS_test (G);
+      generic_elim_DFS_test (G);
 
 //    gen_search::generic_elimination_search_DFS<G_t,
 //        gen_search::configs::CFG_DFS_2 > //TODO: constructor...
@@ -52,25 +56,17 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
 
     generic_elim_DFS_test.do_it();
 
-
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
-	 size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
-	 if(A != B){
-                unreachable();
-                std::cerr << A << " vs " << B << "\n";
-         assert(A<B);
-        }else{
-       //       std::cerr << "ok: " << A << " vs " << B << "\n";
-        }
-
+    size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
+    assert(A == B);
 }
 
 
 template <typename G_t>
 void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned max_orderings)
 {
-    gen_search::overlay<G_t, G_t> olay(G);
+//    gen_search::overlay<G_t, G_t> olay(G);
 
     gen_search::configs::CFG_DFS_3<G_t, algo::default_config>
        generic_elim_DFS_test (G);
@@ -81,8 +77,9 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
     generic_elim_DFS_test.do_it();
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize()
-           ==treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering())+1);
+    size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
+    size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
+    assert(A == B);
 }
 
 
@@ -103,10 +100,8 @@ void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned 
 
     overlay<Underlying_t, Overlay_t> olay(G, active);
 #else
-    typedef G_t Underlying_t;
-    typedef G_t Overlay_t;
 
-    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
+//    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
 #endif
 
     gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
@@ -125,7 +120,9 @@ void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned 
     generic_elim_DFS_test.do_it();
 
     G_t H(G);
-    assert(generic_elim_DFS_test.global_upper_bound_bagsize() == treedec::get_bagsize_of_elimination_ordering(H, ordering));
+    size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
+    size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
+    assert(A == B);
 }
 
 } //namespace treedec
@@ -133,4 +130,5 @@ void generic_elimination_search_CFG4(G_t const &G, unsigned max_nodes, unsigned 
 
 
 #endif //guard
+
 // vim:ts=8:sw=4:et

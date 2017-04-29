@@ -111,9 +111,8 @@ public:
     }
 
     void do_it(){
-        if(_n == 0){ untested();
+        if(_n == 0){
             return;
-        }else{
         }
 
         inverse_ordering();
@@ -234,24 +233,23 @@ typename boost::graph_traits<G_t>::vertices_size_type
 // FIXME: duplicate. use impl.
 template <typename G_t, typename O_t>
 int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
-{ untested();
+{
     unsigned n = boost::num_vertices(G);
     unsigned e = boost::num_edges(G);
 
     O.resize(n);
     unsigned i = 0;
-    if(n == 0) { untested();
-    }else if(n*(n-1u)==e || e==0){ untested();
+    if(n == 0) {
+    }else if(n*(n-1u)==e || e==0){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
         }
-        if(e==0){ untested();
+        if(e==0){
             return 1;
-        }else{ untested();
+        }else{
             return n;
         }
-    }else{ untested();
     }
 
     std::vector<int> inverse_perm(n, 0); // FIXME: use signed_type(vertex_index_t)
@@ -461,11 +459,11 @@ template <typename G_t, typename O_t>
 int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
 {
     int width = -1;
-
     for(unsigned int i = 0; i < elimination_ordering.size(); i++){
         unsigned deg=boost::out_degree(elimination_ordering[i], G);
 
         typename graph_traits<G_t>::outedge_set_type xbag;
+
         treedec::make_clique_and_detach(elimination_ordering[i], G, xbag);
         xbag.clear(); // provide interface with clear included? (not urgent)
 
@@ -861,9 +859,8 @@ void LEX_M_fill_in(G_t &G,
     }
 }
 
-// TODO: what does this function do?
 template <typename G_t>
-int LEX_M_minimal_ordering(const G_t &G,
+void LEX_M_minimal_ordering(const G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
 {
     unsigned int nv = boost::num_vertices(G);
@@ -950,13 +947,14 @@ int LEX_M_minimal_ordering(const G_t &G,
         }
     }
 
-
+/*
     unsigned max = 0;
     for(unsigned int j = 0; j < label.size(); j++){
         max = (label[j] > max)? label[j] : max;
     }
 
     return (int)max-1; //width of new ordering
+*/
 }
 
 } //namespace treedec

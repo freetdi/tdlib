@@ -24,6 +24,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
+#include <boost/property_map/property_map.hpp>
 
 #include "generic_base.hpp"
 #include "generic_elimination_search_overlay.hpp"
@@ -46,8 +47,10 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
                                     unsigned depth, unsigned nodes_generated,
                                     unsigned orderings_generated)
       : algo1(CFG_t::name()),
-        _g(*new internal_graph_type(g)),
         _active(*new std::vector<BOOL>(boost::num_vertices(g), true)),
+        _g(*new internal_graph_type(g,
+                    boost::make_iterator_property_map(&_active[0],
+                               boost::typed_identity_property_map<vertex_descriptor>() ))),
         _best_ordering    (*new std::vector<vd>  (boost::num_vertices(g))),
         _current_ordering (*new std::vector<vd>  (boost::num_vertices(g))),
         _global_lb(g_lb),
@@ -55,7 +58,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(g)),
         _need_cleanup(3)
 {
 #ifdef DEBUG
@@ -84,7 +86,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(Overlay)),
         _need_cleanup(1)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
@@ -116,7 +117,6 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _depth(depth),
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
-        _marker(boost::num_vertices(Overlay)),
         _need_cleanup(0)
 {
 #ifdef DEBUG_NOTYET // perhaps not here.
@@ -142,62 +142,9 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_
       _depth(o._depth), // ??
       _nodes_generated(o._nodes_generated),
       _orderings_generated(o._orderings_generated),
-      _marker(boost::num_vertices(o._g)),
       _need_cleanup(0)
 {}
 
-template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
-unsigned generic_elimination_search_base<G_t, CFG_t, CFGT_t>::eliminate(
-		typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
-{
-	using draft::concat_iterator;
-	active()[elim_vertex] = false;
-
-	unsigned actual_degree = 0;
-
-	// auto p=boost::adjacent_vertices(elim_vertex, *this);
-	auto p=adjacent_vertices(elim_vertex);
-	for(; p.first!=p.second; ++p.first){
-		assert(active()[*p.first]);
-
-		++actual_degree;
-
-		_marker.clear();
-                // mark_smaller_neighbours(_marker, *p.first, *this); doesntwork
-                mark_smaller_neighbours(_marker, *p.first, _g, active());
-
-                auto q=adjacent_vertices(elim_vertex);
-                for(; q.first!=q.second; ++q.first){
-                    assert(active()[*q.first]);
-                    if(*q.first>=*p.first){
-                        // skip. TODO: more efficient skip
-                    }else if(_marker.is_marked(*q.first)){
-                        // done.
-                    }else{
-                        // std::cerr << "ae " << *p.first << *q.first << "\n";
-                        assert(!edge(*p.first, *q.first, _g).second);
-                        _g.add_edge(*p.first, *q.first);
-
-                        // treedec graph iface enforces this. (.. should)
-                        assert(edge(*p.first, *q.first, _g).second);
-                        assert(edge(*q.first, *p.first, _g).second);
-                    }
-		}
-	}
-
-        assert(actual_degree == boost::degree(elim_vertex, _g.underlying()) + boost::degree(elim_vertex, _g._og)); 
-
-	_g.commit();
-	return actual_degree;
-}
-
-template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
-void generic_elimination_search_base<G_t, CFG_t, CFGT_t>::undo_eliminate(
-        typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor elim_vertex)
-{
-    _g.reset(1);
-    active()[elim_vertex] = true;
-}
 
 // BUG: CFG_t is a generic_search config...
 // FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
@@ -212,7 +159,7 @@ private:
     typedef typename baseclass::vertex_descriptor vd;
 
 public:
-    // BUG, too many args
+    // too many args
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay,
             std::vector<BOOL>& active,
             std::vector<vd> &best_ordering, std::vector<vd> &current_ordering)
@@ -260,7 +207,6 @@ private: // recursion
     }
 
 public:
-
     void do_it();
 
     void set_max_nodes_generated(unsigned num){ max_nodes_generated = num; }
@@ -282,7 +228,6 @@ template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 {
     if(baseclass::_nodes_generated % 1000 == 0){
-        // if trace?
         std::cout << "#: " << baseclass::_nodes_generated << std::endl;
     }
 
@@ -293,7 +238,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         if(tmp_global_lb > baseclass::_global_lb){
             baseclass::_global_lb = tmp_global_lb;
         }
-        // if trace?
+
         std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
 
         unsigned tmp_global_ub = CFG_t::initial_ub_algo(baseclass::_g.underlying(), baseclass::_best_ordering);
@@ -302,12 +247,10 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         if(tmp_global_ub < baseclass::_global_ub){
             baseclass::_global_ub = tmp_global_ub;
         }
-        // if trace?
         std::cout << "initial ub: " << baseclass::_global_ub << std::endl;
 
         // baseclass::bagsize_range().size()==1...?
         if(baseclass::_global_lb == baseclass::_global_ub){
-            // if trace?
             std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::_orderings_generated; //not necessary..
             //returns now
@@ -318,15 +261,10 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         if(local_ub < baseclass::_global_ub){ //this should be always true?!
             std::cout << "found better ordering of width " << local_ub << std::endl;
             baseclass::_global_ub = local_ub;
-            baseclass::_best_ordering == baseclass::_current_ordering;
+            baseclass::_best_ordering = baseclass::_current_ordering;
             std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
 
             ++baseclass::_orderings_generated; //ifdef stats?!
-
-            G_t H(baseclass::_g.underlying());
-            size_t w = treedec::get_bagsize_of_elimination_ordering(H, baseclass::_best_ordering);
-
-            std::cout << "bagsize check " << w << std::endl;
 
             std::vector<vd> tmp_ordering(boost::num_vertices(baseclass::_g.underlying()));
             unsigned ref_width = CFG_t::refiner(baseclass::_g.underlying(), baseclass::_best_ordering, tmp_ordering);
@@ -362,7 +300,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 break;
             }
 
-
             if(baseclass::_nodes_generated > max_nodes_generated || baseclass::_orderings_generated > max_orderings_generated){
                 break;
             }
@@ -374,11 +311,12 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
 
-            unsigned step_width = baseclass::eliminate(elim_vertex)+1;
-            std::cout << "depth: " << baseclass::_depth << std::endl;
-            std::cout << "step width: " << step_width << std::endl;
+//            baseclass::eliminate(elim_vertex);
+//            unsigned step_width = baseclass::degree(elim_vertex)+1;
+            unsigned step_width = baseclass::_g.degree(elim_vertex)+1;
 
             if(step_width < baseclass::_global_ub){
+                baseclass::eliminate(elim_vertex);
                 unsigned next_local_ub = (step_width > local_ub)? step_width : local_ub; //local ub is the current width of the ordering
 
                 baseclass::_current_ordering[baseclass::_depth] = elim_vertex;
@@ -396,38 +334,29 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 baseclass::_nodes_generated = nextStep._nodes_generated; //ifdef stats?!
                 baseclass::_orderings_generated = nextStep._orderings_generated;
 
+                baseclass::undo_eliminate();
+
                 if(nextStep._global_ub < baseclass::_global_ub){
                     baseclass::_global_ub = nextStep._global_ub; //may have improved
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::_global_ub || baseclass::_global_lb == baseclass::_global_ub){
-                        baseclass::undo_eliminate(elim_vertex);
+                        //baseclass::undo_eliminate();
                         break; //returns now
                     }
                 }
-            }else{
-                //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
-                std::cout << "prune" << std::endl;
             }
-
-            baseclass::undo_eliminate(elim_vertex);
-
+            else{
+                //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
+            }
         }
     }
 
     baseclass::timer_off();
-
-    /// if OPTIONS::verbosity>K
-    if(false)
-    {
-        std::cout << "lower bound: " << global_lower_bound_bagsize() << std::endl;
-        std::cout << "upper bound: " << global_upper_bound_bagsize() << std::endl;
-        std::cout << "nodes generated: " << baseclass::_nodes_generated << std::endl;
-        std::cout << "orderings generated: " << baseclass::_orderings_generated << std::endl;
-    }
 }
 
 
+#if 0
 template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adj_range
 inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
@@ -444,6 +373,7 @@ inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
 
         return std::make_pair(b, e);
 }
+#endif
 
 
 } //namespace gen_search
@@ -452,4 +382,5 @@ inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
 
 
 #endif //TD_GENERIC_ELIM_SEARCH_H
+
 // vim:ts=8:sw=4:et
