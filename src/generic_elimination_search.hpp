@@ -334,14 +334,14 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 baseclass::_nodes_generated = nextStep._nodes_generated; //ifdef stats?!
                 baseclass::_orderings_generated = nextStep._orderings_generated;
 
- //               baseclass::undo_eliminate();
+                baseclass::undo_eliminate();
 
                 if(nextStep._global_ub < baseclass::_global_ub){
                     baseclass::_global_ub = nextStep._global_ub; //may have improved
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::_global_ub || baseclass::_global_lb == baseclass::_global_ub){
-                        baseclass::undo_eliminate();
+                        //baseclass::undo_eliminate();
                         break; //returns now
                     }
                 }
