@@ -859,7 +859,7 @@ void LEX_M_fill_in(G_t &G,
     }
 }
 
-template <typename G_t, template<class G, class...> class CFGT_t=algo::default_config>
+template <typename G_t>
 void LEX_M_minimal_ordering(const G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
 {
@@ -882,8 +882,6 @@ void LEX_M_minimal_ordering(const G_t &G,
     unsigned int k = 1;
 
     for(int i = boost::num_vertices(G)-1; i >= 0; i--){
-        CFGT_t<G_t>::interruption_point();
-
         typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
         unsigned max = 0;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
