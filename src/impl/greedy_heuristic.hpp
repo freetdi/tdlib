@@ -34,7 +34,7 @@ namespace treedec{ //
 
 namespace impl{ //
 
-template <typename G_t, typename T_t, typename O_t>
+template <typename G_t, typename T_t, typename O_t, template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_heuristic_base : public ::treedec::algo::draft::algo1{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
@@ -107,6 +107,7 @@ public:
         assert(elim_vertices.size() == _num_vert);
 
         while(boost::num_edges(_g) > 0){
+            CFGT_t<G_t>::interruption_point();
             INTERRUPTION_POINT;
 
             vertex_descriptor c;

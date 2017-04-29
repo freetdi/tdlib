@@ -234,7 +234,7 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
         G_t H(G);
         treedec::minimalChordal(H, orig_elim, new_elim);
         G_t H2(G);
-        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //TODO: not necessary
     }
 };
 

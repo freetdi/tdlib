@@ -149,7 +149,7 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_
 // BUG: CFG_t is a generic_search config...
 // FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
 // http://www.gotw.ca/publications/mill07.htm
-template <typename G_t, class OC, template<class G, class ...> class CFGT_t>
+template <typename G_t, class OC, template<class G, class ...> class CFGT_t=algo::default_config>
 class generic_elimination_search_DFS
     : public generic_elimination_search_base<G_t, OC, CFGT_t> {
 private:
@@ -227,6 +227,8 @@ protected:
 template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 {
+    CFGT_t<G_t>::interruption_point();
+
     if(baseclass::_nodes_generated % 1000 == 0){
         std::cout << "#: " << baseclass::_nodes_generated << std::endl;
     }
