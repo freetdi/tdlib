@@ -16,7 +16,7 @@ COUNT_DIMACS = 81
 PREFIX_MAXSAT = "Maxsat_small"
 COUNT_MAXSAT = 120
 
-MAX_NODES = 2000
+MAX_NODES = 10000
 MAX_ORDERINGS = 100
 
 #don't confuse python unittest
@@ -24,6 +24,7 @@ sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
     def test_long1(self):
+        print("FILL config")
         for i in range(0, COUNT_DIMACS+1):
             #if base.skip(PREFIX_DIMACS, i, lambda x,y: x > 100 or y > 2000):
             #    continue
@@ -32,7 +33,7 @@ class TestTdLib(unittest.TestCase):
 
             G = Graph(eval(PREFIX_DIMACS+".V_"+str(i)), eval(PREFIX_DIMACS+".E_"+str(i)))
 
-            tdlib.generic_elimination_search_p17(G, MAX_NODES, MAX_ORDERINGS)
+            tdlib.generic_elimination_search3(G, MAX_NODES, MAX_ORDERINGS)
             print("")
 
 if __name__ == '__main__':

@@ -121,7 +121,7 @@ public:
                 _current_N = &_bags[_i];
             }
 
-            _ub = (_min>_ub)?_min:_ub;
+            _ub = (boost::out_degree(c, _g)>_ub)?boost::out_degree(c, _g):_ub;
 
             // assert(bags_i);?!
 
