@@ -51,4 +51,5 @@ pkginclude_HEADERS = \
   copy.hpp \
   treedec.hpp \
   treedec_traits.hpp \
-  grparse.h
+  grparse.h \
+  preprocessing_edge_insertion.hpp
