@@ -48,6 +48,8 @@ struct CFG_DFS_3;
 
 template <typename G_t, template<class G, class ...> class cfg>
 struct CFG_DFS_p17;
+template <typename G_t, template<class G, class ...> class cfg>
+struct CFG_DFS_p17_2;
 
 
 
@@ -67,6 +69,10 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
     {}
 
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
+    static bool is_jumper(){
+        return false;
+    };
 
     static unsigned INVALID_VERTEX()
     {
@@ -97,7 +103,7 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -135,6 +141,10 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
 
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
+    static bool is_jumper(){
+        return false;
+    };
+
     static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -162,7 +172,7 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -195,6 +205,10 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
     CFG_DFS_3(G_t const& G) : baseclass(G)
     {}
 
+    static bool is_jumper(){
+        return false;
+    };
+
     static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -222,7 +236,7 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -260,6 +274,10 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
 
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
+    static bool is_jumper(){
+        return true;
+    };
+
     static unsigned INVALID_VERTEX()
     {
         return UINT_MAX;
@@ -287,8 +305,79 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
     {
+        for(; idx < active.size(); ++idx){
+            if(active[idx]){
+                return idx++;
+            }
+        }
+
+        return INVALID_VERTEX();
+    }
+
+    static unsigned refiner(const G_t &G, std::vector<vd> &orig_elim, std::vector<vd> &new_elim)
+    {
+        G_t H(G);
+        treedec::minimalChordal(H, orig_elim, new_elim);
+        G_t H2(G);
+        return treedec::get_bagsize_of_elimination_ordering(H2, new_elim); //not necessary
+    }
+};
+
+/* PACE 2017 config 2
+    -initial_lb_algo = deltaC_least_c
+    -initial_ub_algo = minDegree
+    -lb_algo = NONE
+    -next = all nodes "from left to right"
+*/
+template <typename G_t, template<class G, class ...> class CFGT>
+struct CFG_DFS_p17_2 : generic_elimination_search_DFS<G_t, CFG_DFS_p17_2<G_t, CFGT>, CFGT> {
+    typedef generic_elimination_search_DFS<G_t, CFG_DFS_p17_2<G_t, CFGT>, CFGT> baseclass;
+    CFG_DFS_p17_2(G_t const& G) : baseclass(G)
+    {}
+
+    CFG_DFS_p17_2(G_t const& G, unsigned m, unsigned n) : baseclass(G, m, n)
+    {}
+
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
+
+    static bool is_jumper(){
+        return true;
+    };
+
+    static unsigned INVALID_VERTEX()
+    {
+        return UINT_MAX;
+    }
+
+    static const std::string name()
+    {
+        return "CFG_DFS_p17_2";
+    }
+
+    static unsigned initial_lb_algo(const G_t &G)
+    {
+        return 0;
+    }
+
+    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
+    {
+        return UINT_MAX;
+    }
+
+
+    static unsigned lb_algo(const G_t &G){ //aka no lb algo
+        return 0;
+    }
+
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
+    {
+        if(idx == 0 && active[elim_ordering[depth]]){
+            ++idx;
+            return elim_ordering[depth];
+        }
+
         for(; idx < active.size(); ++idx){
             if(active[idx]){
                 return idx++;

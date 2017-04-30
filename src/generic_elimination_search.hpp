@@ -212,6 +212,10 @@ public:
     void set_max_nodes_generated(unsigned num){ max_nodes_generated = num; }
     void set_max_orderings_generated(unsigned num){ max_orderings_generated = num; }
 
+    void set_lb(unsigned lb){ baseclass::_global_lb=lb; }
+    void set_ub(unsigned ub){ baseclass::_global_ub=ub; }
+    void set_best_ordering(std::vector<vd> &best){ baseclass::_best_ordering = best; }
+
     unsigned global_lower_bound_bagsize(){ return baseclass::_global_lb; }
     unsigned global_upper_bound_bagsize(){ return baseclass::_global_ub; }
 
@@ -279,6 +283,11 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 baseclass::_global_ub = ref_width;
                 baseclass::_best_ordering = tmp_ordering;
                 std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
+
+                if(CFG_t::is_jumper()){
+                    baseclass::_nodes_generated = max_nodes_generated; //terminates now
+                    return;
+                }
            }
 
         }
@@ -301,7 +310,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
         //search starts here
         while(true){
-            vd elim_vertex = CFG_t::next(baseclass::_g.underlying(), baseclass::active(), idx);
+            vd elim_vertex = CFG_t::next(baseclass::_g.underlying(), baseclass::active(), idx, baseclass::_best_ordering, baseclass::_depth);
             if(elim_vertex == CFG_t::INVALID_VERTEX()){
                 break;
             }

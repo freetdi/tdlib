@@ -125,6 +125,66 @@ void generic_elimination_search_p17(G_t const &G, unsigned max_nodes, unsigned m
     assert(A == B);
 }
 
+template <typename G_t>
+void generic_elimination_search_p17_jumper(G_t const &G, unsigned max_nodes, unsigned max_orderings)
+{
+    typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ord_type;
+    ord_type ordering(boost::num_vertices(G));
+    ord_type cur_ordering(boost::num_vertices(G));
+
+    std::vector<BOOL> active(boost::num_vertices(G), true);
+
+#ifdef HAVE_GALA_NOTYET
+    typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
+
+    typedef G_t Underlying_t;
+    typedef ssg_vec_vec32i  Overlay_t;
+
+    overlay<Underlying_t, Overlay_t> olay(G, active);
+#else
+
+//    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
+#endif
+
+    gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
+       generic_elim_DFS_test (G /* ... more? */);
+
+    generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
+    generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
+
+    generic_elim_DFS_test.do_it();
+
+    unsigned lb=generic_elim_DFS_test.global_lower_bound_bagsize();
+    unsigned ub=generic_elim_DFS_test.global_upper_bound_bagsize();
+    ord_type best=generic_elim_DFS_test.ordering();
+
+    while(true){
+        gen_search::configs::CFG_DFS_p17_2<G_t, algo::default_config>
+           generic_elim_DFS_test2 (G);
+
+        generic_elim_DFS_test2.set_max_nodes_generated(max_nodes);
+        generic_elim_DFS_test2.set_max_orderings_generated(max_orderings);
+
+        generic_elim_DFS_test2.set_lb(lb);
+        generic_elim_DFS_test2.set_ub(ub);
+        generic_elim_DFS_test2.set_best_ordering(best);
+
+        generic_elim_DFS_test2.do_it();
+
+        lb=generic_elim_DFS_test2.global_lower_bound_bagsize();
+        if(generic_elim_DFS_test2.global_upper_bound_bagsize() == ub){
+            return;
+        }
+        ub=generic_elim_DFS_test2.global_upper_bound_bagsize();
+        best=generic_elim_DFS_test2.ordering();
+    }
+
+    G_t H(G);
+    size_t A=ub;
+    size_t B=treedec::get_bagsize_of_elimination_ordering(H, best);
+    assert(A == B);
+}
+
 } //namespace treedec
 
 

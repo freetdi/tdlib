@@ -1453,3 +1453,16 @@ def generic_elimination_search_p17(G, max_nodes, max_orderings):
 
     gc_generic_elimination_search_p17(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 
+def generic_elimination_search_p17_jumper(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search_p17_jumper(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+
