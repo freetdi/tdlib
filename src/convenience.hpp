@@ -6,8 +6,10 @@
 #include "generic_elimination_search_configs.hpp"
 #include "preprocessing.hpp"
 
+#ifdef HAVE_GALA_NOTYET
 #include <gala/graph.h>
 #include <gala/boost.h>
+#endif
 
 namespace treedec{
 
@@ -98,6 +100,7 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
     std::vector<BOOL> active(boost::num_vertices(G), true);
 
+/*
 #ifdef HAVE_GALA_NOTYET
     typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
 
@@ -109,6 +112,7 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
 //    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
 #endif
+*/
 
     gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
        generic_elim_DFS_test (G /* ... more? */);
@@ -160,6 +164,7 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
 
     std::vector<BOOL> active(boost::num_vertices(G2), true);
 
+/*
 #ifdef HAVE_GALA_NOTYET
     typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
 
@@ -171,6 +176,7 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
 
 //    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
 #endif
+*/
 
     gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
        generic_elim_DFS_test (G2 /* ... more? */);
