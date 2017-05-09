@@ -167,7 +167,7 @@ public: // construct
           _active(o._active),
           _degree(o._degree),
           _marker(o._marker)
-    { 
+    {
         unreachable();
         assert(_changes_container.size()==1); // for now
     }
@@ -235,6 +235,10 @@ public:
         return _g;
     }
 
+    const OverlyingG_t &overlying() const{
+        return _og;
+    }
+
 
     /* TODO:
         -actual degree as in DEGREE..
@@ -271,8 +275,8 @@ private:
         return _active;
     }
 
-private:
-//public: //accessed from outside.
+//private:
+public: //accessed from outside.
     const UnderlyingG_t &_g;
     OverlayG_t _og;
 

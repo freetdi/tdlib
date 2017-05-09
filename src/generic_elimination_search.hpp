@@ -233,7 +233,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 {
     CFGT_t<G_t>::interruption_point();
 
-    if(baseclass::_nodes_generated % 1000 == 0){
+    if(baseclass::_nodes_generated % 100000 == 0){
         std::cout << "#: " << baseclass::_nodes_generated << std::endl;
     }
 
@@ -265,7 +265,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             return;
         }
     }
-    
+
     if(baseclass::_depth == boost::num_vertices(baseclass::_g.underlying())){
         if(local_ub < baseclass::_global_ub){ //this should be always true?!
             std::cout << "found better ordering of width " << local_ub << std::endl;
@@ -297,15 +297,26 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         }
     }
     else{
-/*
-        local_lb = CFG_t::lb_algo(baseclass::_g.underlying());
-        if(local_lb > baseclass::global_ub){
+
+        //TODO: underlying+overlay copy
+        G_t H(baseclass::_g.underlying());
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g._og); vIt != vEnd; vIt++){
+            typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, baseclass::_g._og); nIt != nEnd; nIt++){
+                boost::add_edge(*vIt, *nIt, H);
+            }
+        }
+
+
+        local_lb = CFG_t::lb_algo(H);
+        if(local_lb > baseclass::_global_ub){
             //can be seen as pruning this branch
-            //std::cout << "prune branch since local_lb is greater than the current best solution" << std::endl;
+            std::cout << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
             baseclass::timer_off();
             return;
         }
-*/
+
         unsigned idx = 0;
 
         //search starts here

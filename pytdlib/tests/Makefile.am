@@ -26,7 +26,8 @@ LONG_TESTS = \
 	test_long_approx_Zoo.py \
 	test_long_apps_Zoo.py \
 	test_long_lb_Zoo.py \
-        test_long_generic_search.py
+        test_long_generic_search_Dimacs.py \
+        test_long_generic_search_Networks.py
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py

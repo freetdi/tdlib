@@ -99,7 +99,7 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
     }
 
 
-    static unsigned lb_algo(const G_t &G){ //aka no lb algo
+    static unsigned lb_algo(G_t &G){ //aka no lb algo
         return 0;
     }
 
@@ -166,7 +166,6 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
         G_t H(G);
         return treedec::minDegree_ordering(H, O)+1;
     }
-
 
     static unsigned lb_algo(const G_t &G){ //aka no lb algo
         return 0;
@@ -275,7 +274,8 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vd;
 
     static bool is_jumper(){
-        return true;
+//        return true;
+        return false;
     };
 
     static unsigned INVALID_VERTEX()
@@ -292,6 +292,7 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
     {
         G_t H(G);
         return treedec::lb::deltaC_least_c(H)+1;
+//        return treedec::lb::LBPC_deltaC(H)+1;
     }
 
     static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
@@ -301,8 +302,11 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
     }
 
 
-    static unsigned lb_algo(const G_t &G){ //aka no lb algo
-        return 0;
+    static unsigned lb_algo(G_t &G){ //aka no lb algo
+//        return 0;
+        G_t H(G1);
+        return treedec::lb::deltaC_least_c(G)+1;
+
     }
 
     static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)

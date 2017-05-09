@@ -305,6 +305,7 @@ public:
     template<class GG>
     void get_graph(GG& gg) {
         assert(boost::is_directed(_g));
+
         GG gr;
 #if 1
         copy_trace(_g, gr);
@@ -1567,21 +1568,18 @@ void preprocessing(G_t &G, BV_t &bags, int &low)
         // obsolete interface. possibly slow
         A.get_bags(bags);
         A.get_graph(G);
-    }else{
     }
 }
 
 template <typename G_t, typename BV_t>
 void preprocessing(G_t &G, BV_t &bags)
-{ untested();
-    if(boost::num_vertices(G)){ untested();
+{
+    if(boost::num_vertices(G)){
         impl::preprocessing<G_t> A(G);
         A.do_it();
         // obsolete interface. possibly slow
         A.get_bags(bags);
         A.get_graph(G);
-    }else{ untested();
-        // it does not work (yet.)
     }
 }
 
