@@ -235,7 +235,7 @@ public:
         return _g;
     }
 
-    const OverlyingG_t &overlying() const{
+    const OverlayG_t &overlying() const{
         return _og;
     }
 

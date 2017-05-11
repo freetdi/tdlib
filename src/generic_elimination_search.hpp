@@ -299,12 +299,14 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
     else{
 
         //TODO: underlying+overlay copy
+        // BUG: use boost::copy maybe
         G_t H(baseclass::_g.underlying());
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g._og); vIt != vEnd; vIt++){
+        auto p=boost::vertices(baseclass::_g._og);
+        for(;p.first!=p.second; ++p.first){
             typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, baseclass::_g._og); nIt != nEnd; nIt++){
-                boost::add_edge(*vIt, *nIt, H);
+            auto q=boost::adjacent_vertices(*p.first, baseclass::_g._og);
+            for(; q.first!=q.second; ++q.first){
+                boost::add_edge(*p.first, *q.first, H);
             }
         }
 
