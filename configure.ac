@@ -5,7 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([tdlib], [0.8.7], [larisch@informatik.uni-frankfurt.de,felix@salfelder.org])
 AC_CONFIG_SRCDIR([src/graph_traits.hpp])
 AC_CONFIG_MACRO_DIR([m4])
-#AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([])
 LT_INIT()
 

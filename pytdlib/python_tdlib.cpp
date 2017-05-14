@@ -39,7 +39,6 @@
 #include "misc.hpp"
 
 #ifdef HAVE_GALA
-#include <gala/graph.h> //TODO: not here
 #include <gala/boost.h>
 #endif
 
