@@ -304,7 +304,7 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
 
     static unsigned lb_algo(G_t &G){ //aka no lb algo
 //        return 0;
-        G_t H(G1);
+        G_t H(G);
         return treedec::lb::deltaC_least_c(G)+1;
 
     }

@@ -297,7 +297,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         }
     }
     else{
-
+/*
         //TODO: underlying+overlay copy
         G_t H(baseclass::_g.underlying());
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
@@ -316,7 +316,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             baseclass::timer_off();
             return;
         }
-
+*/
         unsigned idx = 0;
 
         //search starts here

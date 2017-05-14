@@ -6,10 +6,8 @@
 #include "generic_elimination_search_configs.hpp"
 #include "preprocessing.hpp"
 
-#ifdef HAVE_GALA_NOTYET
 #include <gala/graph.h>
 #include <gala/boost.h>
-#endif
 
 namespace treedec{
 
