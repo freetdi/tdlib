@@ -1,7 +1,10 @@
 #ifndef GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 #define GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 
+#ifdef HAVE_GALA
 #include <gala/boost.h>
+#endif
+
 #include <boost/graph/adjacency_list.hpp>
 #include <stack>
 
@@ -233,10 +236,6 @@ public:
 
     const UnderlyingG_t &underlying() const{
         return _g;
-    }
-
-    const OverlayG_t &overlying() const{
-        return _og;
     }
 
 
