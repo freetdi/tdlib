@@ -38,7 +38,7 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
-#ifdef HAVE_GALA
+#ifdef USE_GALA
 #include <gala/boost.h>
 #endif
 
