@@ -1,7 +1,7 @@
 #ifndef GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 #define GENERIC_ELIMINATION_SEARCH_OVERLAY_H
 
-#ifdef HAVE_GALA
+#ifdef USE_GALA
 #include <gala/boost.h>
 #endif
 
@@ -43,13 +43,12 @@ struct outedge_resize{
 };
 
 // TODO:: more generic.
+#ifdef USE_GALA
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G> {
 	static constexpr bool is_directed=true;
 };
 typedef gala::graph<std::vector, std::vector, uint32_t, dvv_config> gdvv;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> baluo;
-
 
 template<>
 struct outedge_resize<gdvv>{
@@ -59,7 +58,9 @@ struct outedge_resize<gdvv>{
         g.out_edges(x).resize(size);
     }
 };
+#endif
 
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> baluo;
 template<>
 struct outedge_resize<baluo>{
 static void do_it(typename boost::graph_traits<baluo>::vertex_descriptor x,
@@ -91,7 +92,7 @@ template <typename UnderlyingG_t, typename OverlayG_tt, class ACTMAP>
 class overlay{
 public:
 
-#if 1
+#ifdef USE_GALA
     typedef detail::gdvv OverlayG_t;
 #else
     typedef detail::baluo OverlayG_t;
