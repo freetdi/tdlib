@@ -298,7 +298,8 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
     static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
     {
         G_t H(G);
-        return treedec::minDegree_ordering(H, O)+1;
+        return treedec::fillIn_ordering(H, O)+1;
+//        return treedec::minDegree_ordering(H, O)+1;
     }
 
 

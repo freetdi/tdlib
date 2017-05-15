@@ -25,11 +25,14 @@ sys.argv=sys.argv[:1]
 class TestTdLib(unittest.TestCase):
     def test_long1(self):
         print("FILL config")
-        for i in range(0, COUNT_DIMACS+1):
-            #if base.skip(PREFIX_DIMACS, i, lambda x,y: x > 100 or y > 2000):
-            #    continue
+        for i in range(37, COUNT_DIMACS+1):
+#            if base.skip(PREFIX_DIMACS, i, lambda x,y: y < 5000):
+#                continue
 
-            if i != 8:
+            if i != 64:
+                continue
+
+            if("-pp" in eval(PREFIX_DIMACS+".name_"+str(i))):
                 continue
 
             base.print_graph_name(PREFIX_DIMACS, i)
