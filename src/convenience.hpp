@@ -10,6 +10,13 @@
 #include <gala/boost.h>
 #endif
 
+#include <iostream>     // std::cout
+#include <algorithm>    // std::random_shuffle
+#include <vector>       // std::vector
+#include <ctime>        // std::time
+#include <cstdlib>      // std::rand, std::srand
+
+
 namespace treedec{
 
 template <typename G_t>
@@ -86,12 +93,42 @@ template <typename G_t>
 void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_orderings)
 {
     std::cout << "edges before PP: " << boost::num_edges(G) << std::endl;
+    std::cout << "vertices before PP: " << boost::num_vertices(G) << std::endl;
 
     impl::preprocessing<G_t> PP(G);
     PP.do_it();
+
+    std::vector<boost::tuple<
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
+         > > bags;
+
+    PP.get_bags(bags); // we don't need them!
     PP.get_graph(G);
 
+    std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
+
+
+    bool cond = true;
+    while(cond){
+        cond = false;
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            if(boost::out_degree(*vIt, G) == 0){
+                boost::remove_vertex(*vIt, G);
+                cond = true;
+                break;
+            }
+        }
+    }
+
+    if(boost::num_vertices(G) == 0){
+        std::cout << "fully reduced by PP!" << std::endl;
+        return;
+    }
+
     std::cout << "edges after PP: " << boost::num_edges(G) << std::endl;
+    std::cout << "vertices after PP: " << boost::num_vertices(G) << std::endl;
 
     typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ord_type;
     ord_type ordering(boost::num_vertices(G));
@@ -137,6 +174,11 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 template <typename G_t>
 void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned max_orderings)
 {
+    clock_t start, end;
+
+    start = clock();
+
+
     std::cout << "vertices before PP: " << boost::num_vertices(G) << std::endl;
     std::cout << "edges before PP: " << boost::num_edges(G) << std::endl;
 
@@ -152,6 +194,30 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
 
     G_t G2;
     PP.get_graph(G2);
+
+    std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
+
+
+    bool cond = true;
+    while(cond){
+        cond = false;
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G2); vIt != vEnd; vIt++){
+            if(boost::out_degree(*vIt, G2) == 0){
+                boost::remove_vertex(*vIt, G2);
+                cond = true;
+                break;
+            }
+        }
+    }
+
+    if(boost::num_vertices(G2) == 0){
+        std::cout << "fully reduced by PP!" << std::endl;
+
+        end = clock();
+        std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
+        return;
+    }
 
     std::cout << "vertices after PP: " << boost::num_vertices(G2) << std::endl;
     std::cout << "edges after PP: " << boost::num_edges(G2) << std::endl;
@@ -189,6 +255,17 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
     unsigned ub=generic_elim_DFS_test.global_upper_bound_bagsize();
     ord_type best=generic_elim_DFS_test.ordering();
 
+    if(lb == ub){
+        end = clock();
+        std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
+        return;
+    }
+
+    unsigned rnd_cnt = 0;
+
+    //std::srand ( unsigned ( std::time(0) ) );
+
+
     while(true){
         gen_search::configs::CFG_DFS_p17_2<G_t, algo::default_config>
            generic_elim_DFS_test2 (G2);
@@ -204,11 +281,22 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
 
         lb=generic_elim_DFS_test2.global_lower_bound_bagsize();
         if(generic_elim_DFS_test2.global_upper_bound_bagsize() == ub){
+/*        std::random_shuffle(best.begin(), best.end());
+              rnd_cnt++;
+              if(rnd_cnt == 3){
+                  break;
+              }
+              continue;
+*/
+        end = clock();
+        std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
             return;
         }
         ub=generic_elim_DFS_test2.global_upper_bound_bagsize();
         best=generic_elim_DFS_test2.ordering();
     }
+    end = clock();
+    std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
 
     G_t H(G2);
     size_t A=ub;
