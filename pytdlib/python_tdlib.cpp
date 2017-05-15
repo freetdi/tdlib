@@ -28,6 +28,7 @@
 #include <map>
 
 #include <boost/graph/adjacency_list.hpp>
+#include "generic_base.hpp"
 #include "graph.hpp"
 #include "preprocessing.hpp"
 #include "combinations.hpp"
@@ -37,10 +38,20 @@
 #include "applications.hpp"
 #include "misc.hpp"
 
+#ifdef USE_GALA
+#include <gala/boost.h>
+#endif
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t;
+
+
+#include "convenience.hpp"
+
+
+
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t; //type 0
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> TD_graph_vec_t; //type 1
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::directedS> TD_graph_directed_t; //type 2
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_graph_directed_vec_t; //type 3
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
 
@@ -99,7 +110,7 @@ void make_python_graph(G_t &G, std::vector<unsigned int> &V_G, std::vector<unsig
 {
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(ignore_isolated_vertices && boost::degree(*vIt, G) == 0){
+        if(ignore_isolated_vertices && boost::out_degree(*vIt, G) == 0){
             continue;
         }
         V_G.push_back(*vIt);
@@ -120,7 +131,7 @@ void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
     std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int> vertex_map;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     unsigned int id = 0;
-    
+
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         vertex_map.insert(std::pair<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>(*tIt, id++));
         std::vector<int> bag;
@@ -129,7 +140,7 @@ void make_python_decomp(T_t &T, std::vector<std::vector<int> > &V_T,
         }
         V_T.push_back(bag);
     }
-    
+
     typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(T); eIt != eEnd; eIt++){
         typename std::map<typename boost::graph_traits<T_t>::vertex_descriptor, unsigned int>::iterator v, w;
@@ -1070,4 +1081,42 @@ int gc_get_width(std::vector<std::vector<int> > &V_T){
     return width-1;
 }
 
-// vim:ts=8:sw=2:et
+
+/* Generic elimination search */
+
+void gc_generic_elimination_search1(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::generic_elimination_search_CFG1(G, max_nodes, max_orderings);
+}
+
+void gc_generic_elimination_search2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::generic_elimination_search_CFG2(G, max_nodes, max_orderings);
+}
+
+void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::generic_elimination_search_CFG3(G, max_nodes, max_orderings);
+}
+
+void gc_generic_elimination_search_p17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::generic_elimination_search_p17(G, max_nodes, max_orderings);
+}
+
+void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned /*graphtype*/, unsigned max_nodes, unsigned max_orderings){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    treedec::generic_elimination_search_p17_jumper(G, max_nodes, max_orderings);
+}
+
+// vim:ts=8:sw=4:et

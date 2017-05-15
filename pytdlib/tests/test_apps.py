@@ -44,12 +44,6 @@ class TestTdLib_app(unittest.TestCase):
         S = tdlib.max_clique_with_treedecomposition(G, T)
         self.assertEqual(len(S), 2)
 
-    def test_max_clique_with_treedecomposition_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.PP_MD(G)
-        S = tdlib.max_clique_with_treedecomposition(G, T)
-        self.assertEqual(len(S), 5)
-
     def test_max_clique_with_treedecomposition_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.PP_MD(G)

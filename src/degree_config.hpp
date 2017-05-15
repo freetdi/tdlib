@@ -40,15 +40,29 @@ struct deg_config{
 
     template <typename C_t>
     static vd_type pick(C_t const &C){
+        assert(C.begin() != C.end());
         return *C.begin();
     }
     template <typename C_t>
-    static vd_type pick_and_erase(C_t &){
+    static vd_type pick_and_erase(C_t &)
+	 {
 		 incomplete();
     }
 };
 
 }
+}
+
+// use this. cleanup later.
+namespace treedec{
+
+namespace degs{
+
+template<class G_t>
+struct default_config : misc::detail::deg_config<G_t> {};
+
+}
+
 }
 
 #endif

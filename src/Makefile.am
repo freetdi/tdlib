@@ -14,6 +14,7 @@ pkginclude_HEADERS = \
   fill.hpp \
   dynamicCR.hpp \
   elimination_orderings.hpp \
+  exact.hpp \
   exact_cutset.hpp \
   iter.hpp \
   lower_bounds.hpp \
@@ -40,4 +41,15 @@ pkginclude_HEADERS = \
   overlay.hpp \
   validation.hpp \
   graph_traits.hpp \
-  convenience.hpp
+  convenience.hpp \
+  generic_elimination_search.hpp \
+  generic_elimination_search_configs.hpp \
+  marker.hpp \
+  numbering.hpp \
+  config_traits.hpp \
+  directed_view.hpp \
+  copy.hpp \
+  treedec.hpp \
+  treedec_traits.hpp \
+  grparse.h \
+  preprocessing_edge_insertion.hpp

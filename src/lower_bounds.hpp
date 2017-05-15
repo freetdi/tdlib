@@ -111,7 +111,7 @@ public:
 
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(_g); vIt != vEnd; vIt++){
-            unsigned degree = boost::degree(*vIt, _g);
+            unsigned degree = boost::out_degree(*vIt, _g);
             _lb = (degree < _lb)? degree : _lb;
         }
 
@@ -159,7 +159,7 @@ public:
 
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(_g); vIt != vEnd; vIt++){
-            unsigned int degree = boost::degree(*vIt, _g);
+            unsigned int degree = boost::out_degree(*vIt, _g);
             if(degree <= min){
                 snd = min;
                 min = degree;
@@ -220,7 +220,7 @@ public:
         for(unsigned int i = 0; i < boost::num_vertices(_g); i++){
             for(unsigned int j = 0; j < i; j++){
                 if(!boost::edge(degree_sequence[i], degree_sequence[j], _g).second){
-                    _lb = boost::degree(degree_sequence[i], _g);
+                    _lb = boost::out_degree(degree_sequence[i], _g);
                     timer_off();
                     return;
                 }
@@ -281,7 +281,7 @@ public:
         while(true){
             unsigned int min_degree = boost::num_vertices(_g);
             for(boost::tie(vIt, vEnd) = boost::vertices(_g); vIt != vEnd; vIt++){
-                unsigned int degree = boost::degree(*vIt, _g);
+                unsigned int degree = boost::out_degree(*vIt, _g);
                 if(degree < min_degree && degree > 0){
                     min_degree = degree;
                     min_vertex = *vIt;
@@ -354,7 +354,7 @@ public:
                     if(*hIt == assumed_minimal[i]){
                         continue;
                     }
-                    unsigned int degree = boost::degree(*hIt, H);
+                    unsigned int degree = boost::out_degree(*hIt, H);
                     if(degree < min_degree && degree > 0){
                         min_degree = degree;
                         min_vertex = *hIt;
@@ -423,7 +423,7 @@ public:
                 }
 
                 //gammaD-left heuristic
-                unsigned int degree = boost::degree(degree_sequence[i], _g);
+                unsigned int degree = boost::out_degree(degree_sequence[i], _g);
                 for(unsigned int k = 0; k < i; k++){
                     boost::clear_vertex(degree_sequence[k], _g);
                 }
@@ -499,7 +499,7 @@ public:
                 }
 
                 //gammaD-right heuristic
-                unsigned int degree = boost::degree(degree_sequence[i], _g);
+                unsigned int degree = boost::out_degree(degree_sequence[i], _g);
                 boost::clear_vertex(degree_sequence[i], _g);
 
                 _lb = (degree > _lb)? degree : _lb;
@@ -573,10 +573,10 @@ public:
                 }
 
                 //gammaD-min-e heuristic
-                unsigned int degree_right = boost::degree(degree_sequence[i], _g);
+                unsigned int degree_right = boost::out_degree(degree_sequence[i], _g);
                 unsigned int degree_left = 0;
                 for(unsigned int k = 0; k < i; k++){
-                    degree_left += boost::degree(degree_sequence[k], _g);
+                    degree_left += boost::out_degree(degree_sequence[k], _g);
                 }
 
                 if(degree_left < degree_right){
@@ -652,7 +652,7 @@ public:
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
                           = get_min_degree_vertex(_g, true); //ignore isolated vertices
 
-            _lb = (_lb>boost::degree(min_vertex, _g))? _lb : boost::degree(min_vertex, _g);
+            _lb = (_lb>boost::out_degree(min_vertex, _g))? _lb : boost::out_degree(min_vertex, _g);
 
             //min_d heuristic: Search a neighbour of min_vertex with minimal degree.
             typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -661,14 +661,14 @@ public:
             boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, _g);
             typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt;
             for(; nIt != nEnd; nIt++){
-                unsigned int degree = boost::degree(*nIt, _g);
+                unsigned int degree = boost::out_degree(*nIt, _g);
                 if(degree <= min_degree_w){
                     min_degree_w = degree;
                     w = *nIt;
                 }
             }
 
-            contract_edge(min_vertex, w, _g, false);
+            contract_edge(min_vertex, w, _g);
         }
 
         timer_off();
@@ -723,7 +723,7 @@ public:
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
                           = get_min_degree_vertex(_g, true); //ignore isolated vertices
 
-            _lb = (_lb>boost::degree(min_vertex, _g))? _lb : boost::degree(min_vertex, _g);
+            _lb = (_lb>boost::out_degree(min_vertex, _g))? _lb : boost::out_degree(min_vertex, _g);
 
             //min_d heuristic: Search a neighbour of min_vertex with minimal degree.
             typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -732,14 +732,14 @@ public:
             boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, _g);
             typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt;
             for(; nIt != nEnd; nIt++){
-                unsigned int degree = boost::degree(*nIt, _g);
+                unsigned int degree = boost::out_degree(*nIt, _g);
                 if(degree > max_degree){
                     max_degree = degree;
                     w = *nIt;
                 }
             }
 
-            contract_edge(min_vertex, w, _g, false);
+            contract_edge(min_vertex, w, _g);
         }
 
         timer_off();
@@ -790,7 +790,7 @@ struct degree_decrease
         _degs(d), G(g){}
 
     void operator()(vertex_descriptor v){
-        size_t degree = boost::degree(v, *G);
+        size_t degree = boost::out_degree(v, *G);
         if(degree==0){
             // unreachable
             // unconnected nodes are unreachable throught adj iterator
@@ -854,7 +854,7 @@ public:
 
             //Contract the edge between min_vertex into w.
             //Clear min_vertex and rearrange degs through callback.
-            contract_edge(min_vertex, w, _g, false, &cb);
+            contract_edge(min_vertex, w, _g, &cb);
 
             degs.reg(w);
         }
@@ -1098,7 +1098,7 @@ public:
                 typename boost::graph_traits<G_t>::vertex_descriptor w =
                               get_least_common_vertex(min_vertex, H);
 
-                contract_edge(min_vertex, w, H, false);
+                contract_edge(min_vertex, w, H);
 
                 CFG_t::improvement_algo(H, lb+1);
             }
@@ -1229,7 +1229,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){
                     Y.insert(*nIt);
                 }
 
-                std::vector<bool> disabled(boost::num_vertices(G), false);
+                std::vector<BOOL> disabled(boost::num_vertices(G), false);
                 unsigned int pos1 = get_pos(*vIt1, G);
                 unsigned int pos2 = get_pos(*vIt2, G);
 

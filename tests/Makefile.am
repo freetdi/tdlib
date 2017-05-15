@@ -28,11 +28,11 @@ check_PROGRAMS = \
 	bucket_sorter_2 \
 	bucket_sorter_2u \
 	common_out_edges \
+	pp \
 	vec2tree
 
 # these fail. known bug...
 XFAIL_TESTS = \
-	bucket_sorter_2 \
 	bucket_sorter_2u
 
 notyets = \
@@ -49,7 +49,7 @@ AM_DEFAULT_SOURCE_EXT=.cpp
 
 BUILT_SOURCES=tdlib
 
-AM_CPPFLAGS = -I. -DTRACE_UNTESTED
+AM_CPPFLAGS = -I. -DTRACE_UNTESTED -UNDEBUG
 AM_CXXFLAGS = -O0 -g
 
 tdlib:

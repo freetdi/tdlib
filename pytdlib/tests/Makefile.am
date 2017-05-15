@@ -1,5 +1,8 @@
 
 TESTS = $(LONG_TESTS) \
+	test_generic_search_CFG1.py \
+	test_generic_search_CFG2.py \
+	test_generic_search_gala.py \
 	test_approx.py \
 	test_apps.py \
 	test_bmd.py \
@@ -12,13 +15,19 @@ TESTS = $(LONG_TESTS) \
 	test_pp_fi.py \
 	test_pre.py \
 	test_sep.py
+  
 
 LONG_TESTS = \
 	test_long_approx_CFGs.py \
 	test_long_apps_CFGs.py \
 	test_long_lb_CFGs.py \
 	test_long_approx_Dimacs.py \
-	test_long_lb_Dimacs.py
+	test_long_lb_Dimacs.py \
+	test_long_approx_Zoo.py \
+	test_long_apps_Zoo.py \
+	test_long_lb_Zoo.py \
+        test_long_generic_search_Dimacs.py \
+        test_long_generic_search_Networks.py
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py
@@ -42,6 +51,9 @@ AM_TESTS_ENVIRONMENT = \
 EXTRA_DIST = \
 	$(TESTS) \
 	CFGs.py \
+	Dimacs.py \
+	Zoo.py \
+        Maxsat_small.py \
 	base.py \
 	RandomGNM_250_1000.py \
 	util.py

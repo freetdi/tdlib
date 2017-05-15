@@ -13,7 +13,7 @@ template <typename G_t>
 struct bbt_bag{
     G_t graph;
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> elim_ordering;
-    std::vector<bool> used_so_far;
+    std::vector<BOOL> used_so_far;
     unsigned int eo_width;
     bool active;
 };

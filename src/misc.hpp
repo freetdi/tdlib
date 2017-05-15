@@ -65,7 +65,7 @@ template <typename T_t>
 typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
     typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
 
     for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end;
         boost::tie(e, e_end)=boost::in_edges(t, T)){
@@ -109,7 +109,7 @@ void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::v
 {
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
 
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
     typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::find_root(T);
@@ -137,7 +137,7 @@ bool validate_connectivity(T_t &T){
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
     treedec::postorder_traversal(T, S);
 
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
     typename treedec_traits<T_t>::bag_type forgotten;
 
     while(true){
@@ -187,7 +187,7 @@ bool is_tree(G_t const& G){
     typename boost::graph_traits<G_t>::vertex_descriptor root = find_root(G);
 
     //This will not be exhaustive if 'root' is not a root.
-    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<BOOL> visited(boost::num_vertices(G), false);
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
     components.resize(1);
     t_search_components(G, root, visited, components, 0);
@@ -364,7 +364,7 @@ void make_small(T_t &T){
                     child = *tIt;
                     parent = *nIt;
 
-                    N.resize(boost::degree(*tIt, T)-1);
+                    N.resize(boost::out_degree(*tIt, T)-1);
                     unsigned int c = 0;
                     typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
                     for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){
@@ -518,7 +518,7 @@ namespace detail{
 //Converts a tree decomposition to a binary tree decomposition (all vertices have degree <= 2).
 //Complexity: Linear in the number of vertices of T.
 template <class T_t>
-void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, std::vector<bool> &visited){
+void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, std::vector<BOOL> &visited){
     typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
     typename boost::graph_traits<T_t>::vertex_descriptor c0, c1;
 
@@ -590,7 +590,7 @@ void make_binary(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t,
 
 template <typename T_t>
 void make_binary(T_t &T){
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
     detail::make_binary(T, *boost::vertices(T).first, visited);
 }
 
@@ -600,7 +600,7 @@ namespace detail{
 template <typename T_undir_t, typename T_dir_t>
 void make_rooted(T_undir_t &T, T_dir_t &T_,
                  typename boost::graph_traits<T_undir_t>::vertex_descriptor t,
-                 std::vector<bool> &visited)
+                 std::vector<BOOL> &visited)
 {
     visited[t] = true;
     typename boost::graph_traits<T_undir_t>::adjacency_iterator nIt, nEnd;
@@ -621,7 +621,7 @@ void make_rooted(T_undir_t &T, T_dir_t &T_,
         bag(new_vertex, T_) = bag(i, T);
     }
 
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
     make_rooted(T, T_, t, visited);
 }
 

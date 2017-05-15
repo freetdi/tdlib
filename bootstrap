@@ -12,7 +12,7 @@ echo "Running aclocal..."
 aclocal -Im4 || exit 1
 
 #echo "Running autoheader..."
-#autoheader || exit 1
+autoheader || exit 1
 
 echo "Running libtoolize"
 libtoolize || exit 1

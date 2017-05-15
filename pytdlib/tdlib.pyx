@@ -131,6 +131,18 @@ This module containes the following functions** :
     - get_width
         Returns the width of a given tree decomposition
 
+    - generic_elimination_search1 TODO: cleanup
+        ....
+
+    - generic_elimination_search2
+        ....
+
+    - generic_elimination_search3
+        ....
+
+    - generic_elimination_search4
+        ....
+
 AUTHOR: Lukas Larisch (now): Initial version
 -------
 """
@@ -1384,4 +1396,73 @@ def get_width(T):
     """
 
     return gc_get_width(T.vertices())
+
+
+def generic_elimination_search1(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search1(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+
+
+def generic_elimination_search2(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search2(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+
+
+def generic_elimination_search3(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search3(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+
+
+def generic_elimination_search_p17(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search_p17(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
+
+def generic_elimination_search_p17_jumper(G, max_nodes, max_orderings):
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned max_nodes_c = max_nodes
+    cdef unsigned max_orderings_c = max_orderings
+
+    gc_generic_elimination_search_p17_jumper(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 

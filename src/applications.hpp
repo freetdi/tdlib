@@ -219,7 +219,7 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         //Search for a clique of size at least 'size' by inspecting all subsets
         //of size exactly 'size' for size = max+1,max+2,..
         for(unsigned int size = max+1; size <= bag(*vIt, T).size(); size++){
-            BOOST_AUTO(P, make_subsets_iter(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
+            BOOST_AUTO(P, make_subsets_range(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
             BOOST_AUTO(I, P.first);
             bool changed = false;
 
@@ -857,7 +857,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                  *(boost::adjacent_vertices(cur, T).first);
 
-        typename boost::graph_traits<G_t>::vertex_descriptor introduced_vertex =
+//        typename boost::graph_traits<G_t>::vertex_descriptor introduced_vertex =
                                  treedec::nice::get_introduced_vertex(cur, T);
 
         std::vector<int> next_htt(boost::get<1>(results[cur][have_to_take]));
@@ -1042,7 +1042,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
                                        treedec::nice::get_forgotten_vertex(cur, T);
             unsigned int pos = get_pos(forgotten_vertex, G);
 
-            std::vector<bool> visited(results[child].size(), false);
+            std::vector<BOOL> visited(results[child].size(), false);
             unsigned int colorings_size = boost::num_vertices(G);
             for(unsigned int i = 0; i < results[child].size(); i++){
                 if(visited[i]){ continue; }

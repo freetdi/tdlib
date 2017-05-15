@@ -43,37 +43,22 @@
 #include "degree.hpp"
 #include "error.hpp"
 #include "graph_traits.hpp"
+#include "treedec_traits.hpp"
 #include "platform.hpp"
 #include "random_generators.hpp"
 #include "trace.hpp"
+#include "error.hpp"
+#include "bits/bool.hpp"
+
+#include "generic_elimination_search_overlay.hpp"
 
 
-#ifndef HAVE_MYBOOL
-#define HAVE_MYBOOL
-class mybool{ //
-public:
-	mybool() : value_(bool())
-	{
-	}
-	/* explicit */ mybool(bool const& t): value_(t) {}
-	// /* explicit */ operator bool&() { return value_; }
-	/* explicit */ operator bool() const { return value_; }
-private:
-	char value_;
-};
-#endif
-
-namespace treedec{ //
+namespace treedec{
 
 #define vertex_iterator_G typename boost::graph_traits<G>::vertex_iterator
 #define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
 
-template<typename G>
-void remove_vertex(vertex_iterator_G u, G &g)
-{
-    remove_vertex(*u, g);
-}
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
@@ -83,7 +68,6 @@ template<typename G>
 void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
-                   bool /*erase*/=false,
                    vertex_callback<vertex_descriptor_G>* cb=NULL)
 {
     adjacency_iterator_G I, E;
@@ -93,11 +77,11 @@ void contract_edge(vertex_descriptor_G v,
             bool added=boost::add_edge(target, *I, g).second;
             if(added){
                 //rebasing edge from I-v to I-target.
-            }else if(cb){
+            }
+            else if(cb){
                 //did not add, degree will drop by one.
                 (*cb)(*I);
             }
-        }else{
         }
     }
 
@@ -105,34 +89,14 @@ void contract_edge(vertex_descriptor_G v,
     assert(!boost::edge(v, target, g).second);
 }
 
-//Vertex v will remain as isolated node, unless erase.
-//If erase, v will be deleted (not collapsed).
-template<typename G>
-inline void contract_edge(vertex_iterator_G v,
-                   vertex_descriptor_G into,
-                   G &g,
-                   bool erase=false,
-                   vertex_callback<vertex_descriptor_G>* cb=NULL)
-{ untested();
-    contract_edge(*v, into, g, erase, cb);
-    if(erase){untested();
-        remove_vertex(v, g);
-    }
-}
 
-} // noboost
-
-namespace treedec{
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
 // returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
-size_t // hmm
-//typename boost::graph_traits<G_t>::edges_size_type
-make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
+void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
 {
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    size_t counter=0;
     B nIt2;
     for(; nIt1!=nEnd; ++nIt1){
 #if 1
@@ -143,23 +107,22 @@ make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NU
         nIt2 = nIt1;
         nIt2++;
         for(; nIt2 != nEnd; nIt2++){
-
             std::pair<edge_descriptor, bool> ep=boost::add_edge(*nIt1, *nIt2, G);
             if(ep.second){
-               // new edge created
-               ++counter;
-
                if(cb){
-#if 0 // doesn't work. removing center...?
-            (*cb)(*nIt1); // hmm
-            (*cb)(*nIt2); // hmm
-#endif
                    (*cb)(*nIt1, *nIt2);
                }
             }
+            if(!boost::is_directed(G)){
+            }
+            else if( boost::edge(*nIt2, *nIt1, G).second ){
+                // change later.
+            }
+            else{
+                boost::add_edge(*nIt2, *nIt1, G);
+            }
         }
     }
-    return counter;
 }
 
 template<typename nIter_t, typename G_t>
@@ -190,7 +153,7 @@ void insert_neighbours(B_t &B, V_t v, V_t w, G_t const &G)
 
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
-{ untested();
+{
     insert_neighbours(B, v, w, G);
     insert_neighbours(B, x, G);
 }
@@ -228,7 +191,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     boost::tie(vIt, vEnd) = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt++;
     for(; vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         if(degree <= min_degree){
             if(ignore_isolated_vertices && degree == 0){ continue; }
             min_degree = degree;
@@ -252,13 +215,13 @@ inline void make_degree_sequence(const G_t &G,
     unsigned int max_degree = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         max_degree = (degree>max_degree)? degree : max_degree;
     }
 
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int degree = boost::degree(*vIt, G);
+        unsigned int degree = boost::out_degree(*vIt, G);
         if(degree > 0){
             buckets[degree].push_back(*vIt);
         }
@@ -277,63 +240,13 @@ struct outedge_set;
 template <typename G_t>
 std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor,
           typename boost::graph_traits<typename graph_traits<G_t>::directed_overlay>::vertex_descriptor>
-    make_digraph_with_source_and_sink(G_t const &G, std::vector<bool> const &disabled,
+    make_digraph_with_source_and_sink(G_t const &G, std::vector<BOOL> const &disabled,
                  unsigned num_dis,
                  typename graph_traits<G_t>::directed_overlay& dg,
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y);
 
-
-namespace detail{ //
-template<class B, class T, class V>
-struct tmpbaghack{ //
-    static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v)
-    {
-        return t[v];
-    }
-    static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v)
-    {
-        return t[v];
-    }
-};
-
-template<class T_t, class V>
-struct tmpbaghack<bag_t, T_t, V>{ //
-    static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v)
-    {
-        return t[v].bag;
-    }
-    static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v)
-    {
-        return t[v].bag;
-    }
-};
-} //detail
-
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type& bag(
-	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
-        T_t& T)
-{
-    typedef typename T_t::vertex_property_type b; //>::bag_type b;
-    return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
-}
-
-template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type const& bag(
-        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
-        T_t const& T)
-{
-    typedef typename T_t::vertex_property_type b; //>::bag_type b;
-    return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
-}
-
-template<class V, class G>
-size_t bag_size(V const & v, G const& g)
-{
-    return bag(v, g).size();
-}
 
 template<class G_t>
 struct deg_chooser { //
@@ -345,20 +258,44 @@ struct deg_chooser { //
 // isolate c in g
 // return bag
 // optionally: pass pointer to bag for storage.
+
 //TODO: not here.
-template<class G>
+template<class G_t, class B_t>
 inline void detach_neighborhood(
-        typename boost::graph_traits<G>::vertex_descriptor& c,
-        G& g, typename graph_traits<G>::outedge_set_type & bag)
+        typename boost::graph_traits<G_t>::vertex_descriptor c,
+        G_t& g, typename std::set<B_t> &bag)
 {
-    typename boost::graph_traits<G>::adjacency_iterator nIt1, nIt2, nEnd;
+    assert(boost::is_undirected(g));
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
+
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
     {
         bag.insert(get_vd(g, *nIt1));
     }
     boost::clear_vertex(c, g);
 }
+
+//TODO: not here.
+template<class G_t, class B_t>
+inline void detach_neighborhood(
+        typename boost::graph_traits<G_t>::vertex_descriptor c,
+        G_t& g, typename std::vector<B_t> &bag)
+{
+    assert(boost::is_undirected(g));
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
+    // inefficient.
+
+    unsigned i = 0;
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
+    {
+        bag[i++] = get_vd(g, *nIt1);
+    }
+    boost::clear_vertex(c, g);
+}
+
 
 
 // count number of edges missing in 1-neighborhood of v
@@ -391,13 +328,13 @@ inline size_t count_missing_edges(
 // - provide memory through bag pointer.
 //
 template<class G, class B>
-size_t /*G::edge_index_type?*/ make_clique_and_detach(
+void make_clique_and_detach(
         typename boost::graph_traits<G>::vertex_descriptor c,
         G& g, B& bag,
         treedec::graph_callback<G>* cb=NULL)
 {
     detach_neighborhood(c, g, bag);
-    return make_clique(bag.begin(), bag.end(), g, cb);
+    make_clique(bag.begin(), bag.end(), g, cb);
 }
 
 namespace detail{ //
@@ -512,7 +449,6 @@ void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
         for(unsigned i=0; i<boost::num_vertices(g); ++i){
             boost::clear_vertex(i, ig);
         }
-    }else{ untested();
     }
 
     std::vector<unsigned> inverse_ordering(boost::num_vertices(g));
@@ -543,11 +479,15 @@ class is_in_neighbour_bd{ //
 public:
     is_in_neighbour_bd(T_t const& T,
         typename boost::graph_traits<T_t>::vertex_descriptor t)
-       : _T(T), _t(t) {}
+       : _T(T), _t(t)
+    {
+    }
 public:
     bool operator() (VD_t vd1, VD_t vd2)
     {
         assert(vd1!=vd2);
+        if(vd1<vd2){
+        }
 
         typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
         bag_iterator nIt, nEnd;
@@ -573,16 +513,103 @@ public: // HACK
     long unsigned a, b;
 };
 
-
 // clone subgraph induced by bag into ig.
 // store map V(H) -> X \subset V(G) in vdMap
 // add more edges for MSVS, TODO: implement properly (how?)
-//template<class G_t, class T_t, class IG_t, class M_t>
-//inline void induced_subgraph_with_extra_edges
-//(G_t const &G, IG_t& ig, // typename graph_traits<G>::immutable_type& ig,
-//       T_t const& T, typename boost::graph_traits<T_t>::vertex_descriptor bd,
-//    //   URGHS. no default types without c++11.
-//     M_t* vdMap /*=NULL*/);
+template<class G_t, class T_t, class IG_t, class M_t>
+inline void induced_subgraph_with_extra_edges
+(G_t const &G, IG_t& ig, // typename graph_traits<G>::immutable_type& ig,
+       T_t const& T, typename boost::graph_traits<T_t>::vertex_descriptor bd,
+    //   URGHS. no default types without c++11.
+     M_t* vdMap /*=NULL*/);
+
+
+// insert reverse edges.
+// dont know how to express "orientation" yet
+template<class G>
+void make_symmetric(G&g, bool force_oriented=false)
+{ untested();
+    // assert(g.is_directed);
+    auto EE=boost::edges(g);
+    if ( /*g.oriented ||*/ force_oriented) { untested();
+        for(;EE.first!=EE.second; ++EE.first){
+            auto s=boost::source(*EE.first, g);
+            auto t=boost::target(*EE.first, g);
+            boost::add_edge(t,s,g);
+        }
+    }else{ untested();
+        for(;EE.first!=EE.second; ++EE.first){
+            auto s=boost::source(*EE.first, g);
+            auto t=boost::target(*EE.first, g);
+            if(!boost::edge(s,t,g).second){ untested();
+                unreachable(); //?
+                boost::add_edge(s,t,g);
+            }else if(!boost::edge(t,s,g).second){ untested();
+                boost::add_edge(t,s,g);
+            }
+        }
+    }
+}
+
+namespace detail{
+
+template<class G, class X=void>
+struct edge_helper{
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    static size_type num(G const& g){ untested();
+        return boost::num_edges(g);
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+        add(vertex_descriptor x, vertex_descriptor y, G& g){
+
+    //std::cout << std::is_convertible<
+    //    typename boost::graph_traits<G>::directed_category, boost::directed_tag>:: value << "\n";
+
+	return boost::add_edge(x, y, g);
+    }
+};
+
+template<class G>
+struct edge_helper<G, typename std::enable_if< std::is_convertible<
+                    typename boost::graph_traits<G>::directed_category*, boost::directed_tag*
+                    >::value, void>::type > {
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    typedef typename std::enable_if< std::is_same< boost::directed_tag,
+                                typename boost::graph_traits<G>::directed_category >::value, G >::type T;
+
+    static size_type num(G const& g){
+        assert(1 ^ boost::num_edges(g)) ;
+        return boost::num_edges(g)/2;
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+        add(vertex_descriptor x, vertex_descriptor y, G& g){
+
+	boost::add_edge(y, x, g);
+	return boost::add_edge(x, y, g);
+    }
+};
+
+}
+
+template<class G>
+inline typename boost::graph_traits<G>::edges_size_type
+  num_edges(G const& g)
+{
+    
+    return detail::edge_helper<G>::num(g);
+}
+
+template<class G>
+inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
+		   typename boost::graph_traits<G>::vertex_descriptor y, G& g)
+{
+    return detail::edge_helper<G>::add(x, y, g);
+}
 
 
 } // treedec
