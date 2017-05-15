@@ -30,10 +30,12 @@ void generic_elimination_search_CFG1(G_t const &G, unsigned max_nodes, unsigned 
 
     generic_elim_DFS_test.do_it();
 
+#ifndef NDEBUG
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
     assert(A == B);
+#endif
 }
 
 template <typename G_t>
@@ -62,10 +64,12 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
 
     generic_elim_DFS_test.do_it();
 
+#ifndef NDEBUG
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
     assert(A == B);
+#endif
 }
 
 
@@ -82,10 +86,12 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
 
     generic_elim_DFS_test.do_it();
 
+#ifndef NDEBUG
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
     assert(A == B);
+#endif
 }
 
 
@@ -165,10 +171,12 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
     generic_elim_DFS_test.do_it();
 
+#ifndef NDEBUG
     G_t H(G);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
     assert(A == B);
+#endif
 }
 
 template <typename G_t>
@@ -261,8 +269,7 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
         return;
     }
 
-    unsigned rnd_cnt = 0;
-
+    //unsigned rnd_cnt = 0;
     //std::srand ( unsigned ( std::time(0) ) );
 
 
@@ -298,10 +305,12 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
     end = clock();
     std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
 
+#ifndef NDEBUG
     G_t H(G2);
     size_t A=ub;
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, best);
     assert(A == B);
+#endif
 }
 
 } //namespace treedec

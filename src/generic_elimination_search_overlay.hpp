@@ -66,8 +66,7 @@ struct outedge_resize<baluo>{
 static void do_it(typename boost::graph_traits<baluo>::vertex_descriptor x,
 		 size_t size, baluo& g)
 {
-    auto deg = boost::out_degree(x, g);
-    assert(deg>=size);
+    assert(boost::out_degree(x, g)>=size);
     auto P=pcnt(size);
     boost::remove_out_edge_if(x, P, g);
     assert( size == boost::out_degree(x, g));
@@ -337,16 +336,17 @@ void treedec::gen_search::overlay<A, B, C>::reset_neigh(vertex_descriptor v)
     }
     assert(_degree[v]==reverse.size());
 
-    auto nv=boost::num_vertices(_g);
     auto reverseit=reverse.rbegin();
     auto p2=adjacent_vertices(v); // use p2...
     for(; p2.first!=p2.second; ++p2.first){
         assert(*reverseit+1>=0);
+#ifndef NDEBUG
         auto olddegree=boost::out_degree(*p2.first, _og);
+#endif
         detail::delete_top_edges(_og, *p2.first, *reverseit + 1);
         assert(boost::out_degree(*p2.first, _og) == olddegree - *reverseit - 1);
         _degree[*p2.first] -= *reverseit;
-        assert(_degree[*p2.first]<nv);
+        assert(_degree[*p2.first]<boost::num_vertices(_g));
         ++reverseit;
     }
 } // reset;
