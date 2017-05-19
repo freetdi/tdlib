@@ -139,7 +139,7 @@ public:
                                       //it toghether with an arbitrary bag.
 
             if(1){
-                for(auto bIt = _b[u].begin(); bIt != _b[u].end(); bIt++){
+                for(auto bIt = _b[u].second.begin(); bIt != _b[u].second.end(); bIt++){
                     unsigned pos = get_pos(*bIt, _g);
                     unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                     if(index < min_index){
@@ -170,7 +170,9 @@ public:
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
 #if 1
-            bag_to_treedec(_b[u], _t, u);
+            bag_to_treedec(_b[u].second, _t, u);
+            trace2("THERE", u, _o[u]);
+            assert(_o[u]==_b[u].first);
             insert(bag(u, _t), _o[u]); //printer variant without this inserting?
 #else // obsolete. probably
                 incomplete();
@@ -211,7 +213,7 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
     // turn that into a numbering...
     typedef draft::NUMBERING_1<G_t> numbering_type;
     draft::NUMBERING_1<G_t> n(boost::num_vertices(G));
-    for(unsigned i=0; i<n_; ++i){ untested();
+    for(unsigned i=0; i<n_; ++i){ itested();
         n.put(O[i]);
         n.increment();
     }
@@ -535,12 +537,18 @@ template <typename G_t, typename V_t, typename T_t>
 void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
 {
     unsigned n = O.size();
+    typedef unsigned vertex_descriptor; // BUG
 
-    typename std::vector<typename treedec_traits<T_t>::bag_type> bags(n);
+    typename std::vector<
+        std::pair<vertex_descriptor,
+        typename treedec_traits<T_t>::bag_type>
+            > bags(n);
 
+    // stuff center and friends into "skeleton"
     for(unsigned int i = 0; i < O.size(); i++){
-        make_clique_and_detach(O[i], G, bags[i]);
-//        bags[i].insert(O[i]);
+        bags[i].first = O[i];
+        make_clique_and_detach(O[i], G, bags[i].second);
+        trace2("HERE", i, O[i]);
     }
 
     treedec::detail::skeleton_to_treedec(G, T, bags, O, n);
