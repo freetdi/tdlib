@@ -86,23 +86,7 @@ class skeleton_helper{
 public:
     skeleton_helper(G_t const &G, T_t &T, B_t const &B, N_t const &numbering, unsigned n)
       : _g(G), _t(T), _b(B), _numbering(numbering), _n(n)
-    {
-        _o = std::vector<unsigned>(boost::num_vertices(G), n+1);
-    }
-
-    void create_ordering(){
-        // from numbering.
-        auto b=boost::vertices(_g);
-        for(; b.first!=b.second; ++b.first){
-            if(_numbering.is_numbered(*b.first)){
-                assert(_numbering.get_position(*b.first)<_n);
-                _o[_numbering.get_position(*b.first)]=*b.first;
-            }else{
-            }
-        }
-        for(auto i: _o){
-            trace1("order reconstruct", i);
-        }
+    { untested();
     }
 
     template <typename X_t>
@@ -123,8 +107,6 @@ public:
         }else{
         }
 
-        create_ordering();
-
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
             boost::add_vertex(_t);
@@ -138,29 +120,13 @@ public:
             unsigned min_index = max; //note: if there's an empty bag, we can glue
                                       //it toghether with an arbitrary bag.
 
-            if(1){
-                for(auto bIt = _b[u].second.begin(); bIt != _b[u].second.end(); bIt++){
-                    unsigned pos = get_pos(*bIt, _g);
-                    unsigned index = _numbering.get_position( /*idmap?!*/ pos);
-                    if(index < min_index){
-                        min_index = index;
-                    }else{
-                    }
+            for(auto bIt = _b[u].second.begin(); bIt != _b[u].second.end(); bIt++){
+                unsigned pos = get_pos(*bIt, _g);
+                unsigned index = _numbering.get_position( /*idmap?!*/ pos);
+                if(index < min_index){
+                    min_index = index;
+                }else{
                 }
-            }else{ untested();
-                incomplete();
-#if 0 // obsolete. probably
-                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                auto p=boost::adjacent_vertices(_o[u], _g);
-                for(;p.first!=p.second;++p.first){
-                    unsigned pos = get_pos(*p.first, _g);
-                    unsigned index = _inv_o[pos];
-                    if(index < min_index){
-                        min_index = index;
-                    }else{
-                    }
-                }
-#endif
             }
             //(min_index, u) will lead to a connected directed graph, if G_t is
             //directed.
@@ -169,18 +135,9 @@ public:
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
-#if 1
             bag_to_treedec(_b[u].second, _t, u);
-            trace2("THERE", u, _o[u]);
-            assert(_o[u]==_b[u].first);
-            insert(bag(u, _t), _o[u]); //printer variant without this inserting?
-#else // obsolete. probably
-                incomplete();
-                typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
-                    insert(bag(u, _t), _o[u]); // BUG?!
-                }
-#endif
+            trace2("THERE", u, _b[u].first);
+            insert(bag(u, _t), _b[u].first); //printer variant without this inserting?
         }
     }
 
@@ -190,16 +147,13 @@ private:
     B_t const &_b;
     N_t const &_numbering;
     unsigned _n;
-
-    std::vector<unsigned int> _o; //??
-
 }; // skeleton_helper
 
 #if 0 // WIP
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void graph_and_numbering_to_treedec(G_t &const G, N const& numbering)
+void graph_and_numbering_to_treedec(G_t &const G, B_t const& B, N const& numbering)
 { untested();
-    skeleton_helper<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
+    skeleton_helper<G_t, T_t, B_t, O_t> S(G, T, B, O, n_);
     S.do_it();
 }
 #endif
