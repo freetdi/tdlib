@@ -81,21 +81,24 @@ namespace detail{
 
 // NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
 // if B is not provided
-template <typename G_t, typename T_t, typename B_t, typename O_t>
+template <typename G_t, typename T_t, typename B_t, typename N_t>
 class skeleton_helper{
 public:
-    skeleton_helper(G_t const &G, T_t &T, B_t const *B, O_t const &O, unsigned n)
-      : _g(G), _t(T), _b(B), _o(O), _n(n)
+    skeleton_helper(G_t const &G, T_t &T, B_t const *B, N_t const &numbering, unsigned n)
+      : _g(G), _t(T), _b(B), _numbering(numbering), _n(n)
     {
-        _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
+        _o = std::vector<unsigned>(boost::num_vertices(G), n);
     }
 
-    void create_inverse_ordering(){
-        // AKA "numbering"
-        for(unsigned u = 0; u < _n; u++){
-            typename treedec_chooser<G_t>::value_type e=_o[u];
-            unsigned pos = get_pos(e, _g);
-            _inv_o[pos] = u;
+    void create_ordering(){
+        // from numbering.
+        auto b=boost::vertices(_g);
+        for(; b.first!=b.second; ++b.first){
+            if(_numbering.is_numbered(*b.first)){
+                assert(_numbering.get_position(*b.first)<_n);
+                _o[_numbering.get_position(*b.first)]=*b.first;
+            }else{
+            }
         }
     }
 
@@ -117,7 +120,7 @@ public:
         }else{
         }
 
-        create_inverse_ordering();
+        create_ordering();
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
@@ -135,13 +138,15 @@ public:
             if(_b != NULL){
                 for(auto bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
                     unsigned pos = get_pos(*bIt, _g);
-                    unsigned index = _inv_o[pos];
+                    unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                     if(index < min_index){
                         min_index = index;
                     }else{
                     }
                 }
             }else{ untested();
+                incomplete();
+#if 0 // obsolete. probably
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 auto p=boost::adjacent_vertices(_o[u], _g);
                 for(;p.first!=p.second;++p.first){
@@ -152,6 +157,7 @@ public:
                     }else{
                     }
                 }
+#endif
             }
             //(min_index, u) will lead to a connected directed graph, if G_t is
             //directed.
@@ -163,10 +169,13 @@ public:
             if(_b != NULL){
                 bag_to_treedec((*_b)[u], _t, u);
             }else{ untested();
+                incomplete();
+#if 0 // obsolete. probably
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
                     insert(bag(u, _t), _o[u]); // BUG?!
                 }
+#endif
             }
             insert(bag(u, _t), _o[u]); //printer variant without this inserting?
         }
@@ -176,10 +185,11 @@ private:
     G_t const &_g;
     T_t &_t;
     B_t const *_b;
-    O_t const &_o;
+    N_t const &_numbering;
     unsigned _n;
 
-    std::vector<unsigned int> _inv_o;
+    std::vector<unsigned int> _o; //??
+
 }; // skeleton_helper
 
 #if 0 // WIP
@@ -191,10 +201,21 @@ void graph_and_numbering_to_treedec(G_t &const G, N const& numbering)
 }
 #endif
 
+// create a treedecomposition of G from n_ bags B[0] ... B[n-1],
+// but also put _o[i] into the ith bag.
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsigned n_)
 { untested();
-    skeleton_helper<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
+
+    // turn that into a numbering...
+    typedef draft::NUMBERING_1<G_t> numbering_type;
+    draft::NUMBERING_1<G_t> n(boost::num_vertices(G));
+    for(unsigned i=0; i<n_; ++i){ untested();
+        n.put(O[i]);
+        n.increment();
+    }
+
+    skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, &B, n, n_);
     S.do_it();
 }
 
