@@ -84,10 +84,10 @@ namespace detail{
 template <typename G_t, typename T_t, typename B_t, typename N_t>
 class skeleton_helper{
 public:
-    skeleton_helper(G_t const &G, T_t &T, B_t const *B, N_t const &numbering, unsigned n)
+    skeleton_helper(G_t const &G, T_t &T, B_t const &B, N_t const &numbering, unsigned n)
       : _g(G), _t(T), _b(B), _numbering(numbering), _n(n)
     {
-        _o = std::vector<unsigned>(boost::num_vertices(G), n);
+        _o = std::vector<unsigned>(boost::num_vertices(G), n+1);
     }
 
     void create_ordering(){
@@ -99,6 +99,9 @@ public:
                 _o[_numbering.get_position(*b.first)]=*b.first;
             }else{
             }
+        }
+        for(auto i: _o){
+            trace1("order reconstruct", i);
         }
     }
 
@@ -135,8 +138,8 @@ public:
             unsigned min_index = max; //note: if there's an empty bag, we can glue
                                       //it toghether with an arbitrary bag.
 
-            if(_b != NULL){
-                for(auto bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
+            if(1){
+                for(auto bIt = _b[u].begin(); bIt != _b[u].end(); bIt++){
                     unsigned pos = get_pos(*bIt, _g);
                     unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                     if(index < min_index){
@@ -166,25 +169,23 @@ public:
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
-            if(_b != NULL){
-                bag_to_treedec((*_b)[u], _t, u);
-            }else{ untested();
+#if 1
+            bag_to_treedec(_b[u], _t, u);
+            insert(bag(u, _t), _o[u]); //printer variant without this inserting?
+#else // obsolete. probably
                 incomplete();
-#if 0 // obsolete. probably
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
                     insert(bag(u, _t), _o[u]); // BUG?!
                 }
 #endif
-            }
-            insert(bag(u, _t), _o[u]); //printer variant without this inserting?
         }
     }
 
 private:
     G_t const &_g;
     T_t &_t;
-    B_t const *_b;
+    B_t const &_b;
     N_t const &_numbering;
     unsigned _n;
 
@@ -214,8 +215,18 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
         n.put(O[i]);
         n.increment();
     }
+#ifndef NDEBUG
+        auto b=boost::vertices(G);
+        for(; b.first!=b.second; ++b.first){
+            if(n.is_numbered(*b.first)){
+                assert(n.get_position(*b.first)<n_);
+                assert(O[n.get_position(*b.first)]==*b.first);
+            }else{
+            }
+        }
+#endif
 
-    skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, &B, n, n_);
+    skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, B, n, n_);
     S.do_it();
 }
 
@@ -529,6 +540,7 @@ void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
 
     for(unsigned int i = 0; i < O.size(); i++){
         make_clique_and_detach(O[i], G, bags[i]);
+//        bags[i].insert(O[i]);
     }
 
     treedec::detail::skeleton_to_treedec(G, T, bags, O, n);
