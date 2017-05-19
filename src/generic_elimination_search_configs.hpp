@@ -103,7 +103,7 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &, unsigned )
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -171,7 +171,7 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &, unsigned )
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -235,7 +235,7 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &, unsigned )
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -310,7 +310,7 @@ struct CFG_DFS_p17 : generic_elimination_search_DFS<G_t, CFG_DFS_p17<G_t, CFGT>,
 
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &elim_ordering, unsigned depth)
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &, unsigned )
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){
@@ -361,12 +361,12 @@ struct CFG_DFS_p17_2 : generic_elimination_search_DFS<G_t, CFG_DFS_p17_2<G_t, CF
         return "CFG_DFS_p17_2";
     }
 
-    static unsigned initial_lb_algo(const G_t &G)
+    static unsigned initial_lb_algo(const G_t &)
     {
         return 0;
     }
 
-    static unsigned initial_ub_algo(const G_t &G, std::vector<vd> &O)
+    static unsigned initial_ub_algo(const G_t &, std::vector<vd> &)
     {
         return UINT_MAX;
     }

@@ -66,6 +66,7 @@
 #include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
+#include "skeleton.hpp"
 
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
 # include "minimum_degree_ordering.hpp"
@@ -75,8 +76,7 @@
 
 namespace treedec{ //
 
-// FIXME: move to detail header.
-// or to greedy_heuristics class?
+// FIXME: move to skeleton.hpp
 namespace detail{
 
 // NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
@@ -120,8 +120,9 @@ public:
             unsigned min_index = max; //note: if there's an empty bag, we can glue
                                       //it toghether with an arbitrary bag.
 
-            for(auto bIt = _b[u].second.begin(); bIt != _b[u].second.end(); bIt++){
-                unsigned pos = get_pos(*bIt, _g);
+            auto b=boost::get(treedec::bag_t(), u, _b);
+            for(auto bIt : b ){
+                unsigned pos = get_pos(bIt, _g);
                 unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                 if(index < min_index){
                     min_index = index;
@@ -134,10 +135,14 @@ public:
         }
 
         //Bag for the u-th elimination vertex will be stored in T[u].
-        for(unsigned u = 0; u < _n; u++){
-            bag_to_treedec(_b[u].second, _t, u);
-            trace2("THERE", u, _b[u].first);
-            insert(bag(u, _t), _b[u].first); //printer variant without this inserting?
+        auto p=::boost::vertices(_b);
+        size_t u=0;
+        for(; p.first!=p.second; ++p.first){
+            auto b=boost::get(treedec::bag_t(), *p.first, _b);
+            auto v=boost::get(boost::vertex_owner, *p.first, _b);
+            bag_to_treedec(b, _t, u);
+            insert(bag(u, _t), v);
+            ++u;
         }
     }
 
@@ -160,6 +165,7 @@ void graph_and_numbering_to_treedec(G_t &const G, B_t const& B, N const& numberi
 
 // create a treedecomposition of G from n_ bags B[0] ... B[n-1],
 // but also put _o[i] into the ith bag.
+// this is probably obsolete.
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsigned n_)
 { untested();
@@ -172,14 +178,14 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
         n.increment();
     }
 #ifndef NDEBUG
-        auto b=boost::vertices(G);
-        for(; b.first!=b.second; ++b.first){
-            if(n.is_numbered(*b.first)){
-                assert(n.get_position(*b.first)<n_);
-                assert(O[n.get_position(*b.first)]==*b.first);
-            }else{
-            }
+    auto b=boost::vertices(G);
+    for(; b.first!=b.second; ++b.first){
+        if(n.is_numbered(*b.first)){
+            assert(n.get_position(*b.first)<n_);
+            assert(O[n.get_position(*b.first)]==*b.first);
+        }else{
         }
+    }
 #endif
 
     skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, B, n, n_);

@@ -133,8 +133,8 @@ template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFG_t, CFGT_t>& o)
     : baseclass(o), // good idea?!
-      _g(o._g),
       _active(o._active),
+      _g(o._g),
       _best_ordering(o._best_ordering),
       _current_ordering(o._current_ordering),
       _global_lb(o._global_lb),
