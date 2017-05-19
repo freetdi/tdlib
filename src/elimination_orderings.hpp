@@ -82,15 +82,16 @@ namespace detail{
 // NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
 // if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-class skeleton{
+class skeleton_helper{
 public:
-    skeleton(G_t &G, T_t &T, B_t *B, O_t &O, unsigned n)
+    skeleton_helper(G_t const &G, T_t &T, B_t const *B, O_t const &O, unsigned n)
       : _g(G), _t(T), _b(B), _o(O), _n(n)
     {
         _inv_o = std::vector<unsigned>(boost::num_vertices(G), n+1);
     }
 
-    void inverse_ordering(){
+    void create_inverse_ordering(){
+        // AKA "numbering"
         for(unsigned u = 0; u < _n; u++){
             typename treedec_chooser<G_t>::value_type e=_o[u];
             unsigned pos = get_pos(e, _g);
@@ -99,12 +100,12 @@ public:
     }
 
     template <typename X_t>
-    void bag_to_treedec(std::set<X_t> &b, T_t &T, unsigned idx){
+    void bag_to_treedec(std::set<X_t> const &b, T_t &T, unsigned idx){
         bag(idx, T) = MOVE(b);
     }
 
     template <typename X_t>
-    void bag_to_treedec(std::vector<X_t> &b, T_t &T, unsigned idx){
+    void bag_to_treedec(std::vector<X_t> const &b, T_t &T, unsigned idx){
         for(auto bIt = b.begin(); bIt != b.end(); bIt++){
             insert(bag(idx, T), *bIt);
         }
@@ -113,9 +114,10 @@ public:
     void do_it(){
         if(_n == 0){
             return;
+        }else{
         }
 
-        inverse_ordering();
+        create_inverse_ordering();
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         for(unsigned u = 0; u < _n; u++){
@@ -134,14 +136,21 @@ public:
                 for(auto bIt = (*_b)[u].begin(); bIt != (*_b)[u].end(); bIt++){
                     unsigned pos = get_pos(*bIt, _g);
                     unsigned index = _inv_o[pos];
-                    min_index = (index < min_index)? index : min_index;
+                    if(index < min_index){
+                        min_index = index;
+                    }else{
+                    }
                 }
             }else{ untested();
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(_o[u], _g); nIt != nEnd; ++nIt){
-                    unsigned pos = get_pos(*nIt, _g);
+                auto p=boost::adjacent_vertices(_o[u], _g);
+                for(;p.first!=p.second;++p.first){
+                    unsigned pos = get_pos(*p.first, _g);
                     unsigned index = _inv_o[pos];
-                    min_index = (index < min_index)? index : min_index;
+                    if(index < min_index){
+                        min_index = index;
+                    }else{
+                    }
                 }
             }
             //(min_index, u) will lead to a connected directed graph, if G_t is
@@ -166,18 +175,26 @@ public:
 private:
     G_t const &_g;
     T_t &_t;
-    B_t *_b;
-    O_t &_o;
+    B_t const *_b;
+    O_t const &_o;
     unsigned _n;
 
     std::vector<unsigned int> _inv_o;
-};
+}; // skeleton_helper
 
+#if 0 // WIP
+template <typename G_t, typename T_t, typename B_t, typename O_t>
+void graph_and_numbering_to_treedec(G_t &const G, N const& numbering)
+{ untested();
+    skeleton_helper<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
+    S.do_it();
+}
+#endif
 
 template <typename G_t, typename T_t, typename B_t, typename O_t>
-void skeleton_to_treedec(G_t &G, T_t &T, B_t &B, O_t &O, unsigned n_)
-{
-    skeleton<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
+void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsigned n_)
+{ untested();
+    skeleton_helper<G_t, T_t, B_t, O_t> S(G, T, &B, O, n_);
     S.do_it();
 }
 
