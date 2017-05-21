@@ -2,6 +2,7 @@
 TESTS = $(LONG_TESTS) \
 	test_generic_search_CFG1.py \
 	test_generic_search_CFG2.py \
+	test_generic_search_p17.py \
 	test_generic_search_gala.py \
 	test_approx.py \
 	test_apps.py \
