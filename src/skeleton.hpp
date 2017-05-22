@@ -63,7 +63,7 @@ template<class VD, class B>
 std::pair<typename std::vector< std::pair<VD, B> >::const_iterator,
           typename std::vector< std::pair<VD, B> >::const_iterator >
 vertices( std::vector< std::pair<VD, B> > const& skel )
-{ untested();
+{
     return std::make_pair(skel.begin(), skel.end());
 }
 
@@ -101,7 +101,7 @@ class skeleton_helper{
 public:
     skeleton_helper(G_t const &G, T_t &T, B_t const &B, N_t const &numbering, unsigned n)
       : _g(G), _t(T), _b(B), _numbering(numbering), _n(n)
-    { untested();
+    {
     }
 
     template <typename X_t>
@@ -183,7 +183,7 @@ void graph_and_numbering_to_treedec(G_t &const G, B_t const& B, N const& numberi
 // this is probably obsolete.
 template <typename G_t, typename T_t, typename B_t, typename O_t>
 void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsigned n_)
-{ untested();
+{
 
     // turn that into a numbering...
     typedef draft::NUMBERING_1<G_t> numbering_type;

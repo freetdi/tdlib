@@ -65,7 +65,7 @@ public:
         }
     }
 
-    void tree_decomposition(){ untested();
+    void tree_decomposition(){
         assert(_t);
         assert(_o->size()<=_bags.size()); // this is obsolete anyway
         assert(_o->size()==_num_vert); // this is relevant.
