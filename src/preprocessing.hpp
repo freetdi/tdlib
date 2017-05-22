@@ -218,7 +218,9 @@ public:
         : algo1("pp"), _g(G),
           _id(boost::get(boost::vertex_index, _g)),
           _degree( /*MOVE*/ (deg_vector_init(_degree, boost::num_vertices(_g), _g, _id) )),
-          _degreemap(boost::make_iterator_property_map(&_degree[0], _id, _degree[0])),
+          _degreemap(boost::make_iterator_property_map(_degree.data(),
+                                                       _id,
+                                                       vertices_size_type())),
           _degs(_g, _degreemap),
           _num_edges(boost::num_edges(_g)),
           _marker(boost::num_vertices(_g)),
@@ -270,8 +272,6 @@ public:
             auto& B=boost::get<1>(bags.back());
             boost::get<0>(bags.back()) = v;
 
-            trace1("BBBBBBBBBBB", v);
-
             // yes, need boost::
             auto Is=boost::adjacent_vertices(v, _g);
             for(; Is.first!=Is.second; ++Is.first){
@@ -280,7 +280,6 @@ public:
                         // num(v) < num(Is.first)
                         // thats why boost numbers reverse?
                     B.insert(*Is.first);
-                    trace1("BBBBBBBBBBB", *Is.first);
                 }else{ untested();
                 }
             }
@@ -330,14 +329,16 @@ public:
         size_t subgraph_nv=boost::num_vertices(_g)-_elims.size();
         gg = GG(subgraph_nv);
         m.resize(subgraph_nv);
+        trace2("gsc", _elims.size(), subgraph_nv);
 
         auto p=boost::vertices(_g);
         vertices_size_type seek=0;
-        for(; p.first!=p.second; ++p.first){ untested();
-            if(_numbering.is_numbered(*p.first)){ untested();
+        for(; p.first!=p.second; ++p.first){ itested();
+            if(_numbering.is_numbered(*p.first)){ itested();
                 continue; // fixme. not here.
                           // use induced subgraph, or boost::filtered_graph.
             }else{ untested();
+                assert(seek<m.size());
                 m[seek++]=*p.first;
             }
 
@@ -1423,7 +1424,8 @@ void preprocessing<G_t, CFG>::do_it()
     auto E=B.end();
     for(; I!=E; ++I){
         _elims.push_back(*I);
-        // no need to number...
+        _numbering.put(*I);
+        _numbering.increment();
     }
 
     unsigned min_ntd = 1;

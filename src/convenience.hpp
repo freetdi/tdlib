@@ -97,7 +97,7 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
 
 template <typename G_t>
 void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_orderings)
-{
+{ untested();
     std::cout << "edges before PP: " << boost::num_edges(G) << std::endl;
     std::cout << "vertices before PP: " << boost::num_vertices(G) << std::endl;
 
@@ -106,7 +106,8 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
     std::vector<size_t> m;
 
-    PP.get_subgraph_copy(G, m);
+    G_t H;
+    PP.get_subgraph_copy(H, m);
 
     std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
 
@@ -125,22 +126,22 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
     }
 #endif
 
-    if(boost::num_vertices(G) == 0){
+    if(boost::num_vertices(H) == 0){
         std::cout << "fully reduced by PP!" << std::endl;
         return;
     }
 
-    std::cout << "edges after PP: " << boost::num_edges(G) << std::endl;
-    std::cout << "vertices after PP: " << boost::num_vertices(G) << std::endl;
+    std::cout << "edges after PP: " << boost::num_edges(H) << std::endl;
+    std::cout << "vertices after PP: " << boost::num_vertices(H) << std::endl;
 
     typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> ord_type;
-    ord_type ordering(boost::num_vertices(G));
-    ord_type cur_ordering(boost::num_vertices(G));
+    ord_type ordering(boost::num_vertices(H));
+    ord_type cur_ordering(boost::num_vertices(H));
 
-    std::vector<BOOL> active(boost::num_vertices(G), true);
+    std::vector<BOOL> active(boost::num_vertices(H), true);
 
     gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
-       generic_elim_DFS_test (G /* ... more? */);
+       generic_elim_DFS_test (H /* ... more? */);
 
     //gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_2 >
     //   generic_elim_DFS_test
@@ -155,10 +156,13 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
     generic_elim_DFS_test.do_it();
 
 #ifndef NDEBUG
-    G_t H(G);
+    {
+    G_t H;
+    PP.get_subgraph_copy(H, m);
     size_t A=generic_elim_DFS_test.global_upper_bound_bagsize();
     size_t B=treedec::get_bagsize_of_elimination_ordering(H, generic_elim_DFS_test.ordering());
     assert(A == B);
+    }
 #endif
 }
 

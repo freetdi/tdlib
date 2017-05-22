@@ -31,7 +31,6 @@ public:
 	      _idmap(idmap_type() )
 	{
 		trace1("NUMBERING_1", _data.size());
-		assert(boost::num_vertices(g));
 		increment();
 	}
 #if 0 // later?
