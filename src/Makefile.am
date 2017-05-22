@@ -23,6 +23,7 @@ pkginclude_HEADERS = \
   exact_cutset.hpp \
   exact.hpp \
   fill.hpp \
+  generic_base.hpp \
   generic_elimination_search_configs.hpp \
   generic_elimination_search.hpp \
   graph.hpp \
