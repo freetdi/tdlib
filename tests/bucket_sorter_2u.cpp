@@ -51,5 +51,9 @@ int main(){
 	std::cout<< B[1].top() << "\n";
 	auto top2=B[1].top();
 
-	assert(top1 == 2 || top2 == 2);
+	if(top1 == 2 || top2 == 2){
+		// that would be nice
+	}else{
+		return 1;
+	}
 }
