@@ -49,7 +49,10 @@
 #include "overlay.hpp"
 #include "container_traits.hpp"
 
+#ifdef HAVE_STX_BTREE_SET_H
 #include <stx/btree_set>
+#endif
+
 #include <boost/container/flat_set.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 /// HACK
