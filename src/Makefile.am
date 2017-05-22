@@ -1,5 +1,6 @@
 SUBDIRS = \
-  impl
+	bits \
+	impl
 
 pkginclude_HEADERS = \
   algo.hpp \
