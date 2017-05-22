@@ -103,7 +103,8 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
         return 0;
     }
 
-    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned &idx, const std::vector<vd> &, unsigned )
+    static vd next(const G_t & /*G*/, const std::vector<BOOL> &active, unsigned
+            &idx, const std::vector<vd> &, unsigned )
     {
         for(; idx < active.size(); ++idx){
             if(active[idx]){

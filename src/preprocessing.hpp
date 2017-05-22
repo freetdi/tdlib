@@ -302,6 +302,7 @@ public:
 #endif
         assert(bags.size()==_elims.size());
     }
+    // legacy support. don't use. don't touch.
     template<class GG>
     void get_graph(GG& gg) {
         assert(boost::is_directed(_g));
@@ -319,6 +320,36 @@ public:
         assert(boost::num_edges(gr)*2 == boost::num_edges(_g));
         gg=gr; //MOVE(gr);
         assert(boost::num_edges(gg)*2 == boost::num_edges(_g));
+    }
+    // the remaining subgraph and a vertex map subgraph->graph
+    template<class GG, class M>
+    void get_subgraph_copy(GG& gg, M& m) { untested();
+        assert(boost::is_directed(_g));
+        assert(boost::num_vertices(gg)==0);
+
+        size_t subgraph_nv=boost::num_vertices(_g)-_elims.size();
+        gg = GG(subgraph_nv);
+        m.resize(subgraph_nv);
+
+        auto p=boost::vertices(_g);
+        vertices_size_type seek=0;
+        for(; p.first!=p.second; ++p.first){ untested();
+            if(_numbering.is_numbered(*p.first)){ untested();
+                continue; // fixme. not here.
+                          // use induced subgraph, or boost::filtered_graph.
+            }else{ untested();
+                m[seek++]=*p.first;
+            }
+
+            auto q=adjacent_vertices(*p.first); // sic!
+            for(; q.first!=q.second; ++q.first){ untested();
+                assert(*p.first!=*q.first);
+                if(*p.first<*q.first){
+                    treedec::add_edge(*p.first, *q.first, gg);
+                }else{
+                }
+            }
+        }
     }
     int get_treewidth() {
         return int(_lb_bs)-1;

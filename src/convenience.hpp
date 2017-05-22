@@ -104,17 +104,13 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
     impl::preprocessing<G_t> PP(G);
     PP.do_it();
 
-    std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > bags;
+    std::vector<size_t> m;
 
-    PP.get_bags(bags); // we don't need them!
-    PP.get_graph(G);
+    PP.get_subgraph_copy(G, m);
 
     std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
 
-
+#if 0 // does not work.
     bool cond = true;
     while(cond){
         cond = false;
@@ -127,6 +123,7 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
             }
         }
     }
+#endif
 
     if(boost::num_vertices(G) == 0){
         std::cout << "fully reduced by PP!" << std::endl;
@@ -141,20 +138,6 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
     ord_type cur_ordering(boost::num_vertices(G));
 
     std::vector<BOOL> active(boost::num_vertices(G), true);
-
-/*
-#ifdef HAVE_GALA_NOTYET
-    typedef gala::graph<std::vector, std::vector, uint32_t> ssg_vec_vec32i;
-
-    typedef G_t Underlying_t;
-    typedef ssg_vec_vec32i  Overlay_t;
-
-    overlay<Underlying_t, Overlay_t> olay(G, active);
-#else
-
-//    gen_search::overlay<Underlying_t, Overlay_t> olay(G);
-#endif
-*/
 
     gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
        generic_elim_DFS_test (G /* ... more? */);
