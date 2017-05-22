@@ -6,9 +6,11 @@
 #endif
 
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/iterator/filter_iterator.hpp>
 #include <stack>
 
 #include "iter.hpp"
+#include "marker.hpp"
 #include "trace.hpp"
 
 namespace treedec{

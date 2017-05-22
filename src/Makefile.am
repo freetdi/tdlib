@@ -8,7 +8,6 @@ pkginclude_HEADERS = \
   branch_decomposition.hpp \
   bucket_sorter_bits.hpp \
   bucket_sorter.hpp \
-  bucket_sorter.hpp.orig \
   combinations.hpp \
   config_traits.hpp \
   container.hpp \
@@ -27,14 +26,15 @@ pkginclude_HEADERS = \
   generic_base.hpp \
   generic_elimination_search_configs.hpp \
   generic_elimination_search.hpp \
+  generic_elimination_search_overlay.hpp \
   graph.hpp \
   graph_traits.hpp \
   grparse.h \
   iter.hpp \
   lower_bounds.hpp \
   marker.hpp \
+  marker_util.hpp \
   minimum_degree_ordering.hpp \
-  minimum_degree_ordering.hpp.orig \
   misc.hpp \
   network_flow.hpp \
   nice_decomposition.hpp \
@@ -56,3 +56,7 @@ pkginclude_HEADERS = \
   treedec_traits.hpp \
   upper_bounds.hpp \
   validation.hpp
+
+EXTRA_DIST = \
+  bucket_sorter.hpp.orig \
+  minimum_degree_ordering.hpp.orig
