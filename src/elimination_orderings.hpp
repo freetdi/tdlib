@@ -621,7 +621,7 @@ void treedec_to_ordering(T_t &T,
 //the cliques in C and the additional edges in F.
 template <typename G_t>
 void make_filled_graph(G_t &G,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
+      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> const &elim_ordering,
       std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &C,
       std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > &F)
 {

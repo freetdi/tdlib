@@ -340,31 +340,43 @@ inline void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_t
     }
 }
 
-/* minimalChordal-algorithm
- *
- * Computes possibly redundant fill-in-edges and runs LEX-M to check,
- * if the graph after removal of a fill-in-edge is chordal.
- * Finally, the algorithm computes a new perfect elimination ordering, that
- * possibly causes lower width than 'old_elimination_ordering'.
- */
-template <typename G_t, class O_t>
-void minimalChordal(G_t &G,
-     O_t& old_elimination_ordering,
-     O_t& new_elimination_ordering)
+namespace impl {
+
+template <typename G_t, typename O_t, template<class GG, class ...> class CFGT>
+class minimalChordal{
+
+public:
+    minimalChordal(G_t& g, O_t& o)
+        : _g(g), _o(o)
+    { untested();
+    }
+public:
+    void do_it();
+    O_t const& ordering() const {return _no;}
+
+private:
+    G_t& _g;
+    O_t const& _o;
+    O_t _no;
+};
+
+template <typename G_t, typename O_t, template<class GG, class ...> class CFGT>
+inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
 {
-    //Make 'G' a filled-in graph according to 'old_elimination_ordering'. This operation stores
+    _no.resize(_o.size());
+    //Make 'G' a filled-in graph according to '_o'. This operation stores
     //all new edges in F.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
     std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > F;
-    treedec::make_filled_graph(G, old_elimination_ordering, C, F);
+    treedec::make_filled_graph(_g, _o, C, F);
 
-    for(int i = old_elimination_ordering.size()-1; i >= 0; i--){
+    for(int i = _o.size()-1; i >= 0; i--){
         //Checks if F[i][j] is an candidate edge. If this is the case, F[i][j] will be stored in
         //'candidate'. The endpoints of F[i][j] will be stored in 'incident'.
         std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
         std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
-            if(treedec::is_candidate_edge(F[i][j], i, old_elimination_ordering, G)){
+            if(treedec::is_candidate_edge(F[i][j], i, _o, _g)){
                 candidate.push_back(F[i][j]);
                 incident.insert(F[i][j][0]);
                 incident.insert(F[i][j][1]);
@@ -376,7 +388,7 @@ void minimalChordal(G_t &G,
             //have to be added to W_i to make the graph chordal. 
             G_t W_i;
             typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
-            treedec::induced_subgraph_omit_edges(W_i, G, incident, candidate, vdMap);
+            treedec::induced_subgraph_omit_edges(W_i, _g, incident, candidate, vdMap);
 
             std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
@@ -402,13 +414,32 @@ void minimalChordal(G_t &G,
                 }
             }
 
-            treedec::delete_edges(G, candidate);
+            treedec::delete_edges(_g, candidate);
         }
     }
-    treedec::LEX_M_minimal_ordering(G, new_elimination_ordering);
+    treedec::LEX_M_minimal_ordering(_g, _no);
 }
 
-} //namespace treedec
+} // impl
+
+/* minimalChordal-algorithm
+ *
+ * Computes possibly redundant fill-in-edges and runs LEX-M to check,
+ * if the graph after removal of a fill-in-edge is chordal.
+ * Finally, the algorithm computes a new perfect elimination ordering, that
+ * possibly causes lower width than '_o'.
+ */
+template <typename G_t, class O_t>
+inline void minimalChordal(G_t &G,
+     O_t& old_elimination_ordering,
+     O_t& new_elimination_ordering)
+{
+    ::treedec::impl::minimalChordal<G_t, O_t, algo::default_config> A(G, old_elimination_ordering);
+    A.do_it();
+    new_elimination_ordering = A.ordering();
+}
+
+} // treedec
 
 #endif //ifdef TD_POSTPROCESSING
 
