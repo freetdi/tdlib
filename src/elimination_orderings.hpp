@@ -623,7 +623,9 @@ template <typename G_t>
 void make_filled_graph(G_t &G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> const &elim_ordering,
       std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &C,
-      std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > &F)
+      std::vector<std::vector<std::pair<
+      typename boost::graph_traits<G_t>::vertex_descriptor,
+      typename boost::graph_traits<G_t>::vertex_descriptor> > > &F)
 {
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     C.resize(elim_ordering.size());
@@ -650,9 +652,9 @@ void make_filled_graph(G_t &G,
             sIt2++;
             for(; sIt2 != C[i].end(); sIt2++){
                 if(!boost::edge(*sIt1, *sIt2, G).second){
-                    typename std::vector<vertex_descriptor> edge(2);
-                    edge[0] = *sIt1;
-                    edge[1] = *sIt2;
+                    typename std::pair<vertex_descriptor, vertex_descriptor> edge;
+                    edge.first = *sIt1;
+                    edge.second = *sIt2;
                     F[i].push_back(edge);
                     boost::add_edge(*sIt1, *sIt2, G);
                 }
@@ -665,9 +667,8 @@ void make_filled_graph(G_t &G,
 }
 
 // TODO: what does this function do?
-template <typename G_t>
-void LEX_M_fill_in(G_t &G,
-     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &fill_in_edges)
+template <typename G_t, typename E_t>
+void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
 {
     unsigned int nv = boost::num_vertices(G);
     std::vector<BOOL> visited(nv);
@@ -738,9 +739,7 @@ void LEX_M_fill_in(G_t &G,
                     if((unsigned int)label[posn]-1 > j){
                         reached_i[(int)label[posn]].push_back(*nIt);
                         label[posn] += 0.5;
-                        std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> edge(2);
-                        edge[0] = v;
-                        edge[1] = *nIt;
+                        auto edge = std::make_pair(v, *nIt);
                         fill_in_edges.push_back(edge);
                     }
                     else{

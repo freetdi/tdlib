@@ -35,10 +35,10 @@
 namespace treedec{
 
 //This function is used in the minimalChordal algorithm.
-template <typename G_t>
+template <typename G_t, typename E_t>
 void induced_subgraph_omit_edges(G_t &H, const G_t &G,
                       typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges,
+                      E_t &edges,
                       typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
@@ -63,8 +63,10 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
         if(!disabled[spos] && !disabled[dpos]){
             bool omit = false;
             for(unsigned int i = 0; i < edges.size(); i++){
-                if((edges[i][0] == boost::source(*eIt, G) && edges[i][1] == boost::target(*eIt, G))
-                || (edges[i][1] == boost::source(*eIt, G) && edges[i][0] == boost::target(*eIt, G)))
+                if((edges[i].first == boost::source(*eIt, G)
+                 && edges[i].second == boost::target(*eIt, G))
+                || (edges[i].second == boost::source(*eIt, G)
+                 && edges[i].first == boost::target(*eIt, G)))
                 {
                     omit = true;
                     break;

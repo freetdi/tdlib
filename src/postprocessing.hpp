@@ -309,8 +309,8 @@ void MSVS(G_t const &G, T_t &T)
     // A.tree_decomposition();
 }
 
-template <typename G_t, class O_t>
-bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &edge, unsigned int i,
+template <typename G_t, class O_t, class E_t>
+bool is_candidate_edge(E_t &edge, unsigned int i,
                        O_t &elimination_ordering, G_t &M)
 {
     //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
@@ -321,9 +321,9 @@ bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_des
     }
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(edge[0], M); nIt != nEnd; nIt++){
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(edge.first, M); nIt != nEnd; nIt++){
         unsigned int pos = get_pos(*nIt, M);
-        if(elimination_ordering_[pos] > i && boost::edge(edge[1], *nIt, M).second
+        if(elimination_ordering_[pos] > i && boost::edge(edge.second, *nIt, M).second
        && !boost::edge(*nIt, elimination_ordering[i], M).second)
         {
             return false;
@@ -333,10 +333,10 @@ bool is_candidate_edge(std::vector<typename boost::graph_traits<G_t>::vertex_des
     return true;
 }
 
-template <typename G_t>
-inline void delete_edges(G_t &G, std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges){
+template <typename G_t, typename E_t>
+inline void delete_edges(G_t &G, E_t &edges){
     for(unsigned int i = 0; i < edges.size(); i++){
-        boost::remove_edge(edges[i][0], edges[i][1], G);
+        boost::remove_edge(edges[i].first, edges[i].second, G);
     }
 }
 
@@ -345,6 +345,7 @@ namespace impl {
 template <typename G_t, typename O_t, template<class GG, class ...> class CFGT>
 class minimalChordal{
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef std::pair<vertex_descriptor, vertex_descriptor> edge_type;
 public:
     minimalChordal(G_t& g, O_t& o)
         : _g(g), _o(o)
@@ -367,19 +368,19 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
     //Make 'G' a filled-in graph according to '_o'. This operation stores
     //all new edges in F.
     std::vector<std::set<vertex_descriptor> > C;
-    std::vector<std::vector<std::vector<vertex_descriptor> > > F;
+    std::vector<std::vector<std::pair<vertex_descriptor, vertex_descriptor> > > F;
     treedec::make_filled_graph(_g, _o, C, F);
 
     for(int i = _o.size()-1; i >= 0; i--){
         //Checks if F[i][j] is an candidate edge. If this is the case, F[i][j] will be stored in
         //'candidate'. The endpoints of F[i][j] will be stored in 'incident'.
-        std::vector<std::vector<vertex_descriptor> > candidate;
+        std::vector<edge_type> candidate;
         std::set<vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
             if(treedec::is_candidate_edge(F[i][j], i, _o, _g)){
                 candidate.push_back(F[i][j]);
-                incident.insert(F[i][j][0]);
-                incident.insert(F[i][j][1]);
+                incident.insert(F[i][j].first);
+                incident.insert(F[i][j].second);
             }
         }
         if(candidate.size() != 0){
@@ -390,23 +391,25 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
             typename std::vector<vertex_descriptor> vdMap;
             treedec::induced_subgraph_omit_edges(W_i, _g, incident, candidate, vdMap);
 
-            std::vector<std::vector<vertex_descriptor> > keep_fill_;
+            std::vector<edge_type> keep_fill_;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
 
             //Translate descriptors of W_i to descriptors of G.
-            std::vector<std::vector<vertex_descriptor> > keep_fill(keep_fill_.size());
+            std::vector<edge_type> keep_fill(keep_fill_.size());
             for(unsigned int j = 0; j < keep_fill_.size(); j++){
-                unsigned int pos1 = get_pos(keep_fill_[j][0], W_i);
-                unsigned int pos2 = get_pos(keep_fill_[j][1], W_i);
-                keep_fill[j].push_back(vdMap[pos1]);
-                keep_fill[j].push_back(vdMap[pos2]);
+                unsigned int pos1 = get_pos(keep_fill_[j].first, W_i);
+                unsigned int pos2 = get_pos(keep_fill_[j].second, W_i);
+                keep_fill[j].first=vdMap[pos1];
+                keep_fill[j].second=vdMap[pos2];
             }
 
             //Delete all candidate edges that can be deleted in G according to LEX_M_fill_in.
             for(unsigned int j = 0; j < candidate.size(); j++){
                 for(unsigned int k = 0; k < keep_fill.size(); k++){
-                    if((candidate[j][0] == keep_fill[k][0] && candidate[j][1] == keep_fill[k][1])
-                     ||(candidate[j][0] == keep_fill[k][1] && candidate[j][1] == keep_fill[k][0]))
+                    if(  (candidate[j].first == keep_fill[k].first
+                       && candidate[j].second == keep_fill[k].second)
+                       ||(candidate[j].first == keep_fill[k].second
+                       && candidate[j].second == keep_fill[k].first))
                     {
                         candidate.erase(candidate.begin()+j);
                         break;
