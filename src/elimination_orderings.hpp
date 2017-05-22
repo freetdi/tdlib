@@ -1,5 +1,5 @@
 // Lukas Larisch, 2014 - 2016
-// Felix Salfelder, 2016
+// Felix Salfelder, 2016 - 2017
 //
 // (c) 2014-2016 Goethe-Universität Frankfurt
 //
@@ -625,6 +625,7 @@ void make_filled_graph(G_t &G,
       std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &C,
       std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > &F)
 {
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     C.resize(elim_ordering.size());
     F.resize(elim_ordering.size());
 
@@ -632,7 +633,7 @@ void make_filled_graph(G_t &G,
 
     for(unsigned int i = 0; i < elim_ordering.size(); i++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N_i, E_i;
+        std::set<vertex_descriptor> N_i, E_i;
         C[i].insert(elim_ordering[i]);
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){
@@ -642,14 +643,14 @@ void make_filled_graph(G_t &G,
             }
         }
 
-        for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt1 =
+        for(typename std::set<vertex_descriptor>::iterator sIt1 =
             C[i].begin(); sIt1 != C[i].end(); sIt1++)
         {
-            typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt2 = sIt1;
+            typename std::set<vertex_descriptor>::iterator sIt2 = sIt1;
             sIt2++;
             for(; sIt2 != C[i].end(); sIt2++){
                 if(!boost::edge(*sIt1, *sIt2, G).second){
-                    typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> edge(2);
+                    typename std::vector<vertex_descriptor> edge(2);
                     edge[0] = *sIt1;
                     edge[1] = *sIt2;
                     F[i].push_back(edge);

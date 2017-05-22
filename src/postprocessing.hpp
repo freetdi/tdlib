@@ -344,7 +344,7 @@ namespace impl {
 
 template <typename G_t, typename O_t, template<class GG, class ...> class CFGT>
 class minimalChordal{
-
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
 public:
     minimalChordal(G_t& g, O_t& o)
         : _g(g), _o(o)
@@ -366,15 +366,15 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
     _no.resize(_o.size());
     //Make 'G' a filled-in graph according to '_o'. This operation stores
     //all new edges in F.
-    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > C;
-    std::vector<std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > > F;
+    std::vector<std::set<vertex_descriptor> > C;
+    std::vector<std::vector<std::vector<vertex_descriptor> > > F;
     treedec::make_filled_graph(_g, _o, C, F);
 
     for(int i = _o.size()-1; i >= 0; i--){
         //Checks if F[i][j] is an candidate edge. If this is the case, F[i][j] will be stored in
         //'candidate'. The endpoints of F[i][j] will be stored in 'incident'.
-        std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > candidate;
-        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> incident;
+        std::vector<std::vector<vertex_descriptor> > candidate;
+        std::set<vertex_descriptor> incident;
         for(unsigned int j = 0; j < F[i].size(); j++){
             if(treedec::is_candidate_edge(F[i][j], i, _o, _g)){
                 candidate.push_back(F[i][j]);
@@ -387,14 +387,14 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
             //and run the LEX_M algorithm. The algorithm will possibly return some edges not in W_I that
             //have to be added to W_i to make the graph chordal. 
             G_t W_i;
-            typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+            typename std::vector<vertex_descriptor> vdMap;
             treedec::induced_subgraph_omit_edges(W_i, _g, incident, candidate, vdMap);
 
-            std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill_;
+            std::vector<std::vector<vertex_descriptor> > keep_fill_;
             treedec::LEX_M_fill_in(W_i, keep_fill_);
 
             //Translate descriptors of W_i to descriptors of G.
-            std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > keep_fill(keep_fill_.size());
+            std::vector<std::vector<vertex_descriptor> > keep_fill(keep_fill_.size());
             for(unsigned int j = 0; j < keep_fill_.size(); j++){
                 unsigned int pos1 = get_pos(keep_fill_[j][0], W_i);
                 unsigned int pos2 = get_pos(keep_fill_[j][1], W_i);

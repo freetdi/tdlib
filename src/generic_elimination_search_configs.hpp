@@ -99,7 +99,7 @@ struct CFG_DFS_1 : generic_elimination_search_DFS<G_t, CFG_DFS_1<G_t, cfg>, cfg>
     }
 
 
-    static unsigned lb_algo(G_t &G){ //aka no lb algo
+    static unsigned lb_algo(G_t &){ //aka no lb algo
         return 0;
     }
 
@@ -168,7 +168,8 @@ struct CFG_DFS_2 : generic_elimination_search_DFS<G_t, CFG_DFS_2<G_t, CFGT>, CFG
         return treedec::minDegree_ordering(H, O)+1;
     }
 
-    static unsigned lb_algo(const G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &){
+        // no lb algo
         return 0;
     }
 
@@ -232,7 +233,8 @@ struct CFG_DFS_3 : generic_elimination_search_DFS<G_t, CFG_DFS_3<G_t, cfg>, cfg>
     }
 
 
-    static unsigned lb_algo(const G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t &){
+        // no lb algo
         return 0;
     }
 
@@ -372,8 +374,8 @@ struct CFG_DFS_p17_2 : generic_elimination_search_DFS<G_t, CFG_DFS_p17_2<G_t, CF
         return UINT_MAX;
     }
 
-
-    static unsigned lb_algo(const G_t &G){ //aka no lb algo
+    static unsigned lb_algo(const G_t&){
+        // no lb algo
         return 0;
     }
 
