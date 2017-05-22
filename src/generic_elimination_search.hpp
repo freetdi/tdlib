@@ -295,7 +295,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             std::cout << "ran into unreachable!!!!!!!!!!!!!!!!!" << std::endl;
             unreachable(); //should be the case?
         }
-    }else{ untested();
+    }else{
         // BUG: use boost::copy maybe
         G_t H(baseclass::_g.underlying());
         auto p=boost::vertices(baseclass::_g._og);
@@ -309,13 +309,13 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
 
         local_lb = CFG_t::lb_algo(H);
-        if(local_lb > baseclass::_global_ub){ untested();
+        if(local_lb > baseclass::_global_ub){
             //can be seen as pruning this branch
             incomplete(); // use message.
             std::cerr << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
             baseclass::timer_off();
             return;
-        }else{ untested();
+        }else{
         }
 
         unsigned idx = 0;

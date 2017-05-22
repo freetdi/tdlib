@@ -248,7 +248,11 @@ void MSVS(G_t const &G, T_t &T)
             treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
             bag(newN[i], T) = MOVE(uB);
 
-            boost::add_edge(refinement_vertex, newN[i], T);
+            assert(!boost::edge(refinement_vertex, newN[i], T).second);
+            assert(!boost::edge(newN[i], refinement_vertex, T).second);
+            treedec::add_edge(refinement_vertex, newN[i], T);
+            assert(boost::edge(refinement_vertex, newN[i], T).second);
+            assert(boost::edge(newN[i], refinement_vertex, T).second);
         }
 
         //Let intersection_i be the intersection of the old bag of 'refinement_vertex' with

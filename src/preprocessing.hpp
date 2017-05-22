@@ -322,7 +322,7 @@ public:
     }
     // the remaining subgraph and a vertex map subgraph->graph
     template<class GG, class M>
-    void get_subgraph_copy(GG& gg, M& m) { untested();
+    void get_subgraph_copy(GG& gg, M& m) {
         assert(boost::is_directed(_g));
         assert(boost::num_vertices(gg)==0);
 
@@ -337,13 +337,13 @@ public:
             if(_numbering.is_numbered(*p.first)){ itested();
                 continue; // fixme. not here.
                           // use induced subgraph, or boost::filtered_graph.
-            }else{ untested();
+            }else{
                 assert(seek<m.size());
                 m[seek++]=*p.first;
             }
 
             auto q=adjacent_vertices(*p.first); // sic!
-            for(; q.first!=q.second; ++q.first){ untested();
+            for(; q.first!=q.second; ++q.first){
                 assert(*p.first!=*q.first);
                 if(*p.first<*q.first){
                     treedec::add_edge(*p.first, *q.first, gg);
@@ -1402,7 +1402,7 @@ void preprocessing<G_t, CFG>::do_it()
 {
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(_g);
 
-    if(num_vert == 0){ untested();
+    if(num_vert == 0){
         return;
     }
 
@@ -1414,7 +1414,7 @@ void preprocessing<G_t, CFG>::do_it()
     if(!cdegs[0].empty()){
         if (_lb_bs==0){
             _lb_bs = 1;
-        }else{ untested();
+        }else{
         }
     }else{
     }

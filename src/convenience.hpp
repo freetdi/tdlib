@@ -97,7 +97,7 @@ void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned 
 
 template <typename G_t>
 void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_orderings)
-{ untested();
+{
     std::cout << "edges before PP: " << boost::num_edges(G) << std::endl;
     std::cout << "vertices before PP: " << boost::num_vertices(G) << std::endl;
 
