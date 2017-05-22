@@ -815,6 +815,7 @@ template <typename G_t>
 class deltaC_least_c : public treedec::algo::draft::algo1{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef typename deg_chooser<G_t>::type degs_type;
 
     deltaC_least_c(G_t &G) : algo1("lb::deltaC_least_c"), _g(G), _lb(0){}
@@ -833,7 +834,7 @@ public:
                 --min_ntd;
             }
 
-            std::pair<vertex_descriptor, unsigned> min_pair;
+            std::pair<vertex_descriptor, vertices_size_type> min_pair;
             min_pair = degs.pick_min(min_ntd);
             min_ntd = min_pair.second;
             trace2("dclc", min_pair.first, min_ntd);
@@ -844,6 +845,7 @@ public:
 
             vertex_descriptor min_vertex;
             min_vertex = min_pair.first;
+            assert(boost::degree(min_vertex, _g));
 
             //least-c heuristic: search the neighbour of min_vertex such that
             //contracting {min_vertex, w} removes the least edges
@@ -878,8 +880,8 @@ private:
 template <typename G_t>
 int deltaC_least_c(G_t& G)
 {
-    unsigned int V = boost::num_vertices(G);
-    unsigned int E = boost::num_edges(G);
+    auto V=boost::num_vertices(G);
+    auto E=treedec::num_edges(G);
 
     if(V == 0){
         return -1;
@@ -1488,7 +1490,7 @@ int MCSC(G_t& G)
         max = (result.first > max)? result.first : max;
         typename boost::graph_traits<G_t>::vertex_descriptor v = result.second;
 
-        typename boost::graph_traits<G_t>::vertex_descriptor w = get_least_common_vertex(v, G);
+        auto w=get_least_common_vertex(v, G);
 
         contract_edge(w, v, G);
     }

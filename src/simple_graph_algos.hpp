@@ -28,6 +28,7 @@
 #define TD_SIMPLE_GRAPH_ALGOS
 
 #include <set>
+#include <limits>
 
 #include <boost/graph/adjacency_list.hpp>
 #include "graph.hpp"
@@ -326,20 +327,20 @@ void get_components(G_t &G,
 
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
-   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor min_vertex,
            const G_t &G)
 {
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
     typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
 
-    unsigned int min_common = UINT_MAX;
+    auto min_common=std::numeric_limits<vertices_size_type>::max();
 
     for(; nIt1 != nEnd; nIt1++){
         unsigned int cnt_common = 0;
-        BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
-        BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);
-        for(; ci!=ce; ++ci){
+        auto p=common_out_edges(*nIt1, min_vertex, G);
+        for(; p.first!=p.second; ++p.first){
             cnt_common++;
         }
         if(cnt_common < min_common){

@@ -204,7 +204,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
-   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor min_vertex,
            const G_t &G);
 
 //Copy vertices of G into degree_sequence, ordered by degree, starting with lowest.
