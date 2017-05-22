@@ -65,8 +65,26 @@ public:
         }
     }
 
-    void tree_decomposition(){
-        treedec::detail::skeleton_to_treedec(_g, *_t, _bags, *_o, _i);
+    void tree_decomposition(){ untested();
+        assert(_t);
+        assert(_o->size()<=_bags.size()); // this is obsolete anyway
+        assert(_o->size()==_num_vert); // this is relevant.
+
+        // yuck... will be obsolete with FI rework
+        typename std::vector<
+            std::pair<vertex_descriptor, bag_t>
+                > bags(_num_vert);
+        typename std::vector<unsigned> io(_num_vert);
+
+        // stuff center and friends into "skeleton"
+        // _num_vert can be less than order/bags size
+        for(unsigned i = 0; i < _num_vert; i++){
+            bags[i].first = (*_o)[i];
+            bags[i].second = _bags[i];
+            // io[ (*_o)[i] ] = i;
+        }
+
+        treedec::detail::skeleton_to_treedec(_g, *_t, bags, *_o, _i);
     }
 
     vertices_size_type get_bagsize(){
