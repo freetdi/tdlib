@@ -133,8 +133,8 @@ template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFG_t, CFGT_t>& o)
     : baseclass(o), // good idea?!
-      _g(o._g),
       _active(o._active),
+      _g(o._g),
       _best_ordering(o._best_ordering),
       _current_ordering(o._current_ordering),
       _global_lb(o._global_lb),
@@ -295,10 +295,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             std::cout << "ran into unreachable!!!!!!!!!!!!!!!!!" << std::endl;
             unreachable(); //should be the case?
         }
-    }
-    else{
-/*
-        //TODO: underlying+overlay copy
+    }else{ untested();
         // BUG: use boost::copy maybe
         G_t H(baseclass::_g.underlying());
         auto p=boost::vertices(baseclass::_g._og);
@@ -306,19 +303,21 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
             auto q=boost::adjacent_vertices(*p.first, baseclass::_g._og);
             for(; q.first!=q.second; ++q.first){
-                boost::add_edge(*p.first, *q.first, H);
+                treedec::add_edge(*p.first, *q.first, H);
             }
         }
 
 
         local_lb = CFG_t::lb_algo(H);
-        if(local_lb > baseclass::_global_ub){
+        if(local_lb > baseclass::_global_ub){ untested();
             //can be seen as pruning this branch
-            std::cout << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
+            incomplete(); // use message.
+            std::cerr << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
             baseclass::timer_off();
             return;
+        }else{ untested();
         }
-*/
+
         unsigned idx = 0;
 
         //search starts here

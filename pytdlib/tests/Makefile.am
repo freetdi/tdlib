@@ -54,7 +54,6 @@ EXTRA_DIST = \
 	CFGs.py \
 	Dimacs.py \
 	Zoo.py \
-        Maxsat_small.py \
 	base.py \
 	RandomGNM_250_1000.py \
 	util.py

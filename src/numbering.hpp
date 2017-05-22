@@ -22,26 +22,45 @@ private: // don't use.
 	 NUMBERING_1(){ unreachable(); }
 	 NUMBERING_1( const NUMBERING_1&){ unreachable(); }
 */
+private:
+	NUMBERING_1(){ unreachable(); }
+	NUMBERING_1(const NUMBERING_1&){ unreachable(); }
 public:
 	NUMBERING_1(G_t const& g)
-		: _current(0), _data(boost::num_vertices(g)), _idmap(idmap_type() ) {
-			increment();
-		}
+	    : _current(0), _data(boost::num_vertices(g)),
+	      _idmap(idmap_type() )
+	{
+		trace1("NUMBERING_1", _data.size());
+		assert(boost::num_vertices(g));
+		increment();
+	}
 #if 0 // later?
 	Numbering(G_t const& g, idmap_type i)
 		: _current(1), _data(boost::num_vertices(g)), _idmap(idmap_type() ) {}
 #endif
 
-	void put(vertex_descriptor v) { _data[get(_idmap, v)] = _current; }
-	void increment(value_type i = 1) { _current -= i; }
+	void put(vertex_descriptor v) {
+		_data[get(_idmap, v)] = _current;
+	}
+	void increment(value_type i = 1) {
+	  	_current -= i;
+	}
 	bool is_numbered(vertex_descriptor v) const {
+		assert(get(_idmap, v) < _data.size());
 		return _data[get(_idmap, v)] != 0;
 	}
 	bool is_not_numbered(vertex_descriptor v) const {
+		assert(v < _data.size());
+		assert(get(_idmap, v) < _data.size());
 		return !is_numbered(v);
 	}
 	bool is_before(vertex_descriptor v, vertex_descriptor w) const {
 		return _data[get(_idmap, v)] > _data[get(_idmap, w)];
+	}
+	value_type get_position(vertex_descriptor v) const{
+		// HACK. cleanup later. NUMBERING_2?
+		assert(_data[get(_idmap, v)]);
+		return -1 - _data[get(_idmap, v)];
 	}
 private:
 	value_type _current;
