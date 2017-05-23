@@ -70,7 +70,8 @@ struct dwt<G,
 	}
 
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){ untested(); }
+	static void copy(GG const&, H&){ untested();
+	}
 };
 
 }

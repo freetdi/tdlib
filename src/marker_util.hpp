@@ -1,5 +1,36 @@
-#pragma once
+// Felix Salfelder, 2017
+//
+// (c) 2017 Felix Salfelder
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#ifndef TD_MARKER_UTIL_HPP
+#define TD_MARKER_UTIL_HPP
+
 #include "marker.hpp"
+
+namespace treedec{
+
+template<class I, class M>
+void mark_range(I i, I e, M& marker)
+{ untested();
+    for(; i!=e; ++i){
+		 marker.mark(*i);
+    }
+}
+
+} // treedec
 
 // mark neighbours of v up to v.
 template<class M, typename V, class G>
@@ -38,3 +69,5 @@ size_t mark_smaller_neighbours(M& marker, V v, G const& g, MASK const& m)
     }
 	 return cnt;
 }
+
+#endif

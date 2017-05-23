@@ -346,7 +346,7 @@ namespace detail{ //
     public:
         typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-        typedef typename boost::graph_traits<G>::adjacency_iterator(*this) baseclass;
+        typedef typename boost::graph_traits<G>::adjacency_iterator baseclass;
     public: // construct
         shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
                         vertex_descriptor s, G const& g)
