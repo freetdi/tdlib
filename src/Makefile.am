@@ -30,6 +30,7 @@ pkginclude_HEADERS = \
   graph.hpp \
   graph_traits.hpp \
   grparse.h \
+  induced_subgraph.hpp \
   iter.hpp \
   lower_bounds.hpp \
   marker.hpp \
