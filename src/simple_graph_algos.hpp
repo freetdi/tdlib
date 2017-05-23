@@ -32,6 +32,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "graph.hpp"
+#include "marker_util.hpp"
 
 namespace treedec{
 
@@ -325,26 +326,34 @@ void get_components(G_t &G,
     }
 }
 
-template <typename G_t>
+// find a neighbour x of v with the least common neighbours
+template <typename G_t, class M>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
-   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor min_vertex,
-           const G_t &G)
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor v,
+           M& marker, const G_t &G)
 {
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
-    typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
 
     auto min_common=std::numeric_limits<vertices_size_type>::max();
 
-    for(; nIt1 != nEnd; nIt1++){
-        unsigned int cnt_common = 0;
-        auto p=common_out_edges(*nIt1, min_vertex, G);
+    marker.clear();
+
+    auto p=boost::adjacent_vertices(v, G);
+    typename boost::graph_traits<G_t>::vertex_descriptor w = *p.first;
+    mark_range(p.first, p.second, marker);
+
+    auto q=boost::adjacent_vertices(v, G);
+    for(; q.first != q.second; q.first++){
+        vertices_size_type cnt_common=0;
+        auto p=boost::adjacent_vertices(v, G);
         for(; p.first!=p.second; ++p.first){
-            cnt_common++;
+            if(marker.is_marked(*p.first)){
+                cnt_common++;
+            }else{
+            }
         }
         if(cnt_common < min_common){
-            w = *nIt1;
+            w = *q.first;
             min_common = cnt_common;
         }
     }

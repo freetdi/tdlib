@@ -90,6 +90,7 @@
 #include "network_flow.hpp"
 #include "simple_graph_algos.hpp"
 #include "algo.hpp"
+#include "trace.hpp"
 
 namespace treedec{
 
@@ -816,9 +817,18 @@ class deltaC_least_c : public treedec::algo::draft::algo1{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+private:
     typedef typename deg_chooser<G_t>::type degs_type;
+    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+public:
 
-    deltaC_least_c(G_t &G) : algo1("lb::deltaC_least_c"), _g(G), _lb(0){}
+    deltaC_least_c(G_t &G)
+      : algo1("lb::deltaC_least_c"),
+        _g(G),
+        _lb(0),
+        _marker(boost::num_vertices(G))
+    { untested();
+    }
 
     void do_it(){
         timer_on();
@@ -849,7 +859,7 @@ public:
 
             //least-c heuristic: search the neighbour of min_vertex such that
             //contracting {min_vertex, w} removes the least edges
-            vertex_descriptor w = get_least_common_vertex(min_vertex, _g);
+            vertex_descriptor w = get_least_common_vertex(min_vertex, _marker, _g);
 
             degs.unlink(w);
             degs.unlink(min_vertex);
@@ -871,6 +881,7 @@ public:
 private:
     G_t& _g;
     unsigned _lb;
+    marker_type _marker;
 };
 
 } //namespace impl
@@ -1073,7 +1084,16 @@ namespace impl{
 template <typename G_t, typename CFG_t>
 class LB_improved_contraction_base : public treedec::algo::draft::algo1{
 public:
-    LB_improved_contraction_base(G_t &G) : algo1(CFG_t::name()), _g(G), _lb(0){}
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+private:
+    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+public:
+    LB_improved_contraction_base(G_t &G)
+      : algo1(CFG_t::name()), _g(G), _lb(0),
+        _marker(boost::num_vertices(G))
+    { untested();
+    }
 
     void do_it(){
         timer_on();
@@ -1094,11 +1114,8 @@ public:
                     break;
                 }
 
-                typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
-                    = get_min_degree_vertex(H, true); //ignore isolated vertices
-
-                typename boost::graph_traits<G_t>::vertex_descriptor w =
-                              get_least_common_vertex(min_vertex, H);
+                auto min_vertex=get_min_degree_vertex(H, true); //ignore isolated vertices
+                auto w=get_least_common_vertex(min_vertex, _marker, H);
 
                 contract_edge(min_vertex, w, H);
 
@@ -1125,6 +1142,7 @@ public:
 private:
     G_t& _g;
     unsigned _lb;
+    marker_type _marker;
 };
 
 } //namespace impl

@@ -202,9 +202,10 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     return min_vertex;
 }
 
-template <typename G_t>
+template <typename G_t, class M>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor min_vertex,
+           M& marker,
            const G_t &G);
 
 //Copy vertices of G into degree_sequence, ordered by degree, starting with lowest.
@@ -396,12 +397,14 @@ namespace detail{ //
 
 }// detail
 
+// inefficient.
+// possibly obsolete.
 template<class G>
 std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
     inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
-{
+{ untested();
     typedef typename detail::shared_adj_iter<G> Iter;
 
     auto p=boost::adjacent_vertices(v, g);
