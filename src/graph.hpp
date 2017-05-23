@@ -346,6 +346,7 @@ namespace detail{ //
     public:
         typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
         typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+        typedef typename boost::graph_traits<G>::adjacency_iterator(*this) baseclass;
     public: // construct
         shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
                         vertex_descriptor s, G const& g)
@@ -379,7 +380,7 @@ namespace detail{ //
         void skip()
         {
             while(true){
-                if(typename boost::graph_traits<G>::adjacency_iterator(*this)==_ve){
+                if(baseclass(*this)==_ve){
                     return;
                 }else if(!boost::edge(**this, _s, _g).second){
                     adjacency_iterator::operator++();
@@ -402,9 +403,8 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
                      const G& g)
 {
     typedef typename detail::shared_adj_iter<G> Iter;
-    typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
 
-    std::pair<adjacency_iterator, adjacency_iterator> p=boost::adjacent_vertices(v, g);
+    auto p=boost::adjacent_vertices(v, g);
     return std::make_pair(Iter(p.first, p.second, w, g),
                           Iter(p.second, p.second, w, g));
 }
