@@ -21,8 +21,8 @@
 //
 // greedy heuristics
 
-#ifndef TD_IMPL_ELIM_ORD
-#define TD_IMPL_ELIM_ORD
+#ifndef TD_IMPL_GREEDY_HPP
+#define TD_IMPL_GREEDY_HPP
 
 #ifndef TD_ELIMINATION_ORDERINGS
 #error "not intended to be used like that."
