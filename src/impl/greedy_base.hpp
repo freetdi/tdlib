@@ -19,21 +19,27 @@
 //
 // greedy base
 //
-#ifndef TD_GREEDY_HPP
-#define TD_GREEDY_HPP
+#ifndef TD_GREEDY_BASE_HPP
+#define TD_GREEDY_BASE_HPP
+
+// FIXME, rearrange, maybe move all to bits?
+#include "../skeleton.hpp"
+#include "../induced_subgraph.hpp"
 
 namespace treedec{
 
 namespace impl{
 
-template <typename G_t, typename T_t, typename O_t, template<class G, class...> class CFGT_t=algo::default_config>
+template <typename G_t, typename O_t,
+          template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_base : public ::treedec::algo::draft::algo1{
 private: // forbidden
     greedy_base(){unreachable();}
 public:
-    typedef typename directed_view_select<G_t>::type D_t;
-    typedef typename boost::graph_traits<D_t>::edges_size_type edges_size_type;
-    typedef typename boost::graph_traits<D_t>::vertex_descriptor vertex_descriptor;
+    typedef typename directed_view_select<G_t>::type graph_type;
+    typedef graph_type D_t; //?
+    typedef typename boost::graph_traits<graph_type>::edges_size_type edges_size_type;
+    typedef typename boost::graph_traits<graph_type>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
     typedef typename boost::property_map<D_t, boost::vertex_index_t>::type idmap_type;
@@ -61,9 +67,9 @@ public:
     typedef typename std::vector<vertex_descriptor> bag_t;
 
 protected: // construct/destruct
-    greedy_base(G_t &g, T_t *T, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
+    greedy_base(G_t &g, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
       : algo1("."),
-        _g(g), _t(T),
+        _g(g),
         _o(O), _own_o(!O), _ub_in(ub),
         _iiv(ignore_isolated_vertices), _i(0),
         _min(0), _ub_tw(0),
@@ -140,7 +146,8 @@ protected: // implementation
     }
 
 public:
-    void tree_decomposition(){
+	 template<class T>
+    void tree_decomposition(T& t){
         elimination_ordering(*_o);
 #ifndef NDEBUG
         for(auto x: *_o){
@@ -157,10 +164,9 @@ public:
         typedef treedec::draft::SKELETON<D_t, numbering_type, O_t> skeleton_type;
         skeleton_type skel(_g, _numbering, *_o);
 
-        assert(_t);
         assert(_i==skel.size());
-        treedec::detail::skeleton_helper<D_t, T_t, skeleton_type, numbering_type>
-            S(_g, *_t, skel, _numbering);
+        treedec::detail::skeleton_helper<D_t, T, skeleton_type, numbering_type>
+            S(_g, t, skel, _numbering);
         S.do_it();
     }
 
@@ -218,8 +224,6 @@ public:
 
             //Abort if the width of this decomposition would be larger than 'ub'.
             if(_min >= _ub_in){ untested();
-                assert(_t); // ouch?
-                _t->clear(); //could be also not the case
                 throw exception_unsuccessful();
             }else{
             }
@@ -265,7 +269,7 @@ public:
 
 protected:
     D_t _g;
-    T_t* _t;
+    //T_t* _t;
     O_t* _o;
     bool _own_o;
 

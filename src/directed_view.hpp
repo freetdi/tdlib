@@ -273,7 +273,7 @@ add_edge(VD v, VD w, treedec::draft::directed_view<G>& g)
 	if(edge(v, w, *g).second){
 		incomplete();
 		// that will not work with vectors
-		return std::make_pair(edge(v, w, *g).first, false);
+		return std::make_pair(edge(v, w, *g).first, true);
 	}
 #endif
 	return add_edge(v, w, *g);

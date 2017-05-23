@@ -92,6 +92,8 @@
 #include "algo.hpp"
 #include "trace.hpp"
 
+#include "impl/greedy_base.hpp"
+
 namespace treedec{
 
 namespace lb{
@@ -812,33 +814,41 @@ private:
 
 namespace impl{
 
-template <typename G_t>
-class deltaC_least_c : public treedec::algo::draft::algo1{
+template <typename G_t,
+          template<class G, class...> class CFGT=algo::default_config>
+class deltaC_least_c
+  : private treedec::impl::greedy_base<
+                 G_t,
+                 std::vector< typename boost::graph_traits<G_t>::vertex_descriptor >,
+                 CFGT>
+{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 private:
-    typedef typename deg_chooser<G_t>::type degs_type;
     typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+    typedef treedec::impl::greedy_base<
+                 G_t, std::vector<vertex_descriptor>, CFGT> baseclass;
+    typedef typename deg_chooser<typename baseclass::graph_type>::type degs_type;
+    using typename baseclass::graph_type;
+    using baseclass::_g;
 public:
 
     deltaC_least_c(G_t &G)
-      : algo1("lb::deltaC_least_c"),
-        _g(G),
-        _lb(0),
-        _marker(boost::num_vertices(G))
+      : baseclass(G, NULL, -1u),
+//        _g(G), // baseclass _g?
+        _lb_tw(0)
     { untested();
     }
 
     void do_it(){
-        timer_on();
 
-        degs_type degs(_g);
-        degree_decrease<G_t> cb(&degs, &_g);
+        degs_type degs(baseclass::_g); // BUG.
+        degree_decrease<graph_type> cb(&degs, &_g);
 
         unsigned int min_ntd = 2;
 
-        while(boost::num_edges(_g) > 0){
+        while(treedec::num_edges(baseclass::_g) > 0){
             //Search a minimum-degree-vertex.
             if(min_ntd>1){
                 --min_ntd;
@@ -849,8 +859,8 @@ public:
             min_ntd = min_pair.second;
             trace2("dclc", min_pair.first, min_ntd);
 
-            if(_lb < min_ntd){
-                _lb = min_ntd;
+            if(_lb_tw < min_ntd){
+                _lb_tw = min_ntd;
             }
 
             vertex_descriptor min_vertex;
@@ -859,7 +869,8 @@ public:
 
             //least-c heuristic: search the neighbour of min_vertex such that
             //contracting {min_vertex, w} removes the least edges
-            vertex_descriptor w = get_least_common_vertex(min_vertex, _marker, _g);
+            vertex_descriptor w = get_least_common_vertex(
+                    min_vertex, baseclass::_marker, _g);
 
             degs.unlink(w);
             degs.unlink(min_vertex);
@@ -870,18 +881,17 @@ public:
 
             degs.reg(w);
         }
-
-        timer_off();
     }
 
     unsigned lower_bound_bagsize(){
-        return _lb+1u;
+        return _lb_tw+1u;
     }
 
+private: // overrides
+    bool next(vertex_descriptor &c) { incomplete(); return false;}
+    void eliminate(vertex_descriptor v) { incomplete(); }
 private:
-    G_t& _g;
-    unsigned _lb;
-    marker_type _marker;
+    unsigned _lb_tw;
 };
 
 } //namespace impl
