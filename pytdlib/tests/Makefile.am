@@ -1,5 +1,6 @@
 
 TESTS = $(LONG_TESTS) \
+	dclc_g5.py \
 	test_generic_search_CFG1.py \
 	test_generic_search_CFG2.py \
 	test_generic_search_p17.py \

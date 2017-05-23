@@ -91,6 +91,9 @@
 #include "simple_graph_algos.hpp"
 #include "algo.hpp"
 #include "trace.hpp"
+#include "degree_config.hpp"
+
+#include "impl/greedy_base.hpp"
 
 namespace treedec{
 
@@ -812,33 +815,58 @@ private:
 
 namespace impl{
 
-template <typename G_t>
-class deltaC_least_c : public treedec::algo::draft::algo1{
+// TODO: move to impl, then use from lb/order
+template <typename G_t,
+          template<class G, class...> class CFGT=algo::default_config>
+class deltaC_least_c
+  : private treedec::impl::greedy_base<
+                 G_t,
+                 std::vector< typename boost::graph_traits<G_t>::vertex_descriptor >,
+                 CFGT>
+{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 private:
-    typedef typename deg_chooser<G_t>::type degs_type;
-    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+    typedef treedec::impl::greedy_base<
+                 G_t, std::vector<vertex_descriptor>, CFGT> baseclass;
+
+    using typename baseclass::graph_type;
+    // typedef typename deg_chooser<typename baseclass::graph_type>::type degs_type;
+    typedef DEGS<graph_type, ::treedec::degs::mapped_config> degs_type;
+
+    using typename baseclass::marker_type;
+    using baseclass::_g;
+    using baseclass::_marker;
+    using baseclass::_numbering;
+    using baseclass::_degreemap;
+    using baseclass::_subgraph;
+    using baseclass::_num_edges;
 public:
 
     deltaC_least_c(G_t &G)
-      : algo1("lb::deltaC_least_c"),
-        _g(G),
-        _lb(0),
-        _marker(boost::num_vertices(G))
+      : baseclass(G, NULL, -1u),
+//        _g(G), // baseclass _g?
+        _lb_tw(0)
     { untested();
+        trace2("deltacleastc", boost::num_vertices(G), boost::num_edges(G));
     }
 
     void do_it(){
-        timer_on();
 
-        degs_type degs(_g);
-        degree_decrease<G_t> cb(&degs, &_g);
+#ifndef NDEBUG
+        auto p=boost::vertices(_g);
+        for(; p.first!=p.second; ++p.first){
+            assert(_degreemap[*p.first] == boost::out_degree(*p.first, _g));
+        }
+#endif
+
+        degs_type degs(_g, baseclass::_degreemap);
+//        degree_decrease<graph_type> cb(&degs, &_g);
 
         unsigned int min_ntd = 2;
 
-        while(boost::num_edges(_g) > 0){
+        while(_num_edges){
             //Search a minimum-degree-vertex.
             if(min_ntd>1){
                 --min_ntd;
@@ -849,39 +877,101 @@ public:
             min_ntd = min_pair.second;
             trace2("dclc", min_pair.first, min_ntd);
 
-            if(_lb < min_ntd){
-                _lb = min_ntd;
+            if(_lb_tw < min_ntd){
+                _lb_tw = min_ntd;
+            }else{
             }
 
             vertex_descriptor min_vertex;
             min_vertex = min_pair.first;
-            assert(boost::degree(min_vertex, _g));
+            assert(_degreemap[min_vertex]);
+            assert(_degreemap[min_vertex]==min_pair.second);
 
             //least-c heuristic: search the neighbour of min_vertex such that
             //contracting {min_vertex, w} removes the least edges
-            vertex_descriptor w = get_least_common_vertex(min_vertex, _marker, _g);
-
-            degs.unlink(w);
-            degs.unlink(min_vertex);
+            vertex_descriptor w = get_least_common_vertex(
+                    min_vertex, _marker, _subgraph);
 
             //Contract the edge between min_vertex into w.
             //Clear min_vertex and rearrange degs through callback.
-            contract_edge(min_vertex, w, _g, &cb);
-
-            degs.reg(w);
+            contract_edge(min_vertex, w, degs);
         }
-
-        timer_off();
     }
 
     unsigned lower_bound_bagsize(){
-        return _lb+1u;
+        return _lb_tw+1u;
+    }
+private:
+    // sort of "eliminate v".
+    template<class D> // TODO...
+    void contract_edge(vertex_descriptor v,
+                       vertex_descriptor target, D& _degs) {
+        _numbering.put(v);
+        _degs.unlink(v);
+
+        trace3("elim", v, _num_edges, _degreemap[v]);
+//        _numbering.increment();
+#ifndef NDEBUG
+        // precondition: the neighs of v are marked!
+        {
+            auto p=adjacent_vertices(v, _subgraph);
+            for(; p.first!=p.second; ++p.first){
+                assert(_marker.is_marked(*p.first));
+            }
+        }
+#endif
+        auto p=adjacent_vertices(target, _subgraph);
+        for(; p.first!=p.second; ++p.first){
+            _marker.unmark(*p.first);
+            assert(*p.first!=v);
+        }
+        _marker.unmark(target);
+
+        // TODO/LATER: modify baseclass::subgraph ...
+        auto q=boost::adjacent_vertices(v, _subgraph);
+        for(; q.first!=q.second; ++q.first){
+            trace3("n", v, target, *q.first);
+            if(_marker.is_marked(*q.first)){
+                assert(*q.first!=target);
+            }
+
+            if(*q.first==target){ untested();
+                --_num_edges;
+                assert(_degreemap[*q.first]);
+                --_degreemap[*q.first];
+            }else if(_marker.is_marked(*q.first)){ untested();
+                // a neigh of v not connected to target.
+                // "move" edge.
+                assert(!boost::edge(target, *q.first, _g).second);
+                assert(!boost::edge(*q.first, target, _g).second);
+                treedec::add_edge(target, *q.first, _g);
+                assert(boost::edge(target, *q.first, _g).second);
+                assert(boost::edge(*q.first, target, _g).second);
+                // ++_degreemap[*q.first];
+                ++_degreemap[target];
+                // ++_num_edges;
+            }else{ untested();
+                // this one has been connected to both. now only one.
+                // tell degs...
+                --_num_edges;
+                assert(_degreemap[*q.first]);
+                --_degreemap[*q.first];
+                assert(_degreemap[*q.first]);
+                _degs.update(*q.first);
+            }
+
+
+        }
+        _degs.update(target);
+
+//        boost::clear_vertex(v, g);
     }
 
+private: // overrides
+    bool next(vertex_descriptor &c) { incomplete(); return false;}
+    void eliminate(vertex_descriptor v) { incomplete(); }
 private:
-    G_t& _g;
-    unsigned _lb;
-    marker_type _marker;
+    unsigned _lb_tw;
 };
 
 } //namespace impl

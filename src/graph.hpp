@@ -74,7 +74,7 @@ void contract_edge(vertex_descriptor_G v,
     for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
         assert(boost::edge(v, *I, g).second);
         if(*I != target){
-            bool added=boost::add_edge(target, *I, g).second;
+            bool added=treedec::add_edge(target, *I, g).second;
             if(added){
                 //rebasing edge from I-v to I-target.
             }

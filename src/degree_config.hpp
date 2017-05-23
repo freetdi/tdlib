@@ -51,6 +51,7 @@ struct deg_config{
 };
 
 }
+
 }
 
 // use this. cleanup later.
@@ -61,8 +62,18 @@ namespace degs{
 template<class G_t>
 struct default_config : misc::detail::deg_config<G_t> {};
 
-}
 
-}
+template<class G_t>
+struct mapped_config : treedec::degs::default_config<G_t> {
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::property_map<G_t, boost::vertex_index_t>::type idmap_type;
+    typedef boost::iterator_property_map<vertex_descriptor*,
+        idmap_type, vertex_descriptor, vertex_descriptor&> degree_type;
+};
+
+} // degs
+
+} // treedec
 
 #endif
