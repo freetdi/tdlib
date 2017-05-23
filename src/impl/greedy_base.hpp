@@ -76,7 +76,7 @@ protected: // construct/destruct
         _current_N(NULL),
         _num_vert(boost::num_vertices(_g)),
         _numbering(g),
-        _num_edges(num_edges(g)),
+        _num_edges(treedec::num_edges(g)),
         _idmap(boost::get(boost::vertex_index, _g)),
         _degree(boost::num_vertices(_g)),
         _degreemap(boost::make_iterator_property_map(_degree.data(),

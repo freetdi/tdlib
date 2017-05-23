@@ -33,6 +33,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "graph.hpp"
 #include "marker_util.hpp"
+#include "induced_subgraph.hpp"
 
 namespace treedec{
 
@@ -345,7 +346,7 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
     auto q=boost::adjacent_vertices(v, G);
     for(; q.first != q.second; q.first++){
         vertices_size_type cnt_common=0;
-        auto p=boost::adjacent_vertices(v, G);
+        auto p=boost::adjacent_vertices(*q.first, G);
         for(; p.first!=p.second; ++p.first){
             if(marker.is_marked(*p.first)){
                 cnt_common++;
