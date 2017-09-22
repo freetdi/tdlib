@@ -1,8 +1,5 @@
-// # define COUNTERS
 // Lukas Larisch, 2014 - 2015
 // Felix Salfelder 2016
-//
-// (c) 2014-2015 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the

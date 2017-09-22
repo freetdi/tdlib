@@ -3,16 +3,16 @@ import os
 def convert(file1, file2, c):
     fin = open(file1, 'r')
     fout = open(file2, 'a')
-    
+
     lines = list()
-    
+
     for line in fin:
          lines.append(line.replace("\n", ""))
 
     fout.write("V_"+ str(c) + " = [");
 
     first = True
-    
+
     for i in range(1, len(lines)-1):
         if "--" not in lines[i]:
             fout.write(lines[i].replace(";", "").replace("\n", ""))
@@ -30,7 +30,7 @@ def convert(file1, file2, c):
                 fout.write(",")
             else:
                 fout.write("]\n")
-                
+
     fout.write("G_name = \"" + file1.replace(".dot", "") + "\"\n")
     fout.write("\n")
 
