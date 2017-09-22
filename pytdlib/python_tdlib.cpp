@@ -35,7 +35,11 @@
 #include "lower_bounds.hpp"
 #include "elimination_orderings.hpp"
 #include "nice_decomposition.hpp"
-#include "applications.hpp"
+#include "applications/clique.hpp"
+#include "applications/independent_set.hpp"
+#include "applications/vertex_cover.hpp"
+#include "applications/dominating_set.hpp"
+#include "applications/coloring.hpp"
 #include "misc.hpp"
 
 #ifdef USE_GALA

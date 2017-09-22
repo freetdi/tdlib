@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([tdlib], [0.8.7], [larisch@informatik.uni-frankfurt.de,felix@salfelder.org])
+AC_INIT([tdlib], [0.8.7], [larisch.larisch@kaust.edu.sa,felix@salfelder.org])
 AC_CONFIG_SRCDIR([src/graph_traits.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -149,6 +149,7 @@ AC_CONFIG_FILES([pytdlib/Makefile])
 AC_CONFIG_FILES([pytdlib/tests/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bits/Makefile])
+AC_CONFIG_FILES([src/applications/Makefile])
 AC_CONFIG_FILES([src/impl/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 
