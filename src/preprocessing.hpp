@@ -326,27 +326,34 @@ public:
         assert(boost::is_directed(_g));
         assert(boost::num_vertices(gg)==0);
 
-        size_t subgraph_nv=boost::num_vertices(_g)-_elims.size();
+        auto nv=boost::num_vertices(_g);
+        auto subgraph_nv=nv-_elims.size();
         gg = GG(subgraph_nv);
         m.resize(subgraph_nv);
+        typedef typename boost::graph_traits<GG>::vertex_descriptor vdGG;
+        std::vector<vdGG> pm(nv); // incomplete. might need real map.
+
         trace2("gsc", _elims.size(), subgraph_nv);
 
-        auto p=boost::vertices(_g);
+        auto p=boost::vertices(_g); // subgraph?
         vertices_size_type seek=0;
         for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
                 continue; // fixme. not here.
                           // use induced subgraph, or boost::filtered_graph.
-            }else{
+            }else{ itested();
                 assert(seek<m.size());
-                m[seek++]=*p.first;
+                pm[*p.first] = seek;
+                m[seek++] = *p.first;
             }
 
             auto q=adjacent_vertices(*p.first); // sic!
             for(; q.first!=q.second; ++q.first){
+                assert(!_numbering.is_numbered(*q.first));
                 assert(*p.first!=*q.first);
-                if(*p.first<*q.first){
-                    treedec::add_edge(*p.first, *q.first, gg);
+                if(*q.first<*p.first){
+                    assert(pm[*p.first]!=pm[*q.first]);
+                    treedec::add_edge(pm[*p.first], pm[*q.first], gg);
                 }else{
                 }
             }
