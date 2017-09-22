@@ -65,12 +65,12 @@ struct dwt<G,
 	typedef typename graph_traits<G>::directed_type& type;
 	static std::string dbg(){ return "dummy wrapper\n"; }
 
-	static G& init(G& g){ untested();
+	static G& init(G& g){
 		return g;
 	}
 
 	template<class GG, class H>
-	static void copy(GG const&, H&){ untested();
+	static void copy(GG const&, H&){
 	}
 };
 

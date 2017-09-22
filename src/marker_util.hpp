@@ -24,7 +24,7 @@ namespace treedec{
 
 template<class I, class M>
 void mark_range(I i, I e, M& marker)
-{ untested();
+{
     for(; i!=e; ++i){
 		 marker.mark(*i);
     }

@@ -349,7 +349,7 @@ class minimalChordal{
 public:
     minimalChordal(G_t& g, O_t& o)
         : _g(g), _o(o)
-    { untested();
+    {
     }
 public:
     void do_it();

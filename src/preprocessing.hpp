@@ -913,17 +913,17 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
     auto f=adjacent_vertices(x).first;
     a = *f;
 
-    if(_degree[a]!=3){ untested();
+    if(_degree[a]!=3){
         return false;
     }else{
     }
     b = *(++f);
-    if(_degree[b]!=3){ untested();
+    if(_degree[b]!=3){
         return false;
     }else{
     }
     c = *(++f);
-    if(_degree[c]!=3){ untested();
+    if(_degree[c]!=3){
         return false;
     }else{
     }

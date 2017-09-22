@@ -848,7 +848,7 @@ public:
       : baseclass(G, NULL, -1u),
 //        _g(G), // baseclass _g?
         _lb_tw(0)
-    { untested();
+    {
         trace2("deltacleastc", boost::num_vertices(G), boost::num_edges(G));
     }
 
@@ -935,11 +935,11 @@ private:
                 assert(*q.first!=target);
             }
 
-            if(*q.first==target){ untested();
+            if(*q.first==target){
                 --_num_edges;
                 assert(_degreemap[*q.first]);
                 --_degreemap[*q.first];
-            }else if(_marker.is_marked(*q.first)){ untested();
+            }else if(_marker.is_marked(*q.first)){
                 // a neigh of v not connected to target.
                 // "move" edge.
                 assert(!boost::edge(target, *q.first, _g).second);
@@ -950,7 +950,7 @@ private:
                 // ++_degreemap[*q.first];
                 ++_degreemap[target];
                 // ++_num_edges;
-            }else{ untested();
+            }else{
                 // this one has been connected to both. now only one.
                 // tell degs...
                 --_num_edges;
@@ -1182,7 +1182,7 @@ public:
     LB_improved_contraction_base(G_t &G)
       : algo1(CFG_t::name()), _g(G), _lb(0),
         _marker(boost::num_vertices(G))
-    { untested();
+    {
     }
 
     void do_it(){

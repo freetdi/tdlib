@@ -404,7 +404,7 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
     inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
                      typename boost::graph_traits<G>::vertex_descriptor w,
                      const G& g)
-{ untested();
+{
     typedef typename detail::shared_adj_iter<G> Iter;
 
     auto p=boost::adjacent_vertices(v, g);
@@ -561,7 +561,7 @@ struct edge_helper{
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    static size_type num(G const& g){ untested();
+    static size_type num(G const& g){
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>

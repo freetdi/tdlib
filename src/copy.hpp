@@ -22,7 +22,7 @@ void copy_trace(const S& s, T& t /*, M map=identity */)
     }else if(!boost::is_multigraph<T>()){
         untested();
         boost::copy_graph(s, t);
-    }else if(boost::is_directed(t)){ untested();
+    }else if(boost::is_directed(t)){
         boost::copy_graph(s, t);
     }else{ untested();
         t = MOVE(T(boost::num_vertices(s)));
