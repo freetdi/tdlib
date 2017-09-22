@@ -157,7 +157,7 @@ private:
         }
         CFG::alloc_init(boost::num_vertices(_g));
         vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(_g); vIt != vEnd; ++vIt){ itested();
+        for(boost::tie(vIt, vEnd) = boost::vertices(_g); vIt != vEnd; ++vIt){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *vIt);
             assert(pos<_vals.size());
             _vals[pos] = boost::out_degree(*vIt, _g);

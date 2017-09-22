@@ -244,7 +244,7 @@ public: // O(1) neighbor stuff.
             if(degn>=degc){
                 long X = degn - degc;
                 long new_fill = old_fill - cfill - X;
-                if(new_fill < 0){ itested();
+                if(new_fill < 0){
                     // new fill is wrong.
                     // there must be edges to fill adjacent to n...
                     q_eval(*n);
@@ -287,11 +287,11 @@ public: // picking
         typename eq_t::const_iterator qi = _eval_queue.begin();
         typename eq_t::const_iterator qe = _eval_queue.end();
         assert(qe!=qi || !_fill.empty());
-        for(; qi!=qe; ++qi){ itested();
+        for(; qi!=qe; ++qi){
             unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), *qi);
             size_t missing_edges = _vals[pos].value;
 
-            if(!_vals[pos].queued){ itested();
+            if(!_vals[pos].queued){
                 // taken out of queue, because fill==0.
                 assert(missing_edges==0);
                 // ignore

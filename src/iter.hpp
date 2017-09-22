@@ -573,7 +573,7 @@ public: // ops
         return vd;
     }
     bfs_iter& operator++()
-    { itested();
+    {
         assert(_q.begin() != _q.end());
         ++front_range().first;
         if(front_range().first == front_range().second){
@@ -593,7 +593,7 @@ public: // ops
         if(_q.empty()){
             trace1("layer atend", _q.size());
             return false;
-        }else if(_q.front().first!=_q.front().second){ itested();
+        }else if(_q.front().first!=_q.front().second){
             return true;
         }else{ untested();
             return false;
@@ -624,10 +624,10 @@ private:
     void next_nonvisited_or_end()
     {
         trace2("next_nonvisited_or_end", _q.size(), count_range(front_range()));
-        while(front_range().first!=front_range().second){ itested();
+        while(front_range().first!=front_range().second){
             vertex_descriptor v=*front_range().first;
             BOOST_AUTO(pos, treedec::get_pos(v, _g));
-            if(visited(pos)){ itested();
+            if(visited(pos)){
                 trace1("been there", pos);
             }else{
                 set_visited(pos);
@@ -667,11 +667,11 @@ public: // construct
            return;
        }else{
        }
-       while(true){ itested();
+       while(true){
            BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
-           if(visited(pos)){ itested();
+           if(visited(pos)){
                ++x.first;
-           }else{ itested();
+           }else{
                trace1("push", count_range(x));
                _q.push_back(x);
                break;
@@ -1347,7 +1347,7 @@ public: // ops
             _t.push_back(_i);
          }else{
             BOOST_AUTO(back, _t.back());
-            if(back==_e){ itested();
+            if(back==_e){
                break;
             }else{
                ++back;
@@ -1878,7 +1878,7 @@ public:
     concat_iterator(iter1 begin1, iter1 end1, iter2 begin2, iter2 end2)
      : _i1(begin1), _e1(end1), _i2(begin2), _e2(end2){}
 
-    bool operator==(const concat_iterator& o) const{ itested();
+    bool operator==(const concat_iterator& o) const{
         return _i1==o._i1 && _i2==o._i2;
     }
     bool operator!=(const concat_iterator& o) const{
