@@ -1,6 +1,5 @@
-// Lukas Larisch, 2014 - 2015
-//
-// (c) 2014-2015 Goethe-Universität Frankfurt
+// Copyright (C) 2014-2017 Lukas Larisch
+// Author: Lukas Larisch
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the

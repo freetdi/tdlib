@@ -16,3 +16,5 @@
 - underlying backend gala sorted
 - overlay muss noch ausprobiert werden
 - (squashen vom overlay)
+
+-use range(.) instead of list of vertices [0..]

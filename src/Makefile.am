@@ -40,7 +40,6 @@ pkginclude_HEADERS = \
   misc.hpp \
   network_flow.hpp \
   nice_decomposition.hpp \
-  noboost.hpp \
   numbering.hpp \
   overlay.hpp \
   platform.hpp \
