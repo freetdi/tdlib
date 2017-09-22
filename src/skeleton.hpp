@@ -187,7 +187,7 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
     // turn that into a numbering...
     typedef draft::NUMBERING_1<G_t> numbering_type;
     draft::NUMBERING_1<G_t> n(boost::num_vertices(G));
-    for(unsigned i=0; i<n_; ++i){ itested();
+    for(unsigned i=0; i<n_; ++i){
         n.put(O[i]);
         n.increment();
     }

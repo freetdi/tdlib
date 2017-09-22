@@ -461,63 +461,63 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
 //    std::vector<std::vector<BOOL> > bags(num_vert);
 //    typedef boost::adjacency_matrix<boost::undirectedS> bamu;
 
-    for(unsigned i = 0; i < num_vert; i++){ itested();
+    for(unsigned i = 0; i < num_vert; i++){
         iO[O[i]] = i;
 #ifdef DO_NOT_USE_BAMU
 //        bags[i].assign(num_vert, false);
 #endif
     }
 
-    for(unsigned i = 0; i < num_vert; i++){ itested();
+    for(unsigned i = 0; i < num_vert; i++){
         auto R=boost::adjacent_vertices(O[i], G);
-        for(;R.first!=R.second;++R.first) { itested();
+        for(;R.first!=R.second;++R.first) {
             unsigned n_node = *R.first;
-            if((unsigned)iO[n_node] > i){ itested();
+            if((unsigned)iO[n_node] > i){
                 boost::add_edge(i, n_node, bags);
             }
         }
     }
 
-    for(unsigned i = 0; i < num_vert; i++){ itested();
+    for(unsigned i = 0; i < num_vert; i++){
         std::vector<unsigned> N;
-        for(unsigned j = 0; j < num_vert; j++){ itested();
-            if(boost::edge(i, j, bags).second){ itested();
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
                 N.push_back(j);
                 unsigned iO_n_node = iO[j];
-                if(iO_n_node < edges[i]){ itested();
+                if(iO_n_node < edges[i]){
                     edges[i] = iO_n_node;
                 }
             }
         }
 
-        for(unsigned j = 0; j < N.size(); j++){ itested();
-            for(unsigned k = 0; k < N.size(); k++){ itested();
-                if(iO[N[k]] > iO[N[j]]){ itested();
+        for(unsigned j = 0; j < N.size(); j++){
+            for(unsigned k = 0; k < N.size(); k++){
+                if(iO[N[k]] > iO[N[j]]){
                 //    bags[iO[N[j]]][N[k]] = true;
                     boost::add_edge(iO[N[j]], N[k], bags);
-                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){ itested();
+                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
                         edges[iO[N[j]]] = iO[N[k]];
-                    }else{ itested();
+                    }else{
                     }
                 }
             }
         }
     }
 
-    for(unsigned i = 0; i < num_vert; i++){ itested();
+    for(unsigned i = 0; i < num_vert; i++){
         boost::add_vertex(t);
         auto& b=bag(i,t);
         push(b, O[i]);
-        for(unsigned j = 0; j < num_vert; j++){ itested();
-            if(boost::edge(i, j, bags).second){ itested();
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
                 push(b, j);
             }
          }
      }
 
-    for(unsigned i = 0; i < num_vert-1u; i++){ itested();
+    for(unsigned i = 0; i < num_vert-1u; i++){
         assert(edges[i]>i || edges[i]==invalid);
-        if(edges[i]!=invalid){ itested();
+        if(edges[i]!=invalid){
             // normal edge, as computed above.
             boost::add_edge(i, edges[i], t);
         }

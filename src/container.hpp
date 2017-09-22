@@ -85,7 +85,7 @@ void insert(C& c, E e)
 
 template<class C, class E>
 bool contains(C const& c, E e)
-{ itested();
+{
     return detail::container_inspect<C>::contains(c, e);
 }
 

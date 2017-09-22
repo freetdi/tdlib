@@ -187,22 +187,22 @@ private:
             assert(&_numbering == &o._numbering);
             return *this;
         }
-        vertex_descriptor operator*(){ itested();
+        vertex_descriptor operator*(){
             assert(*this!=_end);
             return adjacency_iterator::operator*();
         }
-        adjacency_iterator_filter_& operator++(){ itested();
+        adjacency_iterator_filter_& operator++(){
             assert(*this!=_end);
             adjacency_iterator::operator++();
             skip();
             return *this;
         }
     private:
-        void skip(){ itested();
-            while(*this!=_end){ itested();
-                if(_numbering.is_numbered(adjacency_iterator::operator*())){ itested();
+        void skip(){
+            while(*this!=_end){
+                if(_numbering.is_numbered(adjacency_iterator::operator*())){
                     adjacency_iterator::operator++();
-                }else{ itested();
+                }else{
                     return;
                 }
             }
@@ -333,8 +333,8 @@ public:
 
         auto p=boost::vertices(_g);
         vertices_size_type seek=0;
-        for(; p.first!=p.second; ++p.first){ itested();
-            if(_numbering.is_numbered(*p.first)){ itested();
+        for(; p.first!=p.second; ++p.first){
+            if(_numbering.is_numbered(*p.first)){
                 continue; // fixme. not here.
                           // use induced subgraph, or boost::filtered_graph.
             }else{
@@ -485,7 +485,7 @@ private:
             boost::add_edge(v, w, _g);
             ++_degree[v]; // outdegree
             return 1;
-        }else{ itested();
+        }else{
             return 0;
         }
     }
@@ -1338,7 +1338,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         }else{
             return false;
         }
-    }else{ itested();
+    }else{
         return false;
     }
 }

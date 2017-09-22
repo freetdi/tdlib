@@ -119,12 +119,12 @@ namespace boost {
       const const_stack& b = (*this)[bucket[v]];
       if( prev[id_to_value[v]] < next.size()){
         return true;
-      }else if( b.empty()){ itested();
+      }else if( b.empty()){
       //  trace3("empty", v, bucket[v], head[bucket[v]]);
         return false;
       } else if( head[bucket[v]] == v){ itested();
         return true;
-      }else{ itested();
+      }else{
         //trace3("buckettop is", v, k, b.top());
         return false;
       }
