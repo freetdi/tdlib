@@ -951,7 +951,7 @@ std::pair<unsigned,unsigned> find_max_degree_vertex(G const& g)
 namespace draft{
 
 template <typename G_t,
-        template<class G_> class config=algo::default_config>
+        template<class G_, class ...> class config=algo::default_config>
 class exact_cutset { // baseclass?
 public:
     exact_cutset(G_t const& g)
@@ -971,7 +971,7 @@ private:
     G_t const& _g;
 };
 
-template <typename G_t, template<class G_> class config>
+template <typename G_t, template<class G_, class ...> class config>
 template<class T_t>
 bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 {
