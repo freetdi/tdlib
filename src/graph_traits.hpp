@@ -40,7 +40,8 @@ namespace boost{
 
 template<class G>
 unsigned& get(treedec::bagsize_t, G&){
-	return treedec::bagsize_t().dummy;
+	static unsigned udummy;
+	return udummy;
 }
 
 } // boost
