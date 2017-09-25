@@ -21,12 +21,10 @@ sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
     def test_long1(self):
-        print("FILL config")
+        print("---generic search - FILL config---")
         for i in range(0, COUNT_NETWORKS+1):
-            #if base.skip(PREFIX_NETWORKS, i, lambda x,y: x > 100 or y > 2000):
-            #    continue
-#            if i != 3:
-#                continue
+            if base.skip(PREFIX_NETWORKS, i, lambda x,y: x > 100 or y > 2000):
+                continue
 
             base.print_graph_name(PREFIX_NETWORKS, i)
 

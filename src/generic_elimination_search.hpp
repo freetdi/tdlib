@@ -245,7 +245,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             baseclass::_global_lb = tmp_global_lb;
         }
 
-        std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
+//        std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
 
         unsigned tmp_global_ub = CFG_t::initial_ub_algo(baseclass::_g.underlying(), baseclass::_best_ordering);
 
@@ -258,7 +258,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
         // baseclass::bagsize_range().size()==1...?
         if(baseclass::_global_lb == baseclass::_global_ub){
-            std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
+//            std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::_orderings_generated; //not necessary..
 
             baseclass::timer_off();
@@ -271,7 +271,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             std::cout << "found better ordering of width " << local_ub << std::endl;
             baseclass::_global_ub = local_ub;
             baseclass::_best_ordering = baseclass::_current_ordering;
-            std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
+//            std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
 
             ++baseclass::_orderings_generated; //ifdef stats?!
 
@@ -282,7 +282,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                 std::cout << "found better ordering after refinement " << ref_width << std::endl;
                 baseclass::_global_ub = ref_width;
                 baseclass::_best_ordering = tmp_ordering;
-                std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
+//                std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
 
                 if(CFG_t::is_jumper()){
                     baseclass::_nodes_generated = max_nodes_generated; //terminates now
@@ -311,8 +311,8 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         local_lb = CFG_t::lb_algo(H);
         if(local_lb > baseclass::_global_ub){
             //can be seen as pruning this branch
-            incomplete(); // use message.
-            std::cerr << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
+            //incomplete(); // use message.
+//            std::cerr << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
             baseclass::timer_off();
             return;
         }else{

@@ -37,139 +37,71 @@ namespace treedec{
 namespace app{
 
 
-/* MAX INDEPENDENT SET */
+/* MAX CLIQUE */
 
 namespace detail{
 
-template <typename G_t, typename T_t>
-unsigned int bottom_up_computation_independent_set(G_t &G, T_t &T,
-       std::vector<std::map<typename treedec_traits<T_t>::bag_type, int> > &results)
-{
-    std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
-    treedec::nice::postorder_traversal(T, S);
-    typename boost::graph_traits<T_t>::vertex_descriptor cur;
-
-    while(!S.empty()){
-        cur = S.top();
-        S.pop();
-
-        treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
-
-        if(node_type == treedec::nice::LEAF){
-            //Store both possibilities (the empty set and the set containing one vertex).
-            results[cur][typename treedec_traits<T_t>::bag_type()] = 0;
-            results[cur][bag(cur, T)] = 1;
-        }
-        else if(node_type == treedec::nice::INTRODUCE){
-            //For all results S of the child: Store S extended by the introduced vertex with value
-            //old_value + 1, if S extended by the introduced vertex is an independent set, else -1.
-            typename boost::graph_traits<T_t>::vertex_descriptor child =
-                                      *(boost::adjacent_vertices(cur, T).first);
-
-            typename boost::graph_traits<G_t>::vertex_descriptor new_vertex =
-                                     treedec::nice::get_introduced_vertex(cur, T);
-
-            results[cur] = results[child];
-
-            for(typename std::map<typename treedec_traits<T_t>::bag_type, int>::iterator it =
-                         results[child].begin(); it != results[child].end(); it++)
-            {
-                bool extensible = true;
-
-                for(typename treedec_traits<T_t>::bag_type::iterator sIt =
-                         it->first.begin(); sIt != it->first.end(); sIt++)
-                {
-                    if(boost::edge(*sIt, new_vertex, G).second){
-                        extensible = false;
-                        break;
-                    }
-                }
-
-                typename treedec_traits<T_t>::bag_type tmp = it->first;
-                tmp.insert(new_vertex);
-
-                if(extensible){
-                    results[cur][tmp] = results[child][it->first] + 1;
-                }
-                else{
-                    results[cur][tmp] = -1;
-                }
-            }
-        }
-        else if(node_type == treedec::nice::FORGET){
-            //Store the maximum of S and S extended by the forgotten vertex for each subset S
-            //of the current bag.
-            typename boost::graph_traits<T_t>::vertex_descriptor child =
-                                      *(boost::adjacent_vertices(cur, T).first);
-
-            typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex =
-                                treedec::nice::get_forgotten_vertex(cur, T);
-
-            std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
-
-            for(unsigned int i = 0; i < subs.size(); i++){
-                typename treedec_traits<T_t>::bag_type tmp = subs[i];
-                tmp.insert(forgotten_vertex);
-
-                int val_with = results[child][subs[i]];
-                int val_without = results[child][tmp];
-
-                if(val_with >= val_without){
-                    results[cur][subs[i]] = val_with;
-                }
-                else{
-                    results[cur][subs[i]] = val_without;
-                }
-            }
-        }
-
-        if(node_type == treedec::nice::JOIN){
-            //The maximum size of an independent set is the sum of the maximum size of an independent set
-            //of the left child and the right child minus the size of the intersection with the current bag,
-            //or -1 if the at least one of the child's results is not an independent set.
-            typename boost::graph_traits<T_t>::vertex_descriptor child1 =
-                                      *(boost::adjacent_vertices(cur, T).first);
-
-            typename boost::graph_traits<T_t>::vertex_descriptor child2 =
-                                     *(++boost::adjacent_vertices(cur, T).first);
-
-            std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
-
-            for(unsigned int i = 0; i < subs.size(); i++){
-                if(results[child1][subs[i]] < 0 || results[child2][subs[i]] < 0){
-                    results[cur][subs[i]] = -1;
-                }
-                else{
-                    results[cur][subs[i]] = results[child1][subs[i]] + results[child2][subs[i]] - subs[i].size();
-                }
+template <typename G_t, typename A_t, typename B_t>
+bool is_clique(G_t &G, A_t A, B_t B){
+    BOOST_AUTO(p1, A);
+    for(; p1 != B; ++p1){
+        BOOST_AUTO(p2, p1);
+        p2++;
+        for(; p2 != B; ++p2){
+            if(!boost::edge(*p1, *p2, G).second){
+                return false;
             }
         }
     }
-
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
-    return (unsigned int) results[root].begin()->second;
+    return true;
 }
 
-} //namespace detail
+} //namespace detail (for max_clique)
 
 
 template <typename G_t, typename T_t>
-unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
-                      typename treedec_traits<T_t>::bag_type &global_result)
+unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
+                               typename treedec_traits<T_t>::bag_type &global_result)
 {
-    std::vector<std::map<typename treedec_traits<T_t>::bag_type, int> > results(boost::num_vertices(T));
+    unsigned int max = 0;
 
-    unsigned int max = treedec::app::detail::bottom_up_computation_independent_set(G, T, results);
+    typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
+        //We wouldn't find a larger clique.
+        if(bag(*vIt, T).size() <= max){ continue; }
 
-    if(max > 0){
-        typename treedec_traits<T_t>::bag_type a, b;
-        typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
-        treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
+        //Search for a clique of size greater than 'size' by inspecting all subsets
+        //of size exactly 'size' for size = max+1,max+2,..
+        for(unsigned int size = max+1; size <= bag(*vIt, T).size(); size++){
+            BOOST_AUTO(P, make_subsets_range(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
+            BOOST_AUTO(I, P.first);
+            bool changed = false;
+
+            for(; I != bag(*vIt, T).end(); ++I){
+                if(treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
+                    max = size;
+
+                    global_result.clear();
+                    BOOST_AUTO(p, (*I).first);
+
+                    for(; p != (*I).second; p++){
+                        global_result.insert(*p);
+                    }
+
+                    changed = true;
+
+                    //We wouldn't find a larger clique in this loop.
+                    break;
+                }
+            }
+            //This bag doesn't contain a clique larger that 'max'.
+            if(!changed){
+                break;
+            }
+        }
     }
 
-    // assert(treedec::validation::is_valid_independent_set(G, result));
+    // assert(treedec::validation::is_valid_clique(G, result));
 
     return max;
 }
