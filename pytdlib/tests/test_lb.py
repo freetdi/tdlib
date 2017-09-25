@@ -14,76 +14,24 @@ class TestTdLib(unittest.TestCase):
 ############ LOWER BOUNDS ####################################
 
     def test_lower_bounds_0a(self):
-        V, E = cornercases[0]
+      l=[-1, 0, 0, 4]
+      for i in range(4):
+        V, E = cornercases[i]
         G = Graph(V, E)
         lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, -1)
+        self.assertEqual(lb, l[i])
         lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, -1)
-
-    def test_lower_bounds_0b(self):
-        V, E = cornercases[1]
-        G = Graph(V, E)
-        lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, 0)
-
-    def test_lower_bounds_0c(self):
-        V, E = cornercases[2]
-        G = Graph(V, E)
-        lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, 0)
-        lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, 0)
-
-    def test_lower_bounds_0d(self):
-        V, E = cornercases[3]
-        G = Graph(V, E)
-        lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, 4)
+        self.assertEqual(lb, l[i])
 
     def test_lower_bounds_1(self):
         G = Graph(V_P6, E_P6)
@@ -101,23 +49,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(lb, 1)
         lb = tdlib.lower_bound(G, "LBPC_deltaC")
         self.assertEqual(lb, 1)
-
-    def test_lower_bounds_2(self):
-        G = Graph(V_K5, E_K5)
-        lb = tdlib.lower_bound(G, "deltaC_min_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_max_d")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "deltaC_least_c")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBN_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBNC_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBP_deltaC")
-        self.assertEqual(lb, 4)
-        lb = tdlib.lower_bound(G, "LBPC_deltaC")
-        self.assertEqual(lb, 4)
 
     def test_lower_bounds_3(self):
         G = Graph(V_Petersen, E_Petersen)

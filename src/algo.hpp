@@ -24,13 +24,18 @@
 
 #include <limits>
 #include "timer.hpp"
+#include "graph_traits.hpp"
 
 namespace treedec{
 namespace algo{
 
+struct config_base{
+    static void interruption_point(){ }
+};
+
 template<class GraphType>
-struct default_config{
-	typedef typename boost::graph_traits<GraphType>::vertices_size_type vst;
+struct default_config : config_base{
+	using vst=typename boost::graph_traits<GraphType>::vertices_size_type;
 	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
 };
 
@@ -41,7 +46,7 @@ O* clone(O const* o)
 {
 	if(o){ untested();
 		return o->clone();
-	}else{ untested();
+	}else{
 		return NULL;
 	}
 }
@@ -49,37 +54,62 @@ O* clone(O const* o)
 class algo1{
 protected:
 	algo1(const algo1& o)
-		: _label(o._label), _timer(clone(o._timer)){}
+#ifdef TIMER
+		: _timer(clone(o._timer))
+#endif
+		{(void)o;}
 public:
 	algo1(std::string label)
-	   : _label(label), _timer(NULL) {
 #ifdef TIMER
-			_timer=new DOUBLE_TIMER("raw");
-#endif
+	   : _timer(NULL) {
+			_timer=new DOUBLE_TIMER("raw" + label);
 		}
+#else
+	{(void)label;}
+#endif
 	virtual ~algo1(){
+#ifdef TIMER
 		if(_timer){
-			std::cout << _label << ": ";
+		//	std::cout << _label << ": ";
 			std::cout << *_timer << "\n";
 		}
+#endif
 	}
 
 	virtual void do_it() = 0;
 
+//for now
+public:
+	double get_runtime(){
+#ifdef TIMER
+            if(_timer){
+                return _timer->total();
+            }
+#endif
+            return -1;
+        }
+
 protected:
 	void timer_on(){
+#ifdef TIMER
 		if(_timer){
 			_timer->start();
 		}
+#endif
 	}
 	void timer_off(){
+#ifdef TIMER
 		if(_timer){
 			_timer->stop();
 		}
+#endif
 	}
+
 private:
-	std::string _label;
+//	std::string _label; incomplete.
+#ifdef TIMER
 	TIMER_BASE* _timer;
+#endif
 };
 
 } // draft

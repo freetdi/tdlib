@@ -1,6 +1,5 @@
-// Lukas Larisch, 2014 - 2016
-//
-// (c) 2014-2016 Goethe-Universität Frankfurt
+// Copyright (C) 2014-2017 Lukas Larisch
+// Author: Lukas Larisch
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -49,7 +48,7 @@ void get_robber_components(G_t &G,
     typedef typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type bag_type;
 
     //G \ X
-    std::vector<bool> disabled(boost::num_vertices(G), false);
+    std::vector<BOOL> disabled(boost::num_vertices(G), false);
     for(typename bag_type::iterator sIt = X.begin(); sIt != X.end(); sIt++){
         unsigned int pos = get_pos(*sIt, G);
         disabled[pos] = true;

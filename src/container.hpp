@@ -83,6 +83,12 @@ void insert(C& c, E e)
     detail::container_modify<C>::insert(c, e);
 }
 
+template<class C, class E>
+bool contains(C const& c, E e)
+{
+    return detail::container_inspect<C>::contains(c, e);
+}
+
 } // treedec
 
 #endif

@@ -1,7 +1,5 @@
 // Felix Salfelder, 2016
 //
-// (c) 2016 Goethe-Universität Frankfurt
-//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation; either version 2, or (at your option) any
@@ -17,20 +15,38 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-//   traits for tdlib graphs and treedecs.
-//
-//
+//   traits for tdlib graphs.
 
 #ifndef TD_GRAPH_TRAITS_HPP
 #define TD_GRAPH_TRAITS_HPP
 
 #include <boost/graph/graph_traits.hpp>
+#include <boost/graph/properties.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <set>
+#include "trace.hpp"
 
 namespace treedec{
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
+
+struct bagsize_t{
+	unsigned dummy;
+};
+
+} // treedec
+
+namespace boost{
+
+template<class G>
+unsigned& get(treedec::bagsize_t, G&){
+	static unsigned udummy;
+	return udummy;
+}
+
+} // boost
+
+namespace treedec{
 
 struct Vertex_NF{
     bool visited;
@@ -75,6 +91,20 @@ struct treedec_chooser{ //
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag_t> type;
 };
 // } not yet
+//
+namespace detail{
+
+template<class G_t>
+struct default_directed_select{
+   typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> type;
+};
+
+template<class X, class Y, class Z>
+struct default_directed_select< boost::adjacency_list<X, Y, boost::directedS, Z> >{
+   typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
+};
+
+} // detail
 
 // this makes some sense...
 template<class G_t>
@@ -84,6 +114,7 @@ struct graph_traits : public graph_traits_base<G_t> { //
     typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
                 boost::bidirectionalS, Vertex_NF, Edge_NF> directed_overlay;
     typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
+    typedef typename detail::default_directed_select<G_t>::type directed_type;
 };
 
 // obsolete. use graph_traits directly.
@@ -100,10 +131,12 @@ inline bool is_valid(typename boost::graph_traits<G>::vertex_iterator const &,
     return true;
 }
 template<typename G>
-inline bool is_valid(typename boost::graph_traits<G>::vertex_descriptor const &,
-		const G&)
+inline bool is_valid(typename boost::graph_traits<G>::vertex_descriptor const & ,
+		const G& )
 {
-    return true;
+	// bug: missing gala override
+   // return v < boost::num_vertices(g);
+	return true;
 }
 
 
@@ -139,7 +172,7 @@ struct treedec_traits{ //
 
 };
 
-}
+} // treedec
 
 // return "id" where the vertex_descriptor might make more sense.
 // (transitional interface)
@@ -210,6 +243,14 @@ struct graph_callback{ // fixme: union of the above?
     virtual void operator()(vertex_descriptor)=0;
     virtual void operator()(vertex_descriptor, vertex_descriptor)=0;
 };
+
+template<class G>
+inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
+		   typename boost::graph_traits<G>::vertex_descriptor y, G& g);
+
+template<class G>
+inline typename boost::graph_traits<G>::edges_size_type num_edges(G const& g);
 
 } // treedec
 

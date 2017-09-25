@@ -21,12 +21,6 @@ class TestTdLib(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w >= 1 and w <= 5, True)
 
-    def test_seperator_algorithm_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.seperator_algorithm(G)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w >= 4 and w <= 17, True)
-
     def test_seperator_algorithm_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.seperator_algorithm(G)

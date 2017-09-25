@@ -78,7 +78,7 @@
 # ifndef NDEBUG
 template <class C>
 inline bool contains(C const& c, typename C::value_type const& v)
-{ untested();
+{
 	return(c.find(v) != c.end());
 }
 template <class X>

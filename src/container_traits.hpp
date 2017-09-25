@@ -74,15 +74,28 @@ namespace detail{//
     }; // access
     template<class C, class X=void>
     struct container_inspect{//
-        static bool contains(C& c, typename C::value_type e)
+        template<class E>
+        static bool contains(C const& c, E e)
         {
-          (void) c; (void) e;
-          incomplete();
-          return false;
+          return c.find(e)!=c.end();
         }
         // size?
         // is_ordered?
     };
+#ifndef NDEBUG // for now. (this is slow.)
+    template<class C>
+    struct container_inspect<C,
+      typename std::enable_if<
+        std::is_same<C, typename std::vector<
+        typename C::value_type,
+        typename C::allocator_type> >::value
+        >::type >{//
+        static bool contains(C const& c, typename C::value_type e)
+        { incomplete();
+          return std::find(c.begin(), c.end(), e) != c.end();
+        }
+    };
+#endif
     template<class C, class X=void>
     struct container_modify{//
         // push, insert new item
@@ -121,4 +134,4 @@ namespace detail{//
 
 #endif
 
-// vim:ts=8:sw=2:et
+// vim:ts=8:sw=4:et

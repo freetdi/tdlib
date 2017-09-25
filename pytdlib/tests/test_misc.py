@@ -24,13 +24,6 @@ class TestTdLib_misc(unittest.TestCase):
         T, w = tdlib.ordering_to_treedec(G, O)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
-    def test_conversion_2(self):
-        G = Graph(V_K5, E_K5)
-        T, w = tdlib.PP_MD(G)
-        O = tdlib.treedec_to_ordering(T)
-        T, w = tdlib.ordering_to_treedec(G, O)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-
     def test_conversion_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.PP_MD(G)
@@ -71,6 +64,7 @@ class TestTdLib_misc(unittest.TestCase):
             V, E = randomGNP(20, 0.2)
             G = Graph(V, E)
             T, w = tdlib.PP_MD(G)
+            self.assertTrue(tdlib.is_valid_treedecomposition(G, T))
             O = tdlib.treedec_to_ordering(T)
             T, w = tdlib.ordering_to_treedec(G, O)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)

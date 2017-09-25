@@ -1,6 +1,20 @@
-- cleanup interfaces
-- release 1.0
-- provide meta heuristic for treewidth
-- parallelize exact_cutset?
-- solvers as (callable/extensible) classes
-- more treedecomposition structures
+- proper python interface
+- more solvers as classes
+- make clean (e.g. grtd)
+- use "using" instead of typedef for types that should not be exported
+- get rid of unnecessary public inheritance in a few places.
+- directed_view in FI
+- PP simplicial issue (is it a bug?)
+- PP->FI bridge?
+- more tests
+
+- provide meta heuristic for treewidth, PP+generic_search
+  - initialem FI+TM als ub
+  - initialem LBP(C)_deltaC
+  - deltaC_least_c als lb
+  - TM als refiner
+- underlying backend gala sorted
+- overlay muss noch ausprobiert werden
+- (squashen vom overlay)
+
+-use range(.) instead of list of vertices [0..]

@@ -1,7 +1,5 @@
 // Lukas Larisch, 2014 - 2015
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
-//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation; either version 2, or (at your option) any
@@ -66,21 +64,21 @@ typename boost::graph_traits<T_t>::vertex_descriptor logApproximation(G_t &G, T_
 
     typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S, S_;
 
-    std::vector<bool> disabled(boost::num_vertices(G), true);
+    std::vector<BOOL> disabled(boost::num_vertices(G), true);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = union_Z_W.begin(); sIt != union_Z_W.end(); sIt++)
         disabled[G[*sIt].id] = false;
 
     //find a 2/3-vertex seperator S of W in G[Z v W]
-    std::vector<bool> disabled1(disabled);
+    std::vector<BOOL> disabled1(disabled);
     approximate_vertex_seperator(G, disabled1, W, S);
 
     //find a 2/3-vertex seperator S_ of (Z v W) in G[Z v W]
-    std::vector<bool> disabled2(disabled);
+    std::vector<BOOL> disabled2(disabled);
     approximate_vertex_seperator(G, disabled, union_Z_W, S_);
 
 
     //compute the connected components of G[Z v W - (S v S_)]
-    std::vector<bool> disabled3(disabled);
+    std::vector<BOOL> disabled3(disabled);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S.begin(); sIt != S.end(); sIt++)
         disabled[G[*sIt].id] = true;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt = S_.begin(); sIt != S_.end(); sIt++)

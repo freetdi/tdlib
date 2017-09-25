@@ -1,7 +1,5 @@
 // Lukas Larisch, 2014 - 2015
 //
-// (c) 2014-2015 Goethe-Universität Frankfurt
-//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation; either version 2, or (at your option) any
@@ -26,7 +24,7 @@
 
 
 template <typename G_t>
-void approximate_vertex_seperator(G_t &G, std::vector<bool> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S){
+void approximate_vertex_seperator(G_t &G, std::vector<BOOL> &disabled, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X, typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S){
 }
 
 #endif //ifdef TD_APPROXIMATE_SEPERATOR

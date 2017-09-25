@@ -1,7 +1,5 @@
 // Lukas Larisch, 2014 - 2016
 //
-// (c) 2014-2016 Goethe-Universität Frankfurt
-//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation; either version 2, or (at your option) any
@@ -152,7 +150,7 @@ template <typename T_t>
 void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
 
-    std::vector<bool> visited(boost::num_vertices(T), false);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
     typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);

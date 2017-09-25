@@ -1,8 +1,6 @@
 // Lukas Larisch, 2014 - 2016
 // Felix Salfelder, 2016
 //
-// (c) 2014-2016 Goethe-Universität Frankfurt
-//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation; either version 2, or (at your option) any
@@ -28,21 +26,24 @@
 #define TD_SIMPLE_GRAPH_ALGOS
 
 #include <set>
+#include <limits>
 
 #include <boost/graph/adjacency_list.hpp>
 #include "graph.hpp"
+#include "marker_util.hpp"
+#include "induced_subgraph.hpp"
 
 namespace treedec{
 
 //This function is used in the minimalChordal algorithm.
-template <typename G_t>
-void induced_subgraph_omit_edges(G_t &H, G_t &G,
+template <typename G_t, typename E_t>
+void induced_subgraph_omit_edges(G_t &H, const G_t &G,
                       typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &X,
-                      std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > &edges,
+                      E_t &edges,
                       typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap)
 {
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
+    std::vector<BOOL> disabled(boost::num_vertices(G), true);
     vdMap.resize(X.size());
 
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
@@ -63,8 +64,10 @@ void induced_subgraph_omit_edges(G_t &H, G_t &G,
         if(!disabled[spos] && !disabled[dpos]){
             bool omit = false;
             for(unsigned int i = 0; i < edges.size(); i++){
-                if((edges[i][0] == boost::source(*eIt, G) && edges[i][1] == boost::target(*eIt, G))
-                || (edges[i][1] == boost::source(*eIt, G) && edges[i][0] == boost::target(*eIt, G)))
+                if((edges[i].first == boost::source(*eIt, G)
+                 && edges[i].second == boost::target(*eIt, G))
+                || (edges[i].second == boost::source(*eIt, G)
+                 && edges[i].first == boost::target(*eIt, G)))
                 {
                     omit = true;
                     break;
@@ -85,7 +88,7 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
     typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
     typedef typename boost::graph_traits<H_t>::vertex_iterator H_vertex_iterator;
     std::vector<G_vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
+    std::vector<BOOL> disabled(boost::num_vertices(G), true);
     if(vdMap){
         vdMap->resize(X.size());
     }
@@ -131,7 +134,7 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
         throw exception_invalid_precondition();
     }
     std::vector<vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<bool> disabled(boost::num_vertices(G), true);
+    std::vector<BOOL> disabled(boost::num_vertices(G), true);
     if(vdMap){
         vdMap->resize(X.size());
     }
@@ -194,7 +197,7 @@ bool is_edge_between_sets(G_t &G, vertex_set const& X, vertex_set const& Y)
 }
 
 template <typename G_t, typename It>
-inline void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
+inline void get_neighbourhood(G_t const &G, std::vector<BOOL> &disabled,
              It Xit, It Xend,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
 {
@@ -217,7 +220,7 @@ inline void get_neighbourhood(G_t const &G, std::vector<bool> &disabled,
 //  - if it is not an element of X
 //
 template <typename G_t>
-inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
+inline void get_neighbourhood(G_t &G, std::vector<BOOL> &disabled,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
              std::set<typename boost::graph_traits<G_t>::vertex_descriptor> &S_X)
 {
@@ -227,7 +230,7 @@ inline void get_neighbourhood(G_t &G, std::vector<bool> &disabled,
 template <typename G_t, typename B_t>
 void t_search_components(G_t const &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
-        std::vector<bool> &visited,
+        std::vector<BOOL> &visited,
         std::vector<B_t> &components,
         int comp_idx)
 {
@@ -246,7 +249,7 @@ void t_search_components(G_t const &G,
 template <typename G_t, typename VB_t>
 void get_components_provided_map(G_t const &G,
              VB_t &components,
-             std::vector<bool> &visited){
+             std::vector<BOOL> &visited){
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
@@ -267,7 +270,7 @@ void get_components_provided_map(G_t const &G,
 template <typename G_t, typename B_t>
 void t_search_components(G_t &G,
         typename boost::graph_traits<G_t>::vertex_descriptor vertex,
-        std::vector<bool> &visited,
+        std::vector<BOOL> &visited,
         std::vector<B_t> &components,
         int comp_idx)
 {
@@ -286,7 +289,7 @@ void t_search_components(G_t &G,
 template <typename G_t>
 void get_components_provided_map(G_t &G,
              std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &components,
-             std::vector<bool> &visited){
+             std::vector<BOOL> &visited){
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
@@ -307,7 +310,7 @@ template <typename G_t>
 void get_components(G_t &G,
              std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components)
 {
-    std::vector<bool> visited(boost::num_vertices(G), false);
+    std::vector<BOOL> visited(boost::num_vertices(G), false);
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
@@ -322,26 +325,34 @@ void get_components(G_t &G,
     }
 }
 
-template <typename G_t>
+// find a neighbour x of v with the least common neighbours
+template <typename G_t, class M>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
-   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor &min_vertex,
-           const G_t &G)
+   get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor v,
+           M& marker, const G_t &G)
 {
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    boost::tie(nIt1, nEnd) = boost::adjacent_vertices(min_vertex, G);
-    typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt1;
+    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 
-    unsigned int min_common = UINT_MAX;
+    auto min_common=std::numeric_limits<vertices_size_type>::max();
 
-    for(; nIt1 != nEnd; nIt1++){
-        unsigned int cnt_common = 0;
-        BOOST_AUTO(ci, common_out_edges(*nIt1, min_vertex, G).first);
-        BOOST_AUTO(ce, common_out_edges(*nIt1, min_vertex, G).second);
-        for(; ci!=ce; ++ci){
-            cnt_common++;
+    marker.clear();
+
+    auto p=boost::adjacent_vertices(v, G);
+    typename boost::graph_traits<G_t>::vertex_descriptor w = *p.first;
+    mark_range(p.first, p.second, marker);
+
+    auto q=boost::adjacent_vertices(v, G);
+    for(; q.first != q.second; q.first++){
+        vertices_size_type cnt_common=0;
+        auto p=boost::adjacent_vertices(*q.first, G);
+        for(; p.first!=p.second; ++p.first){
+            if(marker.is_marked(*p.first)){
+                cnt_common++;
+            }else{
+            }
         }
         if(cnt_common < min_common){
-            w = *nIt1;
+            w = *q.first;
             min_common = cnt_common;
         }
     }
