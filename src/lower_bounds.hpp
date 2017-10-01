@@ -966,8 +966,8 @@ private:
     }
 
 private: // overrides
-    bool next(vertex_descriptor &c) { incomplete(); return false;}
-    void eliminate(vertex_descriptor v) { incomplete(); }
+    bool next(vertex_descriptor &) { incomplete(); return false;}
+    void eliminate(vertex_descriptor) { incomplete(); }
 private:
     unsigned _lb_tw;
 };

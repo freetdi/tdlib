@@ -58,6 +58,7 @@
 // #define EC_COMP_SET boost::container::flat_set
 #define EC_COMP_SET std::vector
 
+#include "graph_util.hpp"
 
 typedef BOOL EXCUT_BOOL;
 
@@ -710,11 +711,13 @@ bool excut_worker<G>::try_candidate_set(cjob_t& comp_job,
     auto N=make_neighbourhood_range(comp_job.cut_prefix_end, cand_end, _g, nvis);
     assert(N.first!=N.second);
 
+    auto visitedm=util::make_incidence_mask(visited);
+
     // build components neighboring the candidate set.
     BOOST_AUTO(cmps_range,
             make_components_range(
                 N.first, N.second,
-                _g, &visited, &cr_scratch, BOOL()));
+                _g, visitedm, &cr_scratch));
 
     // iterate through components
     // break if one fails.
@@ -1083,15 +1086,16 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
             for( auto jj : parentB){
 //                trace1("", jj);
         //        target_bag.insert(jj);
-                auto pos=get_pos(jj, _g);
-                visited[pos]=true;
+                auto pos = get_pos(jj, _g);
+                visited[pos] = true;
             }
             // put connected component of leaf vertex into final bag
+            auto vm=util::make_incidence_mask(visited);
             auto N=make_components_range(source_bag.begin(), source_bag.end(),
-                    _g, &visited, &crscr, BOOL());
+                    _g, vm, &crscr);
 
-            auto C=*(N.first);
-            for(;C.first!=C.second; ++(C.first)){
+            auto C=*N.first;
+            for(; C.first!=C.second; ++C.first){
                 auto lbv=*C.first;
                 auto pos=get_pos(lbv, _g);
                 (void)pos;

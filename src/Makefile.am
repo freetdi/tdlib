@@ -22,6 +22,7 @@ pkginclude_HEADERS = \
   elimination_orderings.hpp \
   error.hpp \
   exact_cutset.hpp \
+  exact_ta.hpp \
   exact.hpp \
   fill.hpp \
   generic_base.hpp \
@@ -30,6 +31,7 @@ pkginclude_HEADERS = \
   generic_elimination_search_overlay.hpp \
   graph.hpp \
   graph_traits.hpp \
+  graph_util.hpp \
   grparse.h \
   induced_subgraph.hpp \
   iter.hpp \
