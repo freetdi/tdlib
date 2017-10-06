@@ -55,6 +55,7 @@
 
 #include "generic_elimination_search_overlay.hpp"
 #include "induced_subgraph.hpp"
+#include "graph_impl.hpp"
 
 #ifndef get_pos
 // HACK, cleanup later
@@ -114,33 +115,7 @@ void contract_edge(vertex_descriptor_G v,
 template<typename B, typename E, typename G_t>
 void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
 {
-    typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
-    B nIt2;
-    for(; nIt1!=nEnd; ++nIt1){
-#if 1
-        if(cb){
-            (*cb)(*nIt1); // hmm
-        }
-#endif
-        nIt2 = nIt1;
-        nIt2++;
-        for(; nIt2 != nEnd; nIt2++){
-            std::pair<edge_descriptor, bool> ep=boost::add_edge(*nIt1, *nIt2, G);
-            if(ep.second){
-               if(cb){
-                   (*cb)(*nIt1, *nIt2);
-               }
-            }
-            if(!boost::is_directed(G)){
-            }
-            else if( boost::edge(*nIt2, *nIt1, G).second ){
-                // change later.
-            }
-            else{
-                boost::add_edge(*nIt2, *nIt1, G);
-            }
-        }
-    }
+    return impl::make_clique(nIt1, nEnd, G, cb);
 }
 
 template<typename nIter_t, typename G_t>
