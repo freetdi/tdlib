@@ -253,11 +253,11 @@ struct graph_helper{
 	static_assert(sizeof(G)==0, "need specialization");
 
 	template<class S>
-	static void close_neighbourhood(S& c, G const&){
+	static void close_neighbourhood(S&, G const&){
 		static_assert(sizeof(S)==0, "need specialization");
 	};
 	template<class S>
-	static void open_neighbourhood(S& c, G const&){
+	static void open_neighbourhood(S&, G const&){
 		static_assert(sizeof(S)==0, "need specialization");
 	};
 };

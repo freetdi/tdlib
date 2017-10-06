@@ -1032,8 +1032,9 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){
         }
     }
 
-    for(unsigned int i = 0; i < edges_to_add.size(); ++i){
+    for(unsigned int i = 0; i < edges_to_add.size(); ){
         boost::add_edge(edges_to_add[i], edges_to_add[i+1], G);
+        ++i;
         ++i;
     }
 }
@@ -1125,7 +1126,7 @@ int LBN_deltaD(G_t &G)
 template <typename G_t>
 int LBN_deltaD(G_t const&G)
 { untested();
-    G_t H(G_t);
+    G_t H(G);
     return LBN_deltaD(H);
 }
 
@@ -1358,8 +1359,9 @@ void k_path_improved_graph(G_t &G, unsigned int k){
         }
     }
 
-    for(unsigned int i = 0; i < edges_to_add.size(); ++i){
+    for(unsigned int i = 0; i < edges_to_add.size(); ){
         boost::add_edge(edges_to_add[i], edges_to_add[i+1], G);
+        ++i;
         ++i;
     }
 }

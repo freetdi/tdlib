@@ -209,8 +209,7 @@ public: // types
             return(_v==_cs._range.second);
         }
     public: // ops
-        vertex_descriptor operator*()
-        {
+        vertex_descriptor operator*() {
             assert(!is_end());
             vertex_descriptor v;
             if(_cs._stack.size()){
@@ -225,8 +224,7 @@ public: // types
             assert(_cs._visited[pos]);
             return v;
         }
-        component_iter& operator++()
-        {
+        component_iter& operator++() {
             vertex_descriptor pre=**this;
             size_t pos=boost::get(boost::vertex_index, _cs._g, pre);
             (void)pos;
@@ -409,13 +407,13 @@ public: // copy
        }
    }
 public: // ass
-    components_iter& operator=(const components_iter& other)
+    components_iter& operator=(const components_iter&)
     { unreachable();
         incomplete();
         return *this;
     }
 #if __cplusplus >= 201103L
-    components_iter& operator=(const components_iter&& other)
+    components_iter& operator=(const components_iter&&)
     { unreachable();
         incomplete();
         return *this;
@@ -444,7 +442,7 @@ public: // ops
     {
         return _range.first == other._range.first;
     }
-    bool operator<(const components_iter& other) const
+    bool operator<(const components_iter&) const
     { incomplete();
         return false;
         // uuh ooh. vector?! (does not work)
@@ -703,8 +701,7 @@ private:
         return _q.front();
     }
 
-    void next_nonvisited_or_end()
-    {
+    void next_nonvisited_or_end() {
         trace2("next_nonvisited_or_end", _q.size(), count_range(front_range()));
         while(front_range().first!=front_range().second){
             vertex_descriptor v=*front_range().first;
@@ -729,7 +726,7 @@ private:
 //                _q.pop_front();
         }else{ untested();
         }
-    }
+    } // next_nonvisited_or_end
 private:
     // typedef std::pair<layer_iter, layer_end> onion_layer_range;
 public: // construct
@@ -894,7 +891,7 @@ public: // types
     typedef std::vector<BOOL_> vis_t;
     class layer_end{ //
     };
-    class layer_iter{ //
+    class layer_iter {
     public:
         layer_iter(onion_iter& o)
            : _onion(o)
@@ -960,13 +957,11 @@ public: // types
             // trace1("++'d in layer", count_range(front_range()));
             return *this;
         }
-        bool operator!=(const layer_iter& other) const
-        { incomplete();
+        bool operator!=(const layer_iter&) const { incomplete();
             assert(false);
             return true; // dont know how to do that.
         }
-        bool operator==(const layer_end&e) const
-        { untested();
+        bool operator==(const layer_end&e) const { untested();
             return !operator!=(e);
         }
         bool operator!=(const layer_end&) const
@@ -984,29 +979,25 @@ public: // types
         }
 
     private:
-        BOOL& visited(unsigned pos)
-        { untested();
+        BOOL& visited(unsigned pos) { untested();
             assert(pos<_onion._visited.size());
             return _onion._visited[pos];
         }
-        typename queue_type::value_type const& front_range() const
-        { untested();
+        typename queue_type::value_type const& front_range() const { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
         }
-        typename queue_type::value_type& front_range()
-        { untested();
+        typename queue_type::value_type& front_range() { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
         }
-
-        void next_nonvisited_or_end()
-        { untested();
+        // onion_iter::
+        void next_nonvisited_or_end() { untested();
             while(front_range().first!=front_range().second){ untested();
                 vertex_descriptor v=*front_range().first;
-                auto pos=boost::get(boost::vertex_index, _g, v);
+                auto pos=boost::get(boost::vertex_index, _onion._g, v);
                 if(visited(pos)){ untested();
                 }else{ untested();
                     visited(pos) = true;
@@ -1559,7 +1550,7 @@ public: // construct
             _b = _e;
         }
     }
-    neighbourhood01_iter& operator=(const neighbourhood01_iter& x)
+    neighbourhood01_iter& operator=(const neighbourhood01_iter&)
     { untested();
         incomplete();
         return *this;
@@ -1587,7 +1578,7 @@ public: // construct
         x._aa = NULL;
         assert(_aa == NULL || _aa == &_a);
     }
-    neighbourhood01_iter& operator=(const neighbourhood01_iter&& x)
+    neighbourhood01_iter& operator=(const neighbourhood01_iter&&)
     { untested();
         incomplete();
         return *this;
