@@ -44,9 +44,9 @@ namespace detail{
 template <typename G_t>
 bool is_valid_extended_coloring(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor v, std::vector<int> &coloring){
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-    unsigned int vpos = get_pos(v, G);
+    auto vpos=boost::get(boost::vertex_index, G, v);
     for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
-        unsigned int npos = get_pos(*nIt, G);
+        auto npos=boost::get(boost::vertex_index, G, *nIt);
         if(coloring[vpos] == coloring[npos]){
             return false;
         }
@@ -69,7 +69,7 @@ void colorings_intersection(G_t &G, std::vector<std::vector<int> > &results_left
             for(typename treedec_traits<T_t>::bag_type::iterator sIt 
                     = bag.begin(); sIt != bag.end(); sIt++)
             {
-                unsigned int pos = get_pos(*sIt, G);
+                auto pos=boost::get(boost::vertex_index, G, *sIt);
                 if(results_left[i][pos] != results_right[j][pos]){
                     is_compatible = false;
                     break;
@@ -290,7 +290,7 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = get_pos(*vIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *vIt);
         inv_map[pos] = *vIt;
     }
 

@@ -38,8 +38,10 @@ struct bagsize_t{
 
 namespace boost{
 
+// this is forbidden?
 template<class G>
 unsigned& get(treedec::bagsize_t, G&){
+	unreachable();
 	static unsigned udummy;
 	return udummy;
 }
@@ -47,6 +49,7 @@ unsigned& get(treedec::bagsize_t, G&){
 } // boost
 
 namespace treedec{
+
 
 struct Vertex_NF{
     bool visited;
@@ -64,7 +67,8 @@ struct Edge_NF{
 // "bag" is also used as shorthand for bag access...
 
 struct bag_t{ //
-    std::set<unsigned int> bag;
+  typedef boost::vertex_property_tag kind;
+  std::set<unsigned int> bag; // yikes. old way.
 };
 
 // dont define twice (in old code)
@@ -88,7 +92,8 @@ template<class G>
 struct treedec_chooser{ //
     typedef unsigned value_type;
     typedef std::set<unsigned> bag_type;
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, bag_t> type;
+	 typedef boost::adjacency_list<boost::vecS, boost::vecS,
+	                           boost::undirectedS, bag_t> type;
 };
 // } not yet
 //
@@ -152,8 +157,9 @@ struct vdstuff { //
 // specialize teedec_traits (below) in case you must.
 template <typename T>
 struct vdstuff<false, T> { //
-    typedef typename T::value_type type;
-    typedef T bag_type;
+	// T is not bag_t. so probably a boost::property
+    typedef typename T::value_type::value_type type;
+    typedef typename T::value_type bag_type;
 };
 } //detail
 
@@ -167,8 +173,8 @@ struct treedec_traits{ //
          vertex_property_type >::type vd_type;
 
     typedef typename detail::vdstuff<
-       boost::is_same<vertex_property_type, bag_t >::value,
-         vertex_property_type >::bag_type bag_type;
+       boost::is_same<vertex_property_type, treedec::bag_t >::value,
+          vertex_property_type >::bag_type bag_type;
 
 };
 
@@ -189,17 +195,6 @@ inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_d
 //Positions are in {0, 1, ..., num_vertices-1}, where applicable.
 //(One you use the vertex descriptor in boost graphs with vertex container 'vecS').
 // this position must be stable under copy and assignment operations.
-
-namespace treedec{
-
-template<typename G_t>
-inline typename boost::graph_traits<G_t>::vertices_size_type
-   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const& G)
-{
-    return boost::get(boost::vertex_index, G, v);
-}
-
-} // treedec
 
 namespace treedec{
 
@@ -251,6 +246,22 @@ add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
 
 template<class G>
 inline typename boost::graph_traits<G>::edges_size_type num_edges(G const& g);
+
+template<class G>
+struct graph_helper{
+    // stub. incomplete.
+	static_assert(sizeof(G)==0, "need specialization");
+
+	template<class S>
+	static void close_neighbourhood(S& c, G const&){
+		static_assert(sizeof(S)==0, "need specialization");
+	};
+	template<class S>
+	static void open_neighbourhood(S& c, G const&){
+		static_assert(sizeof(S)==0, "need specialization");
+	};
+};
+
 
 } // treedec
 

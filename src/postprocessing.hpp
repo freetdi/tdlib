@@ -211,7 +211,7 @@ public:
         std::vector<BOOL> visited(boost::num_vertices(H), false);
         BOOST_AUTO(sIt, S_.begin());
         for(; sIt!=S_.end(); ++sIt){
-            unsigned int pos = get_pos(*sIt, *HI);
+            auto pos=boost::get(boost::vertex_index, *HI, *sIt);
             visited[pos] = true;
         }
 
@@ -314,7 +314,7 @@ bool is_candidate_edge(E_t &edge, unsigned int i,
     //Position i in 'elimination_ordering_' will store the 'elimination date' of vertex i
     std::vector<unsigned int> elimination_ordering_(boost::num_vertices(M));
     for(unsigned int t = 0; t < elimination_ordering.size(); t++){
-        unsigned int pos = get_pos(elimination_ordering[t], M);
+        auto pos=boost::get(boost::vertex_index, M, elimination_ordering[t]);
         elimination_ordering_[pos] = t;
     }
 
@@ -395,10 +395,10 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
             //Translate descriptors of W_i to descriptors of G.
             std::vector<edge_type> keep_fill(keep_fill_.size());
             for(unsigned int j = 0; j < keep_fill_.size(); j++){
-                unsigned int pos1 = get_pos(keep_fill_[j].first, W_i);
-                unsigned int pos2 = get_pos(keep_fill_[j].second, W_i);
-                keep_fill[j].first=vdMap[pos1];
-                keep_fill[j].second=vdMap[pos2];
+                auto pos1=boost::get(boost::vertex_index, W_i, keep_fill_[j].first);
+                auto pos2=boost::get(boost::vertex_index, W_i, keep_fill_[j].second);
+                keep_fill[j].first = vdMap[pos1];
+                keep_fill[j].second = vdMap[pos2];
             }
 
             //Delete all candidate edges that can be deleted in G according to LEX_M_fill_in.

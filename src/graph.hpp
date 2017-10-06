@@ -38,7 +38,6 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include "degree.hpp"
 #include "error.hpp"
 #include "graph_traits.hpp"
 #include "treedec_traits.hpp"
@@ -48,8 +47,19 @@
 #include "error.hpp"
 #include "bits/bool.hpp"
 
-#include "generic_elimination_search_overlay.hpp"
+// not yet
+// #include <gala/boost.h>
+// #include "graph_gala.hpp"
 
+#include "degree.hpp"
+
+#include "generic_elimination_search_overlay.hpp"
+#include "induced_subgraph.hpp"
+
+#ifndef get_pos
+// HACK, cleanup later
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+#endif
 
 namespace treedec{
 
@@ -57,6 +67,16 @@ namespace treedec{
 #define vertex_descriptor_G typename boost::graph_traits<G>::vertex_descriptor
 #define adjacency_iterator_G typename boost::graph_traits<G>::adjacency_iterator
 
+
+// obsolete forward? better don't use
+#if 0
+template<typename G_t>
+inline typename boost::graph_traits<G_t>::vertices_size_type
+   get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const& G)
+{
+    return boost::get(boost::vertex_index, G, v);
+}
+#endif
 
 //Vertex v will remain as isolated node.
 //Calls cb on neighbors if degree drops by one,
@@ -90,7 +110,7 @@ void contract_edge(vertex_descriptor_G v,
 
 // turn vertex range into clique.
 // call cb on newly created edges and incident vertices.
-// returns the number of newly created edges.
+// (no longer?!) returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
 void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
 {
@@ -296,12 +316,15 @@ inline void detach_neighborhood(
 }
 
 
-
 // count number of edges missing in 1-neighborhood of v
+// OBSOLETE
+// OBSOLETE
+// OBSOLETE
 template <typename G_t>
 inline size_t count_missing_edges(
         const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
 {
+    incomplete(); // obsolete
     size_t missing_edges = 0;
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
@@ -316,6 +339,7 @@ inline size_t count_missing_edges(
     }
     return missing_edges;
 }
+
 
 // collect neighbors of c into bag
 // remove c from graph (i.e. isolate).
@@ -399,9 +423,9 @@ namespace detail{ //
 // possibly obsolete.
 template<class G>
 std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
-    inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
-                     typename boost::graph_traits<G>::vertex_descriptor w,
-                     const G& g)
+inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
+        typename boost::graph_traits<G>::vertex_descriptor w,
+        const G& g)
 {
     typedef typename detail::shared_adj_iter<G> Iter;
 
@@ -556,6 +580,12 @@ namespace detail{
 
 template<class G, class X=void>
 struct edge_helper{
+};
+
+template<class G>
+struct edge_helper<G, typename std::enable_if< std::is_convertible<
+                    typename boost::graph_traits<G>::directed_category*, boost::undirected_tag*
+                    >::value, void>::type > {
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
@@ -564,9 +594,6 @@ struct edge_helper{
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
         add(vertex_descriptor x, vertex_descriptor y, G& g){
-
-    //std::cout << std::is_convertible<
-    //    typename boost::graph_traits<G>::directed_category, boost::directed_tag>:: value << "\n";
 
 	return boost::add_edge(x, y, g);
     }
@@ -600,7 +627,6 @@ template<class G>
 inline typename boost::graph_traits<G>::edges_size_type
   num_edges(G const& g)
 {
-    
     return detail::edge_helper<G>::num(g);
 }
 
@@ -612,9 +638,25 @@ add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
     return detail::edge_helper<G>::add(x, y, g);
 }
 
+template<class S, class G>
+void open_neighbourhood(S& s, G const& g)
+{
+    graph_helper<G>::open_neighbourhood(s, g);
+}
+
+template<class S, class G>
+void close_neighbourhood(S& s, G const& g)
+{
+    graph_helper<G>::close_neighbourhood(s, g);
+}
+
+template<class S, class G>
+void saturate(S& s, G const& g)
+{
+    graph_helper<G>::saturate(s, g);
+}
 
 } // treedec
-
 
 #endif // guard
 // vim:ts=8:sw=4:et

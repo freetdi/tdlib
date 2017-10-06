@@ -708,7 +708,7 @@ private:
         trace2("next_nonvisited_or_end", _q.size(), count_range(front_range()));
         while(front_range().first!=front_range().second){
             vertex_descriptor v=*front_range().first;
-            BOOST_AUTO(pos, treedec::get_pos(v, _g));
+            auto pos=boost::get(boost::vertex_index, _g, v);
             if(visited(pos)){
                 trace1("been there", pos);
             }else{
@@ -750,7 +750,7 @@ public: // construct
        }else{
        }
        while(true){
-           BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
+           auto pos=boost::get(boost::vertex_index, _g, *x.first);
            if(visited(pos)){
                ++x.first;
            }else{
@@ -1006,7 +1006,7 @@ public: // types
         { untested();
             while(front_range().first!=front_range().second){ untested();
                 vertex_descriptor v=*front_range().first;
-                BOOST_AUTO(pos, treedec::get_pos(v, _onion._g));
+                auto pos=boost::get(boost::vertex_index, _g, v);
                 if(visited(pos)){ untested();
                 }else{ untested();
                     visited(pos) = true;
@@ -1068,7 +1068,7 @@ public: // construct
    { untested();
        assert(x.first!=x.second);
        while(true){ untested();
-           BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
+           auto pos=boost::get(boost::vertex_index, _g, *x.first);
            if(_visited[pos]){ untested();
                ++x.first;
            }else{ untested();
@@ -1769,9 +1769,10 @@ public: // construct
             unsigned v=0;
             for(;P.first!=P.second;++P.first){
                 ++t;
-                auto p=treedec::get_pos(*P.first, _g);
+                auto p=boost::get(boost::vertex_index, _g, *P.first);
                 if(!_visited[p]){
                     ++v;
+                }else{
                 }
             }
         }
@@ -1899,7 +1900,7 @@ private: // impl
     bool visited() const
     {
         assert(treedec::is_valid(*_current, _g));
-        auto p=treedec::get_pos(*_current, _g);
+        auto p=boost::get(boost::vertex_index, _g, *_current);
         return _visited[p];
     }
 private: // data

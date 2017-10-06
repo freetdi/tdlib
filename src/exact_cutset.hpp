@@ -125,6 +125,8 @@ inline typename TV::bag_type const& bag(
 }
 } // bagdraft
 
+// obsolete
+#if 0
 template<class G>
 unsigned get_pos(typename treedec::VECTOR_TD<G>::const_vertex_descriptor v,
                  treedec::VECTOR_TD<G> const& _g)
@@ -132,6 +134,7 @@ unsigned get_pos(typename treedec::VECTOR_TD<G>::const_vertex_descriptor v,
     size_t s = sizeof(typename treedec::VECTOR_TD<G>::value_type);
     return (intptr_t(v) - intptr_t(*_g.begin()))/s;
 }
+#endif
 
 namespace detail{ //
 
@@ -364,10 +367,11 @@ bool excut_worker<G>::viceatovin(td_vd cut_ext, cr& cut_red_bag, cmp& cc_mask,
         typename boost::graph_traits<G>::vertex_descriptor II = *sIt;
 
         for(boost::tie(nIt, nEnd)=boost::adjacent_vertices(II, _g); nIt!=nEnd; ++nIt){
-            if(!cc_mask[get_pos(*nIt, _g)]){
-                if(n+1 == _bagsize){
-                    return false;
-                }
+            auto pos=boost::get(boost::vertex_index, _g, *nIt);
+            if(cc_mask[pos]){
+            } else if(n+1 == _bagsize){
+                return false;
+            }else{
                 cut_red_bag[n++] = *sIt;
                 break;
             }
@@ -1066,7 +1070,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
         auto& source_bag=ii->second;
 
         auto parent_it=boost::adjacent_vertices(*ii, results).first;
-        unsigned parent_pos = get_pos(*parent_it, results);
+        unsigned parent_pos=boost::get(boost::vertex_index, results, *parent_it);
         if(boost::degree(*ii,results)){
             assert(boost::degree(*ii,results) == 1);
             assert(bag_index);
@@ -1079,7 +1083,8 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
         auto& target_bag=bag(get_pos(*ii, results), T);
 ///// =============  LEAFTRICK =========
         if(bag_index && source_bag.size()==1){
-            auto const& parentB=bag(get_pos(*parent_it, results), T);
+            auto pos=get_pos(*parent_it, results);
+            auto const& parentB=bag(pos, T);
            // trace2("leaftrick", bag_index, *target_bag.begin());
 
             // mark parent bag visited.

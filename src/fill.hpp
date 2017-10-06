@@ -98,7 +98,7 @@ public: // construct
                     assert(_vals[pos]==-1);
                     assert(contains(_eval_queue, *vIt));
                 }else{
-                    missing_edges = treedec::count_missing_edges(*vIt,_g);
+                    missing_edges = treedec::count_missing_edges(*vIt, _g);
                     reg(*vIt, missing_edges);
                     assert(_vals[pos]==missing_edges);
                 }
