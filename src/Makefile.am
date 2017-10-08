@@ -21,9 +21,9 @@ pkginclude_HEADERS = \
   dynamicCR.hpp \
   elimination_orderings.hpp \
   error.hpp \
+  exact_base.hpp \
   exact_cutset.hpp \
   exact_ta.hpp \
-  exact.hpp \
   fill.hpp \
   generic_base.hpp \
   generic_elimination_search_configs.hpp \
