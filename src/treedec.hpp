@@ -290,11 +290,12 @@ namespace boost{
     }
 
     template<class G>
-    inline void
+    inline size_t
     get(vertex_index_t, treedec::VECTOR_TD<G> & g,
             typename treedec::VECTOR_TD<G>::vertex_descriptor v)
-    //  boost::get(boost::vertex_index, G, v);
-    { incomplete();
+    { untested();
+		 size_t s = sizeof(typename treedec::VECTOR_TD<G>::value_type);
+		 return (intptr_t(v) - intptr_t(*g.begin()))/s;
     }
 } // boost
 

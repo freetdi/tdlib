@@ -49,19 +49,21 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt
          = X.begin(); sIt != X.end(); sIt++)
     {
-       unsigned int pos1 = get_pos(*sIt, G);
+       auto pos1=boost::get(boost::vertex_index, G, *sIt);
        internal_map[pos1] = boost::add_vertex(H);
        disabled[pos1] = false;
 
-       unsigned int pos2 = get_pos(internal_map[pos1], H);
+       auto pos2=boost::get(boost::vertex_index, H, internal_map[pos1]);
        vdMap[pos2] = *sIt;
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        unsigned int spos=get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=get_pos(boost::target(*eIt, G), G);
-        if(!disabled[spos] && !disabled[dpos]){
+        auto s=boost::source(*eIt, G);
+        auto t=boost::target(*eIt, G);
+        auto spos=boost::get(boost::vertex_index, G, s);
+        auto tpos=boost::get(boost::vertex_index, G, t);
+        if(!disabled[spos] && !disabled[tpos]){
             bool omit = false;
             for(unsigned int i = 0; i < edges.size(); i++){
                 if((edges[i].first == boost::source(*eIt, G)
@@ -74,8 +76,10 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
                 }
             }
             if(!omit){
-                boost::add_edge(internal_map[spos], internal_map[dpos], H);
+                boost::add_edge(internal_map[spos], internal_map[tpos], H);
+            }else{
             }
+        }else{
         }
     }
 }
@@ -314,7 +318,7 @@ void get_components(G_t &G,
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     int comp_idx = -1;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = get_pos(*vIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *vIt);
         if(!visited[pos]){
             components.resize(components.size()+1);
             comp_idx++;

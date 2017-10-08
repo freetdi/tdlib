@@ -88,7 +88,7 @@ bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<type
     std::vector<BOOL> visited(boost::num_vertices(G), false);
     for(unsigned i = 0; i < vec.size(); i++){
         for(typename treedec::treedec_traits<typename treedec::treedec_chooser<G_t>::type>::bag_type::iterator sIt = vec[i].begin(); sIt != vec[i].end(); sIt++){
-            unsigned pos = treedec::get_pos(*sIt, G);
+            unsigned pos = get_pos(*sIt, G);
             visited[pos] = true;
         }
     }
@@ -101,13 +101,13 @@ bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<type
     std::vector<unsigned> col(boost::num_vertices(G));
     for(unsigned i = 0; i < vec.size(); i++){
         for(typename treedec::treedec_traits<typename treedec::treedec_chooser<G_t>::type>::bag_type::iterator sIt = vec[i].begin(); sIt != vec[i].end(); sIt++){
-            col[treedec::get_pos(*sIt, G)] = i;
+            col[get_pos(*sIt, G)] = i;
         }
     }
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        if(col[treedec::get_pos(boost::source(*eIt, G), G)] == col[treedec::get_pos(boost::target(*eIt, G), G)]){
+        if(col[get_pos(boost::source(*eIt, G), G)] == col[get_pos(boost::target(*eIt, G), G)]){
             return false;
         }
     }

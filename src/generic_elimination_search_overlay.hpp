@@ -37,8 +37,8 @@ struct pcnt{
 
 template<class G>
 struct outedge_resize{
-    static void do_it(typename boost::graph_traits<G>::vertex_descriptor x,
-                     size_t size, G& g)
+    static void do_it(typename boost::graph_traits<G>::vertex_descriptor,
+                     size_t, G&)
     {
         //static_assert(sizeof(G)==0);
     }

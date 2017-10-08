@@ -58,6 +58,7 @@
 // #define EC_COMP_SET boost::container::flat_set
 #define EC_COMP_SET std::vector
 
+#include "graph_util.hpp"
 
 typedef BOOL EXCUT_BOOL;
 
@@ -124,6 +125,8 @@ inline typename TV::bag_type const& bag(
 }
 } // bagdraft
 
+// obsolete
+#if 0
 template<class G>
 unsigned get_pos(typename treedec::VECTOR_TD<G>::const_vertex_descriptor v,
                  treedec::VECTOR_TD<G> const& _g)
@@ -131,6 +134,7 @@ unsigned get_pos(typename treedec::VECTOR_TD<G>::const_vertex_descriptor v,
     size_t s = sizeof(typename treedec::VECTOR_TD<G>::value_type);
     return (intptr_t(v) - intptr_t(*_g.begin()))/s;
 }
+#endif
 
 namespace detail{ //
 
@@ -363,10 +367,11 @@ bool excut_worker<G>::viceatovin(td_vd cut_ext, cr& cut_red_bag, cmp& cc_mask,
         typename boost::graph_traits<G>::vertex_descriptor II = *sIt;
 
         for(boost::tie(nIt, nEnd)=boost::adjacent_vertices(II, _g); nIt!=nEnd; ++nIt){
-            if(!cc_mask[get_pos(*nIt, _g)]){
-                if(n+1 == _bagsize){
-                    return false;
-                }
+            auto pos=boost::get(boost::vertex_index, _g, *nIt);
+            if(cc_mask[pos]){
+            } else if(n+1 == _bagsize){
+                return false;
+            }else{
                 cut_red_bag[n++] = *sIt;
                 break;
             }
@@ -710,11 +715,13 @@ bool excut_worker<G>::try_candidate_set(cjob_t& comp_job,
     auto N=make_neighbourhood_range(comp_job.cut_prefix_end, cand_end, _g, nvis);
     assert(N.first!=N.second);
 
+    auto visitedm=util::make_incidence_mask(visited);
+
     // build components neighboring the candidate set.
     BOOST_AUTO(cmps_range,
             make_components_range(
                 N.first, N.second,
-                _g, &visited, &cr_scratch, BOOL()));
+                _g, visitedm, &cr_scratch));
 
     // iterate through components
     // break if one fails.
@@ -951,7 +958,7 @@ std::pair<unsigned,unsigned> find_max_degree_vertex(G const& g)
 namespace draft{
 
 template <typename G_t,
-        template<class G_> class config=algo::default_config>
+        template<class G_, class ...> class config=algo::default_config>
 class exact_cutset { // baseclass?
 public:
     exact_cutset(G_t const& g)
@@ -971,7 +978,7 @@ private:
     G_t const& _g;
 };
 
-template <typename G_t, template<class G_> class config>
+template <typename G_t, template<class G_, class ...> class config>
 template<class T_t>
 bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 {
@@ -1063,7 +1070,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
         auto& source_bag=ii->second;
 
         auto parent_it=boost::adjacent_vertices(*ii, results).first;
-        unsigned parent_pos = get_pos(*parent_it, results);
+        unsigned parent_pos=boost::get(boost::vertex_index, results, *parent_it);
         if(boost::degree(*ii,results)){
             assert(boost::degree(*ii,results) == 1);
             assert(bag_index);
@@ -1076,22 +1083,24 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
         auto& target_bag=bag(get_pos(*ii, results), T);
 ///// =============  LEAFTRICK =========
         if(bag_index && source_bag.size()==1){
-            auto const& parentB=bag(get_pos(*parent_it, results), T);
+            auto pos=get_pos(*parent_it, results);
+            auto const& parentB=bag(pos, T);
            // trace2("leaftrick", bag_index, *target_bag.begin());
 
             // mark parent bag visited.
             for( auto jj : parentB){
 //                trace1("", jj);
         //        target_bag.insert(jj);
-                auto pos=get_pos(jj, _g);
-                visited[pos]=true;
+                auto pos = get_pos(jj, _g);
+                visited[pos] = true;
             }
             // put connected component of leaf vertex into final bag
+            auto vm=util::make_incidence_mask(visited);
             auto N=make_components_range(source_bag.begin(), source_bag.end(),
-                    _g, &visited, &crscr, BOOL());
+                    _g, vm, &crscr);
 
-            auto C=*(N.first);
-            for(;C.first!=C.second; ++(C.first)){
+            auto C=*N.first;
+            for(; C.first!=C.second; ++C.first){
                 auto lbv=*C.first;
                 auto pos=get_pos(lbv, _g);
                 (void)pos;

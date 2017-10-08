@@ -138,9 +138,43 @@ typedef enum{
 
 namespace detail{
 
+struct localmask{
+    typedef std::vector<BOOL> S;
+
+    localmask() {}
+    localmask(unsigned x) : _s(x) {}
+    bool operator()(unsigned x) const{
+        return _s[x];
+    }
+    bool operator[](unsigned x) const{
+        return operator()(x);
+    }
+    void visit (unsigned x){
+        _s[x] = true;
+    }
+    void resize(size_t t){ _s.resize(t); }
+    size_t size() const{ return _s.size(); }
+    S _s;
+};
+
+template<class M>
+struct mask_help{
+    template<class A, class B>
+    static void init(A, B){
+    }
+};
+
+template<>
+struct mask_help<localmask>{
+    template<class A, class B>
+    static void init(A& a, B size){
+        a.resize(size);
+    }
+};
+
 // iterate through the connected components of a graph
 // THIS IMPLEMENTS A ONE-PASS ITERATOR
-template<class G, class VR, class BOOL_=bool>
+template<class G, class VR, class vis_t=localmask >
 class components_iter{ //
 public: // types
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
@@ -151,39 +185,51 @@ public: // types
     typedef typename std::vector<adj_range> stack_type;
 
     typedef typename std::vector<adj_range> scratch_type;
-    typedef std::vector<BOOL_> vis_t;
+//    typedef std::vector<BOOL_> vis_t;
     class component_iter{ //
+    public:
+        typedef component_iter hackself;
     public:
         component_iter(typename VR::first_type v, components_iter& cs, bool visit=true)
            : _v(v) /* necessary? */, _cs(cs)
         {
-            // assert(cs._stack.size()==0);
+            assert(cs._stack.size()==0);
             if(v==_cs._range.second){
             }else{
-                auto pos=treedec::get_pos(*_v, _cs._g);
+                auto pos=boost::get(boost::vertex_index, _cs._g, *_v);
                 if(visit){
-                    _cs._visited[pos]=visit;
+                    _cs._visited.visit(pos);
+                }else{
                 }
             }
         }
-    public: // ops
-        vertex_descriptor operator*()
+    private:
+        bool is_end() const
         {
+            return(_v==_cs._range.second);
+        }
+    public: // ops
+        vertex_descriptor operator*() {
+            assert(!is_end());
             vertex_descriptor v;
             if(_cs._stack.size()){
                 v = *(_cs._stack.back().first);
             }else{
+                assert(_v!=_cs._range.second);
                 v = *_v;
             }
+            assert(treedec::is_valid(v, _cs._g));
+            auto pos=boost::get(boost::vertex_index, _cs._g, v);
+            (void)pos;
+            assert(_cs._visited[pos]);
             return v;
         }
-        component_iter& operator++()
-        {
+        component_iter& operator++() {
             vertex_descriptor pre=**this;
-            size_t pos=treedec::get_pos(pre, _cs._g);
+            size_t pos=boost::get(boost::vertex_index, _cs._g, pre);
+            (void)pos;
             // trace1("cmp++ ", pos);
             assert(_cs._visited[pos]);
-            _cs._visited[pos] = true;
 
             BOOST_AUTO(p, boost::adjacent_vertices(pre, _cs._g));
             _cs._stack.push_back(p);
@@ -200,7 +246,7 @@ public: // types
                         assert(treedec::is_valid(*_v, _cs._g));
                         _v = _cs._range.second; // indicate eoc
 
-                        if(_v!=_cs._range.second){ untested();
+                        if(_v!=_cs._range.second){
                             // auto pos=treedec::get_pos(*_v, _cs._g);
                         //    _cs._visited[pos] = true;
                         }else{
@@ -208,21 +254,32 @@ public: // types
                         return *this;
                     }
                 }else{
-                    unsigned pos=treedec::get_pos(*candi.first, _cs._g);
+                    unsigned pos=boost::get(boost::vertex_index, _cs._g, *candi.first);
                     if (!_cs._visited[pos]){
                         // trace1("visiting", pos);
-                        _cs._visited[pos] = true;
+                        _cs._visited.visit(pos);
                         break;
                     }else{
                     }
+
                 }
 
                 next_nonvisited_or_end(_cs._stack.back());
             }
 
+            assert(is_end() || _cs._visited[boost::get(boost::vertex_index, _cs._g, **this)]);
+
             return *this;
         }
 #if 1
+        bool operator<(const component_iter& other) const
+        { incomplete();
+            // uuh vector?
+            if(&_v < &other._v){ untested();
+            }else{ untested();
+            }
+            return &_v < &other._v;
+        }
         bool operator!=(const component_iter& other) const
         {
             if(_v != other._v){
@@ -232,18 +289,18 @@ public: // types
         }
 #else
         bool operator!=(const component_iter& other) const
-        { untested();
-            if(_cs._stack.size()){ untested();
+        {
+            if(_cs._stack.size()){
                 return _cs._stack.back() != other._cs._stack.back();
-            }else{ untested();
+            }else{
                 return true;
             }
         }
         bool operator==(const component_iter& other) const
-        { untested();
-            if(_cs._stack.size()){ untested();
+        {
+            if(_cs._stack.size()){
                 return _cs._stack.back() == other._cs._stack.back();
-            }else{untested();
+            }else{
                 return false;
             }
         }
@@ -251,6 +308,7 @@ public: // types
 
     private:
         template<class T>
+        // component_iter<T>::
         void next_nonvisited_or_end(T& p)
         {
             while(true){
@@ -260,11 +318,13 @@ public: // types
                 }
 
                 BOOST_AUTO(f, *p.first);
-                unsigned pos=treedec::get_pos(f, _cs._g);
+                unsigned pos=boost::get(boost::vertex_index, _cs._g, f);
                 assert(pos<_cs._visited.size());
                 if(!_cs._visited[pos]){
+             //       _cs._visited[pos] = true;
                     return;
                 }else{
+                    // trace1("visited already", pos);
                     ++p.first;
                 }
             }
@@ -279,24 +339,19 @@ public: // construct
 //        : _base(v),
 //          _g(g),
 //          _stack(0)
-//    { untested();
+//    {
 //        _visited.assign(boost::num_vertices(_g), false);
 //    }
-   components_iter(VR v, G const& g, vis_t* vis, scratch_type* c=NULL)
+   components_iter(VR v, G const& g, vis_t vis, scratch_type* c=NULL)
        : _range(v),
-         _visited(vis?(*vis):(*(new vis_t(0)))), _vv(&_visited),
+         _visited(vis),
          _stack(c?(*c):(*(new scratch_type(0)))), _cc(&_stack),
          _g(g)
    {
-       if(vis){
-           _vv = NULL;
-       }else{ untested();
-           incomplete();
-       }
        if(c){
            _cc = NULL;
            _stack.resize(0);
-       }else{ untested();
+       }else{
        }
        // trace3("cmpsiter", *v.first, visited, v.first==v.second);
    }
@@ -304,41 +359,47 @@ public: // construct
    // needed for end?
    components_iter(VR v, G const& g, scratch_type* c=NULL)
        : _range(v),
-         _visited(*(new vis_t(0))), _vv(&_visited),
+         _visited(vis_t(0)),
          _stack(c?(*c):(*(new scratch_type(0)))), _cc(&_stack),
          _g(g)
    {
-       if(c){ untested();
+       if(c){
+           _cc = NULL;
+           _stack.resize(0);
+       }else{
+       }
+   }
+   // hack
+   components_iter(VR v, G const& g, G const&, scratch_type* c=NULL )
+       : _range(v),
+         _visited(vis_t(boost::num_vertices(g))),
+         _stack(c?(*c):(*(new scratch_type(0)))), _cc(&_stack),
+         _g(g)
+   {
+       if(c){
            _cc = NULL;
            _stack.resize(0);
        }else{
        }
    }
 public: // copy
-#if __cplusplus >= 201103L
    components_iter(components_iter const& p)
        : _range(p._range),
-         _visited(*(new vis_t(p._visited))), _vv(&_visited),
+         _visited(vis_t(p._visited)),
          _stack(*(new scratch_type(p._stack))), _cc(&_stack),
          _g(p._g)
-   { untested();
+   {
    }
    components_iter(components_iter const&& p)
        : _range(p._range),
-         _visited(p._visited), _vv(p._vv),
+         _visited(p._visited),
          _stack(p._stack), _cc(p._cc),
          _g(p._g)
    {
        p._cc = NULL;
-       p._vv = NULL;
    }
-#endif
    ~components_iter()
    {
-       if(_vv){
-           // incomplete();
-           delete(&_visited);
-       }
        if(_cc){
            assert(_cc=&_stack);
            delete(&_stack);
@@ -346,13 +407,13 @@ public: // copy
        }
    }
 public: // ass
-    components_iter& operator=(const components_iter& other)
+    components_iter& operator=(const components_iter&)
     { unreachable();
         incomplete();
         return *this;
     }
 #if __cplusplus >= 201103L
-    components_iter& operator=(const components_iter&& other)
+    components_iter& operator=(const components_iter&&)
     { unreachable();
         incomplete();
         return *this;
@@ -360,19 +421,35 @@ public: // ass
 #endif
 public: // ops
     bool operator==(const vertex_iterator& other)
-    { untested();
+    {
         return _range.first == other;
     }
+    bool operator<(const vertex_iterator& other)
+    { incomplete();
+        if(_range.first < other){ untested();
+        }else{
+        }
+        return _range.first < other;
+    }
     bool operator!=(const vertex_iterator& other)
-    { untested();
-        if(_range.first != other){ untested();
-        }else{ untested();
+    {
+        if(_range.first != other){
+        }else{
         }
         return _range.first != other;
     }
     bool operator==(const components_iter& other) const
-    { untested();
+    {
         return _range.first == other._range.first;
+    }
+    bool operator<(const components_iter&) const
+    { incomplete();
+        return false;
+        // uuh ooh. vector?! (does not work)
+//        if( &*_range.first < &*other._range.first){ untested();
+//        }else{ untested();
+//        }
+//        return &*_range.first < &*other._range.first;
     }
     bool operator!=(const components_iter& other) const
     {
@@ -388,10 +465,10 @@ public: // ops
             if(_range.first==_range.second){
                 break;
             }
-            p = treedec::get_pos(*_range.first, _g);
+            p = boost::get(boost::vertex_index, _g, *_range.first);
             // trace1("cmps++ ", p);
             assert(p<_visited.size());
-            if(_range.first==_range.second){ untested();
+            if(_range.first==_range.second){
                 break;
             }else if(_visited[p]){
                 assert(_range.first!=_range.second);
@@ -406,7 +483,7 @@ public: // ops
     }
     std::pair<component_iter, component_iter> operator*()
     {
-        BOOST_AUTO(p, treedec::get_pos(*_range.first, _g));
+        BOOST_AUTO(p, boost::get(boost::vertex_index, _g, *_range.first));
         (void)p;
         // trace2("op*", *_range.first,  _visited[p]);
         assert(_range.first==_range.second || !_visited[p]);
@@ -414,15 +491,15 @@ public: // ops
         BOOST_AUTO(second, _range.first);
         if(_range.first!=_range.second){
             ++second;
-        }else{ untested();
+        }else{
         }
         return std::make_pair(component_iter(_range.first, *this),
                               component_iter(_range.second, *this, false));
     }
 private: // state
     VR _range;
-    vis_t& _visited;
-    mutable vis_t* _vv; // bool?
+    vis_t _visited;
+//    mutable vis_t* _vv; // bool?
     stack_type& _stack;
     mutable stack_type* _cc; // bool?
     G const& _g;
@@ -435,18 +512,19 @@ private: // state
 #define VRP_ std::pair< \
 typename boost::graph_traits<G>::vertex_iterator COMMA \
 typename boost::graph_traits<G>::vertex_iterator >
-template<class G, class BOOL=bool>
-std::pair<detail::components_iter<G, VRP_, BOOL>,
-          detail::components_iter<G, VRP_, BOOL> >
+template<class G, class MASK=detail::localmask >
+std::pair<detail::components_iter<G, VRP_, MASK>,
+          detail::components_iter<G, VRP_, MASK> >
     make_components_range(G const& g,
-        typename detail::components_iter<G, VRP_, BOOL>::scratch_type* s=NULL,
+        typename detail::components_iter<G, VRP_, MASK>::scratch_type* s=NULL,
             BOOL b=true
         )
-{ untested();
+{
+    (void) b;
     BOOST_AUTO(p, boost::vertices(g));
     return std::make_pair(
-        detail::components_iter<G, VRP_, BOOL>(p, g, g, s),
-        detail::components_iter<G, VRP_, BOOL>(std::make_pair(p.second, p.second), g)); // FIXME
+        detail::components_iter<G, VRP_, MASK>(p, g, g, s),
+        detail::components_iter<G, VRP_, MASK>(std::make_pair(p.second, p.second), g)); // FIXME
 }
 #undef VRP_
 
@@ -455,30 +533,32 @@ std::pair<detail::components_iter<G, VRP_, BOOL>,
 
 // iterate through components of graph induced by non-masked nodes that
 // intersect with a vertex range *[i, e).
-template<class G, class VRI, /*class VRIE,*/ class V, class BOOL=bool>
-std::pair<detail::components_iter<G, VRIP_, BOOL>,
-          detail::components_iter<G, VRIEP_, BOOL> >
+template<class G, class VRI, /*class VRIE,*/ class MASK=detail::localmask>
+std::pair<detail::components_iter<G, VRIP_, MASK>,
+          detail::components_iter<G, VRIEP_, MASK> >
     make_components_range(
             VRI i, VRI e,
             G const& g,
-            V* mask,
-            typename detail::components_iter<G, VRIP_, BOOL>::scratch_type* s=NULL,
-            BOOL=true)
+            MASK mask=detail::localmask(),
+            typename detail::components_iter<G, VRIP_, MASK>::scratch_type* s=NULL)
 {
+    detail::mask_help<MASK>::init(mask, boost::num_vertices(g));
     assert(i==e || treedec::is_valid(*i, g));
     while( i!=e ){
         assert(treedec::is_valid(*i, g));
-        if((*mask)[treedec::get_pos(*i, g)]){ untested();
+        if(mask[boost::get(boost::vertex_index, g, *i)]){
             ++i;
         }else{
             break;
         }
     }
-    if(i==e){untested();
+    if(i==e){
+    }else{
+        assert(!mask[boost::get(boost::vertex_index, g, *i)]);
     }
     return std::make_pair(
-        detail::components_iter<G, VRIP_, BOOL>(std::make_pair(i, e), g, mask, s),
-        detail::components_iter<G, VRIEP_, BOOL>(std::make_pair(e, e), g));
+        detail::components_iter<G, VRIP_, MASK>(std::make_pair(i, e), g, mask, s),
+        detail::components_iter<G, VRIEP_, MASK>(std::make_pair(e, e), g, mask));
 }
 #undef VRIP_
 #undef VRIEP_
@@ -621,12 +701,11 @@ private:
         return _q.front();
     }
 
-    void next_nonvisited_or_end()
-    {
+    void next_nonvisited_or_end() {
         trace2("next_nonvisited_or_end", _q.size(), count_range(front_range()));
         while(front_range().first!=front_range().second){
             vertex_descriptor v=*front_range().first;
-            BOOST_AUTO(pos, treedec::get_pos(v, _g));
+            auto pos=boost::get(boost::vertex_index, _g, v);
             if(visited(pos)){
                 trace1("been there", pos);
             }else{
@@ -647,7 +726,7 @@ private:
 //                _q.pop_front();
         }else{ untested();
         }
-    }
+    } // next_nonvisited_or_end
 private:
     // typedef std::pair<layer_iter, layer_end> onion_layer_range;
 public: // construct
@@ -668,7 +747,7 @@ public: // construct
        }else{
        }
        while(true){
-           BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
+           auto pos=boost::get(boost::vertex_index, _g, *x.first);
            if(visited(pos)){
                ++x.first;
            }else{
@@ -812,7 +891,7 @@ public: // types
     typedef std::vector<BOOL_> vis_t;
     class layer_end{ //
     };
-    class layer_iter{ //
+    class layer_iter {
     public:
         layer_iter(onion_iter& o)
            : _onion(o)
@@ -878,13 +957,11 @@ public: // types
             // trace1("++'d in layer", count_range(front_range()));
             return *this;
         }
-        bool operator!=(const layer_iter& other) const
-        { incomplete();
+        bool operator!=(const layer_iter&) const { incomplete();
             assert(false);
             return true; // dont know how to do that.
         }
-        bool operator==(const layer_end&e) const
-        { untested();
+        bool operator==(const layer_end&e) const { untested();
             return !operator!=(e);
         }
         bool operator!=(const layer_end&) const
@@ -902,29 +979,25 @@ public: // types
         }
 
     private:
-        BOOL& visited(unsigned pos)
-        { untested();
+        BOOL& visited(unsigned pos) { untested();
             assert(pos<_onion._visited.size());
             return _onion._visited[pos];
         }
-        typename queue_type::value_type const& front_range() const
-        { untested();
+        typename queue_type::value_type const& front_range() const { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
         }
-        typename queue_type::value_type& front_range()
-        { untested();
+        typename queue_type::value_type& front_range() { untested();
             assert(_onion._q.begin() != _onion._q.end());
             assert(_onion._q.begin() != _onion._layerend);
             return _onion._q.front();
         }
-
-        void next_nonvisited_or_end()
-        { untested();
+        // onion_iter::
+        void next_nonvisited_or_end() { untested();
             while(front_range().first!=front_range().second){ untested();
                 vertex_descriptor v=*front_range().first;
-                BOOST_AUTO(pos, treedec::get_pos(v, _onion._g));
+                auto pos=boost::get(boost::vertex_index, _onion._g, v);
                 if(visited(pos)){ untested();
                 }else{ untested();
                     visited(pos) = true;
@@ -986,7 +1059,7 @@ public: // construct
    { untested();
        assert(x.first!=x.second);
        while(true){ untested();
-           BOOST_AUTO(pos, treedec::get_pos(*x.first, _g));
+           auto pos=boost::get(boost::vertex_index, _g, *x.first);
            if(_visited[pos]){ untested();
                ++x.first;
            }else{ untested();
@@ -1477,7 +1550,7 @@ public: // construct
             _b = _e;
         }
     }
-    neighbourhood01_iter& operator=(const neighbourhood01_iter& x)
+    neighbourhood01_iter& operator=(const neighbourhood01_iter&)
     { untested();
         incomplete();
         return *this;
@@ -1505,7 +1578,7 @@ public: // construct
         x._aa = NULL;
         assert(_aa == NULL || _aa == &_a);
     }
-    neighbourhood01_iter& operator=(const neighbourhood01_iter&& x)
+    neighbourhood01_iter& operator=(const neighbourhood01_iter&&)
     { untested();
         incomplete();
         return *this;
@@ -1687,9 +1760,10 @@ public: // construct
             unsigned v=0;
             for(;P.first!=P.second;++P.first){
                 ++t;
-                auto p=treedec::get_pos(*P.first, _g);
+                auto p=boost::get(boost::vertex_index, _g, *P.first);
                 if(!_visited[p]){
                     ++v;
+                }else{
                 }
             }
         }
@@ -1817,7 +1891,7 @@ private: // impl
     bool visited() const
     {
         assert(treedec::is_valid(*_current, _g));
-        auto p=treedec::get_pos(*_current, _g);
+        auto p=boost::get(boost::vertex_index, _g, *_current);
         return _visited[p];
     }
 private: // data

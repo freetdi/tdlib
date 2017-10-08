@@ -740,7 +740,7 @@ void map_descriptors(std::set<typename boost::graph_traits<G_t>::vertex_descript
                      VDSET &S_, G_t &H, M_t& vdMap)
 {
     for(auto sIt : S) {
-        unsigned int pos = get_pos(sIt, H);
+        auto pos=boost::get(boost::vertex_index, H, sIt);
         S_.insert(vdMap[pos]);
     }
 }
@@ -771,7 +771,7 @@ void apply_map_on_treedec(T_t &T, G_t &G, typename std::vector<typename boost::g
         typename treedec_traits<T_t>::bag_type bag_old, bag_new;
         bag_old = bag(*tIt, T);
         for(typename treedec_traits<T_t>::bag_type::iterator sIt = bag_old.begin(); sIt != bag_old.end(); sIt++){
-            unsigned int pos = get_pos(*sIt, G);
+            auto pos=boost::get(boost::vertex_index, G, *sIt);
             bag_new.insert(vdMap[pos]);
         }
         bag(*tIt, T) = MOVE(bag_new);

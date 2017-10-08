@@ -213,7 +213,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
 
                     typename vertex_set::const_iterator sIt=X_Y.begin();
                     for(; sIt!=X_Y.end(); ++sIt){
-                        unsigned int pos = get_pos(*sIt, G);
+                        auto pos=boost::get(boost::vertex_index, G, *sIt);
                         if(disabled_[pos]){
                         }else{
                             ++num_dis_;
@@ -229,9 +229,11 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                         BOOST_AUTO(N, make_neighbourhood_range((*I).first, (*I).second, G, s));
                         BOOST_AUTO(NI, N.first);
                         for(;NI!=N.second; ++NI){
-                            if(!disabled_[get_pos(*NI, G)]) {
+                            auto pos=boost::get(boost::vertex_index, G, *NI);
+                            if(!disabled_[pos]) {
                                 assert(sX.size()==0 || *NI>*sX.rbegin());
                                 sX.insert(sX.end(), *NI);
+                            }else{
                             }
                         }
                     }
@@ -337,7 +339,7 @@ bool sep_decomp(G_t const &G, T_t &T,
 
         for(typename std::set<vertex_descriptor>::iterator sIt
                 = S.begin(); sIt != S.end(); sIt++) {
-            unsigned int pos = get_pos(*sIt, G);
+            auto pos=boost::get(boost::vertex_index, G, *sIt);
             assert(!disabled[pos]);
             ++num_dis;
             disabled[pos] = true;
@@ -368,7 +370,7 @@ bool sep_decomp(G_t const &G, T_t &T,
             for(typename vertex_set::iterator sIt
                     = union_C_i_S.begin(); sIt != union_C_i_S.end(); sIt++)
             {
-                unsigned int pos = get_pos(*sIt, G);
+                auto pos=boost::get(boost::vertex_index, G, *sIt);
                 disabled_[pos] = false;
                 --num_dis_;
             }

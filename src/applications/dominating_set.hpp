@@ -116,8 +116,8 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
         treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
         if(node_type == treedec::nice::LEAF){
-            unsigned int leaf = *(bag(cur, T).begin());
-            unsigned int pos = get_pos(leaf, G);
+            auto leaf=*(bag(cur, T).begin());
+            auto pos=boost::get(boost::vertex_index, G, leaf);
 
             std::vector<int> result(boost::num_vertices(G), -1);
             for(unsigned int i = 0; i < 3; i++){
@@ -131,7 +131,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
             typename boost::graph_traits<G_t>::vertex_descriptor new_vertex =
                                 treedec::nice::get_introduced_vertex(cur, T);
-            unsigned int pos = get_pos(new_vertex, G);
+            auto pos=boost::get(boost::vertex_index, G, new_vertex);
 
             //If x has a neighbour in the current bag that is dominating .. in the coloring C, store the coloring
             //C' formed by coloring according to C and coloring x as dominated by a vertex.
@@ -140,7 +140,8 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
             {
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
                 bool applied = false;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(new_vertex, G); nIt != nEnd; nIt++){
+                boost::tie(nIt, nEnd) = boost::adjacent_vertices(new_vertex, G);
+                for(; nIt != nEnd; nIt++){
                     unsigned int posn = get_pos(*nIt, G);
                     if(it->first[posn] == 2){
                         std::vector<int> result(it->first);
@@ -395,7 +396,7 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
     typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = get_pos(*vIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *vIt);
         inv_map[pos] = *vIt;
     }
 

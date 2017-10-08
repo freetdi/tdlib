@@ -442,7 +442,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T){
 
 template <typename G_t, typename T_t>
 void MD_MSVS(G_t &G, T_t &T){
-    int low = -1;
     G_t H(G);
     treedec::minDegree_decomp(G, T);
     treedec::MSVS(H, T);

@@ -27,16 +27,29 @@
 #include "graph_traits.hpp"
 
 namespace treedec{
+
 namespace algo{
 
 struct config_base{
-    static void interruption_point(){ }
+    static void interruption_point(){
+        // compile-time disabled signalling
+    }
+    static void commit_lb(unsigned, std::string=""){ untested();
+    }
+    static void commit_ub(unsigned, std::string=""){ untested();
+    }
+    // "C" style seems to be most practical.
+    static void message(unsigned badness, const char* fmt, ...){
+        // compile-time disabled messaging
+        (void) badness; (void) fmt;
+    }
 };
 
-template<class GraphType>
+
+template<class GraphType, class ... rest>
 struct default_config : config_base{
-	using vst=typename boost::graph_traits<GraphType>::vertices_size_type;
-	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
+    using vst=typename boost::graph_traits<GraphType>::vertices_size_type;
+    static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
 };
 
 namespace draft{
@@ -44,11 +57,11 @@ namespace draft{
 template<class O>
 O* clone(O const* o)
 {
-	if(o){ untested();
-		return o->clone();
-	}else{
-		return NULL;
-	}
+    if(o){ untested();
+        return o->clone();
+    }else{
+        return NULL;
+    }
 }
 
 class algo1{
@@ -119,3 +132,5 @@ private:
 } // treedec
 
 #endif // guard
+
+// vim:ts=8:sw=4:et

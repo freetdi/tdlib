@@ -30,60 +30,68 @@
 #include "treedec_misc.hpp"
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/bandwidth.hpp>
-#include "crap.hpp"
 
 namespace treedec{
 
-
 namespace draft{
 
-
 template<typename G_t,
-	template<class G_> class config,
-	template<class X, template<class G__> class Y> class kernel>
-class exact_decomposition{
+	template<class G_, class ...> class config,
+	template<class X, template<class G__, class ...> class Y> class kernel>
+class exact_decomposition /* algo? */ {
 public:
   typedef kernel<G_t, config> kern_t;
 public:
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg16 : config<GraphType>{
       static constexpr unsigned max_vertex_index=15;
       // sparsity?
       // bandwidth?
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg32 : config<GraphType>{
       static constexpr unsigned max_vertex_index=31;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg64 : config<GraphType>{
       static constexpr unsigned max_vertex_index=63;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg128 : config<GraphType>{
       static constexpr unsigned max_vertex_index=127;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg192 : config<GraphType>{
       static constexpr unsigned max_vertex_index=191;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg256 : config<GraphType>{
       static constexpr unsigned max_vertex_index=255;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg512 : config<GraphType>{
       static constexpr unsigned max_vertex_index=511;
   };
-  template<class GraphType>
+  template<class GraphType, class... rest>
   struct cfg1024 : config<GraphType>{
       static constexpr unsigned max_vertex_index=1023;
   };
 public:
     exact_decomposition(G_t &G)
-        : _g(G) {
+        : _g(G), _cleanup_g(false)
+    {
     }
-
+    exact_decomposition(G_t const &G)
+        : _g( *new G_t(G)), _cleanup_g(true)
+    { untested();
+    }
+    ~exact_decomposition() {
+        if(_cleanup_g){ untested();
+            delete &_g;
+        }else{ untested();
+        }
+    }
+public:
     template<class T>
     void try_it(T&, unsigned lb_bs);
     template<class G, class T>
@@ -93,20 +101,21 @@ private:
     void do_components(T_t&, unsigned lb_bs);
 private:
     G_t& _g;
+    bool _cleanup_g;
 };
 
 
 template<typename G_t,
-	template<class G_> class config,
-	template<class X, template<class G__> class Y> class kernel>
+	template<class G_, class ...> class config,
+	template<class X, template<class G__, class... > class Y> class kernel>
 template<class G_t_, class T_t>
 inline void exact_decomposition<G_t, config, kernel>::run_kernel(
         G_t_ const& G, T_t& T, unsigned& lb_bs)
-{ untested();
+{
 
     auto numv=boost::num_vertices(G);
     // std::cout << "c kernel " << numv << "\n";
-    if(numv<=32){ untested();
+    if(numv<=32){
         kernel<G_t_, cfg32> kern(G);
         kern.do_it(T, lb_bs);
     }else if(numv<=64){ untested();
@@ -128,11 +137,12 @@ inline void exact_decomposition<G_t, config, kernel>::run_kernel(
         kernel<G_t_, cfg1024> kern(G);
         kern.do_it(T, lb_bs);
     }
+    assert(boost::num_vertices(T) == boost::num_edges(T)+1);
 }
 
 template<typename G_t,
-	template<class G_> class config,
-	template<class X, template<class G__> class Y> class kernel>
+	template<class G_, class ...> class config,
+	template<class X, template<class G__, class ...> class Y> class kernel>
 template<class T_t>
 inline void exact_decomposition<G_t, config, kernel>::do_components(
         T_t& t, unsigned lb_bs)
@@ -140,6 +150,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
 
     // Compute a tree decomposition for each connected component of G and glue
     // the decompositions together.
+    // FIXME: move to preprocessor.
 #ifndef NEWRANGE
     typedef std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components_t;
     components_t components;
@@ -152,7 +163,8 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
                 _g, &visited, NULL, EXCUT_BOOL());
 #endif
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = boost::add_vertex(t);
+    // root
+    boost::add_vertex(t);
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
 #ifndef NEWRANGE
     typename components_t::iterator i = components.begin();
@@ -164,16 +176,18 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
         //Ignore isolated vertices (already included in 'bags').
 #ifndef NEWRANGE
         trace2("found component ", i->size(), components.size());
-        if(i->size() == 1){
+        if(i->size() == 1){ untested();
             continue;
             auto nv=boost::add_vertex(t);
             auto& B=bag(nv, t);
             treedec::push(B, *(*i).begin());
             trace2("isolated node ", nv,  *(*i).begin());
-            if(nv!=0){ // uuh hack
+            if(nv!=0){ untested();
+                // uuh hack
                 boost::add_edge(nv, nv-1, t);
+            }else{ untested();
             }
-
+        }else{
         }
 #endif
 
@@ -204,6 +218,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
 //        print_matrix(G_, boost::identity_property_map(), std::cout);
 
 #ifdef USE_RCMK
+        incomplete();
 	typedef typename boost::graph_traits<immutable_type>::vertex_descriptor Vertex;
 	typedef std::vector<Vertex> M;
 	auto nv=boost::num_vertices(G_);
@@ -223,9 +238,12 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
         assert(ne1==ne2);
 #endif
 
+        // not yet
+        // rcmk_(G_);
         T_t T_;
 
 #ifdef USE_RCMK
+        incomplete();
         run_kernel(G_cmk, T_, lb_bs);
 
         // permute_vector(vdMap, m); // hmm
@@ -233,29 +251,34 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
         draft::append_decomposition(t, std::move(T_), G_, minv);
 #else
         run_kernel(G_, T_, lb_bs);
+        assert(boost::num_vertices(T_) == boost::num_edges(T_)+1);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
 
 #ifndef NDEBUG
         unsigned tn=boost::num_vertices(t);
         unsigned tn_=boost::num_vertices(T_);
 #endif
         draft::append_decomposition(t, std::move(T_), G_, vdMap);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
         assert( tn+tn_ == boost::num_vertices(t));
 #endif
     }
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
 } // do_it
 
 template<typename G_t,
-	template<class G_> class config,
-	template<class X, template<class Y> class c> class kernel>
+	template<class G_, class ...> class config,
+	template<class X, template<class Y, class ...> class c> class kernel>
 template<class T_t>
 void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
 {
+    typedef config<G_t> CFG;
     int lb_tw=lb_bs-1;
 
     auto n=boost::num_vertices(_g);
     auto e=boost::num_edges(_g);
     trace3("exact_decomposition", lb_tw, n, e);
-    if(n==0){ untested();
+    if(n==0){
         boost::add_vertex(T);
         return;
     }else{
@@ -271,21 +294,22 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
          > > bags;
 
     // if config.preprocessing?
+    // fixme: instanciate.
     treedec::preprocessing(_g, bags, low);
 
-    if(boost::num_edges(_g) == 0){ untested();
+    if(boost::num_edges(_g) == 0){
         treedec::glue_bags(bags, T);
         return;
     }else{
     }
 
-    std::cout << "c PP said tw" << low << "\n";
+    CFG::message(0, "PP said tw %d\n", low);
 
     //Lower bound on the treewidth of the reduced instance of G.
     G_t H(_g);
     int tw_lb_deltaC = treedec::lb::deltaC_least_c(H);
 
-    std::cout << "c deltaC said " << tw_lb_deltaC << "\n";
+    CFG::message(0, "deltaC said tw %d\n", tw_lb_deltaC);
 
     trace3("excut comb", lb_tw, low, tw_lb_deltaC);
     if(low > lb_tw){
@@ -301,8 +325,12 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
     trace3("excut comb", lb_tw, boost::num_vertices(_g), boost::num_edges(_g));
 
     do_components(T, lb_tw+1);
+    trace1("did components", bags.size());
+    assert(boost::num_vertices(T) == boost::num_edges(T)+1);
 
     treedec::glue_bags(bags, T);
+    trace2("done", boost::num_vertices(T), boost::num_edges(T));
+    assert(boost::num_vertices(T) == boost::num_edges(T)+1);
 } // try_it
 
 }// draft
