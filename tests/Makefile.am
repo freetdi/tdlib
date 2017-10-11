@@ -28,7 +28,9 @@ check_PROGRAMS = \
 	bucket_sorter_2 \
 	bucket_sorter_2u \
 	common_out_edges \
+	elim0 \
 	pp \
+	pp0 \
 	vec2tree
 
 # these fail. known bug...
