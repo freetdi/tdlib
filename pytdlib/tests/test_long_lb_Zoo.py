@@ -65,9 +65,12 @@ class TestTdLib_packages(unittest.TestCase):
     def test_LB5(self):
         print("---LBNC_deltaC---")
         for i in range(0, COUNT+1):
+            if base.skip(PREFIX, i, lambda x,y: x > 1000 or y > 3000):
+                continue
+
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
-            tdlib.lower_bound(G, "LBNC_deltaC")
+            tdlib.lower_bound(G, "LBNC_deltaC") #whats up with fuzix_se_compile?
 
     #indirect test
     def test_LB6(self):
@@ -83,7 +86,7 @@ class TestTdLib_packages(unittest.TestCase):
     def test_LB7(self):
         print("---LBPC_deltaC---")
         for i in range(0, COUNT+1):
-            if base.skip(PREFIX, i, lambda x,y: x > 500 or y > 1000):
+            if base.skip(PREFIX, i, lambda x,y: x > 300 or y > 300):
                 continue
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))

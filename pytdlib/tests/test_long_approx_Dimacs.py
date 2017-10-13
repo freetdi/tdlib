@@ -30,47 +30,42 @@ def dump_td_as_dot(V_T, E_T, outname):
 
 class TestTdLib_packages(unittest.TestCase):
     def test_MD(self):
-        #print("---MD---")
+        print("---MD---")
         for i in range(0, COUNT+1):
-            #name = eval(PREFIX+".name_"+str(i))
-            #print("     " + name)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.minDegree_decomp(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_boost_MD(self):
-        #print("---boost::MD---")
+        print("---boost::MD---")
         for i in range(0, COUNT+1):
-            #name = eval(PREFIX+".name_"+str(i))
-            #print("     " + name)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.boost_minDegree_decomp(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP(self):
-       #print("---PP---")
+       print("---PP---")
        for i in range(0, COUNT+1):
-            #name = eval(PREFIX+".name_"+str(i))
-            #print("     " + name)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             G_, B, lb = tdlib.preprocessing(G)
             if G.vertices() is []:
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_MD(self):
-        #print("---PP+MD---")
+        print("---PP+MD---")
         for i in range(0, COUNT+1):
-            #name = eval(PREFIX+".name_"+str(i))
-            #print("     " + name)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.PP_MD(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_minimalChordal_trivial(self):
-        #print("---minimalChordal (trivial)---")
+        print("---minimalChordal (trivial)---")
         for i in range(0, COUNT+1):
-            #name = eval(PREFIX+".name_"+str(i))
-            #print("     " + name)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T1, w1 = tdlib.trivial_decomposition(G)
             T2, w2 = tdlib.minimalChordal_decomp(G, T1)

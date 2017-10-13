@@ -16,7 +16,7 @@ COUNT_DIMACS = 81
 PREFIX_MAXSAT = "Maxsat_small"
 COUNT_MAXSAT = 120
 
-MAX_NODES = 100000
+MAX_NODES = 10000
 MAX_ORDERINGS = 100
 
 #don't confuse python unittest
@@ -24,12 +24,9 @@ sys.argv=sys.argv[:1]
 
 class TestTdLib(unittest.TestCase):
     def test_long1(self):
-        print("FILL config")
-        for i in range(37, COUNT_DIMACS+1):
-#            if base.skip(PREFIX_DIMACS, i, lambda x,y: y < 5000):
-#                continue
-
-            if i != 64:
+        print("---generic search - FILL config---")
+        for i in range(0, COUNT_DIMACS+1):
+            if base.skip(PREFIX_DIMACS, i, lambda x,y: y > 3000):
                 continue
 
             if("-pp" in eval(PREFIX_DIMACS+".name_"+str(i))):

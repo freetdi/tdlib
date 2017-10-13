@@ -278,7 +278,7 @@ public: // picking
             unsigned upper=-1u, bool erase=false)
     {
         if(upper!=-1u){
-            incomplete();
+//            incomplete();
         }
         BOOST_AUTO(fp, _fill.begin());
         if(_fill.empty() || fp->first){

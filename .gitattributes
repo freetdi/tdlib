@@ -1,0 +1,2 @@
+#tell github language detector to skip some files
+pytdlib/tests/* linguist-vendored

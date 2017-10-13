@@ -299,7 +299,6 @@ template <typename G_t>
 inline size_t count_missing_edges(
         const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
 {
-    incomplete(); // obsolete
     size_t missing_edges = 0;
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
