@@ -54,6 +54,7 @@ pkginclude_HEADERS = \
   separator_algorithm.hpp \
   simple_graph_algos.hpp \
   skeleton.hpp \
+  thorup.hpp \
   timer.hpp \
   trace.hpp \
   treedec.hpp \
