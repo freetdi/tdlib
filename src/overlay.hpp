@@ -22,6 +22,8 @@
 
 namespace treedec {
 
+namespace draft { // not exposed yet (for a reason)
+
 // immutable overlay
 // make a vertex subset of a graph look like a graph
 // this graph is immutable, to allow for efficient storage
@@ -150,6 +152,8 @@ inline IG_t const& immutable_clone(
     dummy_hack::cb<vd>* c=NULL;
     return immutable_clone(G, ig, bbegin, bend, bag_nv, vdMap, c);
 }
+
+} // draft
 
 } // treedec
 

@@ -20,6 +20,7 @@
 // does not work (yet?) because the size is not known in advance.
 // ... immutable_clone needs multipass iterator (?)
 // #define NEWRANGE
+// ( TODO: move to pp_base, this way it does not work )
 
 #ifndef TD_EXACT_H
 #define TD_EXACT_H

@@ -31,6 +31,7 @@ check_PROGRAMS = \
 	elim0 \
 	pp \
 	pp0 \
+	ta \
 	vec2tree
 
 # these fail. known bug...

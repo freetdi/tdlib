@@ -47,7 +47,7 @@ struct config_base{
 
 
 template<class GraphType, class ... rest>
-struct default_config : config_base{
+struct default_config : config_base {
     using vst=typename boost::graph_traits<GraphType>::vertices_size_type;
     static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
 };

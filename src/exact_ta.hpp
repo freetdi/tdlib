@@ -33,8 +33,8 @@
 #include <gala/boost.h>
 #include "graph_gala.hpp"
 
-#include "status.hpp"
-#include "exact.hpp"
+// #include "status.hpp"
+#include "exact_base.hpp"
 #include "trace.hpp"
 #include <limits>
 // #include <unordered_map>
@@ -57,6 +57,8 @@ long unsigned neigh_size;
 
 #define EXTA_t template<class G, template<class GG, class ...> class CFGT>
 #define EXTA_a G, CFGT
+
+#define stcnt(x)
 
 namespace treedec{
 
@@ -100,7 +102,7 @@ detail::incidence_mask<S> make_incidence_mask(S& s)
 
 /// treedec::algo::default_config?
 template<class GraphType>
-struct ta_config_default{
+struct ta_config_default : treedec::algo::default_config<GraphType> {
 	typedef typename boost::graph_traits<GraphType>::vertices_size_type vst;
 	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
 };
@@ -445,8 +447,8 @@ private:
 	                T const& onb, vertex_t v, T& cand, D& delta,
 	                S const* comm=NULL);
 	void registerForVertex(vertex_t v, BLOCK *block);
-	void do_it(unsigned n=2);
 public:
+	void do_it(unsigned n=2);
 	template<class T>
 	void do_it(T&, unsigned& bagsize);
 	template<class t>
@@ -1071,11 +1073,11 @@ inline void exact_ta<EXTA_a>::do_it(TT& t, unsigned& bs)
 	do_it(bs);
 
 	bs = _bag_size;
-	make_td(t);
+	make_td(t); // bug. not here.
 }
 /*--------------------------------------------------------------------------*/
 EXTA_t
-inline void exact_ta<EXTA_a>:: do_it(unsigned bs)
+inline void exact_ta<EXTA_a>::do_it(unsigned bs)
 {
 	assert(bs>1);
 	solution = NULL;
@@ -1377,7 +1379,7 @@ inline void exact_ta<EXTA_a>::try_extend_union(
 		T const& uc,
 		T const& un,
 		vertex_t v,
-		T const* nnn
+		T const* //remove?
 		)
 {
 	// avoid sets that intersect cnb(union)
@@ -1419,4 +1421,7 @@ inline void exact_ta<EXTA_a>::try_extend_union(
 } // treedec
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#undef stcnt
+
 #endif // guard

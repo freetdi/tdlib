@@ -168,7 +168,7 @@ public:
 
                 /* draft:: */ is_in_neighbour_bd<vertex_descriptor, T_t> cb(_t, *tIt);
                 BOOST_AUTO(mybag, bag(*tIt, _t));
-                HI = &treedec::immutable_clone(_g, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
+                HI = &treedec::draft::immutable_clone(_g, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
                 status = is_improvement_bag
                   <immutable_type, 
                    std::vector<imm_vertex_descriptor>,
