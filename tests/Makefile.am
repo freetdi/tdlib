@@ -22,7 +22,14 @@
 # Boston, MA 02110-1301, USA.
 #
 
+if USE_GALA
+GPROG = ta
+else
+GPROG =
+endif
+
 check_PROGRAMS = \
+	${GPROG} \
 	bmd \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
@@ -31,7 +38,6 @@ check_PROGRAMS = \
 	elim0 \
 	pp \
 	pp0 \
-	ta \
 	vec2tree
 
 # these fail. known bug...
