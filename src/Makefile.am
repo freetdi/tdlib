@@ -30,6 +30,7 @@ pkginclude_HEADERS = \
   generic_elimination_search.hpp \
   generic_elimination_search_overlay.hpp \
   graph.hpp \
+  graph_gala.hpp \
   graph_impl.hpp \
   graph_traits.hpp \
   graph_util.hpp \
@@ -58,6 +59,7 @@ pkginclude_HEADERS = \
   timer.hpp \
   trace.hpp \
   treedec.hpp \
+  treedec_misc.hpp \
   treedec_traits.hpp \
   upper_bounds.hpp \
   validation.hpp
