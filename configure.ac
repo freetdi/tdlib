@@ -100,7 +100,6 @@ AC_LANG_PUSH([C++])
 # unconditional c++11
 CXXFLAGS="$CXXFLAGS -std=c++11"
 
-# do we need --disable-gala switch?
 have_gala=no
 
 AC_ARG_WITH([gala], AS_HELP_STRING([--without-gala], [Disable gala]))

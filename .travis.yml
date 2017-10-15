@@ -41,5 +41,10 @@ script:
   # run all checks
   - ./bootstrap
   - ./configure --enable-debug CXXFLAGS=-std=c++11
-  -  make check
-  -  make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
+  - make check
+  - wget https://github.com/freetdi/gala/archive/0.tar.gz
+  - mkdir gala
+  - ( cd gala; tar --strip-components=1 -zxf ../0.tar.gz )
+  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}
+  - make check
+  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
