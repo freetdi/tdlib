@@ -33,6 +33,8 @@
 #include "marker_util.hpp"
 #include "induced_subgraph.hpp"
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec{
 
 //This function is used in the minimalChordal algorithm.
@@ -365,6 +367,8 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 }
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //TD_SIMPLE_GRAPH_ALGOS
 

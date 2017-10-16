@@ -45,6 +45,8 @@
 #include "graph.hpp"
 #include "iter.hpp"
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec{
 
 namespace detail{
@@ -424,6 +426,8 @@ void separator_algorithm(G_t const &G, T_t &T)
 }
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //TD_SEPERATOR_ALGORITHM
 

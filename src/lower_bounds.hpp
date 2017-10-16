@@ -1339,8 +1339,8 @@ void k_path_improved_graph(G_t &G, unsigned int k){
                 }
 
                 std::vector<BOOL> disabled(boost::num_vertices(G), false);
-                unsigned int pos1 = get_pos(*vIt1, G);
-                unsigned int pos2 = get_pos(*vIt2, G);
+                auto pos1 = boost::get(boost::vertex_index, G, *vIt1);
+                auto pos2 = boost::get(boost::vertex_index, G, *vIt2);
 
                 unsigned num_dis=0;
                 if(!disabled[pos1]) ++num_dis;
@@ -1558,7 +1558,7 @@ typename std::pair<int, typename boost::graph_traits<G_t>::vertex_descriptor> MC
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*cur_vertex_it, G); nIt != nEnd; nIt++){
-            unsigned int pos = get_pos(*nIt, G);
+            auto pos = boost::get(boost::vertex_index, G, *nIt);
             if(visited_degree[pos] > -1){
                 visited_degree[pos]++;
             }

@@ -20,6 +20,8 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec {
 
 namespace draft { // not exposed yet (for a reason)
@@ -156,6 +158,8 @@ inline IG_t const& immutable_clone(
 } // draft
 
 } // treedec
+
+#undef get_pos
 
 #endif // guard
 

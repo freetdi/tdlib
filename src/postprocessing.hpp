@@ -39,6 +39,8 @@
 #include "graph.hpp"
 #include "overlay.hpp"
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec{
 
 //Check a modified induced subgraph of the bag 'bag(t_desc, T)' for
@@ -441,6 +443,8 @@ inline void minimalChordal(G_t &G,
 }
 
 } // treedec
+
+#undef get_pos
 
 #endif //ifdef TD_POSTPROCESSING
 
