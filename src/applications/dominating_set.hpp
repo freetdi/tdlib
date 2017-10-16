@@ -32,6 +32,8 @@
 
 #include "applications.hpp"
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec{
 
 namespace app{
@@ -419,6 +421,8 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
 } //namespace app
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //TD_DOMINATING_SET
 

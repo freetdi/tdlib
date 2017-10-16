@@ -50,7 +50,7 @@ void get_robber_components(G_t &G,
     //G \ X
     std::vector<BOOL> disabled(boost::num_vertices(G), false);
     for(typename bag_type::iterator sIt = X.begin(); sIt != X.end(); sIt++){
-        unsigned int pos = get_pos(*sIt, G);
+        auto pos = boost::get(boost::vertex_index, G, *sIt);
         disabled[pos] = true;
     }
 

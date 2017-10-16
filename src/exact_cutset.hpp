@@ -60,6 +60,8 @@
 
 #include "graph_util.hpp"
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 typedef BOOL EXCUT_BOOL;
 
 namespace treedec{
@@ -1155,6 +1157,8 @@ unsigned exact_cutset(G_t &G, T_t &T){ untested();
 }
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //TD_EXACT_CUTSET
 // vim:ts=8:sw=4:et

@@ -71,9 +71,9 @@
 # define HAVE_MINDEGREE_FORK
 #endif
 
-
-
 #include "impl/greedy_heuristic.hpp"
+
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
 
 namespace treedec{ //
 
@@ -637,7 +637,7 @@ void make_filled_graph(G_t &G,
         C[i].insert(elim_ordering[i]);
 
         for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){
-            unsigned int pos = get_pos(*nIt, G);
+            auto pos=boost::get(boost::vertex_index, G, *nIt);
             if(!visited[pos]){
                 C[i].insert(*nIt);
             }
@@ -659,7 +659,7 @@ void make_filled_graph(G_t &G,
             }
         }
 
-        unsigned int pos = get_pos(elim_ordering[i], G);
+        auto pos=boost::get(boost::vertex_index, G, elim_ordering[i]);
         visited[pos] = true;
     }
 }
@@ -853,6 +853,8 @@ void LEX_M_minimal_ordering(const G_t &G,
 }
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //TD_ELIMINATION_ORDERINGS
 
