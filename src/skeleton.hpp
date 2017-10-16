@@ -136,7 +136,7 @@ public:
 
             auto b=boost::get(treedec::bag_t(), u, _b);
             for(auto bIt : b ){
-                unsigned pos = get_pos(bIt, _g);
+                auto pos=boost::get(boost::vertex_index, _g, bIt);
                 unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                 if(index < min_index){
                     min_index = index;

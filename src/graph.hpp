@@ -56,11 +56,6 @@
 #include "generic_elimination_search_overlay.hpp"
 #include "induced_subgraph.hpp"
 
-#ifndef get_pos
-// HACK, cleanup later
-#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
-#endif
-
 namespace treedec{
 
 #define vertex_iterator_G typename boost::graph_traits<G>::vertex_iterator

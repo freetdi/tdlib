@@ -147,7 +147,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     unsigned int j = 0;
     BOOST_AUTO(dv, boost::vertices(diG).first);
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = get_pos(*vIt, G);
+        auto pos = boost::get(boost::vertex_index, G, *vIt);
         if(!disabled[pos]){
             internal_idxMap[pos] = *dv;
             ++dv;
@@ -160,8 +160,10 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 
     typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
     for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
-        unsigned int sid = get_pos(boost::source(*eIt, G), G);
-        unsigned int tid = get_pos(boost::target(*eIt, G), G);
+        auto src = boost::source(*eIt, G);
+        auto tgt = boost::target(*eIt, G);
+        auto sid = boost::get(boost::vertex_index, G, src);
+        auto tid = boost::get(boost::vertex_index, G, tgt);
         if(!disabled[sid] && !disabled[tid]){
 
             typename digraph_t::edge_descriptor e1 =
@@ -177,7 +179,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     ++dv;
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             X.begin(); sIt != X.end(); sIt++){
-        unsigned int pos = get_pos(*sIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *sIt);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(source, internal_idxMap[pos], diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
@@ -188,7 +190,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     assert(dv == boost::vertices(diG).second);
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
             Y.begin(); sIt != Y.end(); sIt++){
-        unsigned int pos = get_pos(*sIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *sIt);
         typename digraph_t::edge_descriptor e =
             boost::add_edge(internal_idxMap[pos], sink, diG).first;
         boost::get(&Edge_NF::path, diG, e) = false;
@@ -469,7 +471,7 @@ bool seperate_vertices(
     //disables/deletes the vertices in the intersection of X and Y.
     for(typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor>::iterator sIt =
           S.begin(); sIt != S.end(); sIt++){
-        unsigned int pos = get_pos(*sIt, G);
+        auto pos=boost::get(boost::vertex_index, G, *sIt);
         assert(!disabled[pos]);
         ++num_dis;
         disabled[pos] = true;
