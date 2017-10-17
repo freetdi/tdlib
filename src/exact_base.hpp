@@ -31,6 +31,7 @@
 #include "treedec_misc.hpp"
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/bandwidth.hpp>
+#include "container.hpp"
 
 namespace treedec{
 
@@ -93,6 +94,11 @@ public:
         }
     }
 public:
+    void do_it(unsigned lb_bs=0){ untested();
+        incomplete(); // export t.
+        typename graph_traits<G_t>::treedec_type t;
+        try_it(t, lb_bs);
+    }
     template<class T>
     void try_it(T&, unsigned lb_bs);
     template<class G, class T>

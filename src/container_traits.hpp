@@ -128,6 +128,33 @@ namespace detail{//
           c.insert(e);
         }
     };
+    template<class C>
+    struct container_modify<C,
+      typename std::enable_if<
+        std::is_same<C, typename std::set<
+        typename C::value_type,
+        typename C::key_compare,
+        typename C::allocator_type> >::value
+        >::type >{//
+        // push, insert new item
+        static void push(C& c, typename C::value_type e)
+        {
+          assert(!container_inspect<C>::contains(c, e));
+          c.insert(e);
+        }
+        template<class I>
+        static void push(C& c, I b, I e)
+        {
+          while(b!=e){
+            c.insert(*b);
+            ++b;
+          }
+        }
+        static void insert(C& c, typename C::value_type e)
+        { itested();
+          c.insert(e);
+        }
+    };
 } // detail
 
 } // namespace treedec

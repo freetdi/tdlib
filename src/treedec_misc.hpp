@@ -34,11 +34,12 @@ public:
 
     unsigned operator()(unsigned x) const
     { itested();
-        if(get_pos(x,_g) == x){
-            // simple numbering perhaps
+        auto p=boost::get(boost::vertex_index, _g, x);
+        if(p == x){
+            // simple numbering perhaps, needs more thought
         }else{ untested();
         }
-        return _m[get_pos(x,_g)];
+        return _m[p];
     }
 private:
     G const& _g;
