@@ -23,7 +23,9 @@
 #
 
 if USE_GALA
-GPROG = ta
+GPROG = \
+	gala_bmd \
+	ta
 else
 GPROG =
 endif
@@ -31,6 +33,7 @@ endif
 check_PROGRAMS = \
 	${GPROG} \
 	bmd \
+	directed_view \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
 	bucket_sorter_2u \
@@ -38,6 +41,7 @@ check_PROGRAMS = \
 	elim0 \
 	pp \
 	pp0 \
+	sdcc \
 	vec2tree
 
 # these fail. known bug...
@@ -47,7 +51,6 @@ XFAIL_TESTS = \
 notyets = \
 	svbs_random \
 	onion \
-	gala_bmd \
 	gala_hw \
 	dfs \
 	bfs

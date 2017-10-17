@@ -60,7 +60,9 @@ template<class G>
 struct dwt<G,
 	typename std::enable_if< std::is_convertible<
 	typename boost::graph_traits<G>::directed_category,
-  	boost::directed_tag>::value, void >::type >
+  	boost::directed_tag>::value && !std::is_convertible<
+   typename boost::graph_traits<G>::directed_category,
+   boost::bidirectional_tag>::value, void >::type >
 {
 	typedef typename graph_traits<G>::directed_type& type;
 	static std::string dbg(){ return "dummy wrapper\n"; }
@@ -71,6 +73,27 @@ struct dwt<G,
 
 	template<class GG, class H>
 	static void copy(GG const&, H&){
+	}
+};
+
+template<class G>
+struct dwt<G,
+	typename std::enable_if< std::is_convertible<
+	typename boost::graph_traits<G>::directed_category,
+  	boost::bidirectional_tag>::value, void >::type >
+{
+	typedef typename graph_traits<G>::directed_type type;
+	static std::string dbg(){ return "bidir wrapper\n"; }
+
+	static type init(G& g){
+		incomplete();
+		type R;
+		return R;
+	}
+
+	template<class GG, class H>
+	static void copy(GG const&, H&){
+		incomplete();
 	}
 };
 
@@ -106,7 +129,9 @@ private:
 	directed_view(const directed_view& ) { unreachable();}
 public:
 	directed_view(G& g, bool commit=false)
-	: _g(wrapper_help::init(g)), _commit(commit) {
+	 : _g(wrapper_help::init(g)),
+	   _commit(commit)
+	{
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge
@@ -193,32 +218,46 @@ struct property_map<treedec::draft::directed_view<G>, T> {
 
 template<class G>
 degree_property_map<treedec::draft::directed_view<G> >
-get(vertex_degree_t, treedec::draft::directed_view<G> const& g)
+get(vertex_degree_t t, treedec::draft::directed_view<G> const& g)
 {
-	return get(vertex_degree, *g);
+	return get(t, *g);
 }
 
 template<class G>
 degree_property_map<treedec::draft::directed_view<G> >
-get(vertex_degree_t, treedec::draft::directed_view<G>& g)
+get(vertex_degree_t t, treedec::draft::directed_view<G>& g)
 {
-	return get(vertex_degree, *g);
+	return get(t, *g);
 }
 
-template<class G>
+template<class T, class G>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
-                      boost::vertex_index_t>::const_type
-get(vertex_index_t, treedec::draft::directed_view<G> const& g)
+                      T>::type
+get(T t, treedec::draft::directed_view<G>& g)
 {
-	return get(vertex_index, *g);
+	return get(t, *g);
 }
 
-template<class G>
+template<class T, class G>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
-                      boost::vertex_all_t>::const_type
-get(vertex_all_t, treedec::draft::directed_view<G> const& g)
+                      T>::const_type
+get(T t, treedec::draft::directed_view<G> const& g)
 {
-	return get(vertex_all, *g);
+	return get(t, *g);
+}
+
+template<class T, class G, class V>
+typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
+                      T>::value_type
+get(T t, treedec::draft::directed_view<G> const& g, V v)
+{
+	return get(t, *g, v);
+}
+
+template<class T, class G, class V, class W>
+void put(T t, treedec::draft::directed_view<G>& g, V v, W w)
+{
+	return put(t, *g, v, w);
 }
 
 template<class G>

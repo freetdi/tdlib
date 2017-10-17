@@ -109,6 +109,11 @@ struct default_directed_select< boost::adjacency_list<X, Y, boost::directedS, Z>
    typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
 };
 
+template<class X, class Y, class Z>
+struct default_directed_select< boost::adjacency_list<X, Y, boost::bidirectionalS, Z> >{
+   typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
+};
+
 } // detail
 
 // this makes some sense...

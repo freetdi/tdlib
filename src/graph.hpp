@@ -575,9 +575,10 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    typedef typename std::enable_if< std::is_same< boost::directed_tag,
-                                typename boost::graph_traits<G>::directed_category >::value, G >::type T;
-
+// is this even used?
+//     typedef typename std::enable_if< std::is_same< boost::directed_tag,
+//                                 typename boost::graph_traits<G>::directed_category >::value, G >::type T;
+// 
     static size_type num(G const& g){
         assert(1 ^ boost::num_edges(g)) ;
         return boost::num_edges(g)/2;
