@@ -50,7 +50,6 @@
 #include <boost/graph/adjacency_matrix.hpp>
 
 #include <boost/graph/copy.hpp>
-// #include <boost/graph/minimum_degree_ordering.hpp>
 
 #include "trace.hpp"
 #include "preprocessing.hpp"
@@ -82,9 +81,9 @@ namespace treedec{ //
 //
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-  minDegree_decomp(G_t &G, T_t &T, O_t *O, //FIXME: should be optional//,
-                      unsigned ub=UINT_MAX /* FIXME: move to backend */,
-                      bool ignore_isolated_vertices=false /* FIXME: move to backend */)
+  minDegree_decomp(G_t &G, T_t &T, O_t *O, //TODO: should be optional//,
+                      unsigned ub=UINT_MAX /* TODO: move to backend */,
+                      bool ignore_isolated_vertices=false /* TODO: move to backend */)
 {
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
@@ -105,10 +104,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return 0;
-    }else{
     }
 
-    // hrghs
     typedef typename std::vector<typename treedec_chooser<G_t>::value_type> O_t;
 
     impl::minDegree<G_t, T_t, O_t> MD(G, &T, (O_t*)NULL, -1u, false);
@@ -118,7 +115,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 }
 
 
-// FIXME: duplicate. use impl.
+// TODO: duplicate. use impl.
 template <typename G_t, typename O_t>
 int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
 {
@@ -135,14 +132,14 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
         }
         if(e==0){
             return 1;
-        }else{
+        }
+        else{
             return n;
         }
     }
 
-    std::vector<int> inverse_perm(n, 0); // FIXME: use signed_type(vertex_index_t)
+    std::vector<int> inverse_perm(n, 0); //TODO: use signed_type(vertex_index_t)
     std::vector<int> supernode_sizes(n, 1);
-    // typename boost::property_map<G_t, boost::vertex_index_t>::type ...
     auto id = boost::get(boost::vertex_index, G);
     std::vector<int> degree(n, 0);
 
@@ -215,7 +212,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
     unsigned i = 0;
     if(n == 0){
         return 0;
-    }else if(n*(n-1u) == boost::num_edges(G) || e == 0){
+    }
+    else if(n*(n-1u) == boost::num_edges(G) || e == 0){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
             O[i++] = *vIt;
@@ -280,7 +278,7 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=fa
     impl::fillIn_decomp(G, &T, ub, ignore_isolated);
 }
 
-namespace detail{ //
+namespace detail{
 
 // Compute an elimination ordering according to minDegree heuristic.
 // optionally, treat isolated vertices as deleted.
@@ -291,7 +289,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
       bool ignore_isolated_vertices=false)
 {
     if(ignore_isolated_vertices){ untested();
-        // this is not in use... yet?
+        //TODO/CHECK: this is not in use... yet?
     }
 
     typedef typename treedec::graph_traits<G_t>::treedec_type T;
@@ -312,7 +310,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     return detail::minDegree_ordering(G, O, false);
 }
 
-namespace detail{ //
+namespace detail{
 
 //Compute an elimination ordering according to fillIn heuristic (version used
 //for postprocessing algorithms).
@@ -342,7 +340,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
     return detail::fillIn_ordering(G, elim_ordering, ignore_isolated_vertices);
 }
 
-// incomplete: inefficient. see some.h
+// TODO: inefficient
 template <typename G_t, typename O_t>
 int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
 {
@@ -361,12 +359,13 @@ int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
     return width;
 }
 
-// incomplete: inefficient. see some.h
+
 template <typename G_t, typename O_t>
 unsigned get_bagsize_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
 {
     return get_width_of_elimination_ordering(G, elimination_ordering)+1;
 }
+
 
 namespace impl{
 
@@ -374,7 +373,7 @@ template <typename G_t, typename V_t, typename T_t>
 void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
 {
     unsigned n = O.size();
-    typedef unsigned vertex_descriptor; // BUG
+    typedef unsigned vertex_descriptor;
 
     typename std::vector<
         std::pair<vertex_descriptor,
@@ -385,7 +384,6 @@ void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
     for(unsigned int i = 0; i < O.size(); i++){
         bags[i].first = O[i];
         make_clique_and_detach(O[i], G, bags[i].second);
-        trace2("HERE", i, O[i]);
     }
 
     treedec::detail::skeleton_to_treedec(G, T, bags, O, n);
@@ -415,12 +413,9 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
     ordering_to_treedec(G, O_, T);
 }
 
-namespace draft{ //
+namespace draft{
 
-// TODO: tries hard to add edges at the end. does that make sense?
-// TODO: what are the preconditions?!
-// TODO: can order be an input range?
-// TODO: a test...
+//TODO
 template <typename G_t, typename O_t, class T>
 void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         boost::adjacency_matrix<boost::directedS> *em=NULL )
@@ -441,31 +436,27 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
     if(em){ untested();
         b = em;
     }else{
-        // fixme:free
+        // TODO: free!
         b = new boost::adjacency_matrix<boost::directedS>(num_vert);
     }
     bamd& bags=*b;
 
     if(io){
         assert(io->size()==num_vert);
-    }else{
+    }
+    else{
         iOlocal.resize(num_vert);
         io=&iOlocal;
     }
     O_t& iO=*io;
 
-    // FIXME: use adjacency matrix
+    //TODO: use adjacency matrix
     auto invalid=num_vert;
     std::vector<unsigned> edges(num_vert-1u, invalid);
     assert(edges.size()==num_vert-1);
-//    std::vector<std::vector<BOOL> > bags(num_vert);
-//    typedef boost::adjacency_matrix<boost::undirectedS> bamu;
 
     for(unsigned i = 0; i < num_vert; i++){
         iO[O[i]] = i;
-#ifdef DO_NOT_USE_BAMU
-//        bags[i].assign(num_vert, false);
-#endif
     }
 
     for(unsigned i = 0; i < num_vert; i++){
@@ -493,11 +484,9 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         for(unsigned j = 0; j < N.size(); j++){
             for(unsigned k = 0; k < N.size(); k++){
                 if(iO[N[k]] > iO[N[j]]){
-                //    bags[iO[N[j]]][N[k]] = true;
                     boost::add_edge(iO[N[j]], N[k], bags);
                     if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
                         edges[iO[N[j]]] = iO[N[k]];
-                    }else{
                     }
                 }
             }
@@ -524,7 +513,8 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         else if(i+1!=num_vert){
             // edge to next component
             boost::add_edge(i, i+1, t);
-        } else{ untested();
+        }
+        else{ untested();
             // exiting last connected component.
             // ... dont connect
         }
@@ -537,7 +527,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
 
 } // draft
 
-namespace impl{ //
+namespace impl{
 
 template <typename G_t, typename T_t>
 void treedec_to_ordering(T_t &T,
@@ -664,7 +654,6 @@ void make_filled_graph(G_t &G,
     }
 }
 
-// TODO: what does this function do?
 template <typename G_t, typename E_t>
 void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
 {

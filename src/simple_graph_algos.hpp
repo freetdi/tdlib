@@ -86,7 +86,7 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
     }
 }
 
-// todo: prototype in graph.hpp
+//TODO: prototype in graph.hpp
 template <typename H_t, typename G_t, class S_t, class M_t>
 void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
@@ -270,47 +270,6 @@ void get_components_provided_map(G_t const &G,
         }
     }
 }
-
-#if 0 // duplicates?
-
-template <typename G_t, typename B_t>
-void t_search_components(G_t &G,
-        typename boost::graph_traits<G_t>::vertex_descriptor vertex,
-        std::vector<BOOL> &visited,
-        std::vector<B_t> &components,
-        int comp_idx)
-{
-    unsigned int pos = get_pos(vertex, G);
-    visited[pos] = true;
-    typename boost::graph_traits<G_t>::adjacency_iterator  nIt, nEnd;
-    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vertex, G); nIt != nEnd; nIt++){
-        unsigned int npos = get_pos(*nIt, G);
-        if(!visited[npos]){
-            components[comp_idx].insert(*nIt);
-            t_search_components(G, *nIt, visited, components, comp_idx);
-        }
-    }
-}
-
-template <typename G_t>
-void get_components_provided_map(G_t &G,
-             std::vector<typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type> &components,
-             std::vector<BOOL> &visited){
-
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    int comp_idx = -1;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        unsigned int pos = get_pos(*vIt, G);
-        if(!visited[pos]){
-            components.resize(components.size()+1);
-            comp_idx++;
-
-            components[comp_idx].insert(*vIt);
-            t_search_components(G, *vIt, visited, components, comp_idx);
-        }
-    }
-}
-#endif
 
 template <typename G_t>
 void get_components(G_t &G,

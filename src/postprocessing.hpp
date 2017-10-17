@@ -102,19 +102,16 @@ bool is_improvement_bag(B_t const &H,
 namespace impl{
 
 template <typename G_t, typename T_t>
-class MSVS{ //
+class MSVS{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
     typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
-#if 0
-    typedef typename boost::graph_traits<T_t>::vertex_descriptor bag_descriptor;
-    typedef typename boost::graph_traits<T_t>::vertex_iterator bag_iterator;
-#endif
     typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
     typedef typename graph_traits<G_t>::immutable_type immutable_type;
     typedef typename boost::graph_traits<immutable_type>::vertex_descriptor imm_vertex_descriptor;
+
 public:
     MSVS(G_t const &G, T_t &T)
         : _g(G), _t(T)
@@ -122,176 +119,174 @@ public:
         assert(is_valid_treedecomposition(_g, _t));
     }
 
-    void do_it()
-{ // fix indentation...
+    void do_it(){
+        std::vector<BOOL> disabled;
+        std::vector<BOOL> disabled_;
+        vertices_size_type bagsize = treedec::get_bagsize(_t);
+        std::set<vertex_descriptor> S;
+        std::vector<imm_vertex_descriptor> X, Y;
 
-    std::vector<BOOL> disabled;
-    std::vector<BOOL> disabled_;
-    vertices_size_type bagsize = treedec::get_bagsize(_t);
-    std::set<vertex_descriptor> S;
-    std::vector<imm_vertex_descriptor> X, Y;
+        immutable_type H; // malloc/free, where?
 
-    immutable_type H; // malloc/free, where?
+        std::set<typename immutable_type::vertex_descriptor> S_;
+        std::vector<G_vertex_descriptor> vdMap_, vdMap;
+        std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
 
-    std::set<typename immutable_type::vertex_descriptor> S_;
-    std::vector<G_vertex_descriptor> vdMap_, vdMap;
-    std::set<typename boost::graph_traits<G_t>::vertex_descriptor> component;
+        //TODO: (terribly) inefficient:
+        std::vector<std::set<vertex_descriptor> > union_S_W_i;
 
-    // FIXME: (terribly) inefficient:
-    std::vector<std::set<vertex_descriptor> > union_S_W_i;
+        std::vector<bag_descriptor> newN;
+        std::vector<bag_descriptor> oldN;
+        typename treedec_traits<T_t>::bag_type intersection;
 
-    std::vector<bag_descriptor> newN;
-    std::vector<bag_descriptor> oldN;
-    typename treedec_traits<T_t>::bag_type intersection;
+        while(true){
+            bagsize = treedec::get_bagsize(_t);
 
-    while(true){
-        bagsize = treedec::get_bagsize(_t);
+            callback(bagsize);
 
-        callback(bagsize);
+            //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
+            H.clear();
+            X.clear();
+            Y.clear();
+            disabled.resize(0);
+            disabled_.resize(0);
+            vdMap.resize(0);
 
-        //Check all maximum sized bags, whether they can be improved or not. Take the first improvable.
-        H.clear();
-        X.clear();
-        Y.clear();
-        disabled.resize(0);
-        disabled_.resize(0);
-        vdMap.resize(0);
+            bag_iterator tIt, tEnd;
+            bag_descriptor refinement_vertex;
+            immutable_type const* HI=NULL;
+            bool status=false;
 
-        bag_iterator tIt, tEnd;
-        bag_descriptor refinement_vertex;
-        immutable_type const* HI=NULL;
-        bool status=false;
+            for(boost::tie(tIt, tEnd) = boost::vertices(_t); tIt!=tEnd; ++tIt){
+                callback(0);
+                if(bag(*tIt, _t).size() == bagsize){
+                    disabled_.resize(0);
+                    vdMap_.resize(0);
 
-        for(boost::tie(tIt, tEnd) = boost::vertices(_t); tIt!=tEnd; ++tIt){
-            callback(0);
-            if(bag(*tIt, _t).size() == bagsize){
-                disabled_.resize(0);
-                vdMap_.resize(0);
+                    /* draft:: */ is_in_neighbour_bd<vertex_descriptor, T_t> cb(_t, *tIt);
+                    BOOST_AUTO(mybag, bag(*tIt, _t));
+                    HI = &treedec::draft::immutable_clone(_g, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
+                    status = is_improvement_bag<immutable_type, std::vector<imm_vertex_descriptor>, long unsigned>
+                                                                                  (*HI, disabled_, X, Y, cb.a, cb.b);
 
-                /* draft:: */ is_in_neighbour_bd<vertex_descriptor, T_t> cb(_t, *tIt);
-                BOOST_AUTO(mybag, bag(*tIt, _t));
-                HI = &treedec::draft::immutable_clone(_g, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
-                status = is_improvement_bag
-                  <immutable_type, 
-                   std::vector<imm_vertex_descriptor>,
-                   long unsigned /* H positions... */>
-                       (*HI, disabled_, X, Y, cb.a, cb.b);
-
-                if(status){
-                    refinement_vertex = *tIt;
-                    disabled = MOVE(disabled_);
-                    vdMap = MOVE(vdMap_);
-                    assert(vdMap.size() == boost::num_vertices(*HI));
-                    break;
+                    if(status){
+                        refinement_vertex = *tIt;
+                        disabled = MOVE(disabled_);
+                        vdMap = MOVE(vdMap_);
+                        assert(vdMap.size() == boost::num_vertices(*HI));
+                        break;
+                    }
                 }
             }
-        }
 
-        if(!status){
-            return;
-        }
-        assert(HI);
+            if(!status){
+                return;
+            }
+            assert(HI);
 
 #ifndef NDEBUG
-        std::vector<BOOL>::const_iterator x=disabled.begin();
-        unsigned num_dis=0;
-        for(; x!=disabled.end(); ++x){
-            if(*x) ++num_dis;
-        }
-        assert(num_dis==2);
+            std::vector<BOOL>::const_iterator x=disabled.begin();
+            unsigned num_dis=0;
+            for(; x!=disabled.end(); ++x){
+                if(*x) ++num_dis;
+            }
+            assert(num_dis==2);
 #endif
 
-        //Compute a seperating set S.
-        S_.clear();
-        seperate_vertices(H, disabled, 2, X, Y, S_);
+            //Compute a seperating set S.
+            S_.clear();
+            seperate_vertices(H, disabled, 2, X, Y, S_);
 
-        //S consists of vertex descriptors of H. Use vd_map to map these to descriptors of _g.
-        S.clear();
-        map_descriptors(S_, S, *HI, vdMap);
+            //S consists of vertex descriptors of H. Use vd_map to map these to descriptors of _g.
+            S.clear();
+            map_descriptors(S_, S, *HI, vdMap);
 
-        //Mark the vertices of the seperator as visited (used for computing connected components).
-        std::vector<BOOL> visited(boost::num_vertices(H), false);
-        BOOST_AUTO(sIt, S_.begin());
-        for(; sIt!=S_.end(); ++sIt){
-            auto pos=boost::get(boost::vertex_index, *HI, *sIt);
-            visited[pos] = true;
-        }
+            //Mark the vertices of the seperator as visited (used for computing connected components).
+            std::vector<BOOL> visited(boost::num_vertices(H), false);
+            BOOST_AUTO(sIt, S_.begin());
+            for(; sIt!=S_.end(); ++sIt){
+                auto pos=boost::get(boost::vertex_index, *HI, *sIt);
+                visited[pos] = true;
+            }
 
-        //Convert the descriptors stored in S to a bag and replace
-        //the bag of 'refinement_vertex' with this bag.
-        typename treedec_traits<T_t>::bag_type B;
-        treedec::map_descriptors_to_bags<G_t>(S, B);
-        typename treedec_traits<T_t>::bag_type old_bag = bag(refinement_vertex, _t);
-        bag(refinement_vertex, _t) = MOVE(B);
+            //Convert the descriptors stored in S to a bag and replace
+            //the bag of 'refinement_vertex' with this bag.
+            typename treedec_traits<T_t>::bag_type B;
+            treedec::map_descriptors_to_bags<G_t>(S, B);
+            typename treedec_traits<T_t>::bag_type old_bag = bag(refinement_vertex, _t);
+            bag(refinement_vertex, _t) = MOVE(B);
 
-        //Store the connected components of H[V(H)\S] in 'components'.
-        typedef typename boost::graph_traits<immutable_type>::vertex_descriptor HI_vertex_descriptor;
-        std::vector<std::set<HI_vertex_descriptor> > components;
-        treedec::get_components_provided_map(*HI, components, visited);
+            //Store the connected components of H[V(H)\S] in 'components'.
+            typedef typename boost::graph_traits<immutable_type>::vertex_descriptor HI_vertex_descriptor;
+            std::vector<std::set<HI_vertex_descriptor> > components;
+            treedec::get_components_provided_map(*HI, components, visited);
 
-        //Store the (neighbours of 'refinement_vertex' in _t) in 'oldN'.
-        typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
-        oldN.resize(boost::out_degree(refinement_vertex, _t));
-        unsigned int c = 0;
-        for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_vertex, _t);
-              t_nIt != t_nEnd; t_nIt++){
-            oldN[c++] = *t_nIt;
-        }
+            //Store the (neighbours of 'refinement_vertex' in _t) in 'oldN'.
+            typename boost::graph_traits<T_t>::adjacency_iterator t_nIt, t_nEnd;
+            oldN.resize(boost::out_degree(refinement_vertex, _t));
+            unsigned int c = 0;
+            for(boost::tie(t_nIt, t_nEnd) = boost::adjacent_vertices(refinement_vertex, _t); t_nIt != t_nEnd; t_nIt++){
+                oldN[c++] = *t_nIt;
+            }
 
-        boost::clear_vertex(refinement_vertex, _t);
+            boost::clear_vertex(refinement_vertex, _t);
 
-        //'refinement_vertex' gets |connected_components|-many neighbours, that are new vertices in _t.
-        //The bag of neighbours i will be (connected_components[i] v S).
-        union_S_W_i.resize(components.size());
+            //'refinement_vertex' gets |connected_components|-many neighbours, that are new vertices in _t.
+            //The bag of neighbours i will be (connected_components[i] v S).
+            union_S_W_i.resize(components.size());
 
-        // FIXME: proper container!
-        BOOST_AUTO(ii, union_S_W_i.begin());
-        for(; ii != union_S_W_i.end(); ++ii ){
-            ii->clear();
-        }
-        newN.resize(components.size());
-        for(unsigned int i = 0; i < components.size(); i++){
-            component.clear();
-            treedec::map_descriptors(components[i], component, *HI, vdMap);
+            //TODO: proper container!
+            BOOST_AUTO(ii, union_S_W_i.begin());
+            for(; ii != union_S_W_i.end(); ++ii ){
+                ii->clear();
+            }
 
-            std::set_union(S.begin(), S.end(),
-                           component.begin(), component.end(),
-                           std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
+            newN.resize(components.size());
 
-            newN[i] = boost::add_vertex(_t);
-            typename treedec_traits<T_t>::bag_type uB;
-            treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
-            bag(newN[i], _t) = MOVE(uB);
+            for(unsigned int i = 0; i < components.size(); i++){
+                component.clear();
+                treedec::map_descriptors(components[i], component, *HI, vdMap);
 
-            assert(!boost::edge(refinement_vertex, newN[i], _t).second);
-            assert(!boost::edge(newN[i], refinement_vertex, _t).second);
-            treedec::add_edge(refinement_vertex, newN[i], _t);
-            assert(boost::edge(refinement_vertex, newN[i], _t).second);
-            assert(boost::edge(newN[i], refinement_vertex, _t).second);
-        }
+                std::set_union(S.begin(), S.end(),
+                               component.begin(), component.end(),
+                               std::inserter(union_S_W_i[i], union_S_W_i[i].begin()));
 
-        //Let intersection_i be the intersection of the old bag of 'refinement_vertex' with
-        //the bag of the old neighbour i. Add an edge between i and a new neighbour j of
-        //'refinement_vertex', if the bag of j includes intersection_i. This can only be done
-        //with exactly one new neighbour of 'refinement_vertex'.
-        for(unsigned int i = 0; i <  oldN.size(); i++){
-            intersection.clear();
-            std::set_intersection(old_bag.begin(), old_bag.end(),
-                                  bag(oldN[i], _t).begin(),
-                                  bag(oldN[i], _t).end(),
-                                  std::inserter(intersection, intersection.begin()));
+                newN[i] = boost::add_vertex(_t);
+                typename treedec_traits<T_t>::bag_type uB;
+                treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
+                bag(newN[i], _t) = MOVE(uB);
 
-            for(unsigned int j = 0; j < newN.size(); j++){
-                if(std::includes(bag(newN[j], _t).begin(), bag(newN[j], _t).end(),
-                                 intersection.begin(), intersection.end()))
-                {
-                    boost::add_edge(newN[j], oldN[i], _t);
-                    break;
+                assert(!boost::edge(refinement_vertex, newN[i], _t).second);
+                assert(!boost::edge(newN[i], refinement_vertex, _t).second);
+
+                treedec::add_edge(refinement_vertex, newN[i], _t);
+
+                 assert(boost::edge(refinement_vertex, newN[i], _t).second);
+                assert(boost::edge(newN[i], refinement_vertex, _t).second);
+            }
+
+            //Let intersection_i be the intersection of the old bag of 'refinement_vertex' with
+            //the bag of the old neighbour i. Add an edge between i and a new neighbour j of
+            //'refinement_vertex', if the bag of j includes intersection_i. This can only be done
+            //with exactly one new neighbour of 'refinement_vertex'.
+            for(unsigned int i = 0; i <  oldN.size(); i++){
+                intersection.clear();
+                std::set_intersection(old_bag.begin(), old_bag.end(),
+                                      bag(oldN[i], _t).begin(),
+                                      bag(oldN[i], _t).end(),
+                                      std::inserter(intersection, intersection.begin()));
+
+                for(unsigned int j = 0; j < newN.size(); j++){
+                    if(std::includes(bag(newN[j], _t).begin(), bag(newN[j], _t).end(),
+                                     intersection.begin(), intersection.end()))
+                    {
+                        boost::add_edge(newN[j], oldN[i], _t);
+                        break;
+                    }
                 }
             }
         }
     }
-}
     protected:
         virtual void callback(vertices_size_type){}
     private:
@@ -306,7 +301,6 @@ void MSVS(G_t const &G, T_t &T)
 {
     impl::MSVS<G_t, T_t> A(G, T);
     A.do_it();
-    // A.tree_decomposition();
 }
 
 template <typename G_t, class O_t, class E_t>
@@ -349,8 +343,8 @@ class minimalChordal{
 public:
     minimalChordal(G_t& g, O_t& o)
         : _g(g), _o(o)
-    {
-    }
+    {}
+
 public:
     void do_it();
     O_t const& ordering() const {return _no;}

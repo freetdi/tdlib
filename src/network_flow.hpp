@@ -87,7 +87,11 @@ void check_dis(D dis, size_t num)
 #ifndef NDEBUG
     typename D::const_iterator i=dis.begin();
     unsigned n=0;
-    for(;i!=dis.end();++i) if(*i) ++n;
+    for(;i!=dis.end();++i){
+         if(*i){
+             ++n;
+         }
+    }
     assert(n==num);
 #endif
 }
@@ -113,7 +117,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
     make_digraph_with_source_and_sink(G_t const &G, std::vector<BOOL> const &disabled,
                  unsigned num_dis,
                  typename graph_traits<G_t>::directed_overlay& diG,
-                 /* FIXME: use property... */
+                 /* TODO: use property... */
                  std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &idxMap,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &X,
                  typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> const &Y)
@@ -207,18 +211,17 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 }
 
 namespace impl{
-    template <typename G_t>
-    class disjoint_ways{
-    public:
-        // hmm does not work.
-        // disjoint_ways(G_t const& g) : dg(g) {}
-    public:
-        typedef typename graph_traits<G_t>::directed_overlay digraph_t;
-        typename graph_traits<G_t>::directed_overlay dg;
-        typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
-        std::set<divd> dangerous;
-        std::vector<std::vector<unsigned int> > P;
-    };
+
+template <typename G_t>
+class disjoint_ways{
+public:
+    typedef typename graph_traits<G_t>::directed_overlay digraph_t;
+    typename graph_traits<G_t>::directed_overlay dg;
+    typedef typename boost::graph_traits<digraph_t>::vertex_descriptor divd;
+    std::set<divd> dangerous;
+    std::vector<std::vector<unsigned int> > P;
+};
+
 } // impl
 
 namespace detail{
@@ -355,7 +358,7 @@ static bool t_search_disjoint_ways(
                 return true;
             }
         }else{
-            // no path?
+            //no path!
         }
     }
     return false;

@@ -26,7 +26,6 @@ struct pcnt{
     }
     template<class T>
     bool operator()(T){
-        // trace1("", t);
         if(_cnt){
             --_cnt;
         }
@@ -35,6 +34,7 @@ struct pcnt{
     size_t _cnt;
 };
 
+//TODO
 template<class G>
 struct outedge_resize{
     static void do_it(typename boost::graph_traits<G>::vertex_descriptor,
@@ -138,16 +138,6 @@ public: // construct
 	assert(_changes_container.size()==1);
     }
 #endif
-//    overlay(UnderlyingG_t const& g) // (, std::vector<BOOL> &active_input) //e.g. after PP
-//      : _g(g),
-//        _og(boost::num_vertices(g)),
-//        _active(boost::num_vertices(g)),
-//        _degree(boost::num_vertices(g)),
-//        _marker(boost::num_vertices(g))
-//    {
-//        incomplete();
-//    }
-
     overlay(UnderlyingG_t const& g, ACTMAP m) // (, std::vector<BOOL> &active_input) //e.g. after PP
       : _g(g),
         _og(boost::num_vertices(g)),
@@ -160,11 +150,10 @@ public: // construct
         auto vs=boost::vertices(g);
         for(; vs.first!=vs.second; ++vs.first){
             _degree[*vs.first]=boost::out_degree(*vs.first, _g);
-            //std::cout << "degreeinit " << *vs.first << " " << _degree[*vs.first] << "\n";
         }
     }
 
-    private: // BUG
+private:
     overlay(const overlay&o)
         : _g(o._g),
           _og(o._og),
@@ -220,13 +209,9 @@ public:
         auto i=j.begin();
         auto e=j.end();
 #else
-//        typedef typename boost::graph_traits<UnderlyingG_t>::adjacency_iterator adj1_iterator;
-//        typedef typename boost::graph_traits<OverlayG_t>::adjacency_iterator adj2_iterator;
         auto i=all_adj_it(p.first, p.second, q.first, q.second);
         auto e=all_adj_it(p.second, p.second, q.second, q.second);
 #endif
-//        return std::make_pair(i, e);
-
         typedef boost::filter_iterator<active_filter, all_adj_it> FilterIter;
         active_filter fP(_active);
 
@@ -277,6 +262,7 @@ private:
     }
 
 //private:
+
 public: //accessed from outside.
     const UnderlyingG_t &_g;
     OverlayG_t _og;
@@ -363,7 +349,6 @@ template<class A, class B, class C>
 std::pair<typename treedec::gen_search::overlay<A, B, C>::adjacency_iterator,
           typename treedec::gen_search::overlay<A, B, C>::adjacency_iterator>
   adjacent_vertices(
-          //typename treedec::gen_search::overlay<A, B, C>::vertex_descriptor v,
           unsigned v,
           treedec::gen_search::overlay<A, B, C> const& o)
 {
@@ -510,7 +495,6 @@ void overlay<A, B, C>::eliminate(
 
     unsigned actual_degree = 0; // recompute degree of center vertex?
 
-    // auto p=boost::adjacent_vertices(elim_vertex, *this);
     auto p=adjacent_vertices(elim_vertex);
     for(; p.first!=p.second; ++p.first){
         assert(actual_degree<_degree[elim_vertex]);
@@ -531,9 +515,11 @@ void overlay<A, B, C>::eliminate(
             assert(active()[*q.first]);
             if(*q.first>=*p.first){
                 // skip. TODO: more efficient skip
-            }else if(_marker.is_marked(*q.first)){
+            }
+            else if(_marker.is_marked(*q.first)){
                 // done.
-            }else{
+            }
+            else{
                 ++_degree[*p.first];
                 ++_degree[*q.first];
                 assert(_degree[*p.first]<nv);
@@ -565,7 +551,6 @@ void overlay<A, B, C>::eliminate(
 #ifndef NDEBUG
     auto p3=boost::vertices(_g);
     for(; p3.first!=p3.second; ++p3.first){
-        // std::cerr << "node " << *p3.first << " deg " << degree(*p3.first) << "\n";
     }
 #endif
 

@@ -30,7 +30,6 @@
 #include "generic_elimination_search_overlay.hpp"
 #include "graph.hpp"
 
-//#include "generic_elimination_search_configs.hpp"
 #include "marker_util.hpp"
 
 #include <iostream>
@@ -69,10 +68,9 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
 #endif
 }
 
-// strange: still takes overlay as arg..
 template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
-    generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
+    generic_elimination_search_base(internal_graph_type &Overlay, //TODO: exposes graph type
                                     unsigned g_lb, unsigned g_ub,
                                     unsigned depth, unsigned nodes_generated,
                                     unsigned orderings_generated)
@@ -87,20 +85,12 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
         _nodes_generated(nodes_generated),
         _orderings_generated(orderings_generated),
         _need_cleanup(1)
-{
-#ifdef DEBUG_NOTYET // perhaps not here.
-    auto p=boost::edges(_g); // not implemented
-    for(; p.first!=p.second; ++p.first){
-        /// test self loops? no. only G.
-        // assert(source!=target)...
-    }
-#endif
-}
+{}
 
-// BUG: optional active etc.
+//TODO: optional active etc.
 template <typename G_t, class CFG_t, template<class G, class ...> class CFGT_t>
 generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
-    generic_elimination_search_base(internal_graph_type &Overlay, // BUG: exposes graph type
+    generic_elimination_search_base(internal_graph_type &Overlay, //TODO: exposes graph type
             std::vector<BOOL>& active, // BUG need normal constructor
                                     std::vector<vd> &best_ordering,
                                     std::vector<vd> &current_ordering,
@@ -132,34 +122,32 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
 template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
 generic_elimination_search_base<G_t, CFG_t, CFGT_t>::generic_elimination_search_base(
     generic_elimination_search_base<G_t, CFG_t, CFGT_t>& o)
-    : baseclass(o), // good idea?!
+    : baseclass(o),
       _active(o._active),
       _g(o._g),
       _best_ordering(o._best_ordering),
       _current_ordering(o._current_ordering),
       _global_lb(o._global_lb),
       _global_ub(o._global_ub),
-      _depth(o._depth), // ??
+      _depth(o._depth),
       _nodes_generated(o._nodes_generated),
       _orderings_generated(o._orderings_generated),
       _need_cleanup(0)
 {}
 
 
-// BUG: CFG_t is a generic_search config...
-// FIXME: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
+// TODO: CFG_t is a generic_search config...
+// TODO: do not inherit for IS-IMPLEMENTED-IN-TERMS-OF, see
 // http://www.gotw.ca/publications/mill07.htm
 template <typename G_t, class OC, template<class G, class ...> class CFGT_t=algo::default_config>
 class generic_elimination_search_DFS
     : public generic_elimination_search_base<G_t, OC, CFGT_t> {
 private:
-    // typedef CFG_t UC?
     typedef CFGT_t<G_t> UC;
     typedef generic_elimination_search_base<G_t, OC, CFGT_t> baseclass;
     typedef typename baseclass::vertex_descriptor vd;
 
 public:
-    // too many args
     generic_elimination_search_DFS(overlay<G_t, G_t> &Overlay,
             std::vector<BOOL>& active,
             std::vector<vd> &best_ordering, std::vector<vd> &current_ordering)
@@ -245,20 +233,13 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             baseclass::_global_lb = tmp_global_lb;
         }
 
-//        std::cout << "initial lb: " << baseclass::_global_lb << std::endl;
-
         unsigned tmp_global_ub = CFG_t::initial_ub_algo(baseclass::_g.underlying(), baseclass::_best_ordering);
 
-        // TODO: proper range container...
         if(tmp_global_ub < baseclass::_global_ub){
             baseclass::_global_ub = tmp_global_ub;
         }
 
-        std::cout << "initial ub: " << baseclass::_global_ub << std::endl;
-
-        // baseclass::bagsize_range().size()==1...?
         if(baseclass::_global_lb == baseclass::_global_ub){
-//            std::cout << "finished: initial lower bound == initial upper bound" << std::endl;
             ++baseclass::_orderings_generated; //not necessary..
 
             baseclass::timer_off();
@@ -267,22 +248,18 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
     }
 
     if(baseclass::_depth == boost::num_vertices(baseclass::_g.underlying())){
-        if(local_ub < baseclass::_global_ub){ //this should be always true?!
-            std::cout << "found better ordering of width " << local_ub << std::endl;
+        if(local_ub < baseclass::_global_ub){
             baseclass::_global_ub = local_ub;
             baseclass::_best_ordering = baseclass::_current_ordering;
-//            std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
 
-            ++baseclass::_orderings_generated; //ifdef stats?!
+            ++baseclass::_orderings_generated; //not necessary..
 
             std::vector<vd> tmp_ordering(boost::num_vertices(baseclass::_g.underlying()));
             unsigned ref_width = CFG_t::refiner(baseclass::_g.underlying(), baseclass::_best_ordering, tmp_ordering);
 
             if(ref_width < baseclass::_global_ub){
-                std::cout << "found better ordering after refinement " << ref_width << std::endl;
                 baseclass::_global_ub = ref_width;
                 baseclass::_best_ordering = tmp_ordering;
-//                std::cout << "updated global_ub to " << baseclass::_global_ub << std::endl;
 
                 if(CFG_t::is_jumper()){
                     baseclass::_nodes_generated = max_nodes_generated; //terminates now
@@ -292,7 +269,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
         }
         else{
-            std::cout << "ran into unreachable!!!!!!!!!!!!!!!!!" << std::endl;
             unreachable(); //should be the case?
         }
     }else{
@@ -311,8 +287,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         local_lb = CFG_t::lb_algo(H);
         if(local_lb > baseclass::_global_ub){
             //can be seen as pruning this branch
-            //incomplete(); // use message.
-//            std::cerr << "prune branch (depth " << baseclass::_depth << ") since local_lb is greater than the current best solution" << std::endl;
             baseclass::timer_off();
             return;
         }else{
@@ -337,9 +311,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             //  -if the underlying adj-list graph backend adds edges at the end of the vertex container,
             //   we just have to remember how many edges per node we added and can that pop_back these edges
 
-
-//            baseclass::eliminate(elim_vertex);
-//            unsigned step_width = baseclass::degree(elim_vertex)+1;
             unsigned step_width = baseclass::_g.degree(elim_vertex)+1;
 
             if(step_width < baseclass::_global_ub){
@@ -358,7 +329,7 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
                 nextStep.do_it();
 
-                baseclass::_nodes_generated = nextStep._nodes_generated; //ifdef stats?!
+                baseclass::_nodes_generated = nextStep._nodes_generated; //not necessary..
                 baseclass::_orderings_generated = nextStep._orderings_generated;
 
                 baseclass::undo_eliminate();
@@ -368,40 +339,17 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 
                     //this branch has already width global_ub, so we cant improve here (or we found the exact solution)
                     if(local_ub >= baseclass::_global_ub || baseclass::_global_lb == baseclass::_global_ub){
-                        //baseclass::undo_eliminate();
                         break; //returns now
                     }
                 }
             }
             else{
-                //std::cout << "prune branch, since the current branch has higher width than the current best solution" << std::endl;
             }
         }
     }
 
     baseclass::timer_off();
 }
-
-
-#if 0
-template <typename G_t, class CFG_t, template<class G, class...> class CFGT_t>
-typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adj_range
-inline generic_elimination_search_base<G_t, CFG_t, CFGT_t>::adjacent_vertices(
-        typename generic_elimination_search_base<G_t, CFG_t, CFGT_t>::vertex_descriptor v) const
-{
-        active_filter p(active());
-        std::pair<overlay_adjacency_iterator, overlay_adjacency_iterator>
-            q=boost::adjacent_vertices(v, _g);
-        overlay_adjacency_iterator f=q.first;
-        overlay_adjacency_iterator s=q.second;
-        typedef boost::filter_iterator<active_filter, overlay_adjacency_iterator> FilterIter;
-        FilterIter b(p, f, s);
-        FilterIter e(p, s, s);
-
-        return std::make_pair(b, e);
-}
-#endif
-
 
 } //namespace gen_search
 
