@@ -22,7 +22,7 @@ int main()
 
 	BOOST_CONCEPT_ASSERT(( boost::PropertyGraphConcept<cfg_t, unsigned, bool cfg_node::*> ));
 
-	static_assert( std::is_same<typename cfgd_t::wrapped_type, w_t>::value);
+	BOOST_STATIC_ASSERT( std::is_same<typename cfgd_t::wrapped_type, w_t>::value);
 
 	BOOST_CONCEPT_ASSERT(( boost::PropertyGraphConcept<cfgd_t, unsigned, bool cfg_node::*> ));
 

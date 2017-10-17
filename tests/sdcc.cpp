@@ -7,7 +7,9 @@
 #include <tdlib/preprocessing.hpp>
 #include <tdlib/graph.hpp>
 #include <boost/graph/copy.hpp>
+#ifdef USE_GALA
 #include <tdlib/exact_ta.hpp>
+#endif
 
 
 typedef int var_t; // relevant here?
@@ -35,6 +37,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::bidirectionalS, tree_dec_node> tree_dec_t;
 
 // some algorithms
+#ifdef USE_GALA
 namespace choice{
   template<class G, template<class G_, class ...> class C>
   using exact_ta_=treedec::exact_ta<G, C>;
@@ -42,6 +45,7 @@ namespace choice{
 typedef treedec::draft::exact_decomposition<cfg_t,
              treedec::algo::default_config,
              choice::exact_ta_> alg_A;
+#endif
 
 int main()
 {
@@ -52,9 +56,10 @@ int main()
 	assert(boost::num_edges(g)==6);
 	assert(treedec::num_edges(g)==3);
 
+#ifdef USE_GALA
 	alg_A A(g);
-
 	A.do_it(1);
+#endif
 
 //	std::cout << A.get_treewidth();
 
