@@ -65,19 +65,20 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <tdlib/misc.hpp> // get_bagsize
 
-namespace boost {
-// some hacks. perhaps wrong place
-using HACK_Bag=std::vector<unsigned>;
-using HACK_Treedec=adjacency_list<setS, vecS, undirectedS, HACK_Bag,
-		  no_property, no_property, listS>;
-
-HACK_Bag& get(treedec::bag_t, HACK_Treedec& t, unsigned u)
-{ untested();
-	return t[u];
-}
-
-}
+// namespace boost {
+// // some hacks. perhaps wrong place
+// using HACK_Bag=std::vector<unsigned>;
+// using HACK_Treedec=adjacency_list<setS, vecS, undirectedS, HACK_Bag,
+// 		  no_property, no_property, listS>;
+// 
+// HACK_Bag& get(treedec::bag_t, HACK_Treedec& t, unsigned u)
+// { untested();
+// 	return t[u];
+// }
+// 
+// }
 
 namespace treedec{
 
@@ -237,7 +238,7 @@ find_bag(const std::set<unsigned int> &X, const T_t &T)
 
   for (boost::tie(t, t_end) = vertices(T), t_found = t_end; t != t_end; ++t) {
 	  for (v = X.begin(); v != X.end(); ++v){
-		  auto const& b=bag(*t, T);
+		  auto const& b=boost::get(treedec::bag_t(), T, *t);
 		  if (b.find(*v) == b.end()){ itested();
 			  break;
 		  }else{ itested();
@@ -310,7 +311,7 @@ void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_
   boost::add_edge(*t, s, T);
   // T[s].bag = neighbours;
   // T[s].bag.insert(*v);
-  auto& b=bag(s, T);
+  auto& b=boost::get(treedec::bag_t(), T, s);
   b = neighbours;
   treedec::insert(b, *v);
 
@@ -556,7 +557,7 @@ void nicify(T_t &T) {
 
 } // pkk_thorup
 
-template<typename G, template<class G_, class ...> class config>
+template<typename G, template<class G_, class ...> class config=algo::default_config>
 class thorup : public ::treedec::algo::draft::algo1{
 public: // types
 	// FIXME: use treedec_t<G>
@@ -584,17 +585,15 @@ public:
 	}
 
 	template<class T>
-	void get_tree_decomposition(T& t){ untested();
+	void get_tree_decomposition(T& t) const{ untested();
 		boost::copy_graph(_t, t);
 	}
-	decomp_type const& get_tree_decomposition(){ untested();
+	decomp_type const& get_tree_decomposition() const{ untested();
 		return _t;
 	}
-
 	size_t get_bagsize() const{
 		return treedec::get_bagsize(_t);
 	}
-
 	std::list<unsigned> const&  get_elimord() const{
 		return _o;
 	}
