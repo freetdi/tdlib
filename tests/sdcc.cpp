@@ -20,7 +20,7 @@ struct tree_dec_node
 };
 
 
-#include <tdlib/graph_traits.hpp>
+#include <tdlib/treedec_traits.hpp>
 #include <iostream>
 #include <vector>
 #include <tuple>

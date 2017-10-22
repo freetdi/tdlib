@@ -89,6 +89,92 @@ size_t bag_size(V const & v, G const& g)
 //{ untested();
 //}
 //}
+//
+// uses treedec::push, include container...
+// BUG: only works for "set" and "vector" of unsigned
+// BUG: BAG must be bag, still used in other traits :|
+#define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
+namespace boost{\
+\
+	typename property_map< T, vertex_all_t>::type\
+	get(vertex_all_t, T& g) {\
+		typedef typename property_map< T, vertex_all_t>::type\
+			pmap_type;\
+		return pmap_type(g);\
+	}\
+\
+	inline bagstuff::const_treebagpmap<T>\
+	get(vertex_all_t, T const& g) {\
+		typedef typename property_map< T, vertex_all_t>::const_type\
+			pmap_type;\
+		return pmap_type(g);\
+	}\
+\
+  inline void\
+  put(put_get_helper<bagstuff::gtob<T>::type,\
+		 bagstuff::treebagpmap<T> >& pa, unsigned long k, treedec::bag_t const& v)\
+  { untested();\
+	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+	  b.clear();\
+	  for(auto const& i : v.BAG){ untested();\
+		  treedec::push(b, i);\
+	  }\
+  }\
+\
+  inline void\
+  put(const put_get_helper<bagstuff::gtob<T>::type,\
+		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
+		 const property<treedec::bag_t, std::set<unsigned> >& v)\
+  { untested();\
+	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+	  b.clear();\
+	  for(auto const& i : v.m_value){ untested();\
+		  treedec::push(b, i);\
+	  }\
+  }\
+\
+  inline void\
+  put(const put_get_helper<bagstuff::gtob<T>::type,\
+		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
+		 const property<treedec::bag_t, std::vector<unsigned> >& v)\
+  { untested();\
+	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+	  b.clear();\
+	  for(auto const& i : v.m_value){ untested();\
+		  treedec::push(b, i);\
+	  }\
+  }\
+\
+  inline bagstuff::gtob<T>::type \
+  get(treedec::bag_t, T const&t, unsigned k)\
+  { untested();\
+	  return t[k].bag;\
+  }\
+\
+  inline bagstuff::gtob<T>::type \
+  get(treedec::bag_t, T const&t, unsigned long k)\
+  { untested();\
+	  return t[k].bag;\
+  }\
+\
+	inline bagstuff::const_treebagpmap<T> \
+  get(treedec::bag_t, T const& t)\
+  { untested();\
+	  return bagstuff::const_treebagpmap<T>(t);\
+  }\
+	inline bagstuff::treebagpmap<T> \
+  get(treedec::bag_t, T & t)\
+  { untested();\
+	  return bagstuff::treebagpmap<T>(t);\
+  }\
+\
+    template <>\
+    struct property_map<T, treedec::bag_t>{ \
+	 };\
+} // boost
 
 #endif
 // vim:ts=8:sw=4:et

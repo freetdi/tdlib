@@ -181,10 +181,10 @@ inline bool is_valid(typename boost::graph_traits<G>::vertex_descriptor const & 
 }
 
 
-namespace detail{ //
+namespace detail{
 // working around balu and bag
 template <bool, typename T = void>
-struct vdstuff { //
+struct vdstuff {
     typedef unsigned type;
     typedef std::set<unsigned> bag_type;
 };
@@ -192,7 +192,7 @@ struct vdstuff { //
 // temporary hack don't touch.
 // specialize teedec_traits (below) in case you must.
 template <typename T>
-struct vdstuff<false, T> { //
+struct vdstuff<false, T> {
 	// T is not bag_t. so probably a boost::property
     typedef typename T::value_type::value_type type;
     typedef typename T::value_type bag_type;
@@ -200,7 +200,7 @@ struct vdstuff<false, T> { //
 } //detail
 
 template<class T>
-struct treedec_traits{ //
+struct treedec_traits{
 // TODO should be this (does not work, why?)
 //    typedef typename boost::graph_traits<T>::vertex_property_type vertex_property_type;
     typedef typename T::vertex_property_type vertex_property_type;
@@ -251,13 +251,13 @@ namespace detail{
 }
 
 template<typename vertex_descriptor>
-struct vertex_callback{ //
+struct vertex_callback{
     virtual ~vertex_callback(){};
     virtual void operator()(vertex_descriptor)=0;
 };
 
 template<typename G_t>
-struct edge_callback{ //
+struct edge_callback{
     typedef typename boost::graph_traits<G_t>::edge_descriptor edge_descriptor;
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     virtual ~edge_callback(){};
@@ -313,6 +313,7 @@ struct graph_helper{
 
 namespace boost {
 
+// TODO: move to treedec_traits?
 namespace bagstuff {
 
 	template<class T, class X=void>
@@ -380,92 +381,6 @@ namespace bagstuff {
 } // boost
 
 
-// BUG: uses treedec::push
-// BUG: only works for "set" and "vector" of unsigned
-// TODO: maybe to treedec_traits. check carefully
-// BUG: BAG must be bag, used above.
-#define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
-namespace boost{\
-\
-	typename property_map< T, vertex_all_t>::type\
-	get(vertex_all_t, T& g) {\
-		typedef typename property_map< T, vertex_all_t>::type\
-			pmap_type;\
-		return pmap_type(g);\
-	}\
-\
-	inline bagstuff::const_treebagpmap<T>\
-	get(vertex_all_t, T const& g) {\
-		typedef typename property_map< T, vertex_all_t>::const_type\
-			pmap_type;\
-		return pmap_type(g);\
-	}\
-\
-  inline void\
-  put(put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k, treedec::bag_t const& v)\
-  { untested();\
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.BAG){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
-\
-  inline void\
-  put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
-		 const property<treedec::bag_t, std::set<unsigned> >& v)\
-  { untested();\
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.m_value){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
-\
-  inline void\
-  put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
-		 const property<treedec::bag_t, std::vector<unsigned> >& v)\
-  { untested();\
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.m_value){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
-\
-  inline bagstuff::gtob<T>::type \
-  get(treedec::bag_t, T const&t, unsigned k)\
-  { untested();\
-	  return t[k].bag;\
-  }\
-\
-  inline bagstuff::gtob<T>::type \
-  get(treedec::bag_t, T const&t, unsigned long k)\
-  { untested();\
-	  return t[k].bag;\
-  }\
-\
-	inline bagstuff::const_treebagpmap<T> \
-  get(treedec::bag_t, T const& t)\
-  { untested();\
-	  return bagstuff::const_treebagpmap<T>(t);\
-  }\
-	inline bagstuff::treebagpmap<T> \
-  get(treedec::bag_t, T & t)\
-  { untested();\
-	  return bagstuff::treebagpmap<T>(t);\
-  }\
-\
-    template <>\
-    struct property_map<T, treedec::bag_t>{ \
-	 };\
-} // boost
 
 
 #endif
