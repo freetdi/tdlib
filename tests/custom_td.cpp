@@ -51,7 +51,7 @@ typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
 		  boost::property<treedec::bag_t, std::set<unsigned int> > > example_tdt;
 
 
-static_assert(
+BOOST_STATIC_ASSERT(
 				std::is_same< typename boost::vertex_bundle_type<sbib_tdt>::type,
 								tree_dec_node >::value );
 
