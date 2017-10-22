@@ -116,7 +116,7 @@ int main()
 
 	cfg_t h(g);
 	tree_dec_t t;
-#if 1 //  USE_GALA
+#if USE_GALA
 	std::cout << "p17 test\n";
 	alg_A A(g);
 	A.do_it(1);
