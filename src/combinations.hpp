@@ -59,6 +59,82 @@
 
 namespace treedec{
 
+namespace comb{
+
+// TODO: faster.
+// TODO: more generic
+template<class G>
+class PP_FI_TM{
+public:
+private:
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+public:
+    PP_FI_TM(G& g) : _g(g){untested();
+        _low_tw = -1;
+    }
+
+    void set_lower_bound(unsigned lb){
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{
+        return _low_tw + 1;
+    }
+
+    void do_it(){
+
+        if(boost::num_vertices(_g) == 0){
+            boost::add_vertex(_t);
+            return;
+        }
+
+        std::vector<boost::tuple<
+            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+                     typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
+                         > > bags;
+
+        treedec::preprocessing(_g, bags, _low_tw);
+
+        if(boost::num_edges(_g) > 0){
+            typename std::vector<vertex_descriptor> old_elim_ordering;
+            typename std::vector<vertex_descriptor> new_elim_ordering;
+
+            G H(_g);
+            //true = ignore isolated vertices
+            treedec::fillIn_ordering(_g, old_elim_ordering, true); //ignore isolated
+            _g = H; // reset
+
+            treedec::minimalChordal(_g, old_elim_ordering, new_elim_ordering);
+
+            typename std::vector<vertex_descriptor>
+                new_elim_ordering_(old_elim_ordering.size());
+            unsigned c = 0;
+            for(unsigned i = 0; i < new_elim_ordering.size(); i++){
+                if(boost::out_degree(new_elim_ordering[i], _g) > 0){
+                    new_elim_ordering_[c++] = new_elim_ordering[i];
+                }
+            }
+
+            treedec::ordering_to_treedec(_g, new_elim_ordering_, _t);
+        }
+
+        treedec::glue_bags(bags, _t);
+    }
+
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{ untested();
+        // todo: assemble td here.
+        boost::copy_graph(_t, t);
+    }
+
+private:
+    G& _g;
+    T _t;
+    int _low_tw;
+}; // PPFITM
+
+} // comb
+
 //Recursively applies preprocessing rules and glues corresponding bags with
 //current tree decomposition this version applies the minDegree-heuristic on
 //not fully preprocessable graph instances.
@@ -129,41 +205,13 @@ void PP_FI(G_t &G, T_t &T, int &low_tw){
 //by triangulation minimization on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
 void PP_FI_TM(G_t &G, T_t &T, int &low){
-    if(boost::num_vertices(G) == 0){
-        boost::add_vertex(T);
-        return;
-    }
 
-    std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > bags;
-
-    treedec::preprocessing(G, bags, low);
-
-    if(boost::num_edges(G) > 0){
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> old_elim_ordering;
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering;
-
-        G_t H(G);
-        //true = ignore isolated vertices
-        treedec::fillIn_ordering(G, old_elim_ordering, true); //ignore isolated
-        G = H; // reset
-
-        treedec::minimalChordal(G, old_elim_ordering, new_elim_ordering);
-
-        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> new_elim_ordering_(old_elim_ordering.size());
-        unsigned c = 0;
-        for(unsigned i = 0; i < new_elim_ordering.size(); i++){
-            if(boost::out_degree(new_elim_ordering[i], G) > 0){
-                new_elim_ordering_[c++] = new_elim_ordering[i];
-            }
-        }
-
-        treedec::ordering_to_treedec(G, new_elim_ordering_, T);
-    }
-
-    treedec::glue_bags(bags, T);
+    comb::PP_FI_TM<G_t> a(G);
+//    a.set_low(low);
+    a.set_lower_bound(low+1);
+    a.do_it();
+    low=a.lower_bound()-1;
+    a.get_tree_decomposition(T);
 }
 
 template <typename G_t, typename T_t>
