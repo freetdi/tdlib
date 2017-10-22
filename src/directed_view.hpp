@@ -85,10 +85,8 @@ struct dwt<G,
 	typedef typename graph_traits<G>::directed_type type;
 	static std::string dbg(){ return "bidir wrapper\n"; }
 
-	static type init(G& g){
-		incomplete();
-		type R;
-		return R;
+	static size_t init(G& g){
+		return 0;
 	}
 
 	// check: do we need this copy?
@@ -405,7 +403,7 @@ adjacent_vertices(
 
     template<class G>
     struct vertex_bundle_type<treedec::draft::directed_view<G> > {
-      typedef typename G::vertex_bundled type;
+      typedef typename vertex_bundle_type<G>::type type;
     };
 
 } // boost

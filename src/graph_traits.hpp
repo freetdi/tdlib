@@ -315,9 +315,13 @@ namespace boost {
 
 namespace bagstuff {
 
-	template<class G>
+	template<class T, class X=void>
 	struct gtob{
-		typedef decltype( boost::vertex_bundle_type<G>::type::bag ) type;
+		typedef decltype( boost::vertex_bundle_type<T>::type::bag ) type;
+	};
+	template<class T>
+	struct gtob<T, decltype( boost::vertex_bundle_type<T>::type::bag )>{
+		typedef decltype( boost::vertex_bundle_type<T>::type::bag ) type;
 	};
 
 	template<class G>
@@ -379,6 +383,7 @@ namespace bagstuff {
 // BUG: uses treedec::push
 // BUG: only works for "set" and "vector" of unsigned
 // TODO: maybe to treedec_traits. check carefully
+// BUG: BAG must be bag, used above.
 #define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
 namespace boost{\
 \

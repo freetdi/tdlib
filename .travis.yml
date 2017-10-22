@@ -42,9 +42,14 @@ script:
   - ./bootstrap
   - ./configure --enable-debug CXXFLAGS=-std=c++11
   - make check
+
+  # redo with gala
   - wget https://github.com/freetdi/gala/archive/0.tar.gz
   - mkdir gala
   - ( cd gala; tar --strip-components=1 -zxf ../0.tar.gz )
-  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}
+  - echo ${PWD}, `pwd`
+  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I`pwd`
+  - ls -la
+  - ls -la gala
   - make check
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
