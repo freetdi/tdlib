@@ -79,5 +79,16 @@ size_t bag_size(V const & v, G const& g)
 
 } //treedec
 
+//namespace boost{
+//template<class T, class V>
+//void get(treedec::bag_t, T const& t, V v)
+//{ untested();
+//}
+//template<class T, class V>
+//void get(treedec::bag_t, T& t, V v)
+//{ untested();
+//}
+//}
+
 #endif
 // vim:ts=8:sw=4:et

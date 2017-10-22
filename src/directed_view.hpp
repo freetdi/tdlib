@@ -91,9 +91,21 @@ struct dwt<G,
 		return R;
 	}
 
+	// check: do we need this copy?
 	template<class GG, class H>
-	static void copy(GG const&, H&){
-		incomplete();
+	static void copy(GG const& g, H& h){ untested();
+		assert(!boost::num_vertices(h));
+		assert(boost::is_directed(h));
+		auto p=boost::edges(g);
+		for(; p.first!=p.second; ++p.first){
+			auto V=boost::source(*p.first, g);
+			auto W=boost::target(*p.first, g);
+			boost::add_edge(V, W, h);
+//			boost::add_edge(W, V, h);
+			trace2("bidir cp", W, V);
+		}
+		trace2("bidir cp", boost::num_edges(g), boost::num_edges(h));
+		assert(boost::num_edges(g) == boost::num_edges(h));
 	}
 };
 
@@ -390,6 +402,11 @@ adjacent_vertices(
 {
 	return g.adjacent_vertices(v);
 }
+
+    template<class G>
+    struct vertex_bundle_type<treedec::draft::directed_view<G> > {
+      typedef typename G::vertex_bundled type;
+    };
 
 } // boost
 

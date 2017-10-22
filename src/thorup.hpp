@@ -53,6 +53,9 @@
 //        - namespace
 //        - bag access
 //        - list->vector
+//
+#ifndef TDLIB_PKK_THORUP_H
+#define TDLIB_PKK_THORUP_H
 
 #include <map>
 #include <vector>
@@ -65,7 +68,7 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/misc.hpp> // get_bagsize
+#include <tdlib/treedec.hpp> // get_bagsize
 
 // namespace boost {
 // // some hacks. perhaps wrong place
@@ -205,8 +208,9 @@ void thorup_elimination_ordering(l_t &l, const G_t &G)
   // jumps.
   boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> J;
   boost::copy_graph(G, J, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
-  for (unsigned int i = 0; i < boost::num_vertices(J) - 1; i++){
-    remove_edge(i, i + 1, J);
+  auto N=boost::num_vertices(J);
+  for (unsigned int i = 1; i < N; i++){
+    remove_edge(i-1, i, J);
   }
 
   // Todo: Implement a graph adaptor for boost that allows to treat directed
@@ -604,3 +608,5 @@ private:
 };
 
 } // treedec
+
+#endif

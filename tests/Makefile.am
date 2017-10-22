@@ -34,10 +34,12 @@ check_PROGRAMS = \
 	${GPROG} \
 	bmd \
 	directed_view \
+	bag \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
 	bucket_sorter_2u \
 	common_out_edges \
+	custom_td \
 	elim0 \
 	pp \
 	pp0 \

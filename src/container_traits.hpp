@@ -21,6 +21,8 @@
 #define TD_CONTAINER_TRAITS_HPP
 
 #include <vector>
+#include <assert.h>
+#include <set>
 #include "trace.hpp"
 
 namespace treedec{//
@@ -90,8 +92,7 @@ namespace detail{//
         typename C::value_type,
         typename C::allocator_type> >::value
         >::type >{//
-        static bool contains(C const& c, typename C::value_type e)
-        { incomplete();
+        static bool contains(C const& c, typename C::value_type e) {
           return std::find(c.begin(), c.end(), e) != c.end();
         }
     };
@@ -118,7 +119,7 @@ namespace detail{//
         >::type >{//
         // push, insert new item
         static void push(C& c, typename C::value_type e)
-        { untested();
+        { itested();
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }

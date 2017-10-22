@@ -38,6 +38,7 @@
 #include "misc.hpp"
 #include "graph.hpp"
 #include "overlay.hpp"
+#include "treedec.hpp"
 
 #define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
 

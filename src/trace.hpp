@@ -76,6 +76,7 @@
 #ifndef TRACE_H
 #define TRACE_H
 # ifndef NDEBUG
+#include <vector>
 template <class C>
 inline bool contains(C const& c, typename C::value_type const& v)
 {

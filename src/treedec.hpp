@@ -28,6 +28,18 @@
 #include <assert.h>
 #include "graph.hpp"
 
+
+//REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, bag)
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
+// REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_t, bag)
+
+// doesntwork yet
+#define COMMA ,
+REGISTER_GRAPH_WITH_BUNDLED_BAGS(
+	  boost::adjacency_list<boost::vecS COMMA boost::vecS COMMA
+	                           boost::undirectedS COMMA treedec::bag_t>, bag);
+#undef COMMA
+
 namespace treedec{
 
 // VECTOR_TD.
@@ -36,6 +48,7 @@ namespace treedec{
 // vertex and bag" vertex property. does not allow remove_vertex on vertices
 // other than the last.
 
+// move to other treedec_vector.hpp or something.
 template<class G>
 class VECTOR_TD{
 public: //types
@@ -212,6 +225,27 @@ private:
     G const& _g;
 };
 
+template <typename T_t>
+inline size_t get_bagsize(T_t const &T){
+    size_t max = 0;
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+	 auto const& m=boost::get(bag_t(), T);
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){ untested();
+        auto const& b=boost::get(m, *tIt);
+        size_t bag_size=b.size();
+        if(bag_size > max){
+            max = bag_size;
+        }else{
+		  }
+    }
+    return (max);
+}
+
+template <typename T_t>
+int get_width(T_t const &T){
+    return get_bagsize(T)-1;
+}
+
 } // treedec
 
 namespace boost{
@@ -298,5 +332,7 @@ namespace boost{
 		 return (intptr_t(v) - intptr_t(*g.begin()))/s;
     }
 } // boost
+
+
 
 #endif

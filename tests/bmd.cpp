@@ -1,4 +1,5 @@
 
+#include <tdlib/graph_traits.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/random.hpp>
 #include <boost/random.hpp>
@@ -7,6 +8,7 @@
 #include <tdlib/elimination_orderings.hpp>
 #include <tdlib/graph.hpp>
 #include <tdlib/trace.hpp>
+#include <tdlib/treedec.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> bald_t;
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu_t;
@@ -33,10 +35,10 @@ int main(int argc, char** argv)
 
 	BOOST_AUTO(EE, boost::edges(g));
 	for(;EE.first!=EE.second; ++EE.first){
-		BOOST_AUTO(s, boost::source(*EE.first, g));
-		BOOST_AUTO(t, boost::target(*EE.first, g));
-		if(!boost::edge(t,s,g).second){
-			boost::add_edge(t,s,g);
+		auto s=boost::source(*EE.first, g);
+		auto t=boost::target(*EE.first, g);
+		if(!boost::edge(t, s, g).second){
+			boost::add_edge(t, s, g);
 		}
 	}
 
@@ -135,7 +137,7 @@ int main(int argc, char** argv)
 #endif
 		);
 	typename treedec::graph_traits<G>::treedec_type t;
-	g=h; // restore
+	g = h; // restore
 
 	int status;
 #ifdef TRY_INEFFICIENT_VARIANT
@@ -150,8 +152,7 @@ int main(int argc, char** argv)
 
 	treedec::draft::vec_ordering_to_tree(g, o, t );
 
-
-	status=treedec::check_treedec(g,t);
+	status=treedec::check_treedec(g, t);
 	if (!status) std::cout << "treedec is valid!!\n";
 	std::cout << "bagsize " << treedec::get_bagsize(t) << " status " << status <<"\n";
 	std::cout << "boost_minDegree_ordering said " << w << "\n";
