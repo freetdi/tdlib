@@ -230,7 +230,7 @@ inline size_t get_bagsize(T_t const &T){
     size_t max = 0;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
 	 auto const& m=boost::get(bag_t(), T);
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){ untested();
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
         auto const& b=boost::get(m, *tIt);
         size_t bag_size=b.size();
         if(bag_size > max){
@@ -327,7 +327,7 @@ namespace boost{
     inline size_t
     get(vertex_index_t, treedec::VECTOR_TD<G> & g,
             typename treedec::VECTOR_TD<G>::vertex_descriptor v)
-    { untested();
+    {
 		 size_t s = sizeof(typename treedec::VECTOR_TD<G>::value_type);
 		 return (intptr_t(v) - intptr_t(*g.begin()))/s;
     }

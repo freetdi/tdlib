@@ -87,11 +87,11 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 				for(;srcnp.first!=srcnp.second; ++srcnp.first){
             auto target_in_copy = *srcnp.first;
             assert(target_in_copy!=*SR.first);
-            if(target_in_copy<*SR.first){ untested();
+            if(target_in_copy<*SR.first){
 					trace2("copy edge", *SR.first, target_in_copy);
 					assert(!boost::edge(new_tv, target_in_copy+offset, tgt).second);
 					boost::add_edge(new_tv, target_in_copy+offset, tgt);
-            }else{ untested();
+            }else{
 					/// ???
 					trace1("no copy edge", *SR.first);
 				}

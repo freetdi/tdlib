@@ -90,7 +90,7 @@ public:
     ~exact_decomposition() {
         if(_cleanup_g){ untested();
             delete &_g;
-        }else{ untested();
+        }else{
         }
     }
 public:
@@ -188,7 +188,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
         //Ignore isolated vertices (already included in 'bags').
 #ifndef NEWRANGE
         trace2("found component ", i->size(), components.size());
-        if(i->size() == 1){ untested();
+        if(i->size() == 1){
             continue;
             auto nv=boost::add_vertex(t);
             auto& B=bag(nv, t);

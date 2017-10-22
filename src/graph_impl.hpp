@@ -39,13 +39,13 @@ void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* 
         for(; nIt2 != nEnd; nIt2++){
             std::pair<edge_descriptor, bool> ep=boost::add_edge(*nIt1, *nIt2, G);
 
-            if(!ep.second){ untested();
-				}else if(cb){ untested();
+            if(!ep.second){
+				}else if(cb){
 					(*cb)(*nIt1, *nIt2);
-            }else{ untested();
+            }else{
 				}
 
-            if(!boost::is_directed(G)){ untested();
+            if(!boost::is_directed(G)){
             }else if( boost::edge(*nIt2, *nIt1, G).second ){ untested();
                 // change later.
             }else{ untested();

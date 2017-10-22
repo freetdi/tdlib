@@ -70,7 +70,7 @@ private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 public:
-    PP_FI_TM(G& g) : _g(g){untested();
+    PP_FI_TM(G& g) : _g(g){
         _low_tw = -1;
     }
 
@@ -122,7 +122,7 @@ public:
     }
 
     template<class TT>
-    void get_tree_decomposition(TT& t) const{ untested();
+    void get_tree_decomposition(TT& t) const{
         // todo: assemble td here.
         boost::copy_graph(_t, t);
     }

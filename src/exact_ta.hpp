@@ -327,7 +327,7 @@ public:
 #endif
 
 private:
-	size_t n() const{ untested();
+	size_t n() const{
 		return _g.num_vertices();
 	}
 	void allocate();
@@ -1017,7 +1017,7 @@ inline void exact_ta<EXTA_a>::q_base_sets()
 	for (unsigned v=0; v<n() && !solution; v++) { itested();
 		if (boost::out_degree(v, _g) < _bag_size) { itested();
 			q_base_set(v);
-		}else{ untested();
+		}else{
 		}
 	}
 }
