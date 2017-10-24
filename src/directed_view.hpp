@@ -205,6 +205,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::vertex_iterator vertex_iterator;
 	typedef typename B::edge_iterator edge_iterator;
+	typedef typename B::edge_iterator out_edge_iterator; //?
 	typedef typename B::directed_category directed_category;
 	typedef typename B::adjacency_iterator adjacency_iterator;
 
@@ -212,7 +213,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 	// typedef typename boost::disallow_parallel_edge_tag edge_parallel_category;
 	typedef typename B::edge_parallel_category edge_parallel_category;
 
-	typedef typename graph_traits<W>::traversal_category traversal_category;
+	typedef typename B::traversal_category traversal_category;
 
 	static vertex_descriptor null_vertex(){
 		return 0; // graph_traits<W>::null_vertex();
@@ -387,6 +388,15 @@ std::pair<
 	typename treedec::draft::directed_view<G>::edge_iterator,
 	typename treedec::draft::directed_view<G>::edge_iterator>
 edges(treedec::draft::directed_view<G> const& g)
+{
+	return edges(*g);
+}
+
+template<class G>
+std::pair<
+	typename treedec::draft::directed_view<G>::edge_iterator,
+	typename treedec::draft::directed_view<G>::edge_iterator>
+out_edges(treedec::draft::directed_view<G> const& g)
 {
 	return edges(*g);
 }
