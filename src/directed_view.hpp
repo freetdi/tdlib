@@ -85,7 +85,7 @@ struct dwt<G,
 	typedef typename graph_traits<G>::directed_type type;
 	static std::string dbg(){ return "bidir wrapper\n"; }
 
-	static size_t init(G& g){
+	static size_t init(G&){
 		return 0;
 	}
 
@@ -96,14 +96,15 @@ struct dwt<G,
 		assert(boost::is_directed(h));
 		auto p=boost::edges(g);
 		for(; p.first!=p.second; ++p.first){
-			auto V=boost::source(*p.first, g);
-			auto W=boost::target(*p.first, g);
+			auto e=*p.first;
+			auto V=boost::source(e, g);
+			auto W=boost::target(e, g);
 			boost::add_edge(V, W, h);
-//			boost::add_edge(W, V, h);
+			boost::add_edge(W, V, h);
 			trace2("bidir cp", W, V);
 		}
 		trace2("bidir cp", boost::num_edges(g), boost::num_edges(h));
-		assert(boost::num_edges(g) == boost::num_edges(h));
+		assert(2*boost::num_edges(g) == boost::num_edges(h));
 	}
 };
 
@@ -129,10 +130,10 @@ public:
 
 	typedef typename wrapped_traits::edge_parallel_category edge_parallel_category;
 
-	// this should always be "directed" hmmm
-	typedef typename wrapped_traits::directed_category directed_category;
+	typedef typename boost::directed_tag directed_category;
 
-	typedef typename wrapped_traits::traversal_category traversal_category;
+//	typedef typename wrapped_traits::traversal_category traversal_category;
+	typedef typename boost::adjacency_graph_tag traversal_category;
 
 private:
 	directed_view(){ unreachable(); }

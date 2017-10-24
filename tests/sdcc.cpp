@@ -1,6 +1,7 @@
 #include <set>
 #include <tdlib/trace.hpp>
 #include <boost/graph/properties.hpp>
+#include <boost/graph/graph_utility.hpp>
 
 namespace treedec{
 	struct bag_t;
@@ -102,16 +103,17 @@ int main()
 	cfg_t g(4);
 	treedec::add_edge(0, 1, g);
 	treedec::add_edge(1, 2, g);
-	treedec::add_edge(2, 3, g);
-	treedec::add_edge(3, 0, g);
-	assert(boost::num_edges(g)==8);
+	boost::add_edge(2, 3, g);
+	boost::add_edge(3, 0, g);
+	assert(boost::num_edges(g)==4); // oops?
+	boost::print_graph(g);
 	assert(treedec::num_edges(g)==4);
 	auto p=boost::edges(g);
 	unsigned ii=0;
 	for(; p.first!=p.second; ++p.first){
 		++ii;
 	}
-	assert(ii==8);
+	assert(ii==4);
 
 
 	cfg_t h(g);

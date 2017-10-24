@@ -41,6 +41,7 @@ check_PROGRAMS = \
 	common_out_edges \
 	custom_td \
 	elim0 \
+	graph \
 	pp \
 	pp0 \
 	sdcc \

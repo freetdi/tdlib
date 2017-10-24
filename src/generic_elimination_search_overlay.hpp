@@ -52,6 +52,10 @@ struct dvv_config : public gala::graph_cfg_default<G> {
 };
 typedef gala::graph<std::vector, std::vector, uint32_t, dvv_config> gdvv;
 
+    BOOST_STATIC_ASSERT(
+            !std::is_convertible<typename boost::graph_traits<gdvv>::traversal_category*,
+                         boost::bidirectional_graph_tag* >::value);
+
 template<>
 struct outedge_resize<gdvv>{
     static void do_it(typename boost::graph_traits<gdvv>::vertex_descriptor x,
@@ -515,16 +519,15 @@ void overlay<A, B, C>::eliminate(
             assert(active()[*q.first]);
             if(*q.first>=*p.first){
                 // skip. TODO: more efficient skip
-            }
-            else if(_marker.is_marked(*q.first)){
+            }else if(_marker.is_marked(*q.first)){
                 // done.
-            }
-            else{
+            }else{
                 ++_degree[*p.first];
                 ++_degree[*q.first];
                 assert(_degree[*p.first]<nv);
                 assert(_degree[*q.first]<nv);
                 assert(!boost::edge(*p.first, *q.first, _og).second);
+                trace2("overlay add", *p.first, *q.first);
                 treedec::add_edge(*p.first, *q.first, _og);
 
                 // treedec graph iface enforces this. (.. should)

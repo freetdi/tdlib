@@ -547,14 +547,69 @@ void make_symmetric(G&g, bool force_oriented=false)
 
 namespace detail{
 
+// fallback, undirected graphs
 template<class G, class X=void>
 struct edge_helper{
+#if 0
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    static size_type num(G const& g){
+        return boost::num_edges(g);
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+        add(vertex_descriptor x, vertex_descriptor y, G& g)
+    { untested();
+        BOOST_STATIC_ASSERT(std::is_convertible<
+                             typename boost::graph_traits<G>::directed_category*,
+                             boost::undirected_tag* >::value);
+
+	return boost::add_edge(x, y, g);
+    }
+#endif
 };
 
+// bidirectional and directed
 template<class G>
 struct edge_helper<G, typename std::enable_if< std::is_convertible<
-                    typename boost::graph_traits<G>::directed_category*, boost::undirected_tag*
-                    >::value, void>::type > {
+                             typename boost::graph_traits<G>::traversal_category*,
+                             boost::bidirectional_graph_tag* >::value
+                             && std::is_convertible<
+                             typename boost::graph_traits<G>::directed_category*,
+                             boost::directed_tag* >::value ,
+                       void>::type >
+{
+    typedef typename boost::graph_traits<G>::edges_size_type size_type;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+    static size_type num(G const& g){
+        return boost::num_edges(g);
+    }
+    static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
+    add(vertex_descriptor x, vertex_descriptor y, G& g){
+
+        BOOST_STATIC_ASSERT(
+                std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
+                             boost::bidirectional_graph_tag* >::value);
+        BOOST_STATIC_ASSERT(
+                std::is_convertible<typename boost::graph_traits<G>::directed_category*,
+                             boost::directed_tag* >::value);
+
+        trace2("add dir bid", y ,x);
+	return boost::add_edge(x, y, g);
+    }
+}; // edge_helper, bidirectional and directed
+
+// bidirectional and undirected
+template<class G>
+struct edge_helper<G, typename std::enable_if< std::is_convertible<
+                             typename boost::graph_traits<G>::traversal_category*,
+                             boost::bidirectional_graph_tag* >::value
+                             && std::is_convertible<
+                             typename boost::graph_traits<G>::directed_category*,
+                             boost::undirected_tag* >::value ,
+                       void>::type >
+{
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
@@ -563,33 +618,44 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
         add(vertex_descriptor x, vertex_descriptor y, G& g){
+        trace2("add !dir bid", y ,x);
 
 	return boost::add_edge(x, y, g);
     }
-};
+}; // edge_helper, bidirectional and undirected
 
+// edge_helper, directed but not bidirectional.
 template<class G>
-struct edge_helper<G, typename std::enable_if< std::is_convertible<
-                    typename boost::graph_traits<G>::directed_category*, boost::directed_tag*
-                    >::value, void>::type > {
+struct edge_helper<G, typename std::enable_if<
+                !std::is_convertible<
+                    typename boost::graph_traits<G>::traversal_category*,
+                    boost::bidirectional_graph_tag* >::value
+                    && std::is_convertible<
+                       typename boost::graph_traits<G>::directed_category*,
+                       boost::directed_tag* >::value,
+                    void>::type > {
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-// is this even used?
-//     typedef typename std::enable_if< std::is_same< boost::directed_tag,
-//                                 typename boost::graph_traits<G>::directed_category >::value, G >::type T;
-// 
     static size_type num(G const& g){
         assert(1 ^ boost::num_edges(g)) ;
         return boost::num_edges(g)/2;
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-        add(vertex_descriptor x, vertex_descriptor y, G& g){
+        add(vertex_descriptor x, vertex_descriptor y, G& g)
+    { untested();
+        trace2("add dir !bid", y ,x);
+        BOOST_STATIC_ASSERT(
+                !std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
+                             boost::bidirectional_graph_tag* >::value);
+        BOOST_STATIC_ASSERT(
+                std::is_convertible<typename boost::graph_traits<G>::directed_category*,
+                             boost::directed_tag* >::value);
 
 	boost::add_edge(y, x, g);
 	return boost::add_edge(x, y, g);
     }
-};
+}; // edge_helper, directed but not bidirectional.
 
 }
 

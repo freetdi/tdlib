@@ -61,7 +61,7 @@ namespace treedec{
 
 namespace comb{
 
-template <typename G>
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
 class FI_TM{
 public: // types
     typedef typename treedec::graph_traits<G>::treedec_type T;
@@ -91,7 +91,7 @@ private:
     int _low_tw;
 }; // FI_TM
 
-template<class G> // more
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
 class PP_MD {
 public: // types
     typedef typename treedec::graph_traits<G>::treedec_type T;
@@ -142,7 +142,7 @@ private:
 
 // TODO: faster.
 // TODO: more generic
-template<class G>
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
 class PP_FI_TM{
 public:
 private:
