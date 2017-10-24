@@ -94,7 +94,7 @@ public:
         }
     }
 public:
-    void do_it(unsigned lb_bs=0){ untested();
+    void do_it(unsigned lb_bs=0){
         incomplete(); // export t.
         typename graph_traits<G_t>::treedec_type t;
 #ifndef NDEBUG

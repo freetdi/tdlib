@@ -569,10 +569,10 @@ public: // types
 			  boost::property<treedec::bag_t, std::set<unsigned> > > decomp_type;
 public:
 	thorup(G const& g)
-		: algo1("thorup"), _g(g){ untested();
+		: algo1("thorup"), _g(g){
 	}
 
-	void do_it(){ untested();
+	void do_it(){
 		pkk_thorup::thorup_elimination_ordering(_o, _g);
 
 		// check: do we have better algorithms?
@@ -589,10 +589,10 @@ public:
 	}
 
 	template<class T>
-	void get_tree_decomposition(T& t) const{ untested();
+	void get_tree_decomposition(T& t) const{
 		boost::copy_graph(_t, t);
 	}
-	decomp_type const& get_tree_decomposition() const{ untested();
+	decomp_type const& get_tree_decomposition() const{
 		return _t;
 	}
 	size_t get_bagsize() const{

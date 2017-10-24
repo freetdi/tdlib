@@ -91,7 +91,7 @@ struct dwt<G,
 
 	// check: do we need this copy?
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){ untested();
+	static void copy(GG const& g, H& h){
 		assert(!boost::num_vertices(h));
 		assert(boost::is_directed(h));
 		auto p=boost::edges(g);
