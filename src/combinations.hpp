@@ -61,6 +61,85 @@ namespace treedec{
 
 namespace comb{
 
+template <typename G>
+class FI_TM{
+public: // types
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+public: // construct
+    FI_TM(G const& g) : _g(g) {
+    }
+public: // random stuff, should be in algo. later
+    void set_lower_bound(unsigned lb){ untested();
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{ untested();
+        return _low_tw + 1;
+    }
+public: // algo interface
+    void do_it(){
+        std::vector<unsigned int> old_elim_ordering;
+        typename std::vector<vertex_descriptor> new_elim_ordering;
+        treedec::fillIn_ordering(_g, old_elim_ordering);
+        treedec::minimalChordal(_g, old_elim_ordering, new_elim_ordering);
+        treedec::ordering_to_treedec(_g, new_elim_ordering, _t);
+    }
+
+private:
+    G& _g;
+    T _t;
+    int _low_tw;
+}; // FI_TM
+
+template<class G> // more
+class PP_MD {
+public: // types
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+public: // construct
+    PP_MD(G& g) : _g(g){
+    }
+public: // random stuff, should be in algo. later
+    void set_lower_bound(unsigned lb){ untested();
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{ untested();
+        return _low_tw + 1;
+    }
+
+    void do_it(){
+        if(boost::num_vertices(_g) == 0){
+            boost::add_vertex(_t);
+            return;
+        }else{
+        }
+
+        // TODO: cleanup
+        std::vector<boost::tuple<
+            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+                     typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
+                         > > bags;
+
+        treedec::preprocessing(_g, bags, _low_tw);
+        if(boost::num_edges(_g) > 0){
+            treedec::minDegree_decomp(
+                    _g, _t,
+                    (typename std::vector<typename treedec_chooser<G>::value_type>*)NULL,
+                    UINT_MAX, true); //ignore_isolated_vertices
+        }
+        treedec::glue_bags(bags, _t);
+    }
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{
+        // todo: assemble td here.
+        boost::copy_graph(_t, t);
+    }
+private:
+    G& _g;
+    T _t;
+    int _low_tw;
+};
+
+
 // TODO: faster.
 // TODO: more generic
 template<class G>
@@ -69,18 +148,18 @@ public:
 private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
-public:
+public: // construct
     PP_FI_TM(G& g) : _g(g){
         _low_tw = -1;
     }
-
+public: // random stuff
     void set_lower_bound(unsigned lb){
         _low_tw = lb-1;
     }
     unsigned lower_bound()const{
         return _low_tw + 1;
     }
-
+public: // algo interface
     void do_it(){
 
         if(boost::num_vertices(_g) == 0){
@@ -139,25 +218,13 @@ private:
 //current tree decomposition this version applies the minDegree-heuristic on
 //not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
-void PP_MD(G_t &G, T_t &T, int &low){
-    if(boost::num_vertices(G) == 0){
-        boost::add_vertex(T);
-        return;
-    }
-
-    std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
-         > > bags;
-
-    treedec::preprocessing(G, bags, low);
-    if(boost::num_edges(G) > 0){
-        treedec::minDegree_decomp(
-         G, T,
-         (typename std::vector<typename treedec_chooser<G_t>::value_type>*)NULL,
-         UINT_MAX, true); //ignore_isolated_vertices
-    }
-    treedec::glue_bags(bags, T);
+void PP_MD(G_t &G, T_t &T, int &low)
+{
+    treedec::comb::PP_MD<G_t> a(G);
+    a.set_lower_bound(low+1);
+    a.do_it();
+    low=a.lower_bound()-1;
+    a.get_tree_decomposition(T);
 }
 
 //Recursively applies preprocessing rules and glues corresponding bags with
