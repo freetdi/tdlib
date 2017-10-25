@@ -121,6 +121,7 @@ public:
 	typedef typename boost::graph_traits<wrapped_type> wrapped_traits;
 	typedef typename wrapped_traits::vertex_descriptor vertex_descriptor;
 	typedef typename wrapped_traits::edge_descriptor edge_descriptor;
+	typedef typename wrapped_traits::out_edge_iterator out_edge_iterator;
 	typedef typename wrapped_traits::adjacency_iterator adjacency_iterator;
 	typedef typename wrapped_traits::vertex_iterator vertex_iterator;
 	typedef typename wrapped_traits::edge_iterator edge_iterator;
@@ -205,7 +206,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::vertex_iterator vertex_iterator;
 	typedef typename B::edge_iterator edge_iterator;
-	typedef typename B::edge_iterator out_edge_iterator; //?
+	typedef typename B::out_edge_iterator out_edge_iterator; //?
 	typedef typename B::directed_category directed_category;
 	typedef typename B::adjacency_iterator adjacency_iterator;
 
@@ -394,11 +395,13 @@ edges(treedec::draft::directed_view<G> const& g)
 
 template<class G>
 std::pair<
-	typename treedec::draft::directed_view<G>::edge_iterator,
-	typename treedec::draft::directed_view<G>::edge_iterator>
-out_edges(treedec::draft::directed_view<G> const& g)
+	typename treedec::draft::directed_view<G>::out_edge_iterator,
+	typename treedec::draft::directed_view<G>::out_edge_iterator>
+out_edges(
+		typename treedec::draft::directed_view<G>::vertex_descriptor v,
+		treedec::draft::directed_view<G> const& g)
 {
-	return edges(*g);
+	return out_edges(v, *g);
 }
 
 template<class G>
