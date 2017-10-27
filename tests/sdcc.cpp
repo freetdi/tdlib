@@ -1,7 +1,5 @@
 #include <set>
 #include <tdlib/trace.hpp>
-#include <boost/graph/properties.hpp>
-#include <boost/graph/graph_utility.hpp>
 
 namespace treedec{
 	struct bag_t;
@@ -11,15 +9,10 @@ typedef int var_t; // relevant here?
 typedef std::set<unsigned int> sdcc_bagtype;
 struct tree_dec_node
 {
-//  typedef boost::vertex_property_tag kind; // do we need it?
   std::set<unsigned int> bag;
   std::set<var_t> alive;
-  // assignment_list_t assignments; // not relevant
   unsigned weight;
-
-  //tree_dec_node& operator=(const boost::property<treedec::bag_t, std::set<unsigned int> >&);
 };
-
 
 #include <tdlib/treedec_traits.hpp>
 #include <iostream>
@@ -27,6 +20,7 @@ struct tree_dec_node
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/graph/graph_utility.hpp>
 
 typedef bool cfg_alive_t;
 typedef bool cfg_dying_t;
@@ -64,41 +58,30 @@ typedef treedec::draft::exact_decomposition<cfg_t,
              choice::exact_ta_> alg_A;
 #endif
 
-typedef treedec::thorup<cfg_t> alg_B;
+typedef treedec::thorup<cfg_t> thorup;
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-			  boost::property<treedec::bag_t, std::vector<unsigned> > > prop_tdt;
-typedef boost::adjacency_list<boost::vecS, boost::vecS,
-                              boost::bidirectionalS, tree_dec_node> sbib_tdt;
-
-void dryrun()
-{
-	typedef boost::adjacency_list<boost::vecS, boost::vecS,
-			  boost::undirectedS, treedec::bag_t> bag_t_tdt;
-
-	prop_tdt p;
-	bag_t_tdt b;
+template<class G, class A>
+void do_it(G& g){
 	tree_dec_t t;
-	boost::copy_graph(p, t);
-	boost::copy_graph(b, t);
+	A B(g);
+	B.do_it();
+	B.get_tree_decomposition(t);
+	assert(treedec::get_bagsize(t) == 3);
+	auto nt=boost::num_vertices(t);
 
+	boost::print_graph(t);
+
+	for(unsigned i=0; i<nt; ++i){
+		std::cout << i << ":";
+		for(auto x: t[i].bag){
+			std::cout << " " << x;
+		}
+		std::cout << "\n";
+	}
 }
-
-#if 0
-namespace boost{
-
-  inline bagstuff::gtob<tree_dec_t>::type \
-  get(treedec::bag_t, tree_dec_t const&t, unsigned k)\
-  { untested();\
-	  return t[k].bag;\
-  }\
-
-}
-#endif
 
 int main()
 {
-	dryrun();
 
 	cfg_t g(4);
 	treedec::add_edge(0, 1, g);
@@ -106,7 +89,6 @@ int main()
 	boost::add_edge(2, 3, g);
 	boost::add_edge(3, 0, g);
 	assert(boost::num_edges(g)==4); // oops?
-	boost::print_graph(g);
 	assert(treedec::num_edges(g)==4);
 	auto p=boost::edges(g);
 	unsigned ii=0;
@@ -115,28 +97,15 @@ int main()
 	}
 	assert(ii==4);
 
-
 	cfg_t h(g);
-	tree_dec_t t;
 #if USE_GALA
 	std::cout << "p17 test\n";
+	//test<cfg_t, alg_A>(h);
 	alg_A A(g);
 	A.do_it(1);
 	// A.get_tree_decomposition(t); almost
 #endif
 
-	std::cout << "thorup test\n";
-	alg_B B(h);
-	B.do_it();
-	B.get_tree_decomposition(t);
-	std::cout << "thorup test done\n";
-
-	boost::get(treedec::bag_t(), t); // test
-	auto const&ct(t);
-	boost::get(treedec::bag_t(), ct); // test
-
-	assert(treedec::get_bagsize(t) == 3);
-
-//	std::cout << A.get_treewidth();
-
+	std::cout << "thorup\n";
+	do_it<cfg_t, thorup>(h);
 }
