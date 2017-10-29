@@ -29,7 +29,7 @@ install:
   - sudo pip install cython
 
 script:
-  - GALA_COMMIT=752c
+  - GALA_COMMIT=23edc6
 
   - uname -a
   - $CXX --version

@@ -51,6 +51,7 @@
 
 #include <boost/graph/copy.hpp>
 
+#include "graph_traits.hpp"
 #include "trace.hpp"
 #include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
@@ -64,6 +65,7 @@
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "skeleton.hpp"
+#include "treedec.hpp"
 
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
 # include "minimum_degree_ordering.hpp"
@@ -495,7 +497,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
 
     for(unsigned i = 0; i < num_vert; i++){
         boost::add_vertex(t);
-        auto& b=bag(i,t);
+        auto& b=boost::get(treedec::bag_t(), t, i);
         push(b, O[i]);
         for(unsigned j = 0; j < num_vert; j++){
             if(boost::edge(i, j, bags).second){

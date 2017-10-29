@@ -1,5 +1,9 @@
 
-#ifdef HAVE_GALA
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #include <gala/graph.h>
 #include <gala/td.h>
@@ -17,9 +21,10 @@
 #include <tdlib/trace.hpp>
 // not in development yet
 //#include <tdlib/printer.hpp>
+#include <tdlib/treedec.hpp>
 
 
-#ifdef HAVE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
@@ -43,7 +48,7 @@ typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu
 
 int main(int argc, char** argv)
 {
-#ifndef HAVE_GALA
+#ifndef HAVE_GALA_GRAPH_H
 	(void) argc;
 	(void) argv;
 	return 77;
@@ -208,10 +213,13 @@ int main(int argc, char** argv)
 	assert(boost::num_edges(t)+1==boost::num_vertices(t));
 	assert(boost::num_edges(t)+1==boost::num_vertices(g));
 
+	incomplete(); // need printer header
+#if 0
 	if(print){
-		auto P = treedec::grtdprinter<G>(std::cout, g, "test");
+		auto P = treedec::draft::grtdprinter<G>(std::cout, g, "test");
 		treedec::draft::vec_ordering_to_tree(g, ou, P );
 	}
+#endif
 
 
 	// does not work on vectors...

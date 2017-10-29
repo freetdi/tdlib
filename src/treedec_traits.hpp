@@ -148,19 +148,21 @@ namespace boost{\
 	  }\
   }\
 \
-  inline bagstuff::gtob<T>::type \
-  get(treedec::bag_t, T const&t, unsigned k)\
+  template<class U> \
+  inline bagstuff::gtob<T>::type const& \
+  get(treedec::bag_t, T const&t, U k)\
   { untested();\
 	  return t[k].bag;\
   }\
 \
-  inline bagstuff::gtob<T>::type \
-  get(treedec::bag_t, T const&t, unsigned long k)\
+  template<class U> \
+  inline bagstuff::gtob<T>::type& \
+  get(treedec::bag_t, T &t, U k)\
   { untested();\
 	  return t[k].bag;\
   }\
 \
-	inline bagstuff::const_treebagpmap<T> \
+  inline bagstuff::const_treebagpmap<T> \
   get(treedec::bag_t, T const& t)\
   { untested();\
 	  return bagstuff::const_treebagpmap<T>(t);\
