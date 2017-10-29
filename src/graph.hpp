@@ -643,7 +643,7 @@ struct edge_helper<G, typename std::enable_if<
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
         add(vertex_descriptor x, vertex_descriptor y, G& g)
-    { untested();
+    {
         trace2("add dir !bid", y ,x);
         BOOST_STATIC_ASSERT(
                 !std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
