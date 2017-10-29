@@ -5,6 +5,10 @@
 
 #include <boost/graph/copy.hpp>
 
+#ifdef HAVE_GALA_GRAPH_H
+#include <gala/boost_copy.h>
+#endif
+
 namespace treedec{
 
 using boost::num_vertices;

@@ -77,7 +77,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
             trace1("appendfound", *SR.first);
             ++next;
             new_tv=boost::add_vertex(tgt);
-            auto& B=bag(new_tv, tgt);
+            auto& B=boost::get(bag_t(), tgt, new_tv);
             auto const& SB=boost::get(M, *SR.first);
 
             assert(boost::degree(*SR.first, src)>0);

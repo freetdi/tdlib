@@ -191,7 +191,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
         if(i->size() == 1){
             continue;
             auto nv=boost::add_vertex(t);
-            auto& B=bag(nv, t);
+            auto& B=boost::get(bag_t(), t, nv);
             treedec::push(B, *(*i).begin());
             trace2("isolated node ", nv,  *(*i).begin());
             if(nv!=0){ untested();
@@ -319,7 +319,8 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
 
     //Lower bound on the treewidth of the reduced instance of G.
     G_t H(_g);
-    int tw_lb_deltaC = treedec::lb::deltaC_least_c(H);
+    incomplete(); //deltac does not seem to work
+    int tw_lb_deltaC = 0; // treedec::lb::deltaC_least_c(H);
 
     CFG::message(0, "deltaC said tw %d\n", tw_lb_deltaC);
 

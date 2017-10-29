@@ -144,6 +144,7 @@ else
 fi
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([examples/Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
 AC_CONFIG_FILES([pytdlib/tests/Makefile])
 AC_CONFIG_FILES([src/Makefile])

@@ -110,9 +110,10 @@ namespace boost{\
 		return pmap_type(g);\
 	}\
 \
+  template<class U> \
   inline void\
   put(put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k, treedec::bag_t const& v)\
+		 bagstuff::treebagpmap<T> >& pa, U k, treedec::bag_t const& v)\
   { untested();\
 	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
 	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
@@ -122,9 +123,10 @@ namespace boost{\
 	  }\
   }\
 \
+  template<class U> \
   inline void\
   put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
+		 bagstuff::treebagpmap<T> >& pa, U k,\
 		 const property<treedec::bag_t, std::set<unsigned> >& v)\
   { untested();\
 	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
@@ -135,9 +137,10 @@ namespace boost{\
 	  }\
   }\
 \
+  template<class U> \
   inline void\
   put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, unsigned long k,\
+		 bagstuff::treebagpmap<T> >& pa, U k,\
 		 const property<treedec::bag_t, std::vector<unsigned> >& v)\
   { untested();\
 	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\

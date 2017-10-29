@@ -1110,7 +1110,7 @@ inline void exact_ta<EXTA_a>::make_td(TD_t& td) const
 
   if(n() - cbset::size(component)) {
     unsigned k = boost::add_vertex(td);
-    auto& b=treedec::bag(k, td);
+    auto& b=boost::get(bag_t(), td, k);
 	 T s=cbset::diff(all, component);
     treedec::merge(b, s);
     unsigned j = make_td(solution, &td);
@@ -1150,7 +1150,7 @@ template<class T, class TD_> // TD
 static unsigned addBag(T s, TD_* td)
 {
   unsigned k=boost::add_vertex(*td);
-  auto& b=treedec::bag(k, *td);
+  auto& b=boost::get(treedec::bag_t(), *td, k);
   treedec::merge(b, s);
   return k;
 }

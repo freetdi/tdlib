@@ -44,6 +44,7 @@ check_PROGRAMS = \
 	graph \
 	pp \
 	pp0 \
+	print_concept \
 	sdcc \
 	vec2tree
 

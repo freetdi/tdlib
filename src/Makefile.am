@@ -39,6 +39,7 @@ pkginclude_HEADERS = \
   iter.hpp \
   lower_bounds.hpp \
   marker.hpp \
+  message.hpp \
   marker_util.hpp \
   minimum_degree_ordering.hpp \
   misc.hpp \
@@ -50,6 +51,7 @@ pkginclude_HEADERS = \
   postprocessing.hpp \
   preprocessing_edge_insertion.hpp \
   preprocessing.hpp \
+  printer.hpp \
   random_generators.hpp \
   random.hpp \
   separator_algorithm.hpp \
@@ -61,6 +63,7 @@ pkginclude_HEADERS = \
   treedec.hpp \
   treedec_misc.hpp \
   treedec_traits.hpp \
+  tuple_td.hpp \
   upper_bounds.hpp \
   validation.hpp
 
