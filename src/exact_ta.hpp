@@ -37,7 +37,9 @@
 #include "exact_base.hpp"
 #include "trace.hpp"
 #include <limits>
-// #include <unordered_map>
+#ifdef STDHASH
+#include <unordered_map>
+#endif
 
 #include <boost/graph/copy.hpp>
 
@@ -565,10 +567,12 @@ private: // here?
 		assert(hash->bi);
 		return hash->bi;
 	}
+#ifdef STDHASH
 	template<class X, class S>
 	static void alloc(std::unordered_map<X, S>& m)
 	{ untested();
 	}
+#endif
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
