@@ -29,6 +29,8 @@ install:
   - sudo pip install cython
 
 script:
+  - GALA_COMMIT=752c
+
   - uname -a
   - $CXX --version
   - cython --version
@@ -44,12 +46,9 @@ script:
   - make check
 
   # redo with gala
-  - wget https://github.com/freetdi/gala/archive/0.tar.gz
+  - wget https://github.com/freetdi/gala/archive/${GALA_COMMIT}.tar.gz
   - mkdir gala
-  - ( cd gala; tar --strip-components=1 -zxf ../0.tar.gz )
-  - echo ${PWD}, `pwd`
-  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I`pwd`
-  - ls -la
-  - ls -la gala
+  - ( cd gala; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
+  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}
   - make check
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
