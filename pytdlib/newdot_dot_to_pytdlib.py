@@ -34,13 +34,17 @@ def convert(dir, file1, file2, c):
             if st not in E:
                 E.append(st)
 
+    if first:
+        fout.write("V_"+ str(c) + " = range(" + str(num_v) + ")\n")
+        fout.write("E_"+ str(c) + " = []\n")
+
     for i in range(0, len(E)-1):
         fout.write(E[i] + ",")
 
     if len(E) > 0:
         fout.write(E[len(E)-1] + "]\n")
 
-    fout.write("G_" + str(c) + "_name = \"" + name+"_"+file1.replace(".dot", "") + "\"\n")
+    fout.write("name_"+str(c) + " = \"" + name+"_"+file1.replace(".dot", "") + "\"\n")
     fout.write("\n")
 
 

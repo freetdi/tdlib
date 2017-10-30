@@ -8,6 +8,7 @@ def print_graph_name(PREFIX, c):
     if not LONG_VERBOSE:
         return
     import CFGs
+    import NewCFGs
     import Zoo
     import Dimacs
     import Networks
@@ -15,6 +16,7 @@ def print_graph_name(PREFIX, c):
 
 def skip(PREFIX, c, f):
     import CFGs
+    import NewCFGs
     import Zoo
     import Dimacs
     import Networks
