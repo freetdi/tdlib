@@ -9,7 +9,6 @@ from graphs import *
 sys.argv=sys.argv[:1]
 
 class TestTdLib_pre(unittest.TestCase):
-    """
     def test_PP_FI_0(self):
         for V, E in cornercases:
             G = Graph(V, E)
@@ -45,7 +44,6 @@ class TestTdLib_pre(unittest.TestCase):
         T, w = tdlib.PP_FI(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 6)
-    """
 
     def test_PP_FI_7(self):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
@@ -55,7 +53,6 @@ class TestTdLib_pre(unittest.TestCase):
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(w, 5)
 
-    """
     def test_PP_FI_8(self):
         for n in range(0, 13):
             for i in range(0, 10):
@@ -63,9 +60,7 @@ class TestTdLib_pre(unittest.TestCase):
                 G = Graph(V, E)
                 T, w = tdlib.PP_FI(G)
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-    """
 
-    """
     def test_PP_FI_TM_0(self):
         for V, E in cornercases:
             G = Graph(V, E)
@@ -121,7 +116,6 @@ class TestTdLib_pre(unittest.TestCase):
                 G = Graph(V, E)
                 T, w = tdlib.PP_FI_TM(G)
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-    """
 
 if __name__ == '__main__':
     unittest.main()
