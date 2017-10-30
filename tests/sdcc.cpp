@@ -45,7 +45,11 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
 #include <tdlib/exact_ta.hpp>
 #endif
 #include <boost/graph/copy.hpp>
+
+
 #include <tdlib/thorup.hpp>
+#include <tdlib/combinations.hpp>
+
 
 #ifdef USE_GALA
 // some algorithms, need to move to comb::p17...
@@ -55,10 +59,16 @@ namespace choice{
 }
 typedef treedec::draft::exact_decomposition<cfg_t,
              treedec::algo::default_config,
-             choice::exact_ta_> alg_A;
+             choice::exact_ta_> Tamaki;
 #endif
 
+
+typedef treedec::comb::PP_MD<cfg_t> PP_MD;
+typedef treedec::comb::PP_FI<cfg_t> PP_FI;
+typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
 typedef treedec::thorup<cfg_t> thorup;
+
+
 
 template<class G, class A>
 void do_it(G& g){
@@ -80,9 +90,9 @@ void do_it(G& g){
 	}
 }
 
+
 int main()
 {
-
 	cfg_t g(4);
 	treedec::add_edge(0, 1, g);
 	treedec::add_edge(1, 2, g);
@@ -97,15 +107,30 @@ int main()
 	}
 	assert(ii==4);
 
-	cfg_t h(g);
+	cfg_t h1(g);
+	cfg_t h2(g);
+	cfg_t h3(g);
+	cfg_t h4(g);
+	cfg_t h5(g);
+
+	std::cout << "thorup\n";
+	do_it<cfg_t, thorup>(h1);
+
+	std::cout << "PP+MD\n";
+	do_it<cfg_t, PP_MD>(h2);
+
+	std::cout << "PP+FI\n";
+	do_it<cfg_t, PP_FI>(h3);
+
+	std::cout << "PP+FI\n";
+	do_it<cfg_t, PP_FI_TM>(h4);
+
+
 #if USE_GALA
-	std::cout << "p17 test\n";
+	std::cout << "tamaki\n";
 	//test<cfg_t, alg_A>(h);
-	alg_A A(g);
+	Tamaki A(h5);
 	A.do_it(1);
 	// A.get_tree_decomposition(t); almost
 #endif
-
-	std::cout << "thorup\n";
-	do_it<cfg_t, thorup>(h);
 }
