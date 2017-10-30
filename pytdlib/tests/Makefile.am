@@ -23,6 +23,9 @@ LONG_TESTS = \
 	test_long_approx_CFGs.py \
 	test_long_apps_CFGs.py \
 	test_long_lb_CFGs.py \
+	test_long_approx_NewCFGs.py \
+	test_long_apps_NewCFGs.py \
+	test_long_lb_NewCFGs.py \
 	test_long_approx_Dimacs.py \
 	test_long_lb_Dimacs.py \
 	test_long_approx_Zoo.py \
