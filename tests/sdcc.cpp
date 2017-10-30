@@ -58,6 +58,7 @@ typedef treedec::comb::ex17<cfg_t> ppta;
 #endif
 
 
+#include <tdlib/nice_decomposition.hpp>
 
 template<class G, class A>
 void do_it(G& g){
@@ -77,6 +78,8 @@ void do_it(G& g){
 		}
 		std::cout << "\n";
 	}
+
+	treedec::nice::nicify(t);
 }
 
 
@@ -122,4 +125,6 @@ int main()
 	A.do_it(1);
 	// A.get_tree_decomposition(t); almost
 #endif
+
+
 }
