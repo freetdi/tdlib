@@ -79,9 +79,7 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
             }
             if(!omit){
                 boost::add_edge(internal_map[spos], internal_map[tpos], H);
-            }else{
             }
-        }else{
         }
     }
 }
@@ -313,7 +311,6 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
         for(; p.first!=p.second; ++p.first){
             if(marker.is_marked(*p.first)){
                 cnt_common++;
-            }else{
             }
         }
         if(cnt_common < min_common){

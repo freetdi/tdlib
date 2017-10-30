@@ -157,6 +157,7 @@ private:
 
 } // treedec
 
+
 namespace boost {
 
 template<class A, class O, template<class G, class ...> class B>

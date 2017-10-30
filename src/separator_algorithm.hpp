@@ -216,8 +216,7 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                     typename vertex_set::const_iterator sIt=X_Y.begin();
                     for(; sIt!=X_Y.end(); ++sIt){
                         auto pos=boost::get(boost::vertex_index, G, *sIt);
-                        if(disabled_[pos]){
-                        }else{
+                        if(!disabled_[pos]){
                             ++num_dis_;
                         }
                         disabled_[pos] = true;
@@ -235,7 +234,6 @@ bool nearly_balanced_seperator(G_t const &G, W_t const &W, S_t &S,
                             if(!disabled_[pos]) {
                                 assert(sX.size()==0 || *NI>*sX.rbegin());
                                 sX.insert(sX.end(), *NI);
-                            }else{
                             }
                         }
                     }

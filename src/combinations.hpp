@@ -67,17 +67,19 @@ public: // types
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 public: // construct
-    FI_TM(G const& g) : _g(g) { untested();
+    FI_TM(G const& g) : _g(g) {
     }
+
 public: // random stuff, should be in algo. later
-    void set_lower_bound(unsigned lb){ untested();
+    void set_lower_bound(unsigned lb){ untested(); //gets bs, works on tw, returns bs?
         _low_tw = lb-1;
     }
     unsigned lower_bound()const{ untested();
         return _low_tw + 1;
     }
+
 public: // algo interface
-    void do_it(){ untested();
+    void do_it(){
         std::vector<unsigned int> old_elim_ordering;
         typename std::vector<vertex_descriptor> new_elim_ordering;
         treedec::fillIn_ordering(_g, old_elim_ordering);
@@ -94,15 +96,17 @@ private:
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
 class PP_MD {
 public: // types
+
     typedef typename treedec::graph_traits<G>::treedec_type T;
 public: // construct
     PP_MD(G& g) : _g(g){
     }
+
 public: // random stuff, should be in algo. later
-    void set_lower_bound(unsigned lb){
+    void set_lower_bound(unsigned lb){ untested();
         _low_tw = lb-1;
     }
-    unsigned lower_bound()const{
+    unsigned lower_bound()const{ untested();
         return _low_tw + 1;
     }
 
@@ -110,7 +114,6 @@ public: // random stuff, should be in algo. later
         if(boost::num_vertices(_g) == 0){
             boost::add_vertex(_t);
             return;
-        }else{
         }
 
         // TODO: cleanup
@@ -128,11 +131,13 @@ public: // random stuff, should be in algo. later
         }
         treedec::glue_bags(bags, _t);
     }
+
     template<class TT>
     void get_tree_decomposition(TT& t) const{
         // todo: assemble td here.
         boost::copy_graph(_t, t);
     }
+
 private:
     G& _g;
     T _t;
@@ -144,14 +149,15 @@ private:
 // TODO: more generic
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
 class PP_FI_TM{
-public:
 private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
 public: // construct
     PP_FI_TM(G& g) : _g(g){
         _low_tw = -1;
     }
+
 public: // random stuff
     void set_lower_bound(unsigned lb){
         _low_tw = lb-1;
@@ -159,6 +165,7 @@ public: // random stuff
     unsigned lower_bound()const{
         return _low_tw + 1;
     }
+
 public: // algo interface
     void do_it(){
 
@@ -180,13 +187,14 @@ public: // algo interface
 
             G H(_g);
             //true = ignore isolated vertices
-            treedec::fillIn_ordering(_g, old_elim_ordering, true); //ignore isolated
+            treedec::fillIn_ordering(_g, old_elim_ordering, true);
             _g = H; // reset
 
             treedec::minimalChordal(_g, old_elim_ordering, new_elim_ordering);
 
             typename std::vector<vertex_descriptor>
                 new_elim_ordering_(old_elim_ordering.size());
+
             unsigned c = 0;
             for(unsigned i = 0; i < new_elim_ordering.size(); i++){
                 if(boost::out_degree(new_elim_ordering[i], _g) > 0){
@@ -210,7 +218,7 @@ private:
     G& _g;
     T _t;
     int _low_tw;
-}; // PPFITM
+}; // PP_FI_TM
 
 } // comb
 
@@ -221,7 +229,7 @@ template <typename G_t, typename T_t>
 void PP_MD(G_t &G, T_t &T, int &low)
 {
     treedec::comb::PP_MD<G_t> a(G);
-    a.set_lower_bound(low+1);
+    a.set_lower_bound(low+1); //sure that low is bs?!
     a.do_it();
     low=a.lower_bound()-1;
     a.get_tree_decomposition(T);
@@ -302,7 +310,6 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     if(boost::num_edges(G) == 0){
         treedec::glue_bags(bags, T);
         return;
-    }else{
     }
 
     //Lower bound on the treewidth of the reduced instance of G.
@@ -344,7 +351,7 @@ void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
     treedec::glue_bags(bags, T);
 }
 
-
+//this is in SageMath
 template <typename G_t, typename T_t>
 bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     if(boost::num_vertices(G) == 0){
@@ -352,7 +359,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
 
         if(k >= -1){
             return true;
-        }else{
+        }
+        else{
             return false;
         }
     }
@@ -371,7 +379,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
         treedec::glue_bags(bags, T);
         if(low_tw <= k){
             return true;
-        }else{ untested();
+        }
+        else{
             return false;
         }
     }
@@ -381,14 +390,12 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
     int lb_deltaC = treedec::lb::deltaC_least_c(H);
 
     int lb = low_tw;
-    if(lb_deltaC > lb){ untested();
+    if(lb_deltaC > lb){
         lb = lb_deltaC;
-    }else{
     }
 
-    if(lb > k){ untested();
+    if(lb > k){
         return false;
-    }else{
     }
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.
@@ -412,9 +419,8 @@ bool exact_decomposition_cutset_decision(G_t &G, T_t &T, int k){
 
         while(!treedec::exact_cutset(G_, T_, lb)){
             lb++;
-            if(lb > k){ untested();
+            if(lb > k){
                 return false;
-            }else{
             }
         }
     }
@@ -427,7 +433,6 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
-    }else{
     }
 
     //preprocessing
@@ -441,18 +446,19 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     if(boost::num_edges(G) == 0){
         treedec::glue_bags(bags, T);
         return;
-    }else{ untested();
     }
 
+/*  what is this?!
     if(low > lb){ untested();
     }else{ untested();
     }
+*/
 
     //Compute a treedecomposition for each connected component of G and glue the decompositions together.
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
     treedec::get_components(G, components);
 
-    if(components.size() == 1){ untested();
+    if(components.size() == 1){
         treedec::CR_dynamic_decomp(G, T, lb);
 
         treedec::glue_bags(bags, T);
@@ -462,11 +468,10 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
     // root
     boost::add_vertex(T);
 
-    for(unsigned int i = 0; i < components.size(); i++){ untested();
+    for(unsigned int i = 0; i < components.size(); i++){
         //Ignore isolated vertices (already included in 'bags').
-        if(components[i].size() == 1){ untested();
+        if(components[i].size() == 1){
             continue;
-        }else{ untested();
         }
 
         G_t G_;
@@ -486,11 +491,10 @@ void exact_decomposition_dynamic(G_t &G, T_t &T, int lb){
 
 
 template <typename G_t, typename T_t>
-void exact_decomposition_chordal(G_t &G, T_t &T){ untested();
-    if(boost::num_vertices(G) == 0){ untested();
+void exact_decomposition_chordal(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
-    }else{ untested();
     }
 
     typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> elim_ordering;
@@ -498,12 +502,12 @@ void exact_decomposition_chordal(G_t &G, T_t &T){ untested();
     treedec::ordering_to_treedec(G, elim_ordering, T);
 }
 
+
 template <typename G_t, typename T_t>
-void separator_algorithm_MSVS(G_t &G, T_t &T){ untested();
-    if(boost::num_vertices(G) == 0){ untested();
+void separator_algorithm_MSVS(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
-    }else{ untested();
     }
 
     treedec::separator_algorithm(G, T);
@@ -511,8 +515,8 @@ void separator_algorithm_MSVS(G_t &G, T_t &T){ untested();
 }
 
 template <typename G_t, typename T_t>
-void separator_algorithm_TM(G_t &G, T_t &T){ untested();
-    if(boost::num_vertices(G) == 0){ untested();
+void separator_algorithm_TM(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
     }
@@ -527,11 +531,10 @@ void separator_algorithm_TM(G_t &G, T_t &T){ untested();
 }
 
 template <typename G_t, typename T_t>
-void MSVS_trivial(G_t &G, T_t &T){ untested();
-    if(boost::num_vertices(G) == 0){ untested();
+void MSVS_trivial(G_t &G, T_t &T){
+    if(boost::num_vertices(G) == 0){
         boost::add_vertex(T);
         return;
-    }else{ untested();
     }
 
     treedec::trivial_decomposition(G, T);
@@ -545,38 +548,38 @@ void PP_MD(G_t &G, T_t &T){
 }
 
 template <typename G_t, typename T_t>
-void PP_FI(G_t &G, T_t &T){ untested();
+void PP_FI(G_t &G, T_t &T){
     int low = -1;
     PP_FI(G, T, low);
 }
 
 template <typename G_t, typename T_t>
-void PP_FI_TM(G_t &G, T_t &T){ untested();
+void PP_FI_TM(G_t &G, T_t &T){
     int low = -1;
     PP_FI_TM(G, T, low);
 }
 
 template <typename G_t, typename T_t>
-void exact_decomposition_dynamic(G_t &G, T_t &T){ untested();
+void exact_decomposition_dynamic(G_t &G, T_t &T){
     int lb = -1;
     exact_decomposition_dynamic(G, T, lb);
 }
 
 template <typename G_t, typename T_t>
-void exact_decomposition_cutset(G_t &G, T_t &T){ untested();
+void exact_decomposition_cutset(G_t &G, T_t &T){
     int lb = -1;
     exact_decomposition_cutset(G, T, lb);
 }
 
 template <typename G_t, typename T_t>
-void MD_MSVS(G_t &G, T_t &T){ untested();
+void MD_MSVS(G_t &G, T_t &T){
     G_t H(G);
     treedec::minDegree_decomp(G, T);
     treedec::MSVS(H, T);
 }
 
 template <typename G_t, typename T_t>
-void FI_MSVS(G_t &G, T_t &T){ untested();
+void FI_MSVS(G_t &G, T_t &T){
     int low = -1;
     G_t H(G);
     treedec::fillIn_decomp(G, T);

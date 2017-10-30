@@ -10,11 +10,11 @@
 #include <gala/boost.h>
 #endif
 
-#include <iostream>     // std::cout
+#include <iostream>
 #include <algorithm>    // std::random_shuffle
-#include <vector>       // std::vector
-#include <ctime>        // std::time
-#include <cstdlib>      // std::rand, std::srand
+#include <vector>
+#include <ctime>
+#include <cstdlib>
 
 
 namespace treedec{
@@ -46,18 +46,10 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
     ord_type ordering(boost::num_vertices(G));
     ord_type cur_ordering(boost::num_vertices(G));
 
-    std::vector<BOOL> active(boost::num_vertices(G), true); // BUG
+    std::vector<BOOL> active(boost::num_vertices(G), true);
 
     gen_search::configs::CFG_DFS_2<G_t, algo::default_config>
       generic_elim_DFS_test (G);
-
-//    gen_search::generic_elimination_search_DFS<G_t,
-//        gen_search::configs::CFG_DFS_2 > //TODO: constructor...
-//       generic_elim_DFS_test
-//              (olay,
-//               active,
-//               ordering,
-//               cur_ordering);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
     generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
@@ -76,8 +68,6 @@ void generic_elimination_search_CFG2(G_t const &G, unsigned max_nodes, unsigned 
 template <typename G_t>
 void generic_elimination_search_CFG3(G_t const &G, unsigned max_nodes, unsigned max_orderings)
 {
-//    gen_search::overlay<G_t, G_t> olay(G);
-
     gen_search::configs::CFG_DFS_3<G_t, algo::default_config>
        generic_elim_DFS_test (G);
 
@@ -111,21 +101,6 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
     std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
 
-#if 0 // does not work.
-    bool cond = true;
-    while(cond){
-        cond = false;
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-            if(boost::out_degree(*vIt, G) == 0){
-                boost::remove_vertex(*vIt, G);
-                cond = true;
-                break;
-            }
-        }
-    }
-#endif
-
     if(boost::num_vertices(H) == 0){
         std::cout << "fully reduced by PP!" << std::endl;
         return;
@@ -142,13 +117,6 @@ void generic_elimination_search_p17(G_t &G, unsigned max_nodes, unsigned max_ord
 
     gen_search::configs::CFG_DFS_p17<G_t, algo::default_config>
        generic_elim_DFS_test (H /* ... more? */);
-
-    //gen_search::generic_elimination_search_DFS<G_t, gen_search::configs::CFG_DFS_2 >
-    //   generic_elim_DFS_test
-    //          (olay, // FIXME.
-    //           active,
-    //           ordering,
-    //           cur_ordering);
 
     generic_elim_DFS_test.set_max_nodes_generated(max_nodes);
     generic_elim_DFS_test.set_max_orderings_generated(max_orderings);
@@ -256,10 +224,6 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
         return;
     }
 
-    //unsigned rnd_cnt = 0;
-    //std::srand ( unsigned ( std::time(0) ) );
-
-
     while(true){
         gen_search::configs::CFG_DFS_p17_2<G_t, algo::default_config>
            generic_elim_DFS_test2 (G2);
@@ -275,15 +239,8 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
 
         lb=generic_elim_DFS_test2.global_lower_bound_bagsize();
         if(generic_elim_DFS_test2.global_upper_bound_bagsize() == ub){
-/*        std::random_shuffle(best.begin(), best.end());
-              rnd_cnt++;
-              if(rnd_cnt == 3){
-                  break;
-              }
-              continue;
-*/
-        end = clock();
-        std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
+            end = clock();
+            std::cout << "Process took " << (double(end - start) / CLOCKS_PER_SEC) << " seconds" << std::endl;
             return;
         }
         ub=generic_elim_DFS_test2.global_upper_bound_bagsize();

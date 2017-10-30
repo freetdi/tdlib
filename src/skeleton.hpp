@@ -95,6 +95,7 @@ namespace treedec{
 namespace detail{
 
 // NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
+
 // if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename N_t>
 class skeleton_helper{
@@ -119,7 +120,6 @@ public:
     void do_it(){
         if(_n == 0){
             return;
-        }else{
         }
 
         //Bag for the u-th elimination vertex will be stored in T[u].
@@ -133,7 +133,7 @@ public:
         unsigned max = _n-1u;
         for(unsigned u = 0; u < max; u++){
             unsigned min_index = max; //note: if there's an empty bag, we can glue
-                                      //it toghether with an arbitrary bag.
+                                      //it together with an arbitrary bag.
 
             auto b=boost::get(treedec::bag_t(), u, _b);
             for(auto bIt : b ){
@@ -141,7 +141,6 @@ public:
                 unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                 if(index < min_index){
                     min_index = index;
-                }else{
                 }
             }
             //(min_index, u) will lead to a connected directed graph, if G_t is
@@ -198,7 +197,6 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
         if(n.is_numbered(*b.first)){
             assert(n.get_position(*b.first)<n_);
             assert(O[n.get_position(*b.first)]==*b.first);
-        }else{
         }
     }
 #endif

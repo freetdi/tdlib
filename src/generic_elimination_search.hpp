@@ -271,7 +271,8 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
         else{
             unreachable(); //should be the case?
         }
-    }else{
+    }
+    else{
         // BUG: use boost::copy maybe
         G_t H(baseclass::_g.underlying());
         auto p=boost::vertices(baseclass::_g._og);
@@ -289,7 +290,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
             //can be seen as pruning this branch
             baseclass::timer_off();
             return;
-        }else{
         }
 
         unsigned idx = 0;
@@ -342,8 +342,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
                         break; //returns now
                     }
                 }
-            }
-            else{
             }
         }
     }

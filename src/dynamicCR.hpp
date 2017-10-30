@@ -27,6 +27,8 @@
  *
  */
 
+/* WARNING: You should not use this algorithm (huge running time) */
+
 #ifndef TD_DYNAMICCR
 #define TD_DYNAMICCR
 

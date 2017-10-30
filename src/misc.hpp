@@ -491,6 +491,99 @@ void make_binary(T_t &T){
     detail::make_binary(T, *boost::vertices(T).first, visited);
 }
 
+template <typename T_t>
+void thicken(T_t &T){
+    unsigned int maxsize = (unsigned int) treedec::get_width(T)+1;
+    bool modified = true;
+
+    //Fill bags such that they all have size 'maxsize'.
+    while(modified){
+        modified = false;
+
+        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+            if((int)bag(*tIt, T).size() == maxsize){
+                typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
+                    typename treedec_traits<T_t>::bag_type::iterator bIt = bag(*tIt, T).begin();
+                    while(bag(*nIt, T).size() < maxsize){
+                        bag(*nIt, T).insert(*(bIt++));
+                        modified = true;
+                    }
+                }
+            }
+        }
+    }
+
+    modified = true;
+
+    //Remove duplicated bags.
+    while(modified){
+        modified = false;
+
+        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+            typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
+                if(bag(*tIt, T) == bag(*nIt, T)){
+                    typename boost::graph_traits<T_t>::adjacency_iterator nIt2, nEnd2;
+                    for(boost::tie(nIt2, nEnd2) = boost::adjacent_vertices(*tIt, T); nIt2 != nEnd2; nIt2++){
+                        if(*nIt2 != *nIt){
+                            boost::add_edge(*nIt2, *nIt, T);
+                        }
+                    }
+                    boost::clear_vertex(*tIt, T);
+                    boost::remove_vertex(*tIt, T);
+                    modified = true;
+
+                    goto NEXT_ITER1;
+                }
+            }
+        }
+        NEXT_ITER1: ;
+    }
+
+    //Adjacent bags B1, B2 must fulfill |(B1 ^ B2)| = maxwidth-1.
+    while(modified){
+        modified = false;
+
+        typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+        for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+            typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
+            for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*tIt, T); nIt != nEnd; nIt++){
+                typename treedec_traits<T_t>::bag_type intersection;
+                std::set_intersection(bag(*tIt, T).begin(), bag(*tIt, T).end(),
+                                      bag(*nIt, T).begin(), bag(*nIt, T).end(),
+                                      std::inserter(intersection, intersection.begin()));
+
+                if(intersection.size() != maxsize-1){
+                    typename boost::graph_traits<T_t>::vertex_descriptor new_vertex = boost::add_vertex(T);
+                    bag(new_vertex, T) = intersection;
+
+                    typename treedec_traits<T_t>::bag_type::iterator bIt = bag(*tIt, T).begin();
+                    while(bag(new_vertex, T).size() < maxsize){
+                        bag(new_vertex, T).insert(*(bIt++));
+                    }
+
+                    boost::remove_edge(*tIt, *nIt, T);
+                    boost::add_edge(*tIt, new_vertex, T);
+                    boost::add_edge(new_vertex, *nIt, T);
+
+                    modified = true;
+                    goto NEXT_ITER2;
+                }
+            }
+        }
+        NEXT_ITER2: ;
+    }
+}
+
+// legacy. does not make anything.
+template <typename T_t>
+void make_thick(T_t &T){ untested();
+	return thicken(T);
+}
+
 namespace detail{
 
 //Complexity: O(|V(T)|)
