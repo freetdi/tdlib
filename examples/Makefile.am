@@ -90,7 +90,9 @@ tdlib:
 	-$(LN_S) $(top_srcdir)/src $@
 
 #here?
-EXTRA_DIST = grparse.h twthread.hpp twh.h
+EXTRA_DIST = \
+	gala_graphs.h \
+	grparse.h twthread.hpp twh.h
 
 # TESTS = $(check_PROGRAMS)
 
