@@ -29,6 +29,7 @@ fi
 # Checks for programs.
 AC_PROG_CXX
 AC_LANG(C++)
+AX_COMPILER_VENDOR
 
 OLD_CXXFLAGS="CXXFLAGS"
 CXXFLAGS="$CXXFLAGS"
@@ -130,6 +131,10 @@ AS_IF([test x"$PYTHON" != x], [
 	[AC_MSG_ERROR(please install python headers matching $PYTHON)])
 ])
 ])
+
+# HACK. actually we only check if profiling works.
+# it doesnt with clang.
+AM_CONDITIONAL([CLANG], [test "x$ax_cv_cxx_compiler_vendor" = "xclang"])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

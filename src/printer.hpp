@@ -106,7 +106,6 @@ namespace draft {
 	};
 
 
-	// incomplete
 	template<class T>
 	using grtdprinter=draft::printer<T>;
 

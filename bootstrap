@@ -9,7 +9,7 @@ CONFIG_SHELL=/bin/sh
 export CONFIG_SHELL
 
 echo "Running aclocal..."
-aclocal -Im4 || exit 1
+aclocal -I m4 || exit 1
 
 #echo "Running autoheader..."
 autoheader || exit 1

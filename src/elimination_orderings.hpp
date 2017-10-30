@@ -51,17 +51,13 @@
 
 #include <boost/graph/copy.hpp>
 
-#include "graph_traits.hpp"
 #include "trace.hpp"
-#include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 
-#include "graph.hpp"
 #include "fill.hpp"
 #include "platform.hpp"
 
-#include "preprocessing.hpp"
 #include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "skeleton.hpp"

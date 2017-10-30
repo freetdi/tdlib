@@ -40,8 +40,11 @@ PROFILE_GRAPH = HoffmanGraph.gr
 COMMON_CXXFLAGS = -Os -march=native
 
 tdecompdir=$(pkglibexecdir)
+
+if !CLANG
 tdecomp_PROGRAMS = ${GALA_APPS}
 check_PROGRAMS = ${GALA_NOINST_APPS}
+endif
 
 tdecomp_profile_SOURCES = tdecomp.cc
 tdecomp_profile_CXXFLAGS = $(AM_CXXFLAGS) $(PROFILE_GEN) $(COMMON_CXXFLAGS)
@@ -63,11 +66,6 @@ $(TWEX_AMNAME).Tpo: $(TWEXP_AMNAME).gcda
 $(GRTD_AMNAME).o: $(GRTDP_AMNAME).gcda
 $(GRTD_AMNAME).Tpo: $(GRTDP_AMNAME).gcda
 
-CLEANFILES = \
-   $(TWEXP_AMNAME).gcda \
-	$(GRTDP_AMNAME).gcda \
-	HoffmanGraph.gr.td*
-
 TIME=1
 
 $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile
@@ -82,6 +80,11 @@ $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile
 	done
 
 BUILT_SOURCES = tdlib
+CLEANFILES = \
+	${BUILT_SOURCES} *~ \
+   $(TWEXP_AMNAME).gcda \
+	$(GRTDP_AMNAME).gcda \
+	HoffmanGraph.gr.td*
 
 tdlib:
 	-$(LN_S) $(top_srcdir)/src $@

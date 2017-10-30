@@ -15,9 +15,6 @@
 #include <tdlib/printer.hpp>
 #include <boost/graph/copy.hpp>
 #include <gala/boost_copy.h>
-#endif
-#include <tdlib/treedec.hpp>
-
 // undirected simple loopless graph
 template<class G>
 struct uvv_config : gala::graph_cfg_default<G> {
@@ -37,6 +34,10 @@ struct test{
    boost::add_vertex(x);
     }
 } x;
+#endif
+#include <tdlib/treedec.hpp>
+#include <tdlib/printer.hpp>
+#include <boost/graph/copy.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> ALVVD;
 template<class G>

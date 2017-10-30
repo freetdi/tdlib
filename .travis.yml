@@ -24,15 +24,19 @@ addons:
       - trusty
     packages:
       - libboost-dev
+      - libboost-thread-dev
+      - libboost-graph-dev
+      - stx-btree-dev
 
 install:
   - sudo pip install cython
 
 script:
-  - GALA_COMMIT=23edc6
+  - GALA_COMMIT=2695d582
 
   - uname -a
-  - $CXX --version
+  - g++ --version
+  - clang++ --version
   - cython --version
   - autoconf --version
   - automake --version

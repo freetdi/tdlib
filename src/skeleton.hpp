@@ -24,6 +24,7 @@
 #define TD_SKELETON_HPP
 
 #include <boost/graph/graph_traits.hpp>
+#include "numbering.hpp"
 
 namespace treedec{ //
 
