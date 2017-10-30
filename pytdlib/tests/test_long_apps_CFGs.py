@@ -15,19 +15,6 @@ sys.argv=sys.argv[:1]
 PREFIX = "CFGs"
 COUNT = 1816
 
-def dump_td_as_dot(V_T, E_T, outname):
-    fout = open(outname, 'w')
-    fout.write("digraph G{\n")
-    for i in range(0, len(V_T)):
-        fout.write(str(i) + "[label=\"")
-        for v in V_T[i]:
-            fout.write(str(v) + " ")
-        fout.write("\"];\n")
-    for i in range(0, len(E_T)-1, 2):
-        fout.write(str(E_T[i]) + " -> " + str(E_T[i+1]) + ";\n")
-    fout.write("}\n")
-    fout.close()
-
 class TestTdLib_packages(unittest.TestCase):
     #TODO: validation (is_clique, is_IS, is_VC,..) in tdlib?
     def test_max_clique(self):
