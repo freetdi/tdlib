@@ -36,10 +36,10 @@ neighbours with reasonable effort).
 
 == configuration objects ==
 
-Config objects can control some of the algorithm behaviour, such as statistic
-generation, debugging, signalling and subalgorithm/subroutine/data\ structure
-selection. The default, algo::cfg_default is a sensible choice, if you don't
-care.
+Config objects can control some of the algorithm behaviour, such as statistics
+generation, debug output, signalling and subalgorithm/subroutine/data\
+structure selection. The default, algo::cfg_default is a sensible choice, if
+you don't care.
 
 (TODO: more on config objects)
 

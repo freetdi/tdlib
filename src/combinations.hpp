@@ -56,6 +56,9 @@
 #include "exact_cutset.hpp"
 #include "separator_algorithm.hpp"
 #include "misc.hpp"
+#ifdef USE_GALA
+#include "exact_ta.hpp"
+#endif
 
 namespace treedec{
 
@@ -290,6 +293,17 @@ private:
     T _t;
     int _low_tw;
 }; // FI_TM
+
+#ifdef USE_GALA
+namespace ex17choice{
+  template<class G, template<class G_, class ...> class C=treedec::algo::default_config>
+  using exact_ta_=treedec::exact_ta<G, C>;
+}
+
+template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
+using ex17=treedec::draft::exact_decomposition<x,
+             C, ex17choice::exact_ta_>;
+#endif
 
 } // comb
 

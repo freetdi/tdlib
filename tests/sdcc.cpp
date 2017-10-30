@@ -41,9 +41,6 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
 
 #include <tdlib/graph.hpp>
 #include <tdlib/preprocessing.hpp>
-#ifdef USE_GALA
-#include <tdlib/exact_ta.hpp>
-#endif
 #include <boost/graph/copy.hpp>
 
 
@@ -51,22 +48,14 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
 #include <tdlib/combinations.hpp>
 
 
-#ifdef USE_GALA
-// some algorithms, need to move to comb::p17...
-namespace choice{
-  template<class G, template<class G_, class ...> class C>
-  using exact_ta_=treedec::exact_ta<G, C>;
-}
-typedef treedec::draft::exact_decomposition<cfg_t,
-             treedec::algo::default_config,
-             choice::exact_ta_> Tamaki;
-#endif
-
-
 typedef treedec::comb::PP_MD<cfg_t> PP_MD;
 typedef treedec::comb::PP_FI<cfg_t> PP_FI;
 typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
 typedef treedec::thorup<cfg_t> thorup;
+
+#ifdef USE_GALA
+typedef treedec::comb::ex17<cfg_t> ppta;
+#endif
 
 
 
@@ -127,9 +116,9 @@ int main()
 
 
 #if USE_GALA
-	std::cout << "tamaki\n";
+	std::cout << "ppta\n";
 	//test<cfg_t, alg_A>(h);
-	Tamaki A(h5);
+	ppta A(h5);
 	A.do_it(1);
 	// A.get_tree_decomposition(t); almost
 #endif
