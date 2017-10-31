@@ -96,6 +96,7 @@ size_t bag_size(V const & v, G const& g)
 #define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
 namespace boost{\
 \
+        inline \
 	typename property_map< T, vertex_all_t>::type\
 	get(vertex_all_t, T& g) {\
 		typedef typename property_map< T, vertex_all_t>::type\
@@ -103,7 +104,8 @@ namespace boost{\
 		return pmap_type(g);\
 	}\
 \
-	inline bagstuff::const_treebagpmap<T>\
+	inline \
+        bagstuff::const_treebagpmap<T>\
 	get(vertex_all_t, T const& g) {\
 		typedef typename property_map< T, vertex_all_t>::const_type\
 			pmap_type;\
@@ -168,17 +170,18 @@ namespace boost{\
   inline bagstuff::const_treebagpmap<T> \
   get(treedec::bag_t, T const& t)\
   { untested();\
-	  return bagstuff::const_treebagpmap<T>(t);\
+    return bagstuff::const_treebagpmap<T>(t);\
   }\
-	inline bagstuff::treebagpmap<T> \
+\
+  inline bagstuff::treebagpmap<T> \
   get(treedec::bag_t, T & t)\
   { untested();\
-	  return bagstuff::treebagpmap<T>(t);\
+    return bagstuff::treebagpmap<T>(t);\
   }\
 \
     template <>\
     struct property_map<T, treedec::bag_t>{ \
-	 };\
+    };\
 } // boost
 
 #endif

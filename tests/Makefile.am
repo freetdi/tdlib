@@ -41,6 +41,7 @@ check_PROGRAMS = \
 	common_out_edges \
 	custom_td \
 	elim0 \
+	inline \
 	graph \
 	pp \
 	pp0 \
@@ -51,6 +52,9 @@ check_PROGRAMS = \
 # these fail. known bug...
 XFAIL_TESTS = \
 	bucket_sorter_2u
+
+inline_SOURCES=sdcc.cpp inline.cpp
+inline_CXXFLAGS=${AM_CXXFLAGS}
 
 notyets = \
 	svbs_random \

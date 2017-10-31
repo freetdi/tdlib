@@ -74,6 +74,7 @@ struct visited_mask{
 
 }
 
+inline
 detail::visited_mask<std::vector<BOOL> > make_incidence_mask(std::vector<BOOL>& v)
 {
 	return detail::visited_mask<std::vector<BOOL> >(v);
