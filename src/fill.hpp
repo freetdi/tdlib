@@ -33,7 +33,7 @@
 static bool const lazy_init=true;
 static bool const catch_zeroes_in_decrement=true;
 
-namespace misc {
+namespace treedec{
 
 namespace detail {
 template<class G>
@@ -49,12 +49,12 @@ struct fill_config{
     }
     static unsigned num_threads(){return 1;}
 };
+
 } // detail
-} // misc
 
+namespace obsolete {
 
-namespace misc{ // treedec::misc? hmmm.
-
+// old hash based fill.
 template<class G_t, class CFG=detail::fill_config<G_t> >
 class FILL{
     FILL(const FILL&)
@@ -448,22 +448,14 @@ private:
     mutable eq_t _eval_queue;
 }; // FILL
 
-} //namespace misc
-
-namespace treedec{
+} // obsolete
 
 template<class G_t>
 struct fill_chooser{
-    typedef typename misc::FILL<G_t> type;
+    typedef typename treedec::obsolete::FILL<G_t> type;
 };
 
 }
 
-//transition, don't use.
-namespace noboost{
-    using treedec::fill_chooser;
-}
-
 #endif //guard
-
 // vim:ts=8:sw=4:et
