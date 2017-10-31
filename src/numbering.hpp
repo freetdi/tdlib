@@ -26,11 +26,20 @@ private:
 	NUMBERING_1(){ unreachable(); }
 	NUMBERING_1(const NUMBERING_1&){ unreachable(); }
 public:
+	NUMBERING_1(G_t const& g, idmap_type idm)
+	    : _current(0), _data(boost::num_vertices(g)),
+	      _idmap(idm)
+	{
+		increment();
+	}
 	NUMBERING_1(G_t const& g)
 	    : _current(0), _data(boost::num_vertices(g)),
-	      _idmap(idmap_type() )
+	      _idmap(idmap_type(g, boost::vertex_index) )
 	{
 		trace1("NUMBERING_1", _data.size());
+		if(boost::num_vertices(g)){
+		}else{
+		}
 		increment();
 	}
 #if 0 // later?
@@ -41,7 +50,7 @@ public:
 	void put(vertex_descriptor v) {
 		_data[get(_idmap, v)] = _current;
 	}
-	void increment(value_type i = 1) {
+	void increment(value_type i=1) {
 	  	_current -= i;
 	}
 	bool is_numbered(vertex_descriptor v) const {

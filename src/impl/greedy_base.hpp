@@ -23,12 +23,21 @@
 #define TD_GREEDY_BASE_HPP
 
 // FIXME, rearrange, maybe move all to bits?
+#include "../graph_traits.hpp"
 #include "../skeleton.hpp"
 #include "../induced_subgraph.hpp"
 
 namespace treedec{
 
 namespace impl{
+
+#if 0
+// check: why is this in experimental?
+template<class G>
+struct directed_view_select{
+    typedef treedec::draft::directed_view<G> type;
+};
+#endif
 
 template <typename G_t, typename O_t,
           template<class G, class...> class CFGT_t=algo::default_config>
@@ -37,15 +46,15 @@ private: // forbidden
     greedy_base(){unreachable();}
 public:
     typedef typename directed_view_select<G_t>::type graph_type;
-    typedef graph_type D_t; //?
-    typedef typename boost::graph_traits<graph_type>::edges_size_type edges_size_type;
-    typedef typename boost::graph_traits<graph_type>::vertex_descriptor vertex_descriptor;
-    typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
+    using D_t=graph_type;
+    typedef typename boost::graph_traits<D_t>::edges_size_type edges_size_type;
+    typedef typename boost::graph_traits<D_t>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
     typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
     typedef typename boost::property_map<D_t, boost::vertex_index_t>::type idmap_type;
-    typedef boost::iterator_property_map<vertex_descriptor*,
-        idmap_type, vertex_descriptor, vertex_descriptor&> degreemap_type;
     typedef std::vector<vertices_size_type> degree_type;
+    typedef boost::iterator_property_map<vertices_size_type*,
+        idmap_type, vertices_size_type, vertices_size_type&> degreemap_type;
     typedef treedec::draft::NUMBERING_1<D_t> numbering_type;
     struct sgm{
         sgm(numbering_type const& n)
@@ -59,29 +68,34 @@ public:
         bool operator[](vertex_descriptor v) const{ untested();
             return _n.is_not_numbered(v);
         }
+        sgm& operator=(const sgm& o){
+            assert(&_n==&o._n);
+            return *this;
+        }
         numbering_type const& _n;
     };
     typedef sgm member_pred_type;
+    // TODO: alternative subgraph with edge deletion
     typedef INDUCED_SUBGRAPH_1<D_t, member_pred_type, degreemap_type> subgraph_type;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename std::vector<vertex_descriptor> bag_t;
 
 protected: // construct/destruct
-    greedy_base(G_t &g, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
+    greedy_base(G_t &g, unsigned ub, bool ignore_isolated_vertices=false)
       : algo1("."),
         _g(g),
-        _o(O), _own_o(!O), _ub_in(ub),
+        _o(NULL), _own_o(true), _ub_in(ub),
         _iiv(ignore_isolated_vertices), _i(0),
         _min(0), _ub_tw(0),
         _current_N(NULL),
         _num_vert(boost::num_vertices(_g)),
-        _numbering(g),
         _num_edges(treedec::num_edges(g)),
         _idmap(boost::get(boost::vertex_index, _g)),
+        _numbering(g, _idmap),
         _degree(boost::num_vertices(_g)),
         _degreemap(boost::make_iterator_property_map(_degree.data(),
                                                      _idmap,
-                                                     typename degree_type::value_type())),
+                                                     vertices_size_type())),
         _subgraph(_g, member_pred_type(_numbering), _degreemap),
         _marker(boost::num_vertices(_g))
     {
@@ -92,6 +106,7 @@ protected: // construct/destruct
         }
 
         // BUG. part of subgraph constructor?!
+        // yes: not necessary if we use subgraph with edge deletion.
         auto p=boost::vertices(g);
         for(; p.first!=p.second; ++p.first){
             auto d=boost::out_degree(*p.first, g);
@@ -118,26 +133,25 @@ protected: // construct/destruct
     }
 
 protected: // implementation
-    typedef greedy_base baseclass;
     void initialize(){
         // yuck.
-        auto p=boost::vertices(baseclass::_g);
+        auto p=boost::vertices(_g);
         unsigned checksum=0;
         for(; p.first!=p.second; ++p.first){
-            auto d=boost::out_degree(*p.first, baseclass::_g); // BUG
-            checksum+=d;
-            assert(_idmap(*p.first) < _degree.size());
+            auto d=boost::out_degree(*p.first, _g); // BUG
+            checksum += d;
+            assert(_idmap[*p.first] < _degree.size());
             _degreemap[*p.first] = d;
             if(d == 0){
-                if(!baseclass::_iiv){
+                if(!_iiv){
                     // eliminate isolated vertices first
-                    (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *p.first); // ???
+                    (*_o)[_i++] = *p.first;
                     _numbering.put(*p.first);
                     _numbering.increment(); // TODO. possibly unnecessary.
                 }else{
                     // just ignore them, so they don't show up in the order
-                    assert(baseclass::_num_vert);
-                    --baseclass::_num_vert;
+                    assert(_num_vert);
+                    --_num_vert;
                 }
             }else{
             }
@@ -146,15 +160,18 @@ protected: // implementation
     }
 
 public:
+	 // dump a tree decomposition into t
 	 template<class T>
     void tree_decomposition(T& t){
+        assert(_o);
+        _o->resize(_i);
         elimination_ordering(*_o);
 #ifndef NDEBUG
         for(auto x: *_o){
             trace1("order", x);
         }
-        auto p=boost::vertices(baseclass::_g);
-        for(; p.first!=p.second; ++p.first){ itested();
+        auto p=boost::vertices(_g);
+        for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
                 trace2("number", *p.first, _numbering.get_position(*p.first));
             }
@@ -175,27 +192,36 @@ public:
         return _ub_tw+1;
     }
 
-    //?? maybe later
-//    O_t& elimination_ordering() { untested();
+    // later
+//    O_t& elimination_ordering() const { untested();
 //        return *_o;
 //    }
     template<class O>
     void elimination_ordering(O& o) const{
-        auto p=boost::vertices(baseclass::_g);
+		 if(_i){
+		 }else{untested();
+		 }
+		 // incomplete(); inefficient perhaps
+
+        o.resize(_i);
+        auto p=boost::vertices(_g);
         for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
                 auto pos=_numbering.get_position(*p.first);
+                assert(pos<o.size());
                 o[pos] = _idmap[*p.first];
+                assert(o[pos] == (*_o)[pos]);
             }else{
             }
         }
     }
 
 //    virtual void initialize() = 0; ??
-    virtual bool next(vertex_descriptor &c) = 0;
-    virtual void eliminate(vertex_descriptor v) = 0;
+    virtual bool next(vertex_descriptor &){ unreachable(); return false; }
+    virtual void eliminate(vertex_descriptor){ unreachable(); }
     virtual void postprocessing(){ untested(); }
 
+    // greedy_base::
     void do_it(){
         trace2("do_it", _i, _num_vert);
         timer_on();
@@ -203,6 +229,7 @@ public:
         if(!_num_vert){
             timer_off();
             return;
+        }else{
         }
 
         assert(_o);
@@ -222,24 +249,18 @@ public:
 
         while(next(c)){
 
+#if 0 // maybe later.
             //Abort if the width of this decomposition would be larger than 'ub'.
             if(_min >= _ub_in){ untested();
                 throw exception_unsuccessful();
             }else{
             }
-
-            elim_vertices[_i] = get_vd(_g, c);
-
-#if 0
-            if(_t){ untested();
-               incomplete();
-                // _current_N = &_bags[_i];
-            }else{ untested();
-            }
 #endif
 
-            if(boost::out_degree(c, _g)>_ub_tw){
-                _ub_tw=boost::out_degree(c, _g);
+            elim_vertices[_i] = c;
+
+            if(boost::out_degree(c, _subgraph)>_ub_tw){
+                _ub_tw = boost::out_degree(c, _subgraph);
             }else{
             }
 
@@ -284,9 +305,9 @@ protected:
     bag_t* _current_N; // BUG
 
     unsigned _num_vert;
-    numbering_type _numbering;
     edges_size_type _num_edges; // hmm, somehow use _subgraph
     idmap_type _idmap;
+    numbering_type _numbering;
     degree_type _degree;
     degreemap_type _degreemap;
     subgraph_type _subgraph;
@@ -298,3 +319,4 @@ protected:
 } // treedec
 
 #endif
+// vim:ts=8:sw=4:et

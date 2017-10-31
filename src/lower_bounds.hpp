@@ -852,7 +852,7 @@ private:
 public:
 
     deltaC_least_c(G_t &G)
-      : baseclass(G, NULL, -1u),
+      : baseclass(G, -1u),
 //        _g(G), // baseclass _g?
         _lb_tw(0)
     {
