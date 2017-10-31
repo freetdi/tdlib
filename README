@@ -22,6 +22,16 @@ where G is a graph and C is a config object. a graph is expected to come with
 a boost graph interface. there are some extra implicit assumptions, which the
 graph data structure may or may not enforce.
 
+an algorithm has (should have) a constructor taking G& and a constructor
+taking const G&. you should expect the argument to be modified, unless it's
+const. i.e. make sure to cast to const reference, if this is not desired.
+
+an algorithm also provides
+T get_tree_decomposition() const;
+template<class TT>
+void get_tree_decomposition(TT&) const;
+which is meant to work with treedecomposition types (see below).
+
 == graph types ==
 
 A graph is expected to be a model of AdjacencyGraph, but without self loops
