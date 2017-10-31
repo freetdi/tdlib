@@ -82,33 +82,31 @@ typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_decomp(G_t &G, T_t &T, O_t *O, //TODO: should be optional//,
                       unsigned ub=UINT_MAX /* TODO: move to backend */,
                       bool ignore_isolated_vertices=false /* TODO: move to backend */)
-{
-    if(boost::num_vertices(G) == 0){
+{ untested();
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return 0;
     }
 
-    impl::minDegree<G_t, T_t, O_t> MD(G, &T, O, ub, ignore_isolated_vertices);
+    impl::minDegree<G_t> MD(G, ub, ignore_isolated_vertices);
     MD.do_it();
-    MD.tree_decomposition();
+    MD.get_tree_decomposition(T);
     return MD.get_bagsize()-1;
 }
 
 template <typename G_t, typename T_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_decomp(G_t &G, T_t &T)
-{
+{ untested();
 
-    if(boost::num_vertices(G) == 0){
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return 0;
     }
 
-    typedef typename std::vector<typename treedec_chooser<G_t>::value_type> O_t;
-
-    impl::minDegree<G_t, T_t, O_t> MD(G, &T, (O_t*)NULL, -1u, false);
+    impl::minDegree<G_t> MD(G, -1u, false);
     MD.do_it();
-    MD.tree_decomposition();
+    MD.get_tree_decomposition(T);
     return MD.get_bagsize()-1;
 }
 
@@ -116,22 +114,22 @@ typename boost::graph_traits<G_t>::vertices_size_type
 // TODO: duplicate. use impl.
 template <typename G_t, typename O_t>
 int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
-{
+{ untested();
     unsigned n = boost::num_vertices(G);
     unsigned e = boost::num_edges(G);
 
     O.resize(n);
     unsigned i = 0;
-    if(n == 0) {
-    }else if(n*(n-1u)==e || e==0){
+    if(n == 0) { untested();
+    }else if(n*(n-1u)==e || e==0){ untested();
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
             O[i++] = *vIt;
         }
-        if(e==0){
+        if(e==0){ untested();
             return 1;
         }
-        else{
+        else{ untested();
             return n;
         }
     }
@@ -178,7 +176,7 @@ int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
 
 template <typename G_t, typename O_t>
 int boost_minDegree_ordering(G_t &G, O_t &O, unsigned ub=UINT_MAX)
-{
+{ untested();
     O_t iO(boost::num_vertices(G), 0);
     return boost_minDegree_ordering(G, O, iO, ub);
 }
@@ -198,7 +196,7 @@ namespace impl{
 template <typename G_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   boost_minDegree_ordering(G_t &G, std::vector<int> &O)
-{
+{ untested();
     typedef typename boost::graph_traits<G_t>::edges_size_type edges_size_type;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
 
@@ -208,17 +206,17 @@ typename boost::graph_traits<G_t>::vertices_size_type
     O.resize(n);
 
     unsigned i = 0;
-    if(n == 0){
+    if(n == 0){ untested();
         return 0;
     }
-    else if(n*(n-1u) == boost::num_edges(G) || e == 0){
+    else if(n*(n-1u) == boost::num_edges(G) || e == 0){ untested();
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
             O[i++] = *vIt;
         }
-        if(e==0){
+        if(e==0){ untested();
             return 1;
-        }else{
+        }else{ untested();
             return n;
         }
     }
@@ -246,17 +244,16 @@ namespace impl{
 
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
-{
+{ untested();
     assert(T);
-    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
-    fillIn<G_t, T_t, O_t> FI(G, T, (O_t*)NULL, ub, ignore_isolated);
+    fillIn<G_t> FI(G, ub, ignore_isolated);
     FI.do_it();
-    FI.tree_decomposition();
+    FI.get_tree_decomposition(*T);
 }
 
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
-{
+{ untested();
     return fillIn_decomp(G, &T, ub, ignore_isolated);
 }
 
@@ -267,8 +264,8 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=fa
 //fill-in heuristic.
 template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
-{
-    if(boost::num_vertices(G) == 0){
+{ untested();
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
     }
@@ -285,16 +282,16 @@ typename boost::graph_traits<G_t>::vertices_size_type
   minDegree_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false)
-{
+{ untested();
     if(ignore_isolated_vertices){ untested();
         //TODO/CHECK: this is not in use... yet?
     }
 
-    typedef typename treedec::graph_traits<G_t>::treedec_type T;
-    typedef typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
-    impl::minDegree<G_t, T, O_t> MD(G, elim_ordering, ignore_isolated_vertices);
+    impl::minDegree<G_t> MD(G, ignore_isolated_vertices);
     MD.do_it();
-    MD.elimination_ordering();
+    auto o=MD.get_elimination_ordering();
+    elim_ordering = o; // HACK
+
     return MD.get_bagsize()-1;
 }
 
@@ -304,7 +301,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 template<typename G_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
  minDegree_ordering(G_t& G, O_t& O)
-{
+{ untested();
     return detail::minDegree_ordering(G, O, false);
 }
 
@@ -315,13 +312,13 @@ namespace detail{
 template<typename G_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
   fillIn_ordering(G_t &G, O_t &elim_ordering, bool ignore_isolated_vertices=false)
-{
+{ untested();
     trace3("fillIn_ordering", ignore_isolated_vertices, boost::num_vertices(G), elim_ordering.size());
 
-    typedef typename treedec::graph_traits<G_t>::treedec_type T;
-    impl::fillIn<G_t, T, O_t> FI(G, elim_ordering, ignore_isolated_vertices, -1u);
+    impl::fillIn<G_t> FI(G, ignore_isolated_vertices, -1u);
     FI.do_it();
-    FI.elimination_ordering();
+    auto o=FI.get_elimination_ordering();
+    elim_ordering = o; // HACK
     assert(elim_ordering.size()==boost::num_vertices(G) || ignore_isolated_vertices);
     return FI.get_bagsize()-1;
 }
@@ -334,16 +331,16 @@ typename boost::graph_traits<G_t>::vertices_size_type
  fillIn_ordering(G_t& G,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &elim_ordering,
       bool ignore_isolated_vertices=false /* fixme, not in frontend! */)
-{
+{ untested();
     return detail::fillIn_ordering(G, elim_ordering, ignore_isolated_vertices);
 }
 
 // TODO: inefficient
 template <typename G_t, typename O_t>
 int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
-{
+{ untested();
     int width = -1;
-    for(unsigned int i = 0; i < elimination_ordering.size(); i++){
+    for(unsigned int i = 0; i < elimination_ordering.size(); i++){ untested();
         unsigned deg=boost::out_degree(elimination_ordering[i], G);
 
         typename graph_traits<G_t>::outedge_set_type xbag;
@@ -360,7 +357,7 @@ int get_width_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
 
 template <typename G_t, typename O_t>
 unsigned get_bagsize_of_elimination_ordering(G_t &G, O_t& elimination_ordering)
-{
+{ untested();
     return get_width_of_elimination_ordering(G, elimination_ordering)+1;
 }
 
@@ -369,7 +366,7 @@ namespace impl{
 
 template <typename G_t, typename V_t, typename T_t>
 void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
-{
+{ untested();
     unsigned n = O.size();
     typedef unsigned vertex_descriptor;
 
@@ -379,7 +376,7 @@ void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
             > bags(n);
 
     // stuff center and friends into "skeleton"
-    for(unsigned int i = 0; i < O.size(); i++){
+    for(unsigned int i = 0; i < O.size(); i++){ untested();
         bags[i].first = O[i];
         make_clique_and_detach(O[i], G, bags[i].second);
     }
@@ -393,8 +390,8 @@ template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t &G,
                          std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O,
                          T_t &T)
-{
-    if(boost::num_vertices(G) == 0){
+{ untested();
+    if(boost::num_vertices(G) == 0){ untested();
         boost::add_vertex(T);
         return;
     }
@@ -404,7 +401,7 @@ void ordering_to_treedec(G_t &G,
 
 template <typename G_t, typename T_t>
 void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
-{
+{ untested();
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_(O.size());
     for(unsigned int i = 0; i < O.size(); i++){ O_[i] = O[i]; }
 
@@ -417,10 +414,10 @@ namespace draft{
 template <typename G_t, typename O_t, class T>
 void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         boost::adjacency_matrix<boost::directedS> *em=NULL )
-{
+{ untested();
     size_t num_vert = boost::num_vertices(G);
 
-    if(num_vert == 0){
+    if(num_vert == 0){ untested();
         boost::add_vertex(t);
         return;
     }
@@ -433,16 +430,16 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
     bamd* b;
     if(em){ untested();
         b = em;
-    }else{
+    }else{ untested();
         // TODO: free!
         b = new boost::adjacency_matrix<boost::directedS>(num_vert);
     }
     bamd& bags=*b;
 
-    if(io){
+    if(io){ untested();
         assert(io->size()==num_vert);
     }
-    else{
+    else{ untested();
         iOlocal.resize(num_vert);
         io=&iOlocal;
     }
@@ -453,37 +450,37 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
     std::vector<unsigned> edges(num_vert-1u, invalid);
     assert(edges.size()==num_vert-1);
 
-    for(unsigned i = 0; i < num_vert; i++){
+    for(unsigned i = 0; i < num_vert; i++){ untested();
         iO[O[i]] = i;
     }
 
-    for(unsigned i = 0; i < num_vert; i++){
+    for(unsigned i = 0; i < num_vert; i++){ untested();
         auto R=boost::adjacent_vertices(O[i], G);
-        for(;R.first!=R.second;++R.first) {
+        for(;R.first!=R.second;++R.first) { untested();
             unsigned n_node = *R.first;
-            if((unsigned)iO[n_node] > i){
+            if((unsigned)iO[n_node] > i){ untested();
                 boost::add_edge(i, n_node, bags);
             }
         }
     }
 
-    for(unsigned i = 0; i < num_vert; i++){
+    for(unsigned i = 0; i < num_vert; i++){ untested();
         std::vector<unsigned> N;
-        for(unsigned j = 0; j < num_vert; j++){
-            if(boost::edge(i, j, bags).second){
+        for(unsigned j = 0; j < num_vert; j++){ untested();
+            if(boost::edge(i, j, bags).second){ untested();
                 N.push_back(j);
                 unsigned iO_n_node = iO[j];
-                if(iO_n_node < edges[i]){
+                if(iO_n_node < edges[i]){ untested();
                     edges[i] = iO_n_node;
                 }
             }
         }
 
-        for(unsigned j = 0; j < N.size(); j++){
-            for(unsigned k = 0; k < N.size(); k++){
-                if(iO[N[k]] > iO[N[j]]){
+        for(unsigned j = 0; j < N.size(); j++){ untested();
+            for(unsigned k = 0; k < N.size(); k++){ untested();
+                if(iO[N[k]] > iO[N[j]]){ untested();
                     boost::add_edge(iO[N[j]], N[k], bags);
-                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
+                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){ untested();
                         edges[iO[N[j]]] = iO[N[k]];
                     }
                 }
@@ -491,24 +488,24 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         }
     }
 
-    for(unsigned i = 0; i < num_vert; i++){
+    for(unsigned i = 0; i < num_vert; i++){ untested();
         boost::add_vertex(t);
         auto& b=boost::get(treedec::bag_t(), t, i);
         push(b, O[i]);
-        for(unsigned j = 0; j < num_vert; j++){
-            if(boost::edge(i, j, bags).second){
+        for(unsigned j = 0; j < num_vert; j++){ untested();
+            if(boost::edge(i, j, bags).second){ untested();
                 push(b, j);
             }
          }
      }
 
-    for(unsigned i = 0; i < num_vert-1u; i++){
+    for(unsigned i = 0; i < num_vert-1u; i++){ untested();
         assert(edges[i]>i || edges[i]==invalid);
-        if(edges[i]!=invalid){
+        if(edges[i]!=invalid){ untested();
             // normal edge, as computed above.
             boost::add_edge(i, edges[i], t);
         }
-        else if(i+1!=num_vert){
+        else if(i+1!=num_vert){ untested();
             // edge to next component
             boost::add_edge(i, i+1, t);
         }
@@ -518,7 +515,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
         }
     }
 
-    if(!em){
+    if(!em){ untested();
         delete &bags;
     }
 }
@@ -530,32 +527,32 @@ namespace impl{
 template <typename G_t, typename T_t>
 void treedec_to_ordering(T_t &T,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
-{
+{ untested();
     bool leaf_found = false;
 
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){ untested();
+        if(boost::out_degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){ untested();
             leaf = *tIt;
             leaf_found = true;
             break;
         }
     }
 
-    if(leaf_found){
+    if(leaf_found){ untested();
         typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(leaf, T);
         parent = *nIt;
 
         typename treedec_traits<T_t>::bag_type difference;
 
-        if(boost::out_degree(leaf, T) == 1){
+        if(boost::out_degree(leaf, T) == 1){ untested();
             if(!std::includes(bag(parent, T).begin(),
                               bag(parent, T).end(),
                               bag(leaf, T).begin(),
                               bag(leaf, T).end()))
-            {
+            { untested();
                 std::set_difference(bag(leaf, T).begin(),
                                     bag(leaf, T).end(),
                                     bag(parent, T).begin(),
@@ -564,13 +561,13 @@ void treedec_to_ordering(T_t &T,
             }
             boost::clear_vertex(leaf, T);
         }
-        else{
+        else{ untested();
             difference = MOVE(bag(leaf, T));
         }
 
         for(typename treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();
             sIt != difference.end(); sIt++)
-        {
+        { untested();
             O.push_back(*sIt);
         }
 
@@ -585,16 +582,16 @@ void treedec_to_ordering(T_t &T,
 template <typename G_t, typename T_t>
 void treedec_to_ordering(T_t &T,
       std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
-{
-    if(boost::num_vertices(T) == 0){
+{ untested();
+    if(boost::num_vertices(T) == 0){ untested();
         return;
     }
-    else if(boost::num_vertices(T) == 1){
+    else if(boost::num_vertices(T) == 1){ untested();
         typename boost::graph_traits<T_t>::vertex_descriptor t =
                                                    *(boost::vertices(T).first);
         for(typename treedec_traits<T_t>::bag_type::iterator sIt =
                             bag(t, T).begin(); sIt != bag(t, T).end(); sIt++)
-        {
+        { untested();
             O.push_back(*sIt);
         }
         return;
@@ -612,32 +609,32 @@ void make_filled_graph(G_t &G,
       std::vector<std::vector<std::pair<
       typename boost::graph_traits<G_t>::vertex_descriptor,
       typename boost::graph_traits<G_t>::vertex_descriptor> > > &F)
-{
+{ untested();
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     C.resize(elim_ordering.size());
     F.resize(elim_ordering.size());
 
     std::vector<BOOL> visited(boost::num_vertices(G), false);
 
-    for(unsigned int i = 0; i < elim_ordering.size(); i++){
+    for(unsigned int i = 0; i < elim_ordering.size(); i++){ untested();
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
         std::set<vertex_descriptor> N_i, E_i;
         C[i].insert(elim_ordering[i]);
 
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(elim_ordering[i], G); nIt != nEnd; nIt++){ untested();
             auto pos=boost::get(boost::vertex_index, G, *nIt);
-            if(!visited[pos]){
+            if(!visited[pos]){ untested();
                 C[i].insert(*nIt);
             }
         }
 
         for(typename std::set<vertex_descriptor>::iterator sIt1 =
             C[i].begin(); sIt1 != C[i].end(); sIt1++)
-        {
+        { untested();
             typename std::set<vertex_descriptor>::iterator sIt2 = sIt1;
             sIt2++;
-            for(; sIt2 != C[i].end(); sIt2++){
-                if(!boost::edge(*sIt1, *sIt2, G).second){
+            for(; sIt2 != C[i].end(); sIt2++){ untested();
+                if(!boost::edge(*sIt1, *sIt2, G).second){ untested();
                     typename std::pair<vertex_descriptor, vertex_descriptor> edge;
                     edge.first = *sIt1;
                     edge.second = *sIt2;
@@ -654,7 +651,7 @@ void make_filled_graph(G_t &G,
 
 template <typename G_t, typename E_t>
 void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
-{
+{ untested();
     unsigned int nv = boost::num_vertices(G);
     std::vector<BOOL> visited(nv);
     std::vector<float> label(nv);
@@ -664,7 +661,7 @@ void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
     //Initializing.
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
         unsigned int pos = get_pos(*vIt, G);
         label[pos] = 1.0;
         alpha_inv[i++] = false;
@@ -673,13 +670,13 @@ void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
 
     unsigned int k = 1;
 
-    for(int i = boost::num_vertices(G)-1; i >= 0; i--){
+    for(int i = boost::num_vertices(G)-1; i >= 0; i--){ untested();
         typename boost::graph_traits<G_t>::vertex_descriptor v = *vIt;
         unsigned int max = 0;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
             unsigned int pos = get_pos(*vIt, G);
-            if(!alpha_inv[pos]){
-                if(label[pos] > max){
+            if(!alpha_inv[pos]){ untested();
+                if(label[pos] > max){ untested();
                     max = (unsigned int) label[pos];
                     v = *vIt;
                 }
@@ -689,52 +686,52 @@ void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
         visited[pos] = true;
         alpha_inv[pos] = true;
 
-        for(unsigned int j = 0; j < k; j++){
+        for(unsigned int j = 0; j < k; j++){ untested();
             reached_i[j].clear();
         }
 
-        for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(!alpha_inv[j]){
+        for(unsigned int j = 0; j < alpha_inv.size(); j++){ untested();
+            if(!alpha_inv[j]){ untested();
                 visited[j] = false;
             }
         }
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){ untested();
             unsigned int posn = get_pos(*nIt, G);
-            if(!alpha_inv[posn]){
+            if(!alpha_inv[posn]){ untested();
                 reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
                 label[posn] += 0.5;
             }
         }
 
-        for(unsigned int j = 0; j < k; j++){
-            while(reached_i[j].size() != 0){
+        for(unsigned int j = 0; j < k; j++){ untested();
+            while(reached_i[j].size() != 0){ untested();
                 typename boost::graph_traits<G_t>::vertex_descriptor w = reached_i[j].back();
 
                 reached_i[j].pop_back();
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){ untested();
                     unsigned int posn = get_pos(*nIt, G);
-                    if(visited[posn]){
+                    if(visited[posn]){ untested();
                         continue;
                     }
 
                     visited[posn] = true;
-                    if((unsigned int)label[posn]-1 > j){
+                    if((unsigned int)label[posn]-1 > j){ untested();
                         reached_i[(int)label[posn]].push_back(*nIt);
                         label[posn] += 0.5;
                         auto edge = std::make_pair(v, *nIt);
                         fill_in_edges.push_back(edge);
                     }
-                    else{
+                    else{ untested();
                         reached_i[j].push_back(*nIt);
                     }
                 }
             }
         }
 
-        for(unsigned int j = 0; j < label.size(); j++){
+        for(unsigned int j = 0; j < label.size(); j++){ untested();
             label[j] = (float)roundf(label[j]);
             k = (k > (unsigned int)label[j])? k : (unsigned int)label[j];
         }
@@ -744,7 +741,7 @@ void LEX_M_fill_in(G_t &G, E_t &fill_in_edges)
 template <typename G_t>
 void LEX_M_minimal_ordering(const G_t &G,
      typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &alpha)
-{
+{ untested();
     unsigned int nv = boost::num_vertices(G);
     alpha.resize(boost::num_vertices(G));
     std::vector<BOOL> visited(nv);
@@ -754,7 +751,7 @@ void LEX_M_minimal_ordering(const G_t &G,
 
     unsigned int i = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
         unsigned int pos = get_pos(*vIt, G);
         label[pos] = 1.0;
         alpha_inv[i++] = 0;
@@ -763,13 +760,13 @@ void LEX_M_minimal_ordering(const G_t &G,
 
     unsigned int k = 1;
 
-    for(int i = boost::num_vertices(G)-1; i >= 0; i--){
+    for(int i = boost::num_vertices(G)-1; i >= 0; i--){ untested();
         typename boost::graph_traits<G_t>::vertex_descriptor v=*vEnd;
         unsigned max = 0;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
             unsigned int pos = get_pos(*vIt, G);
-            if(!alpha_inv[pos]){
-                if((unsigned int)label[pos] > max){
+            if(!alpha_inv[pos]){ untested();
+                if((unsigned int)label[pos] > max){ untested();
                     max = (unsigned int) label[pos];
                     v = *vIt;
                 }
@@ -780,50 +777,50 @@ void LEX_M_minimal_ordering(const G_t &G,
         alpha[i] = v;
         alpha_inv[posv] = true;
 
-        for(unsigned int j = 0; j < k; j++){
+        for(unsigned int j = 0; j < k; j++){ untested();
             reached_i[j].clear();
         }
 
-        for(unsigned int j = 0; j < alpha_inv.size(); j++){
-            if(!alpha_inv[j]){
+        for(unsigned int j = 0; j < alpha_inv.size(); j++){ untested();
+            if(!alpha_inv[j]){ untested();
                 visited[j] = false;
             }
         }
 
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G); nIt != nEnd; nIt++){ untested();
             unsigned int posn = get_pos(*nIt, G);
-            if(!alpha_inv[posn]){
+            if(!alpha_inv[posn]){ untested();
                 reached_i[(int)label[posn]-1].push_back(*nIt);
                 visited[posn] = true;
                 label[posn] += 0.5;
             }
         }
 
-        for(unsigned int j = 0; j < k; j++){
-            while(reached_i[j].size() != 0){
+        for(unsigned int j = 0; j < k; j++){ untested();
+            while(reached_i[j].size() != 0){ untested();
                 typename boost::graph_traits<G_t>::vertex_descriptor w = reached_i[j].back();
 
                 reached_i[j].pop_back();
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(w, G); nIt != nEnd; nIt++){ untested();
                     unsigned int posn = get_pos(*nIt, G);
-                    if(visited[posn]){
+                    if(visited[posn]){ untested();
                         continue;
                     }
 
                     visited[posn] = true;
-                    if((unsigned int)label[posn]-1 > j){
+                    if((unsigned int)label[posn]-1 > j){ untested();
                         reached_i[(int)label[posn]].push_back(*nIt);
                         label[posn] += 0.5;
                     }
-                    else{
+                    else{ untested();
                         reached_i[j].push_back(*nIt);
                     }
                 }
             }
         }
 
-        for(unsigned int j = 0; j < label.size(); j++){
+        for(unsigned int j = 0; j < label.size(); j++){ untested();
             label[j] = (float)roundf(label[j]);
             k = (k > (unsigned int)label[j])? k : (unsigned int)label[j];
         }
@@ -831,7 +828,7 @@ void LEX_M_minimal_ordering(const G_t &G,
 
 /*
     unsigned max = 0;
-    for(unsigned int j = 0; j < label.size(); j++){
+    for(unsigned int j = 0; j < label.size(); j++){ untested();
         max = (label[j] > max)? label[j] : max;
     }
 

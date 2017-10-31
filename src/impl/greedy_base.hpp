@@ -193,11 +193,12 @@ public:
     }
 
     // later
-//    O_t& elimination_ordering() const { untested();
-//        return *_o;
-//    }
+    O_t& get_elimination_ordering() const { untested();
+        return *_o;
+    }
+
     template<class O>
-    void elimination_ordering(O& o) const{
+    void get_elimination_ordering(O& o) const{
 		 if(_i){
 		 }else{untested();
 		 }

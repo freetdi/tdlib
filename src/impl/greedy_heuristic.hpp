@@ -28,32 +28,29 @@
 
 #include "../algo.hpp"
 
-namespace treedec{ //
+namespace treedec{
 
-namespace impl{ //
+namespace impl{
 
-template <typename G_t, typename T_t, typename O_t, template<class G, class...> class CFGT_t=algo::default_config>
+// TODO: how does this relate to greedy_base?
+template<class G_t, template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_heuristic_base : public ::treedec::algo::draft::algo1{
 public:
     typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
+    typedef typename treedec::graph_traits<G_t>::treedec_type T_t;
     typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename std::vector<vertex_descriptor> bag_t;
+    typedef typename std::vector<vertex_descriptor> O_t;
 
-    greedy_heuristic_base(G_t &G, T_t *T, O_t *O, unsigned ub, bool ignore_isolated_vertices=false)
-      : algo1("."), _g(G), _t(T), _o(O), _own_o(!O), _ub_in(ub), _iiv(ignore_isolated_vertices), _i(0),
+    greedy_heuristic_base(G_t &G, unsigned ub, bool ignore_isolated_vertices=false)
+      : algo1("."), _g(G), _t(NULL), _own_o(),
+        _ub_in(ub), _iiv(ignore_isolated_vertices), _i(0),
         _min(0), _ub(0), _current_N(&bag_i), _num_vert(boost::num_vertices(_g))
     {
-        if(_own_o){
-            _o = new O_t;
-        }
-
-        //the following seems to be unnecessary
-        if(_t){
-            _bags.resize(_num_vert);
-        }
-
+        _o = new O_t;
         _o->resize(_num_vert);
+        _do_tree_decomposition=true; // for now.
     }
 
 
@@ -63,8 +60,20 @@ public:
         }
     }
 
-    void tree_decomposition(){
-        assert(_t);
+    O_t& get_elimination_ordering() const { untested();
+        return *_o;
+    }
+
+#if 0
+    template<class O>
+    void get_elimination_ordering(O& o) const { untested();
+        O = *_o; // doesnt work like this.
+    }
+#endif
+
+    template<class T>
+    void get_tree_decomposition(T& t)const{
+        std::cerr << "hmm " << _o->size() << " " << _bags.size() << "\n";
         assert(_o->size()<=_bags.size()); // this is obsolete anyway
         assert(_o->size()==_num_vert); // this is relevant.
 
@@ -82,15 +91,11 @@ public:
             // io[ (*_o)[i] ] = i;
         }
 
-        treedec::detail::skeleton_to_treedec(_g, *_t, bags, *_o, _i);
+        treedec::detail::skeleton_to_treedec(_g, t, bags, *_o, _i);
     }
 
     vertices_size_type get_bagsize(){
         return _ub+1;
-    }
-
-    O_t& elimination_ordering() {
-        return *_o;
     }
 
     virtual void initialize() = 0;
@@ -98,12 +103,26 @@ public:
     virtual void eliminate(vertex_descriptor v) = 0;
     virtual void postprocessing() = 0;
 
-    void do_it(){
+    void disable_td(){
+        // stupid hack
+        _do_tree_decomposition = true;
+    }
+
+    void do_it() {
+        if(_do_tree_decomposition){
+            _t=new T_t;
+            // bags seem to be unnecessary
+            _bags.resize(_num_vert);
+        }else{untested();
+        }
+
+
         timer_on();
 
         if(!_num_vert){
             timer_off();
             return;
+        }else{
         }
 
         assert(_o);
@@ -135,6 +154,7 @@ public:
 
             if(_t){
                 _current_N = &_bags[_i];
+            }else{
             }
 
             _ub = (boost::out_degree(c, _g)>_ub)?boost::out_degree(c, _g):_ub;
@@ -145,6 +165,7 @@ public:
 
             if(!_t){
                 _current_N->clear();
+            }else{
             }
 
             ++_i;
@@ -178,29 +199,36 @@ protected:
     bag_t* _current_N;
 
     unsigned _num_vert;
-
+private:
+    bool _do_tree_decomposition;
 };
 
 
-template <typename G_t, typename T_t, typename O_t>
-class minDegree : public greedy_heuristic_base<G_t, T_t, O_t>{
+template <typename G_t, template<class G, class...> class CFG=algo::default_config>
+class minDegree : public greedy_heuristic_base<G_t, CFG>{
 public:
-    typedef greedy_heuristic_base<G_t, T_t, O_t> baseclass;
+    typedef greedy_heuristic_base<G_t, CFG> baseclass;
 
     typedef typename deg_chooser<G_t>::type degs_type;
 
-    minDegree(G_t &g, T_t *t, O_t *o,
+    minDegree(G_t &g,
                     unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
-        : baseclass(g, t, o, ub, ignore_isolated_vertices),
+        : baseclass(g, ub, ignore_isolated_vertices),
          _degs(baseclass::_g)
     {
     }
 
-    minDegree(G_t &G, O_t& o, bool ignore_isolated_vertices)
-        : baseclass(G, NULL, &o, -1u, ignore_isolated_vertices),
+    minDegree(G_t &G, bool ignore_isolated_vertices)
+        : baseclass(G, -1u, ignore_isolated_vertices),
           _degs(baseclass::_g)
     {
     }
+
+#if 0 // base
+    void get_elimination_ordering(){ untested();
+        // incomplete()
+    }
+#endif
 
     void initialize(){
         auto zerodegbag1=MOVE(_degs.detach_bag(0));
@@ -258,12 +286,11 @@ private:
 }; // minDegree
 
 
-
 // the fillIn heuristic.
-template <typename G_t, typename T_t, typename O_t>
-class fillIn : public greedy_heuristic_base<G_t, T_t, O_t>{
+template <typename G_t, template<class G, class...> class CFGT_t=algo::default_config>
+class fillIn : public greedy_heuristic_base<G_t, CFGT_t>{
 public: //types
-    typedef greedy_heuristic_base<G_t, T_t, O_t> baseclass;
+    typedef greedy_heuristic_base<G_t, CFGT_t> baseclass;
     typedef typename fill_chooser<G_t>::type fill_type;
 
     struct fill_update_cb : public graph_callback<G_t>{
@@ -298,15 +325,14 @@ public: //types
     }; // update_cb
 
 public: // construct
-    fillIn(G_t &g, T_t *t, O_t *o,
-                    unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
-        : baseclass(g, t, o, ub, ignore_isolated_vertices),
+    fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
+        : baseclass(g, ub, ignore_isolated_vertices),
          _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
     {
     }
 
-    fillIn(G_t &G, O_t& o, bool ignore_isolated_vertices, unsigned ub=-1u)
-        : baseclass(G, NULL, &o, ub, ignore_isolated_vertices),
+    fillIn(G_t &G, bool ignore_isolated_vertices, unsigned ub=-1u)
+        : baseclass(G, ub, ignore_isolated_vertices),
           _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
     {
     }

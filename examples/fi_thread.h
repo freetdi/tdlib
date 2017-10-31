@@ -37,7 +37,7 @@ public:
 		  size_t numbags = boost::num_vertices(_work); // ask P?!
 		  P.head(numbags, _result);
 		  assert(_FI);
-		  _FI->tree_decomposition(P);
+		  _FI->get_tree_decomposition(P);
     }
 
     void run() { untested();
