@@ -773,6 +773,7 @@ bool is_antisymmetric(G_t const &G)
     return true;
 }
 
+#if 0
 //checks if G is connected
 template <typename G_t>
 bool is_connected(G_t const &G){ untested();
@@ -789,6 +790,7 @@ template <typename G_t>
 bool is_tree(G_t const &G){ untested();
     return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
 }
+#endif
 
 //checks if O is a permutation of V(G)
 //TODO: use vec<bool>

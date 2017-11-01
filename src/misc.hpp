@@ -183,7 +183,7 @@ bool validate_connectivity(T_t const &T){
     }
 }
 
-#if 0 // already defined?
+#if 1 // already defined?
 template <typename G_t>
 bool is_tree(G_t const& G){
     //This is a root if G is a tree.
