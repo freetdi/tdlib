@@ -183,6 +183,7 @@ bool validate_connectivity(T_t const &T){
     }
 }
 
+#if 0 // already defined?
 template <typename G_t>
 bool is_tree(G_t const& G){
     //This is a root if G is a tree.
@@ -197,6 +198,7 @@ bool is_tree(G_t const& G){
     //root itself is not contained in components[0].
     return (components[0].size()+1 == boost::num_vertices(G));
 }
+#endif
 
 
 /* Check if a tree decomposition is valid with respect to G.

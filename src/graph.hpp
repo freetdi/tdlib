@@ -69,7 +69,7 @@ namespace treedec{
 template<typename G_t>
 inline typename boost::graph_traits<G_t>::vertices_size_type
    get_pos(typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const& G)
-{
+{ untested();
     return boost::get(boost::vertex_index, G, v);
 }
 #endif
@@ -83,16 +83,16 @@ void contract_edge(vertex_descriptor_G v,
                    vertex_descriptor_G target,
                    G &g,
                    vertex_callback<vertex_descriptor_G>* cb=NULL)
-{
+{ untested();
     adjacency_iterator_G I, E;
-    for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){
+    for(boost::tie(I, E)=boost::adjacent_vertices(v, g); I!=E; ++I){ untested();
         assert(boost::edge(v, *I, g).second);
-        if(*I != target){
+        if(*I != target){ untested();
             bool added=treedec::add_edge(target, *I, g).second;
-            if(added){
+            if(added){ untested();
                 //rebasing edge from I-v to I-target.
             }
-            else if(cb){
+            else if(cb){ untested();
                 //did not add, degree will drop by one.
                 (*cb)(*I);
             }
@@ -109,13 +109,13 @@ void contract_edge(vertex_descriptor_G v,
 // (no longer?!) returns the number of newly created edges.
 template<typename B, typename E, typename G_t>
 void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* cb=NULL)
-{
+{ untested();
     return impl::make_clique(nIt1, nEnd, G, cb);
 }
 
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{
+{ untested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
     boost::tie(nIt1, nEnd) = nIter;
     make_clique(nIt1, nEnd, G, cb);
@@ -124,24 +124,24 @@ void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
 // insert the neighbors of v in G into B
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, G_t const &G)
-{
+{ untested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
-    for(; nIt!=nEnd; ++nIt){
+    for(; nIt!=nEnd; ++nIt){ untested();
         B.insert(*nIt);
     }
 }
 
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, V_t w, G_t const &G)
-{
+{ untested();
     insert_neighbours(B, v, G);
     insert_neighbours(B, w, G);
 }
 
 template<typename B_t, typename V_t, typename G_t>
 void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
-{
+{ untested();
     insert_neighbours(B, v, w, G);
     insert_neighbours(B, x, G);
 }
@@ -151,10 +151,10 @@ void insert_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
 // equivalent to B = outedge_set(v, G) where applicable
 template<typename B_t, typename V_t, typename G_t>
 void assign_neighbours(B_t &B, V_t v, G_t const &G)
-{
+{ untested();
     typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
     boost::tie(nIt, nEnd) = boost::adjacent_vertices(v, G);
-    for(; nIt!=nEnd; ++nIt){
+    for(; nIt!=nEnd; ++nIt){ untested();
         B.insert(B.end(), *nIt);
     }
 }
@@ -162,7 +162,7 @@ void assign_neighbours(B_t &B, V_t v, G_t const &G)
 // insert neighbors of both vertices, after clearing B
 template<typename B_t, typename V_t, typename G_t>
 void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
-{
+{ untested();
     B.clear();
     insert_neighbours(B, v, w, G);
     insert_neighbours(B, x, G);
@@ -172,15 +172,15 @@ void assign_neighbours(B_t &B, V_t v, V_t w, V_t x, G_t const &G)
 template <typename G_t>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_min_degree_vertex(const G_t &G, bool ignore_isolated_vertices=false)
-{
+{ untested();
     unsigned int min_degree = UINT_MAX;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     boost::tie(vIt, vEnd) = boost::vertices(G);
     typename boost::graph_traits<G_t>::vertex_descriptor min_vertex = *vIt++;
-    for(; vIt != vEnd; vIt++){
+    for(; vIt != vEnd; vIt++){ untested();
         unsigned int degree = boost::out_degree(*vIt, G);
-        if(degree <= min_degree){
+        if(degree <= min_degree){ untested();
             if(ignore_isolated_vertices && degree == 0){ continue; }
             min_degree = degree;
             min_vertex = *vIt;
@@ -200,23 +200,23 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 template <typename G_t>
 inline void make_degree_sequence(const G_t &G,
           std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &degree_sequence)
-{
+{ untested();
     unsigned int max_degree = 0;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
         unsigned int degree = boost::out_degree(*vIt, G);
         max_degree = (degree>max_degree)? degree : max_degree;
     }
 
     std::vector<std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> > buckets(max_degree+1);
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
         unsigned int degree = boost::out_degree(*vIt, G);
-        if(degree > 0){
+        if(degree > 0){ untested();
             buckets[degree].push_back(*vIt);
         }
     }
-    for(unsigned int i = 1; i <= max_degree; i++){
-        for(unsigned int j = 0; j < buckets[i].size(); j++){
+    for(unsigned int i = 1; i <= max_degree; i++){ untested();
+        for(unsigned int j = 0; j < buckets[i].size(); j++){ untested();
             degree_sequence.push_back(buckets[i][j]);
         }
     }
@@ -238,7 +238,7 @@ std::pair<typename boost::graph_traits<typename graph_traits<G_t>::directed_over
 
 
 template<class G_t>
-struct deg_chooser { //
+struct deg_chooser {
     typedef typename misc::DEGS<G_t> type;
     typedef type degs_type; // transition? don't use.
 };
@@ -253,14 +253,14 @@ template<class G_t, class B_t>
 inline void detach_neighborhood(
         typename boost::graph_traits<G_t>::vertex_descriptor c,
         G_t& g, typename std::set<B_t> &bag)
-{
+{ untested();
     assert(boost::is_undirected(g));
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
 
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
-    {
+    { untested();
         bag.insert(get_vd(g, *nIt1));
     }
     boost::clear_vertex(c, g);
@@ -271,7 +271,7 @@ template<class G_t, class B_t>
 inline void detach_neighborhood(
         typename boost::graph_traits<G_t>::vertex_descriptor c,
         G_t& g, typename std::vector<B_t> &bag)
-{
+{ untested();
     assert(boost::is_undirected(g));
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
@@ -279,7 +279,7 @@ inline void detach_neighborhood(
 
     unsigned i = 0;
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
-    {
+    { untested();
         bag[i++] = get_vd(g, *nIt1);
     }
     boost::clear_vertex(c, g);
@@ -293,15 +293,15 @@ inline void detach_neighborhood(
 template <typename G_t>
 inline size_t count_missing_edges(
         const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
-{
+{ untested();
     size_t missing_edges = 0;
 
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){ untested();
         nIt2 = nIt1;
         nIt2++;
-        for(; nIt2 != nEnd; nIt2++){
-            if(!boost::edge(*nIt1, *nIt2, G).second){
+        for(; nIt2 != nEnd; nIt2++){ untested();
+            if(!boost::edge(*nIt1, *nIt2, G).second){ untested();
                 ++missing_edges;
             }
         }
@@ -324,7 +324,7 @@ void make_clique_and_detach(
         typename boost::graph_traits<G>::vertex_descriptor c,
         G& g, B& bag,
         treedec::graph_callback<G>* cb=NULL)
-{
+{ untested();
     detach_neighborhood(c, g, bag);
     make_clique(bag.begin(), bag.end(), g, cb);
 }
@@ -344,7 +344,7 @@ namespace detail{ //
                         vertex_descriptor s, G const& g)
             : adjacency_iterator(v), _ve(ve),
               _s(s), _g(g)
-        {
+        { untested();
             skip();
         }
         shared_adj_iter(vertex_descriptor v,
@@ -357,10 +357,10 @@ namespace detail{ //
         }
         shared_adj_iter(const shared_adj_iter& p)
             : adjacency_iterator(p), _ve(p._ve), _s(p._s), _g(p._g)
-        {
+        { untested();
         }
     public: //ops
-        shared_adj_iter& operator++(){
+        shared_adj_iter& operator++(){ untested();
             assert(_ve!=adjacency_iterator(*this));
             assert(adjacency_iterator(*this)!=_ve);
             adjacency_iterator::operator++();
@@ -370,13 +370,13 @@ namespace detail{ //
         }
     private:
         void skip()
-        {
-            while(true){
+        { untested();
+            while(true){ untested();
                 if(baseclass(*this)==_ve){
                     return;
-                }else if(!boost::edge(**this, _s, _g).second){
+                }else if(!boost::edge(**this, _s, _g).second){ untested();
                     adjacency_iterator::operator++();
-                }else{
+                }else{ untested();
                     return;
                 }
             }
@@ -395,7 +395,7 @@ std::pair<detail::shared_adj_iter<G>, detail::shared_adj_iter<G> >
 inline common_out_edges(typename boost::graph_traits<G>::vertex_descriptor v,
         typename boost::graph_traits<G>::vertex_descriptor w,
         const G& g)
-{
+{ untested();
     typedef typename detail::shared_adj_iter<G> Iter;
 
     auto p=boost::adjacent_vertices(v, g);
@@ -409,7 +409,7 @@ template<class G_t>
 bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
                  typename boost::graph_traits<G_t>::vertex_descriptor w,
                  const G_t& G)
-{
+{ untested();
     typename graph_traits<G_t>::outedge_set_type N1, N2;
     assign_neighbours(N1, v, G);
     assign_neighbours(N2, w, G);
@@ -424,7 +424,7 @@ bool check_twins(typename boost::graph_traits<G_t>::vertex_descriptor v,
 template<class G>
 void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
    std::vector<typename boost::graph_traits<G>::vertex_descriptor>* ordering=NULL)
-{
+{ untested();
     typedef typename graph_traits<G>::immutable_type immutable_type;
 //    typedef typename graph_traits<G>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
@@ -440,24 +440,24 @@ void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
         // inefficient.
         ig = MOVE(immutable_type(boost::num_vertices(g)));
     }else if(boost::num_edges(ig)){ untested();
-        for(unsigned i=0; i<boost::num_vertices(g); ++i){
+        for(unsigned i=0; i<boost::num_vertices(g); ++i){ untested();
             boost::clear_vertex(i, ig);
         }
     }
 
     std::vector<unsigned> inverse_ordering(boost::num_vertices(g));
-    for(unsigned o=0; o<boost::num_vertices(g); ++o){
+    for(unsigned o=0; o<boost::num_vertices(g); ++o){ untested();
         assert((*ordering)[o] < inverse_ordering.size());
         inverse_ordering[(*ordering)[o]] = o;
     }
 
-    for(unsigned o=0; o<boost::num_vertices(g); ++o){
+    for(unsigned o=0; o<boost::num_vertices(g); ++o){ untested();
         assert((*ordering)[inverse_ordering[o]] == o);
     }
 
     edge_iterator e, eend;
     boost::tie(e,eend) = boost::edges(g);
-    for(;e!=eend; ++e){
+    for(;e!=eend; ++e){ untested();
         vertex_descriptor s = boost::source(*e, g);
         vertex_descriptor t = boost::target(*e, g);
         assert(inverse_ordering[s] < boost::num_vertices(ig));
@@ -474,25 +474,25 @@ public:
     is_in_neighbour_bd(T_t const& T,
         typename boost::graph_traits<T_t>::vertex_descriptor t)
        : _T(T), _t(t)
-    {
+    { untested();
     }
 public:
     bool operator() (VD_t vd1, VD_t vd2)
-    {
+    { untested();
         assert(vd1!=vd2);
-        if(vd1<vd2){
+        if(vd1<vd2){ untested();
         }
 
         typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
         bag_iterator nIt, nEnd;
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(_t, _T);
-        for(; nIt != nEnd; nIt++){
+        for(; nIt != nEnd; nIt++){ untested();
             BOOST_AUTO(const& ibag, bag(*nIt, _T));
 
             // BUG, does not work on vectors.
-            if(ibag.find(vd1)==ibag.end()){
-            }else if(ibag.find(vd2)==ibag.end()){
-            }else{
+            if(ibag.find(vd1)==ibag.end()){ untested();
+            }else if(ibag.find(vd2)==ibag.end()){ untested();
+            }else{ untested();
                 return true;
             }
         }
@@ -526,13 +526,13 @@ void make_symmetric(G&g, bool force_oriented=false)
     // assert(g.is_directed);
     auto EE=boost::edges(g);
     if ( /*g.oriented ||*/ force_oriented) { untested();
-        for(;EE.first!=EE.second; ++EE.first){
+        for(;EE.first!=EE.second; ++EE.first){ untested();
             auto s=boost::source(*EE.first, g);
             auto t=boost::target(*EE.first, g);
             boost::add_edge(t,s,g);
         }
     }else{ untested();
-        for(;EE.first!=EE.second; ++EE.first){
+        for(;EE.first!=EE.second; ++EE.first){ untested();
             auto s=boost::source(*EE.first, g);
             auto t=boost::target(*EE.first, g);
             if(!boost::edge(s,t,g).second){ untested();
@@ -554,7 +554,7 @@ struct edge_helper{
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    static size_type num(G const& g){
+    static size_type num(G const& g){ untested();
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
@@ -578,15 +578,15 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
                              typename boost::graph_traits<G>::directed_category*,
                              boost::directed_tag* >::value ,
                        void>::type >
-{
+{ //
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    static size_type num(G const& g){
+    static size_type num(G const& g){ untested();
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-    add(vertex_descriptor x, vertex_descriptor y, G& g){
+    add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
 
         BOOST_STATIC_ASSERT(
                 std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
@@ -609,15 +609,15 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
                              typename boost::graph_traits<G>::directed_category*,
                              boost::undirected_tag* >::value ,
                        void>::type >
-{
+{ //
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    static size_type num(G const& g){
+    static size_type num(G const& g){ untested();
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-        add(vertex_descriptor x, vertex_descriptor y, G& g){
+        add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
         trace2("add !dir bid", y ,x);
 
 	return boost::add_edge(x, y, g);
@@ -633,17 +633,18 @@ struct edge_helper<G, typename std::enable_if<
                     && std::is_convertible<
                        typename boost::graph_traits<G>::directed_category*,
                        boost::directed_tag* >::value,
-                    void>::type > {
+                    void>::type >
+{ //
     typedef typename boost::graph_traits<G>::edges_size_type size_type;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
-    static size_type num(G const& g){
+    static size_type num(G const& g){ untested();
         assert(1 ^ boost::num_edges(g)) ;
         return boost::num_edges(g)/2;
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
         add(vertex_descriptor x, vertex_descriptor y, G& g)
-    {
+    { untested();
         trace2("add dir !bid", y ,x);
         BOOST_STATIC_ASSERT(
                 !std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
@@ -662,7 +663,7 @@ struct edge_helper<G, typename std::enable_if<
 template<class G>
 inline typename boost::graph_traits<G>::edges_size_type
   num_edges(G const& g)
-{
+{ untested();
     return detail::edge_helper<G>::num(g);
 }
 
@@ -670,25 +671,25 @@ template<class G>
 inline std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
 add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
 		   typename boost::graph_traits<G>::vertex_descriptor y, G& g)
-{
+{ untested();
     return detail::edge_helper<G>::add(x, y, g);
 }
 
 template<class S, class G>
 void open_neighbourhood(S& s, G const& g)
-{
+{ untested();
     graph_helper<G>::open_neighbourhood(s, g);
 }
 
 template<class S, class G>
 void close_neighbourhood(S& s, G const& g)
-{
+{ untested();
     graph_helper<G>::close_neighbourhood(s, g);
 }
 
 template<class S, class G>
 void saturate(S& s, G const& g)
-{
+{ untested();
     graph_helper<G>::saturate(s, g);
 }
 
@@ -700,11 +701,13 @@ void saturate(S& s, G const& g)
 
 //checks if G has no self-loops
 template <typename G_t>
-bool no_loops(G_t &G){
-    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        if(boost::edge(*vIt, *vIt, G).second){
+bool no_loops(G_t const &G)
+{ untested();
+    auto p=boost::vertices(G);
+    for(; p.first!=p.second; ++p.first){ untested();
+        if(boost::edge(*p.first, *p.first, G).second){ untested();
             return false;
+        }else{ untested();
         }
     }
     return true;
@@ -713,13 +716,14 @@ bool no_loops(G_t &G){
 //checks if G has no duplicated edges
 //TODO: dont use sets but markers (see one neighbour more than once -> return false)
 template <typename G_t>
-bool no_duplicate_edges(G_t &G){
-    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+bool no_duplicate_edges(G_t const &G)
+{ untested();
+    auto p=boost::vertices(G);
+    for(; p.first!=p.second; ++p.first){ untested();
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            if(S.find(*nIt) != S.end()){
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*p.first, G); nIt != nEnd; nIt++){ untested();
+            if(S.find(*nIt) != S.end()){ untested();
                 return false;
             }
             S.insert(*nIt);
@@ -730,13 +734,15 @@ bool no_duplicate_edges(G_t &G){
 
 //checks if G is symmetric (v -> w => w -> v)
 template <typename G_t>
-bool is_symmetric(G_t &G){
-typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            if(!boost::edge(*nIt, *vIt, G).second){
+bool is_symmetric(G_t const &G)
+{ untested();
+    auto p=boost::vertices(G);
+    for(; p.first!=p.second; ++p.first){ untested();
+        auto q=boost::adjacent_vertices(*p.first, G);
+        for(; q.first!=q.second; ++q.first){ untested();
+            if(!boost::edge(*q.first, *p.first, G).second){ untested();
                 return false;
+            }else{ untested();
             }
         }
     }
@@ -745,19 +751,22 @@ typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
 
 //this means the edge set, not the boost-type
 template <typename G_t>
-bool is_undirected(G_t &G){
+bool is_undirected(G_t const &G)
+{ untested();
     return is_symmetric(G);
 }
 
 //checks if G is antisymmetric (v -> w => !(w -> v))
 template <typename G_t>
-bool is_antisymmetric(G_t &G){
-    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
-            if(boost::edge(*nIt, *vIt, G).second){
+bool is_antisymmetric(G_t const &G)
+{ untested();
+    auto p=boost::vertices(G);
+    for(; p.first!=p.second; ++p.first){ untested();
+        auto q=boost::adjacent_vertices(*p.first, G);
+        for(; q.first!=q.second; ++q.first){ untested();
+            if(boost::edge(*q.first, *p.first, G).second){ untested();
                 return false;
+            }else{ untested();
             }
         }
     }
@@ -766,7 +775,7 @@ bool is_antisymmetric(G_t &G){
 
 //checks if G is connected
 template <typename G_t>
-bool is_connected(G_t &G){
+bool is_connected(G_t const &G){ untested();
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
     get_components(G, components);
 
@@ -777,23 +786,23 @@ bool is_connected(G_t &G){
 //TODO: #edges on directed symmetric graphs is twice the number on undirected graphs..
 //TODO: additionally needs no_duplicate edges for directed graphs
 template <typename G_t>
-bool is_tree(G_t &G){
+bool is_tree(G_t const &G){ untested();
     return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
 }
 
 //checks if O is a permutation of V(G)
 //TODO: use vec<bool>
-template <typename O_t, typename G_t>
-bool is_permutation(O_t &O, G_t &G){
-    std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V
+template <typename O_t, typename G>
+bool is_permutation(O_t const &O, G const &g){ untested();
+    std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V;
 
-    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        V.insert(*vIt);
+    auto p=boost::vertices(g);
+    for(; p.first!=p.second; ++p.first){ untested();
+        V.insert(*p.first);
     }
 
-    O_t::iterator oIt;
-    for(oIt = O.begin(); oIt != O.End(); oIt++){
+    typename O_t::const_iterator oIt;
+    for(oIt = O.begin(); oIt != O.End(); oIt++){ untested();
         S.insert(*oIt);
     }
 
