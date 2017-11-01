@@ -60,7 +60,7 @@ public:
         }
     }
 
-    O_t& get_elimination_ordering() const { untested();
+    O_t& get_elimination_ordering() const {
         return *_o;
     }
 

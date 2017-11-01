@@ -75,10 +75,10 @@ public: // construct
     }
 
 public: // random stuff, should be in algo. later
-    void set_lower_bound(unsigned lb){ untested();
+    void set_lower_bound(unsigned lb){
         _low_tw = lb-1;
     }
-    unsigned lower_bound()const{ untested();
+    unsigned lower_bound()const{
         return _low_tw + 1;
     }
 

@@ -655,10 +655,10 @@ class deltaC_min_d : public treedec::algo::draft::algo1{
 public:
     deltaC_min_d(G_t &G) : algo1("lb::deltaC_min_d"), _g(G), _lb(0){}
 
-    void do_it(){ untested();
+    void do_it(){
         timer_on();
 
-        while(boost::num_edges(_g) > 0){ untested();
+        while(boost::num_edges(_g) > 0){
             //Search a minimum-degree-vertex.
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
                           = get_min_degree_vertex(_g, true); //ignore isolated vertices
@@ -671,9 +671,9 @@ public:
 
             boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, _g);
             typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt;
-            for(; nIt != nEnd; nIt++){ untested();
+            for(; nIt != nEnd; nIt++){
                 unsigned int degree = boost::out_degree(*nIt, _g);
-                if(degree <= min_degree_w){ untested();
+                if(degree <= min_degree_w){
                     min_degree_w = degree;
                     w = *nIt;
                 }
@@ -685,7 +685,7 @@ public:
         timer_off();
     }
 
-    unsigned lower_bound_bagsize(){ untested();
+    unsigned lower_bound_bagsize(){
         return _lb+1u;
     }
 
@@ -698,20 +698,20 @@ private:
 
 template <typename G_t>
 int deltaC_min_d(G_t& G)
-{ untested();
+{
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
     else if(2*E+1 == V*(V-1u)){ untested();
         return V-1;
     }
-    else{ untested();
+    else{
         impl::deltaC_min_d<G_t> deltaC_min_d(G);
         deltaC_min_d.do_it();
         return (int)deltaC_min_d.lower_bound_bagsize()-1;
@@ -726,10 +726,10 @@ class deltaC_max_d : public treedec::algo::draft::algo1{
 public:
     deltaC_max_d(G_t &G) : algo1("lb::deltaC_max_d"), _g(G), _lb(0){}
 
-    void do_it(){ untested();
+    void do_it(){
         timer_on();
 
-        while(boost::num_edges(_g) > 0){ untested();
+        while(boost::num_edges(_g) > 0){
             //Search a minimum-degree-vertex.
             typename boost::graph_traits<G_t>::vertex_descriptor min_vertex
                           = get_min_degree_vertex(_g, true); //ignore isolated vertices
@@ -742,9 +742,9 @@ public:
 
             boost::tie(nIt, nEnd) = boost::adjacent_vertices(min_vertex, _g);
             typename boost::graph_traits<G_t>::vertex_descriptor w = *nIt;
-            for(; nIt != nEnd; nIt++){ untested();
+            for(; nIt != nEnd; nIt++){
                 unsigned int degree = boost::out_degree(*nIt, _g);
-                if(degree > max_degree){ untested();
+                if(degree > max_degree){
                     max_degree = degree;
                     w = *nIt;
                 }
@@ -756,7 +756,7 @@ public:
         timer_off();
     }
 
-    unsigned lower_bound_bagsize(){ untested();
+    unsigned lower_bound_bagsize(){
         return _lb+1u;
     }
 
@@ -770,20 +770,20 @@ private:
 
 template <typename G_t>
 int deltaC_max_d(G_t& G)
-{ untested();
+{
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
-    else if(2*E == V*(V-1u)){ untested();
+    else if(2*E == V*(V-1u)){
         return V-1u;
     }
-    else{ untested();
+    else{
         impl::deltaC_max_d<G_t> deltaC_max_d(G);
         deltaC_max_d.do_it();
         return (int)deltaC_max_d.lower_bound_bagsize()-1;
@@ -1013,21 +1013,21 @@ int deltaC_least_c(G_t& G)
 /* IMPROVED GRAPHS */
 
 template <typename G_t>
-void k_neighbour_improved_graph(G_t &G, unsigned int k){ untested();
+void k_neighbour_improved_graph(G_t &G, unsigned int k){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> edges_to_add;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){ untested();
+    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
-        for(; vIt2 != vEnd; vIt2++){ untested();
-            if(!boost::edge(*vIt1, *vIt2, G).second){ untested();
+        for(; vIt2 != vEnd; vIt2++){
+            if(!boost::edge(*vIt1, *vIt2, G).second){
                 std::set<typename boost::graph_traits<G_t>::vertex_descriptor> N1, N2;
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){ untested();
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){
                     N1.insert(*nIt);
                 }
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){ untested();
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){
                     N2.insert(*nIt);
                 }
                 std::set<typename boost::graph_traits<G_t>::vertex_descriptor> intersection;
@@ -1035,7 +1035,7 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){ untested();
                 std::set_intersection(N1.begin(), N1.end(), N2.begin(), N2.end(),
                                       std::inserter(intersection, intersection.begin()));
 
-                if(intersection.size() >= k){ untested();
+                if(intersection.size() >= k){
                     edges_to_add.push_back(*vIt1);
                     edges_to_add.push_back(*vIt2);
                 }
@@ -1043,7 +1043,7 @@ void k_neighbour_improved_graph(G_t &G, unsigned int k){ untested();
         }
     }
 
-    for(unsigned int i = 0; i < edges_to_add.size(); ){ untested();
+    for(unsigned int i = 0; i < edges_to_add.size(); ){
         boost::add_edge(edges_to_add[i], edges_to_add[i+1], G);
         ++i;
         ++i;
@@ -1058,13 +1058,13 @@ class LB_improved_base : public treedec::algo::draft::algo1{
 public:
     LB_improved_base(G_t &G) : algo1(CFG_t::name()), _g(G), _lb(0){}
 
-    void do_it(){ untested();
+    void do_it(){
         timer_on();
 
         G_t H(_g);
         int lb = CFG_t::lb_algo(H);
 
-        while(true){ untested();
+        while(true){
             G_t H;
             boost::copy_graph(_g, H);
             CFG_t::improvement_algo(H, lb+1);
@@ -1072,7 +1072,7 @@ public:
             int new_lb = CFG_t::lb_algo(H);
             if(new_lb > lb){ untested();
                 lb++;
-            }else{ untested();
+            }else{
                 break;
             }
         }
@@ -1083,7 +1083,7 @@ public:
     }
 
 
-    unsigned lower_bound_bagsize(){ untested();
+    unsigned lower_bound_bagsize(){
         return _lb+1u;
     }
 
@@ -1142,33 +1142,33 @@ int LBN_deltaD(G_t const&G)
 
 template <typename G_t>
 struct CFG_LBN_deltaC{
-    static int lb_algo(G_t &H){ untested();
+    static int lb_algo(G_t &H){
         impl::deltaC_least_c<G_t> deltaC(H);
         deltaC.do_it();
         return (int)deltaC.lower_bound_bagsize() - 1;
     }
 
-    static void improvement_algo(G_t &H, unsigned k){ untested();
+    static void improvement_algo(G_t &H, unsigned k){
         treedec::lb::k_neighbour_improved_graph(H, k);
     }
 
-    static const std::string name(){ untested();
+    static const std::string name(){
         return "lb::LBN_deltaC";
     }
 };
 
 template <typename G_t>
-int LBN_deltaC(G_t &G){ untested();
+int LBN_deltaC(G_t &G){
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
-    else if(2*E == V*(V-1u)){ untested();
+    else if(2*E == V*(V-1u)){
         return V-1u;
     }
 
@@ -1191,27 +1191,27 @@ public:
     LB_improved_contraction_base(G_t &G)
       : algo1(CFG_t::name()), _g(G), _lb(0),
         _marker(boost::num_vertices(G))
-    { untested();
+    {
     }
 
-    void do_it(){ untested();
+    void do_it(){
         timer_on();
 
         G_t H(_g);
         int lb = CFG_t::lb_algo(H);
 
-        while(true){ untested();
+        while(true){
             G_t H;
             boost::copy_graph(_g, H);
             CFG_t::improvement_algo(H, lb+1);
 
             int new_lb=0;
 
-            while(boost::num_edges(H) > 0){ untested();
+            while(boost::num_edges(H) > 0){
                 new_lb = CFG_t::lb_algo(H);
                 if(new_lb > lb){ untested();
                     break;
-                }else{ untested();
+                }else{
                 }
 
                 auto min_vertex=get_min_degree_vertex(H, true); //ignore isolated vertices
@@ -1224,7 +1224,7 @@ public:
             if(new_lb > lb){ untested();
                 lb++;
             }
-            else{ untested();
+            else{
                 break;
             }
         }
@@ -1235,7 +1235,7 @@ public:
     }
 
 
-    unsigned lower_bound_bagsize(){ untested();
+    unsigned lower_bound_bagsize(){
         return _lb+1u;
     }
 
@@ -1293,33 +1293,33 @@ int LBNC_deltaD(G_t const&G)
 
 template <typename G_t>
 struct CFG_LBNC_deltaC{
-    static int lb_algo(G_t &H){ untested();
+    static int lb_algo(G_t &H){
         impl::deltaC_least_c<G_t> deltaC(H);
         deltaC.do_it();
         return (int)deltaC.lower_bound_bagsize() - 1;
     }
 
-    static void improvement_algo(G_t &H, unsigned k){ untested();
+    static void improvement_algo(G_t &H, unsigned k){
         treedec::lb::k_neighbour_improved_graph(H, k);
     }
 
-    static const std::string name(){ untested();
+    static const std::string name(){
         return "lb::LBNC_deltaC";
     }
 };
 
 template <typename G_t>
-int LBNC_deltaC(G_t &G){ untested();
+int LBNC_deltaC(G_t &G){
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
-    else if(2*E == V*(V-1u)){ untested();
+    else if(2*E == V*(V-1u)){
         return V-1u;
     }
 
@@ -1330,22 +1330,22 @@ int LBNC_deltaC(G_t &G){ untested();
 
 
 template <typename G_t>
-void k_path_improved_graph(G_t &G, unsigned int k){ untested();
+void k_path_improved_graph(G_t &G, unsigned int k){
     std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> edges_to_add;
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt1, vIt2, vEnd;
-    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){ untested();
+    for(boost::tie(vIt1, vEnd) = boost::vertices(G); vIt1 != vEnd; vIt1++){
         vIt2 = vIt1;
         vIt2++;
-        for(; vIt2 != vEnd; vIt2++){ untested();
-            if(!boost::edge(*vIt1, *vIt2, G).second){ untested();
+        for(; vIt2 != vEnd; vIt2++){
+            if(!boost::edge(*vIt1, *vIt2, G).second){
                 typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> X, Y, S;
 
                 typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){ untested();
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt1, G); nIt != nEnd; nIt++){
                     X.insert(*nIt);
                 }
-                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){ untested();
+                for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt2, G); nIt != nEnd; nIt++){
                     Y.insert(*nIt);
                 }
 
@@ -1362,7 +1362,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){ untested();
 
                 treedec::seperate_vertices(G, disabled, num_dis, X, Y, S);
 
-                if(S.size() >= k){ untested();
+                if(S.size() >= k){
                     edges_to_add.push_back(*vIt1);
                     edges_to_add.push_back(*vIt2);
                 }
@@ -1370,7 +1370,7 @@ void k_path_improved_graph(G_t &G, unsigned int k){ untested();
         }
     }
 
-    for(unsigned int i = 0; i < edges_to_add.size(); ){ untested();
+    for(unsigned int i = 0; i < edges_to_add.size(); ){
         boost::add_edge(edges_to_add[i], edges_to_add[i+1], G);
         ++i;
         ++i;
@@ -1425,33 +1425,33 @@ int LBP_deltaD(const G_t &G)
 
 template <typename G_t>
 struct CFG_LBP_deltaC{
-    static int lb_algo(G_t &H){ untested();
+    static int lb_algo(G_t &H){
         impl::deltaC_least_c<G_t> deltaC(H);
         deltaC.do_it();
         return (int)deltaC.lower_bound_bagsize() - 1;
     }
 
-    static void improvement_algo(G_t &H, unsigned k){ untested();
+    static void improvement_algo(G_t &H, unsigned k){
         treedec::lb::k_path_improved_graph(H, k);
     }
 
-    static const std::string name(){ untested();
+    static const std::string name(){
         return "lb::LBP_deltaC";
     }
 };
 
 template <typename G_t>
-int LBP_deltaC(G_t &G){ untested();
+int LBP_deltaC(G_t &G){
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
-    else if(2*E == V*(V-1u)){ untested();
+    else if(2*E == V*(V-1u)){
         return V-1u;
     }
 
@@ -1505,35 +1505,35 @@ int LBPC_deltaD(const G_t &G)
 
 template <typename G_t>
 struct CFG_LBPC_deltaC{
-    static int lb_algo(G_t &H){ untested();
+    static int lb_algo(G_t &H){
         impl::deltaC_least_c<G_t> deltaC(H);
         deltaC.do_it();
         return (int)deltaC.lower_bound_bagsize() - 1;
     }
 
-    static void improvement_algo(G_t &H, unsigned k){ untested();
+    static void improvement_algo(G_t &H, unsigned k){
         treedec::lb::k_path_improved_graph(H, k);
     }
 
-    static const std::string name(){ untested();
+    static const std::string name(){
         return "lb::LBPC_deltaC";
     }
 };
 
 template <typename G_t>
-int LBPC_deltaC(G_t &G){ untested();
+int LBPC_deltaC(G_t &G){
     unsigned int V = boost::num_vertices(G);
     unsigned int E = boost::num_edges(G);
 
-    if(V == 0){ untested();
+    if(V == 0){
         return -1;
     }
-    else if(E == 0){ untested();
+    else if(E == 0){
         return 0;
     }
-    else if(2*E == V*(V-1u)){ untested();
+    else if(2*E == V*(V-1u)){
         return V-1u;
-    }else{ untested();
+    }else{
     }
 
     impl::LB_improved_contraction_base<G_t, CFG_LBPC_deltaC<G_t> > LBPC_deltaC(G);
