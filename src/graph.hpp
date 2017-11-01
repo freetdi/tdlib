@@ -774,12 +774,15 @@ bool is_connected(G_t &G){
 }
 
 //checks if G is a tree
+//TODO: #edges on directed symmetric graphs is twice the number on undirected graphs..
+//TODO: additionally needs no_duplicate edges for directed graphs
 template <typename G_t>
 bool is_tree(G_t &G){
     return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
 }
 
 //checks if O is a permutation of V(G)
+//TODO: use vec<bool>
 template <typename O_t, typename G_t>
 bool is_permutation(O_t &O, G_t &G){
     std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V
