@@ -56,7 +56,7 @@ namespace draft {
 			_num_vertices=numvert;
 		}
 
-		size_t add_vertex() { untested();
+		size_t add_vertex() {
 			return _nva;
 		}
 		void edge(size_t x, size_t y) { itested();

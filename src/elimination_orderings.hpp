@@ -436,7 +436,7 @@ void vec_ordering_to_tree(G_t const &G, O_t &O, T& t, O_t* io=NULL,
     }
     bamd& bags=*b;
 
-    if(io){ untested();
+    if(io){
         assert(io->size()==num_vert);
     }
     else{
