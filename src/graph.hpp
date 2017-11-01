@@ -692,6 +692,117 @@ void saturate(S& s, G const& g)
     graph_helper<G>::saturate(s, g);
 }
 
+
+
+
+
+/* checks for preconditions prior to running an algorithm */
+
+//checks if G has no self-loops
+template <typename G_t>
+bool no_loops(G_t &G){
+    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        if(boost::edge(*vIt, *vIt, G).second){
+            return false;
+        }
+    }
+    return true;
+}
+
+//checks if G has no duplicated edges
+//TODO: dont use sets but markers (see one neighbour more than once -> return false)
+template <typename G_t>
+bool no_duplicate_edges(G_t &G){
+    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+            if(S.find(*nIt) != S.end()){
+                return false;
+            }
+            S.insert(*nIt);
+        }
+    }
+    return true;
+}
+
+//checks if G is symmetric (v -> w => w -> v)
+template <typename G_t>
+bool is_symmetric(G_t &G){
+typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+            if(!boost::edge(*nIt, *vIt, G).second){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+//this means the edge set, not the boost-type
+template <typename G_t>
+bool is_undirected(G_t &G){
+    return is_symmetric(G);
+}
+
+//checks if G is non-symmetric (v -> w => !(w -> v))
+template <typename G_t>
+bool is_not_symmetric(G_t &G){
+    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; nIt++){
+            if(boost::edge(*nIt, *vIt, G).second){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+//checks if G has a vertex v such that there exists a path from v to all other vertices w
+//On a tree, v is the only vertex without an incoming edge
+//On general graphs, there can
+//TODO: name misleading?
+template <typename G_t>
+bool is_oriented(G_t &G){
+    std::set<typename boost::graph_traits<G>::vertex_descriptor> S, A, R;
+
+    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        A.insert(*vIt);
+    }
+
+    typename boost::graph_traits<G>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
+        S.insert(boost::target(*eIt, G));
+    }
+
+    std::set_difference(A.begin(), A.end(), S.begin(), S.end(), std::inserter(R, R.begin()));
+
+    return R.size() == 1;
+}
+
+
+//checks if G is connected
+template <typename G_t>
+bool is_connected(G_t &G){
+    std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
+    get_components(G, components);
+
+    return components.size() == 1;
+}
+
+//checks if G is a tree
+template <typename G_t>
+bool is_tree(G_t &G){
+    return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
+}
+
 } // treedec
 
 #endif // guard
