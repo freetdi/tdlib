@@ -1,3 +1,4 @@
+#include "config.h"
 #include <set>
 #include <tdlib/trace.hpp>
 
@@ -118,12 +119,9 @@ int main()
 	do_it<cfg_t, PP_FI_TM>(h4);
 
 
-#if USE_GALA
+#ifdef USE_GALA
 	std::cout << "ppta\n";
-	//test<cfg_t, alg_A>(h);
-	ppta A(h5);
-	A.do_it(1);
-	// A.get_tree_decomposition(t); almost
+	do_it<cfg_t, ppta>(h5);
 #endif
 
 

@@ -32,6 +32,7 @@
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/bandwidth.hpp>
 #include "treedec.hpp"
+#include <boost/graph/copy.hpp>
 
 namespace treedec{
 
@@ -95,14 +96,11 @@ public:
     }
 public:
     void do_it(unsigned lb_bs=0){
-        incomplete(); // export t.
-        typename graph_traits<G_t>::treedec_type t;
-#ifndef NDEBUG
-        {
-            boost::get(bag_t(), t);
-        }
-#endif
-        try_it(t, lb_bs);
+        try_it(_t, lb_bs);
+    }
+    template<class T>
+    void get_tree_decomposition(T& t) const{
+        boost::copy_graph(_t, t);
     }
     template<class T>
     void try_it(T&, unsigned lb_bs);
@@ -113,6 +111,7 @@ private:
     void do_components(T_t&, unsigned lb_bs);
 private:
     G_t& _g;
+    typename graph_traits<G_t>::treedec_type _t;
     bool _cleanup_g;
 };
 
