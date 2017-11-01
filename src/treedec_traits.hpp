@@ -182,7 +182,15 @@ namespace boost{\
     template <>\
     struct property_map<T, treedec::bag_t>{ \
     };\
-} // boost
+} /* boost */ \
+namespace treedec{ \
+template<> \
+struct treedec_traits<T>{ \
+    typedef typename T::vertex_property_type vertex_property_type; \
+    typedef typename boost::bagstuff::gtob<T>::type bag_type; \
+    typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
+}; \
+} // treedec
 
 #endif
 // vim:ts=8:sw=4:et

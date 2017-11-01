@@ -79,7 +79,7 @@ namespace treedec{ //
 //
 template <typename G_t, typename T_t, typename O_t>
 typename boost::graph_traits<G_t>::vertices_size_type
-  minDegree_decomp(G_t &G, T_t &T, O_t *O, //TODO: should be optional//,
+  minDegree_decomp(G_t &G, T_t &T, O_t *, //TODO: should be optional//,
                       unsigned ub=UINT_MAX /* TODO: move to backend */,
                       bool ignore_isolated_vertices=false /* TODO: move to backend */)
 {

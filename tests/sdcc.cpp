@@ -62,13 +62,15 @@ typedef treedec::comb::ex17<cfg_t> ppta;
 #include <tdlib/nice_decomposition.hpp>
 
 template<class G, class A>
-static void do_it(G& g){
+static void do_it(G const& g_){
+	auto g=g_;
 	tree_dec_t t;
 	A B(g);
 	B.do_it();
 	B.get_tree_decomposition(t);
 	assert(treedec::get_bagsize(t) == 3);
 	auto nt=boost::num_vertices(t);
+	assert(  treedec::is_valid_treedecomposition(g, t));
 
 	boost::print_graph(t);
 

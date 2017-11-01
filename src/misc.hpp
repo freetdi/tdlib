@@ -134,7 +134,7 @@ void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::v
 }
 
 template <typename T_t>
-bool validate_connectivity(T_t &T){
+bool validate_connectivity(T_t const &T){
     //Compute a postorder traversal.
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
     treedec::postorder_traversal(T, S);
@@ -212,6 +212,7 @@ bool is_tree(G_t const& G){
 template <typename G_t, typename T_t>
 int check_treedec(G_t const& G, T_t const& T)
 {
+//    typedef  typename boost::graph_traits<T_t>::vertex_descriptor vertex_descriptor;
     if(boost::num_vertices(T) == 0){
         //The empty graph has a treedecomposition with 1 vertex and an empty bag.
         return -5;
@@ -704,11 +705,8 @@ void glue_two_bags(T_t &T,
 }
 
 //Glues bags with the current tree decomposition.
-template<typename T_t>
-void glue_bags(std::vector< boost::tuple<
-        typename treedec_traits<T_t>::vd_type,
-        typename treedec_traits<T_t>::bag_type
-             > > &bags, T_t &T)
+template<class B, typename T_t>
+void glue_bags(B& bags, T_t &T)
 {
     for(unsigned int i = bags.size(); i > 0; i--){
         typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
