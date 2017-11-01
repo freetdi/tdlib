@@ -749,9 +749,9 @@ bool is_undirected(G_t &G){
     return is_symmetric(G);
 }
 
-//checks if G is non-symmetric (v -> w => !(w -> v))
+//checks if G is antisymmetric (v -> w => !(w -> v))
 template <typename G_t>
-bool is_not_symmetric(G_t &G){
+bool is_antisymmetric(G_t &G){
     typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
@@ -763,30 +763,6 @@ bool is_not_symmetric(G_t &G){
     }
     return true;
 }
-
-//checks if G has a vertex v such that there exists a path from v to all other vertices w
-//On a tree, v is the only vertex without an incoming edge
-//On general graphs, there can
-//TODO: name misleading?
-template <typename G_t>
-bool is_oriented(G_t &G){
-    std::set<typename boost::graph_traits<G>::vertex_descriptor> S, A, R;
-
-    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        A.insert(*vIt);
-    }
-
-    typename boost::graph_traits<G>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt != eEnd; eIt++){
-        S.insert(boost::target(*eIt, G));
-    }
-
-    std::set_difference(A.begin(), A.end(), S.begin(), S.end(), std::inserter(R, R.begin()));
-
-    return R.size() == 1;
-}
-
 
 //checks if G is connected
 template <typename G_t>
@@ -801,6 +777,24 @@ bool is_connected(G_t &G){
 template <typename G_t>
 bool is_tree(G_t &G){
     return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
+}
+
+//checks if O is a permutation of V(G)
+template <typename O_t, typename G_t>
+bool is_permutation(O_t &O, G_t &G){
+    std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V
+
+    typename boost::graph_traits<G>::vertex_iterator vIt, vEnd;
+    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+        V.insert(*vIt);
+    }
+
+    O_t::iterator oIt;
+    for(oIt = O.begin(); oIt != O.End(); oIt++){
+        S.insert(*oIt);
+    }
+
+    return O == V;
 }
 
 } // treedec
