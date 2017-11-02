@@ -677,13 +677,13 @@ add_edge(typename boost::graph_traits<G>::vertex_descriptor x,
 
 template<class S, class G>
 void open_neighbourhood(S& s, G const& g)
-{ untested();
+{ itested();
     graph_helper<G>::open_neighbourhood(s, g);
 }
 
 template<class S, class G>
 void close_neighbourhood(S& s, G const& g)
-{ untested();
+{ itested();
     graph_helper<G>::close_neighbourhood(s, g);
 }
 

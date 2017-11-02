@@ -308,8 +308,10 @@ public:
         trace2("", boost::num_edges(gr), boost::num_edges(_g));
         trace2("", boost::num_vertices(gr), boost::num_vertices(_g));
         assert(boost::num_vertices(gr) == boost::num_vertices(_g));
+        if(!boost::is_directed(gr))
         assert(boost::num_edges(gr)*2 == boost::num_edges(_g));
         gg=gr; //MOVE(gr);
+        if(!boost::is_directed(gr))
         assert(boost::num_edges(gg)*2 == boost::num_edges(_g));
     }
     // the remaining subgraph and a vertex map subgraph->graph

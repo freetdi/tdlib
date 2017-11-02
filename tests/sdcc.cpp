@@ -68,11 +68,13 @@ static void do_it(G const& g_){
 	A B(g);
 	B.do_it();
 	B.get_tree_decomposition(t);
-	assert(treedec::get_bagsize(t) == 3);
-	auto nt=boost::num_vertices(t);
-	assert(  treedec::is_valid_treedecomposition(g, t));
-
 	boost::print_graph(t);
+	//assert(treedec::get_bagsize(t) == 3);
+	std::cout << treedec::get_bagsize(t) << "\n";
+	auto nt=boost::num_vertices(t);
+	assert(treedec::is_valid_treedecomposition(g, t));
+	treedec::nice::nicify(t);
+
 
 	for(unsigned i=0; i<nt; ++i){
 		std::cout << i << ":";
@@ -88,19 +90,11 @@ static void do_it(G const& g_){
 #ifndef INLINE_CC
 int main()
 {
-	cfg_t g(4);
-	treedec::add_edge(0, 1, g);
-	treedec::add_edge(1, 2, g);
-	boost::add_edge(2, 3, g);
-	boost::add_edge(3, 0, g);
-	assert(boost::num_edges(g)==4); // oops?
-	assert(treedec::num_edges(g)==4);
-	auto p=boost::edges(g);
-	unsigned ii=0;
-	for(; p.first!=p.second; ++p.first){
-		++ii;
-	}
-	assert(ii==4);
+	const unsigned n=16;
+	cfg_t g(n);
+#include "g.h"
+	boost::print_graph(g);
+	std::cout << "====\n";
 
 	cfg_t h1(g);
 	cfg_t h2(g);
@@ -111,14 +105,14 @@ int main()
 	std::cout << "thorup\n";
 	do_it<cfg_t, thorup>(h1);
 
-	std::cout << "PP+MD\n";
-	do_it<cfg_t, PP_MD>(h2);
+	std::cout << "skip PP+MD\n";
+//	do_it<cfg_t, PP_MD>(h2);
 
-	std::cout << "PP+FI\n";
-	do_it<cfg_t, PP_FI>(h3);
+	std::cout << "skip PP+FI\n";
+//	do_it<cfg_t, PP_FI>(h3);
 
-	std::cout << "PP+FI\n";
-	do_it<cfg_t, PP_FI_TM>(h4);
+	std::cout << "skip PP+FI\n";
+//	do_it<cfg_t, PP_FI_TM>(h4);
 
 
 #ifdef USE_GALA

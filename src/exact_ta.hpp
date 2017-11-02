@@ -66,7 +66,7 @@ namespace treedec{
 
 // cleanup later.
 template<class B, class T>
-void merge(B&b, T s)
+void merge(B&b, T const& s)
 {
 	for (auto const&v : s) {
 		treedec::insert(b, v);
@@ -1109,11 +1109,11 @@ inline void exact_ta<EXTA_a>::make_td(TD_t& td) const
   tassert(_bag_size);
 
   if(n() - cbset::size(component)) {
-    unsigned k = boost::add_vertex(td);
+    unsigned k=boost::add_vertex(td);
     auto& b=boost::get(bag_t(), td, k);
 	 T s=cbset::diff(all, component);
     treedec::merge(b, s);
-    unsigned j = make_td(solution, &td);
+    unsigned j=make_td(solution, &td);
     boost::add_edge(k, j, td);
   }else{ untested();
     // all in one...
@@ -1146,7 +1146,7 @@ inline void exact_ta<EXTA_a>::make_td(TD_t& td) const
 #endif
 }
 /*--------------------------------------------------------------------------*/
-template<class T, class TD_> // TD
+template<class T, class TD_>
 static unsigned addBag(T s, TD_* td)
 {
   unsigned k=boost::add_vertex(*td);
@@ -1177,7 +1177,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TD_* td) const
       <= _bag_size) { itested();
       int j = addBag(cbset::union_(b->component, b->neighbours()), td);
       if (k >= 0) {
-			boost::add_edge(k, j, *td);
+			boost::add_edge(j, k, *td);
       }else{ untested();
 			r = j;
 		}
@@ -1189,7 +1189,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TD_* td) const
 
     unsigned j=addBag(s, td);
     if(k >= 0){
-      boost::add_edge(k, j, *td);
+      boost::add_edge(j, k, *td);
     }else{
       r = j;
     }

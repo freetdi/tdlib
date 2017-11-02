@@ -1,4 +1,4 @@
-// Felix Salfelder 2016
+// Felix Salfelder 2016-2017
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -53,6 +53,7 @@ private:
 template <typename T_t, class S_t, class G_t, class M_t>
 void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t const& map)
 {
+	typedef typename boost::graph_traits<T_t>::vertex_descriptor treenode_descriptor;
 #ifdef DEBUG
 	for(auto& i: map){
 		std::cerr << "map " << i << "\n";
@@ -70,7 +71,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
     if(SR.first==SR.second){ untested();
         // no bags to fetch. done
     }else{
-        unsigned new_tv;
+       treenode_descriptor new_tv;
         auto next=SR.first;
 		  auto const& M=boost::get(bag_t(), src);
         for(; SR.first!=SR.second; SR.first=next){
@@ -90,7 +91,9 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
             if(target_in_copy<*SR.first){
 					trace2("copy edge", *SR.first, target_in_copy);
 					assert(!boost::edge(new_tv, target_in_copy+offset, tgt).second);
-					boost::add_edge(new_tv, target_in_copy+offset, tgt);
+					// this one seems correct?
+					boost::add_edge(target_in_copy+offset, new_tv, tgt);
+					//boost::add_edge(new_tv, target_in_copy+offset, tgt);
             }else{
 					/// ???
 					trace1("no copy edge", *SR.first);
@@ -125,7 +128,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 	 trace2("done", boost::num_vertices(src), boost::num_edges(src));
 	 trace2("done", boost::num_vertices(tgt), boost::num_edges(tgt));
     assert(boost::num_vertices(tgt) == boost::num_edges(tgt)+1);
-}
+} // append_decomposition
 
 #ifdef NDEBUG
 #define assert_permutation(P)
