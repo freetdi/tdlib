@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	bucket_sorter_2u \
 	common_out_edges \
 	custom_td \
+	dead_simple \
 	elim0 \
 	inline \
 	graph \

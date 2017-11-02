@@ -65,7 +65,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/treedec.hpp> // get_bagsize
+#include <tdlib/algo.hpp>
+#include <tdlib/treedec.hpp>
 
 // namespace boost {
 // // some hacks. perhaps wrong place
@@ -348,7 +349,7 @@ void thorup_tree_decomposition(T_t &tree_decomposition, const G_t &cfg)
 
 } // pkk_thorup
 
-template<typename G, template<class G_, class ...> class config=algo::default_config>
+template<typename G, template<class G_, class ...> class config=treedec::algo::default_config>
 class thorup : public ::treedec::algo::draft::algo1{
 public: // types
 	// FIXME: use treedec_t<G>
