@@ -35,6 +35,7 @@
 
 #include "graph.hpp"
 #include "misc.hpp"
+#include "algo.hpp"
 
 #define BAG_(x, y) boost::get(treedec::bag_t(), y, x)
 
@@ -386,7 +387,7 @@ void nicify(T_t &T, bool empty_leafs=false, bool cleanup=false){ //TODO: test em
 }
 
 //TODO: cleanup names
-template<class T, template<class G_, class ...> class CFGT=algo::default_config>
+template<class T, template<class G_, class ...> class CFGT=treedec::algo::default_config>
 class I_nicify{
 public: // construct
     I_nicify(T &t, bool empty_leafs, bool cleanup=true) : _t(t), _empty_leafs(empty_leafs), _cleanup(cleanup) { //TODO should cleanup be always true?!
