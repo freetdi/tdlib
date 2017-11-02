@@ -155,7 +155,7 @@ void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::v
     std::vector<BOOL> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     S_tmp.push(root);
     visited[root] = true;
 
@@ -352,7 +352,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 //Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
 void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
-    typename boost::graph_traits<T_t>::vertex_descriptor t = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor t = find_root(T);
 
     //Ensure we have an empty bag at the root.
     if(boost::get(treedec::bag_t(), T, t).size() > 0){
