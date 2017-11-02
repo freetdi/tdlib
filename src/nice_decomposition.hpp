@@ -244,8 +244,8 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             c0 = *c++;
             c1 = *c;
 
-            nicify_diffs(T, c0, empty_leafs);
-            nicify_diffs(T, c1, empty_leafs);
+            nicify_diffs(T, c0, empty_leafs, cleanup);
+            nicify_diffs(T, c1, empty_leafs, cleanup);
             return;
         default:
             //An error occured.
@@ -372,7 +372,7 @@ void nicify(T_t &T, bool empty_leafs=false, bool cleanup=false){ //TODO: test em
 }
 
 //TODO: cleanup names
-template<class T, template<class G_, class ...> class CFGT=algo::default_config>
+template<class T, template<class G_, class ...> class CFGT=treedec::algo::default_config>
 class I_nicify{
 public: // construct
     I_nicify(T &t, bool empty_leafs, bool cleanup=true) : _t(t), _empty_leafs(empty_leafs), _cleanup(cleanup) { //TODO should cleanup be always true?!
