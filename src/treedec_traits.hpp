@@ -189,8 +189,9 @@ struct treedec_traits<T>{ \
     typedef typename T::vertex_property_type vertex_property_type; \
     typedef typename boost::bagstuff::gtob<T>::type bag_type; \
     typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
-}; \
-} // treedec
+}; /* treedec */ \
+} \
+void TDLIB_DUMMY_FUNCTION_DECLARATION(void) /* a dummy function declaration to require a ';' after the macro invokation */
 
 #endif
 // vim:ts=8:sw=4:et
