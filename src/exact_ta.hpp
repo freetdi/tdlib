@@ -121,7 +121,7 @@ namespace hack{
 template<class T>
 struct help{
 	static void* next(T const& sth)
-	{ itested();
+	{
 		return (void*)(&sth + 1);
 	}
 };
@@ -136,7 +136,7 @@ struct help<  cbset::BSET_DYNAMIC<w, c> >{
 #endif
 template<class T>
 void* next(T const& sth)
-{ itested();
+{
 	return help<T>::next(sth);
 }
 
@@ -549,7 +549,7 @@ private: // here?
 	void putHash(ENTRY* hp, KEY const& component, long bi, BLOCK* blocks);
 	/// ...
 	BLOCK const* getBlock(ENTRY const* x, T c) const
-	{ itested();
+	{
 		trace1("getblock1", c);
 		auto hash=getHash(x, c);
 		assert(hash);
@@ -825,10 +825,7 @@ void exact_ta<EXTA_a>::clear()
 	assert(_blockmem);
 // 	memset(_blockmem, char(0), nbMax * sizeof(BLOCK));
 	_top_block = (BLOCK*)_blockmem;
-
-	untested();
 	clear_tries();
-
 	clearh(hashTable);
 }
 /*--------------------------------------------------------------------------*/
@@ -1018,8 +1015,8 @@ EXTA_t
 inline void exact_ta<EXTA_a>::q_base_sets()
 {
 //	for ( vertices... )
-	for (unsigned v=0; v<n() && !solution; v++) { itested();
-		if (boost::out_degree(v, _g) < _bag_size) { itested();
+	for (unsigned v=0; v<n() && !solution; v++) {
+		if (boost::out_degree(v, _g) < _bag_size) {
 			q_base_set(v);
 		}else{
 		}
@@ -1055,7 +1052,7 @@ inline bool exact_ta<EXTA_a>::try_decompose(unsigned bs)
 	q_base_sets();
 
 	BLOCK* bb=_blockmem;
-	while(bb!=&top_block() && !solution){ itested();
+	while(bb!=&top_block() && !solution){
 		// try to extend newly discovered blocks.
 		process(bb);
 		bb = bb->next();
@@ -1174,7 +1171,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TD_* td) const
     int k = aStack[top];
     top--;
     if (cbset::size(b->component) + cbset::size(b->neighbours())
-      <= _bag_size) { itested();
+      <= _bag_size) {
       int j = addBag(cbset::union_(b->component, b->neighbours()), td);
       if (k >= 0) {
 			boost::add_edge(j, k, *td);

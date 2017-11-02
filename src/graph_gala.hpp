@@ -22,7 +22,7 @@ struct graph_helper<gala::graph<ECT, VCT, VDP, CFG> > {
 
 	template<class S>
 	static void close_neighbourhood(S& c, G const& g)
-	{ itested();
+	{
 		S verts(c);
 		for(auto const&v : verts){
 			c.merge(g.out_edges(v));

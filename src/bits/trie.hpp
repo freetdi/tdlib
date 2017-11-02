@@ -142,7 +142,7 @@ public: // iter types
 		    : _stack(i._stack),
 		      _seek(i._seek),
 		      _own_stack(i._own_stack)
-		{ itested();
+		{
 			i._own_stack=false;
 		}
 		~const_iterator(){
@@ -371,7 +371,7 @@ public:
 template<class V, class B, class Alloc>
 inline typename TRIE<V, B, Alloc>::node_t*
 TRIE<V, B, Alloc>::new_node()
-{ itested();
+{
   
   Alloc a;
   node_t* newnode = (node_t*) const_cast<Alloc&>(_allocator).allocate(sizeof(node_t));
@@ -387,7 +387,7 @@ TRIE<V, B, Alloc>::new_node()
 template<class V, class B, class Alloc>
 inline typename TRIE<V, B, Alloc>::node_t*
 TRIE<V, B, Alloc>::new_node(V v, node_t* left, node_t* right)
-{ itested();
+{
   
   Alloc a;
   node_t* newnode = new_node();

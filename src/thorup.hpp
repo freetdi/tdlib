@@ -240,9 +240,9 @@ find_bag(const std::set<unsigned int> &X, const T_t &T)
   for (boost::tie(t, t_end) = vertices(T), t_found = t_end; t != t_end; ++t) {
 	  for (v = X.begin(); v != X.end(); ++v){
 		  auto const& b=boost::get(treedec::bag_t(), T, *t);
-		  if (b.find(*v) == b.end()){ itested();
+		  if (b.find(*v) == b.end()){
 			  break;
-		  }else{ itested();
+		  }else{
 		  }
 	  }
 

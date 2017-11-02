@@ -120,7 +120,7 @@ namespace detail{//
         >::type >{//
         // push, insert new item
         static void push(C& c, typename C::value_type e)
-        { itested();
+        {
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }
@@ -153,7 +153,7 @@ namespace detail{//
           }
         }
         static void insert(C& c, typename C::value_type e)
-        { itested();
+        {
           c.insert(e);
         }
     };

@@ -77,7 +77,7 @@ void push(C& c, E e)
 // push a range. otherwise like push
 template<class C, class B, class E>
 void push(C& c, B b, E e)
-{ untested();
+{
     detail::container_modify<C>::push(c, b, e);
 }
 

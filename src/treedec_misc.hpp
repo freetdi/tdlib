@@ -35,7 +35,7 @@ public:
     typedef unsigned result_type;
 
     unsigned operator()(unsigned x) const
-    { itested();
+    {
         auto p=boost::get(boost::vertex_index, _g, x);
         if(p == x){
             // simple numbering perhaps, needs more thought
