@@ -99,7 +99,7 @@ AS_IF([test "$python" != no], [
 AC_LANG_PUSH([C++])
 
 # unconditional c++11
-CXXFLAGS="$CXXFLAGS -std=c++11"
+CXXFLAGS="$CXXFLAGS -std=c++11 -pedantic"
 
 have_gala=no
 
