@@ -35,6 +35,7 @@
 
 #include "graph.hpp"
 #include "misc.hpp"
+#include "algo.hpp"
 
 #define BAG_(x, y) boost::get(treedec::bag_t(), y, x)
 
