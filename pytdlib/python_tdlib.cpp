@@ -32,7 +32,7 @@
 // typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 // REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_t, bag)
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_directed_t, bag)
+REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_directed_t, bag);
 
 #include "generic_base.hpp"
 #include "graph.hpp"
