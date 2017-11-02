@@ -55,8 +55,10 @@ you don't care.
 
 == tree decompositions ==
 
-a tree decomposition is a boost graph with a undirected edges and a vertex
-property of access type treedec::bag_t.
+a tree decomposition is a graph in the above sense with a vertex property of
+access type treedec::bag_t. the edges in a bidirectional graph container are
+oriented away from a root vertex. this root vertex should/will/might be
+accessible e.g. using a property tag such as treedec::root_t (or similar).
 
 a possible model is
 
