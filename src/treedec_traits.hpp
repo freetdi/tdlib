@@ -55,7 +55,7 @@ struct tmpbaghack<bag_t, T_t, V>{ //
 
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type& bag(
-	const typename boost::graph_traits<T_t>::vertex_descriptor& v,
+        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t& T)
 {
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
@@ -96,104 +96,104 @@ size_t bag_size(V const & v, G const& g)
 #define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
 namespace boost{\
 \
-        inline \
-	typename property_map< T, vertex_all_t>::type\
-	get(vertex_all_t, T& g) \
-        { untested(); \
-		typedef typename property_map< T, vertex_all_t>::type\
-			pmap_type;\
-		return pmap_type(g);\
-	}\
+    inline \
+    typename property_map< T, vertex_all_t>::type\
+    get(vertex_all_t, T& g) \
+    { untested(); \
+        typedef typename property_map< T, vertex_all_t>::type\
+          pmap_type;\
+        return pmap_type(g);\
+    }\
 \
-	inline \
-        bagstuff::const_treebagpmap<T>\
-	get(vertex_all_t, T const& g) \
-        { untested(); \
-		typedef typename property_map< T, vertex_all_t>::const_type\
-			pmap_type;\
-		return pmap_type(g);\
-	}\
+    inline \
+    bagstuff::const_treebagpmap<T>\
+    get(vertex_all_t, T const& g) \
+    { untested(); \
+        typedef typename property_map< T, vertex_all_t>::const_type\
+            pmap_type;\
+        return pmap_type(g);\
+    }\
 \
-  template<class U> \
-  inline void\
-  put(put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, U k, treedec::bag_t const& v)\
-  { untested();\
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.BAG){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
+    template<class U> \
+    inline void\
+    put(put_get_helper<bagstuff::gtob<T>::type,\
+            bagstuff::treebagpmap<T> >& pa, U k, treedec::bag_t const& v)\
+    { untested();\
+        auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+        auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+        b.clear();\
+        for(auto const& i : v.BAG){ untested();\
+            treedec::push(b, i);\
+        }\
+    }\
 \
-  template<class U> \
-  inline void\
-  put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, U k,\
-		 const property<treedec::bag_t, std::set<unsigned> >& v)\
-  { untested(); \
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.m_value){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
+    template<class U> \
+    inline void\
+    put(const put_get_helper<bagstuff::gtob<T>::type,\
+          bagstuff::treebagpmap<T> >& pa, U k,\
+          const property<treedec::bag_t, std::set<unsigned> >& v)\
+    { untested(); \
+        auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+        auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+        b.clear();\
+        for(auto const& i : v.m_value){ untested();\
+            treedec::push(b, i);\
+        }\
+    }\
 \
-  template<class U> \
-  inline void\
-  put(const put_get_helper<bagstuff::gtob<T>::type,\
-		 bagstuff::treebagpmap<T> >& pa, U k,\
-		 const property<treedec::bag_t, std::vector<unsigned> >& v)\
-  { untested(); \
-	  auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
-	  auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
-	  b.clear();\
-	  for(auto const& i : v.m_value){ untested();\
-		  treedec::push(b, i);\
-	  }\
-  }\
+    template<class U> \
+    inline void\
+    put(const put_get_helper<bagstuff::gtob<T>::type,\
+        bagstuff::treebagpmap<T> >& pa, U k,\
+        const property<treedec::bag_t, std::vector<unsigned> >& v)\
+    { untested(); \
+        auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+        auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+        b.clear();\
+        for(auto const& i : v.m_value){ untested();\
+            treedec::push(b, i);\
+        }\
+    }\
 \
-  template<class U> \
-  inline bagstuff::gtob<T>::type const& \
-  get(treedec::bag_t, T const&t, U k)\
-  {\
-	  return t[k].bag;\
-  }\
+    template<class U> \
+    inline bagstuff::gtob<T>::type const& \
+    get(treedec::bag_t, T const&t, U k)\
+    {\
+        return t[k].bag;\
+    }\
 \
-  template<class U> \
-  inline bagstuff::gtob<T>::type& \
-  get(treedec::bag_t, T &t, U k)\
-  {\
-	  return t[k].bag;\
-  }\
+    template<class U> \
+    inline bagstuff::gtob<T>::type& \
+    get(treedec::bag_t, T &t, U k)\
+    {\
+        return t[k].bag;\
+    }\
 \
-  inline bagstuff::const_treebagpmap<T> \
-  get(treedec::bag_t, T const& t)\
-  {\
-    return bagstuff::const_treebagpmap<T>(t);\
-  }\
+    inline bagstuff::const_treebagpmap<T> \
+    get(treedec::bag_t, T const& t)\
+    {\
+        return bagstuff::const_treebagpmap<T>(t);\
+    }\
 \
-  inline bagstuff::treebagpmap<T> \
-  get(treedec::bag_t, T & t)\
-  { untested(); \
-    return bagstuff::treebagpmap<T>(t);\
-  }\
+    inline bagstuff::treebagpmap<T> \
+    get(treedec::bag_t, T & t)\
+    { untested(); \
+        return bagstuff::treebagpmap<T>(t);\
+    }\
 \
     template <>\
     struct property_map<T, treedec::bag_t>{ \
     };\
 } /* boost */ \
 namespace treedec{ \
-template<> \
-struct treedec_traits<T>{ \
-    typedef typename T::vertex_property_type vertex_property_type; \
-    typedef typename boost::bagstuff::gtob<T>::type bag_type; \
-    typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
-}; /* treedec */ \
-} \
-void TDLIB_DUMMY_FUNCTION_DECLARATION(void) /* a dummy function declaration to require a ';' after the macro invokation */
+    template<> \
+    struct treedec_traits<T>{ \
+        typedef typename T::vertex_property_type vertex_property_type; \
+        typedef typename boost::bagstuff::gtob<T>::type bag_type; \
+        typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
+    }; \
+} /* treedec */ \
+void TDLIB_DUMMY_FUNCTION_DECLARATION(void)
 
 #endif
 // vim:ts=8:sw=4:et
