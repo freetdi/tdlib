@@ -190,7 +190,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
         case 0:
             return;
         case 1:
-            treedec::nice::nicify_joins(T, *c);
+            nicify_joins(T, *c);
             return;
         case 2:
             break;
@@ -207,14 +207,14 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             boost::get(treedec::bag_t(), T, d) = boost::get(treedec::bag_t(), T, t);
             boost::add_edge(t, d, T);
 
-            treedec::nice::nicify_joins(T, t);
+            nicify_joins(T, t);
             return;
     }
 
     c0 = *c++;
     c1 = *c;
 
-    treedec::nice::nicify_joins(T, c0);
+    nicify_joins(T, c0);
 
     if(BAG_(t, T) != BAG_(c0, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
@@ -224,7 +224,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
         BAG_(d, T) = BAG_(t, T);
     }
 
-    treedec::nice::nicify_joins(T, c1);
+    nicify_joins(T, c1);
 
     if(BAG_(t, T) != BAG_(c1, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
@@ -258,8 +258,8 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             c0 = *c++;
             c1 = *c;
 
-            treedec::nice::nicify_diffs(T, c0, empty_leafs);
-            treedec::nice::nicify_diffs(T, c1, empty_leafs);
+            nicify_diffs(T, c0, empty_leafs);
+            nicify_diffs(T, c1, empty_leafs);
             return;
         default:
             //An error occured.
@@ -267,7 +267,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     }
 
     c0 = *c;
-    treedec::nice::nicify_diffs(T, c0, empty_leafs);
+    nicify_diffs(T, c0, empty_leafs);
 
     if(std::includes(BAG_(t, T).begin(), BAG_(t, T).end(),
                      BAG_(c0, T).begin(), BAG_(c0, T).end())
@@ -304,7 +304,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
                 BAG_(d, T).erase(BAG_(d, T).begin());
                 boost::add_edge(t, d, T);
 
-                treedec::nice::nicify_diffs_more(T, t);
+                nicify_diffs_more(T, t);
             }
             return;
         case 1:
@@ -313,8 +313,8 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
             c0 = *c++;
             c1 = *c;
 
-            treedec::nice::nicify_diffs_more(T, c0);
-            treedec::nice::nicify_diffs_more(T, c1);
+            nicify_diffs_more(T, c0);
+            nicify_diffs_more(T, c1);
             return;
         default:
             //an error occured
@@ -328,7 +328,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     c0_size = BAG_(c0, T).size();
 
     if(t_size <= c0_size + 1 && t_size + 1 >= c0_size){
-        treedec::nice::nicify_diffs_more(T, c0);
+        nicify_diffs_more(T, c0);
         return;
     }
 
@@ -346,7 +346,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 
     BAG_(d, T).erase(i);
 
-    treedec::nice::nicify_diffs_more(T, t);
+    nicify_diffs_more(T, t);
 }
 
 //Transform a tree decomposition into a nice tree decomposition.
@@ -361,9 +361,9 @@ void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
         boost::add_edge(t, d, T);
     }
 
-    treedec::nice::nicify_joins(T, t);
-    treedec::nice::nicify_diffs(T, t, empty_leafs);
-    treedec::nice::nicify_diffs_more(T, t);
+    nicify_joins(T, t);
+    nicify_diffs(T, t, empty_leafs);
+    nicify_diffs_more(T, t);
 }
 
 } //namespace nice
