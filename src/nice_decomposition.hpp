@@ -238,7 +238,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 //Ensure that all nodes' bags are either a subset or a superset of their successors'.
 //Complexity: Linear in the number of vertices of T.
 template <class T_t>
-void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t){
+void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, bool empty_leafs){
     typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
     typename boost::graph_traits<T_t>::vertex_descriptor c0, c1;
 
@@ -246,20 +246,20 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 
     switch(boost::out_degree(t, T)){
         case 0:
-/*
+            if(empty_leafs){
             //Ensures that leafs have empty bags.
-            if(BAG_(t, T).size())
-                boost::add_edge(t, boost::add_vertex(T), T);
-*/
-                return;
+                if(BAG_(t, T).size())
+                    boost::add_edge(t, boost::add_vertex(T), T);
+            }
+            return;
         case 1:
             break;
         case 2:
             c0 = *c++;
             c1 = *c;
 
-            nicify_diffs(T, c0);
-            nicify_diffs(T, c1);
+            nicify_diffs(T, c0, empty_leafs);
+            nicify_diffs(T, c1, empty_leafs);
             return;
         default:
             //An error occured.
@@ -267,7 +267,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     }
 
     c0 = *c;
-    nicify_diffs(T, c0);
+    nicify_diffs(T, c0, empty_leafs);
 
     if(std::includes(BAG_(t, T).begin(), BAG_(t, T).end(),
                      BAG_(c0, T).begin(), BAG_(c0, T).end())
@@ -351,7 +351,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 
 //Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
-void nicify(T_t &T){
+void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
     typename boost::graph_traits<T_t>::vertex_descriptor t = treedec::nice::find_root(T);
 
     //Ensure we have an empty bag at the root.
@@ -362,7 +362,7 @@ void nicify(T_t &T){
     }
 
     nicify_joins(T, t);
-    nicify_diffs(T, t);
+    nicify_diffs(T, t, empty_leafs);
     nicify_diffs_more(T, t);
 }
 
