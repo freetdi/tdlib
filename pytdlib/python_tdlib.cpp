@@ -836,7 +836,9 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     TD_tree_dec_directed_t T_;
     treedec::make_rooted(T, T_);
 
-    treedec::nice::nicify(T_);
+    treedec::nice::I_nicify<TD_tree_dec_directed_t> N(T_, false);
+    N.do_it();
+//    treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
 

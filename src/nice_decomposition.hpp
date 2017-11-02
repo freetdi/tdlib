@@ -366,6 +366,24 @@ void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
     treedec::nice::nicify_diffs_more(T, t);
 }
 
+//TODO: cleanup names
+template<class T, template<class G_, class ...> class CFGT=algo::default_config>
+class I_nicify{
+public: // construct
+    I_nicify(T &t, bool empty_leafs) : _t(t), _empty_leafs(empty_leafs) {
+    }
+
+public: // algo interface
+    void do_it(){
+        nicify(_t, _empty_leafs);
+    }
+
+private:
+    T& _t;
+    bool _empty_leafs;
+}; // nicify
+
+
 } //namespace nice
 
 } //namespace treedec
