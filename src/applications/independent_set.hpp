@@ -148,7 +148,7 @@ unsigned int bottom_up_computation_independent_set(G_t &G, T_t &T,
         }
     }
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     return (unsigned int) results[root].begin()->second;
 }
 
@@ -165,7 +165,7 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
 
     if(max > 0){
         typename treedec_traits<T_t>::bag_type a, b;
-        typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+        typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
 

@@ -61,29 +61,6 @@
 
 namespace treedec{
 
-// Find a root of an acyclic graph T.
-// Complexity: Linear in the number of vertices of T.
-template <typename T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
-    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-    std::vector<BOOL> visited(boost::num_vertices(T), false);
-
-    for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end;
-        boost::tie(e, e_end)=boost::in_edges(t, T)){
-        if(!visited[boost::source(*e, T)]){
-            t = boost::source(*e, T);
-            visited[t] = true;
-        }
-        else{
-            //T is undirected
-            return t;
-        }
-    }
-
-    return t;
-}
-
 // TODO: deduplicate (see sethack.h)
 // be careful: will fail on unordered sets without warning.
 template<class S, class T>

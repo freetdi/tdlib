@@ -134,20 +134,6 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
     }
 }
 
-//Find a root of an acyclic graph T
-//Complexity: Linear in the number of vertices of T.
-template <class T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
-    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-
-    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
-        t = boost::source(*e, T);
-    }
-
-    return t;
-}
-
 template <typename T_t>
 void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
