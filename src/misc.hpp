@@ -817,6 +817,26 @@ void subsets(S const &X, int size, int k, int idx,
     return subsets(X, size, k, idx, subs, &sub);
 }
 
+// Remove isolated vertices
+template <class G_t>
+void remove_isolated_vertices(G_t &G){
+    bool change = true;
+    while(change){
+        change = false;
+        if(boost::num_vertices(G) <= 1)
+            return;
+
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            if(boost::degree(*vIt, G) == 0){
+                boost::remove_vertex(*vIt, G);
+                change = true;
+                break;
+            }
+        }
+    }
+}
+
 } // namespace treedec
 
 #undef BAG_

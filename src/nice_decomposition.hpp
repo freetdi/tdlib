@@ -238,7 +238,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 //Ensure that all nodes' bags are either a subset or a superset of their successors'.
 //Complexity: Linear in the number of vertices of T.
 template <class T_t>
-void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, bool empty_leafs){
+void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, bool empty_leafs, bool cleanup){
     typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
     typename boost::graph_traits<T_t>::vertex_descriptor c0, c1;
 
@@ -258,8 +258,8 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             c0 = *c++;
             c1 = *c;
 
-            treedec::nice::nicify_diffs(T, c0, empty_leafs);
-            treedec::nice::nicify_diffs(T, c1, empty_leafs);
+            treedec::nice::nicify_diffs(T, c0, empty_leafs, cleanup);
+            treedec::nice::nicify_diffs(T, c1, empty_leafs, cleanup);
             return;
         default:
             //An error occured.
@@ -267,7 +267,20 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     }
 
     c0 = *c;
-    treedec::nice::nicify_diffs(T, c0, empty_leafs);
+    treedec::nice::nicify_diffs(T, c0, empty_leafs, cleanup);
+
+    if(cleanup){
+        // Redundant bags are isolated, and thus marked for later removal.
+        if (T[t].bag == T[c0].bag){
+            T[c0].bag.clear();
+            boost::remove_edge(t, c0, T);
+            typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
+            for(boost::tie(c, c_end) = adjacent_vertices(c0, T); c != c_end; ++c){
+                boost::add_edge(t, *c, T);
+                boost::remove_edge(c0, *c, T);
+            }
+        }
+    }
 
     if(std::includes(BAG_(t, T).begin(), BAG_(t, T).end(),
                      BAG_(c0, T).begin(), BAG_(c0, T).end())
@@ -351,7 +364,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 
 //Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
-void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
+void nicify(T_t &T, bool empty_leafs=false, bool cleanup=false){ //TODO: test empty_leafs=true and cleanup=true
     typename boost::graph_traits<T_t>::vertex_descriptor t = treedec::nice::find_root(T);
 
     //Ensure we have an empty bag at the root.
@@ -362,25 +375,32 @@ void nicify(T_t &T, bool empty_leafs=false){ //TODO: test empty_leafs=true
     }
 
     treedec::nice::nicify_joins(T, t);
-    treedec::nice::nicify_diffs(T, t, empty_leafs);
+    treedec::nice::nicify_diffs(T, t, empty_leafs, cleanup);
     treedec::nice::nicify_diffs_more(T, t);
+
+    if(cleanup){
+        treedec::remove_isolated_vertices(T);
+    }
+
+    assert(boost::num_edges(T)+1 == boost::num_vertices(T));
 }
 
 //TODO: cleanup names
 template<class T, template<class G_, class ...> class CFGT=algo::default_config>
 class I_nicify{
 public: // construct
-    I_nicify(T &t, bool empty_leafs) : _t(t), _empty_leafs(empty_leafs) {
+    I_nicify(T &t, bool empty_leafs, bool cleanup=true) : _t(t), _empty_leafs(empty_leafs), _cleanup(cleanup) { //TODO should cleanup be always true?!
     }
 
 public: // algo interface
     void do_it(){
-        nicify(_t, _empty_leafs);
+        nicify(_t, _empty_leafs, _cleanup);
     }
 
 private:
     T& _t;
     bool _empty_leafs;
+    bool _cleanup;
 }; // nicify
 
 
