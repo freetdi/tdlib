@@ -323,7 +323,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
     }
 
 
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     return (unsigned int) boost::get<0>(results[root].begin()->second);
 }
 
@@ -408,7 +408,7 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
 
     if(min > 0){
         std::vector<int> domset(boost::num_vertices(G), -1);
-        typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+        typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
         std::vector<int> have_to_take(boost::num_vertices(G), -1);
         treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, global_result, have_to_take);
     }

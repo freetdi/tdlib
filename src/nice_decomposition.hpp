@@ -134,20 +134,6 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
     }
 }
 
-//Find a root of an acyclic graph T
-//Complexity: Linear in the number of vertices of T.
-template <class T_t>
-typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T){
-    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
-    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-
-    for(boost::tie(e, e_end) = boost::in_edges(t, T); e != e_end; boost::tie(e, e_end) = boost::in_edges(t, T)){
-        t = boost::source(*e, T);
-    }
-
-    return t;
-}
-
 template <typename T_t>
 void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
@@ -155,7 +141,7 @@ void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::v
     std::vector<BOOL> visited(boost::num_vertices(T), false);
 
     //The root can be chosen freely.
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     S_tmp.push(root);
     visited[root] = true;
 
@@ -190,7 +176,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
         case 0:
             return;
         case 1:
-            treedec::nice::nicify_joins(T, *c);
+            nicify_joins(T, *c);
             return;
         case 2:
             break;
@@ -207,14 +193,14 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             boost::get(treedec::bag_t(), T, d) = boost::get(treedec::bag_t(), T, t);
             boost::add_edge(t, d, T);
 
-            treedec::nice::nicify_joins(T, t);
+            nicify_joins(T, t);
             return;
     }
 
     c0 = *c++;
     c1 = *c;
 
-    treedec::nice::nicify_joins(T, c0);
+    nicify_joins(T, c0);
 
     if(BAG_(t, T) != BAG_(c0, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
@@ -224,7 +210,7 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
         BAG_(d, T) = BAG_(t, T);
     }
 
-    treedec::nice::nicify_joins(T, c1);
+    nicify_joins(T, c1);
 
     if(BAG_(t, T) != BAG_(c1, T)){
         typename boost::graph_traits<T_t>::vertex_descriptor d = boost::add_vertex(T);
@@ -258,8 +244,8 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
             c0 = *c++;
             c1 = *c;
 
-            treedec::nice::nicify_diffs(T, c0, empty_leafs, cleanup);
-            treedec::nice::nicify_diffs(T, c1, empty_leafs, cleanup);
+            nicify_diffs(T, c0, empty_leafs);
+            nicify_diffs(T, c1, empty_leafs);
             return;
         default:
             //An error occured.
@@ -267,7 +253,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     }
 
     c0 = *c;
-    treedec::nice::nicify_diffs(T, c0, empty_leafs, cleanup);
+    nicify_diffs(T, c0, empty_leafs, cleanup);
 
     if(cleanup){
         // Redundant bags are isolated, and thus marked for later removal.
@@ -317,7 +303,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
                 BAG_(d, T).erase(BAG_(d, T).begin());
                 boost::add_edge(t, d, T);
 
-                treedec::nice::nicify_diffs_more(T, t);
+                nicify_diffs_more(T, t);
             }
             return;
         case 1:
@@ -326,8 +312,8 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
             c0 = *c++;
             c1 = *c;
 
-            treedec::nice::nicify_diffs_more(T, c0);
-            treedec::nice::nicify_diffs_more(T, c1);
+            nicify_diffs_more(T, c0);
+            nicify_diffs_more(T, c1);
             return;
         default:
             //an error occured
@@ -341,7 +327,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
     c0_size = BAG_(c0, T).size();
 
     if(t_size <= c0_size + 1 && t_size + 1 >= c0_size){
-        treedec::nice::nicify_diffs_more(T, c0);
+        nicify_diffs_more(T, c0);
         return;
     }
 
@@ -359,13 +345,13 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
 
     BAG_(d, T).erase(i);
 
-    treedec::nice::nicify_diffs_more(T, t);
+    nicify_diffs_more(T, t);
 }
 
 //Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
 void nicify(T_t &T, bool empty_leafs=false, bool cleanup=false){ //TODO: test empty_leafs=true and cleanup=true
-    typename boost::graph_traits<T_t>::vertex_descriptor t = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor t = find_root(T);
 
     //Ensure we have an empty bag at the root.
     if(boost::get(treedec::bag_t(), T, t).size() > 0){
@@ -374,9 +360,9 @@ void nicify(T_t &T, bool empty_leafs=false, bool cleanup=false){ //TODO: test em
         boost::add_edge(t, d, T);
     }
 
-    treedec::nice::nicify_joins(T, t);
-    treedec::nice::nicify_diffs(T, t, empty_leafs, cleanup);
-    treedec::nice::nicify_diffs_more(T, t);
+    nicify_joins(T, t);
+    nicify_diffs(T, t, empty_leafs, cleanup);
+    nicify_diffs_more(T, t);
 
     if(cleanup){
         treedec::remove_isolated_vertices(T);

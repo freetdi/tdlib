@@ -285,7 +285,7 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
     }
 
     std::vector<int> global_results_map(boost::num_vertices(G), -1);
-    typename boost::graph_traits<T_t>::vertex_descriptor root = treedec::nice::find_root(T);
+    typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
     treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_results_map);
 
     typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
