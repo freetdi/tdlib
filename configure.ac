@@ -99,7 +99,7 @@ AS_IF([test "$python" != no], [
 AC_LANG_PUSH([C++])
 
 # unconditional c++11
-CXXFLAGS="$CXXFLAGS -std=c++11 -pedantic"
+CXXFLAGS="$CXXFLAGS -std=c++11"
 
 have_gala=no
 
@@ -143,7 +143,7 @@ AC_C_INLINE
 
 if test "$enable_debug" = "yes" ; then
 	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
-	CXXFLAGS="$CXXFLAGS -Wall -Wextra -O0 -g"
+	CXXFLAGS="$CXXFLAGS -Wall -Wextra -O0 -g -pedantic"
 else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
