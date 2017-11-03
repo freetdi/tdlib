@@ -65,6 +65,7 @@ pkginclude_HEADERS = \
   treedec_traits.hpp \
   tuple_td.hpp \
   upper_bounds.hpp \
+  util.hpp \
   validation.hpp
 
 EXTRA_DIST = \

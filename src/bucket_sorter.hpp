@@ -270,6 +270,8 @@ namespace boost {
       }
       value_type const& top() const { return value[ head[bucket_id] ]; }
       value_type& top() { return value[ head[bucket_id] ]; }
+      value_type const& front() const { return value[ head[bucket_id] ]; }
+      value_type& front() { return value[ head[bucket_id] ]; }
       bool empty() const { return head[bucket_id] == invalid_value(); }
     public: // iterator access
       const_iterator begin() const{

@@ -290,24 +290,6 @@ inline void detach_neighborhood(
 // OBSOLETE
 // OBSOLETE
 // OBSOLETE
-template <typename G_t>
-inline size_t count_missing_edges(
-        const typename boost::graph_traits<G_t>::vertex_descriptor v, G_t const &G)
-{
-    size_t missing_edges = 0;
-
-    typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(v, G); nIt1 != nEnd; nIt1++){
-        nIt2 = nIt1;
-        nIt2++;
-        for(; nIt2 != nEnd; nIt2++){
-            if(!boost::edge(*nIt1, *nIt2, G).second){
-                ++missing_edges;
-            }
-        }
-    }
-    return missing_edges;
-}
 
 
 // collect neighbors of c into bag

@@ -246,7 +246,7 @@ template <typename G_t, typename T_t>
 void fillIn_decomp(G_t &G, T_t *T, unsigned ub=UINT_MAX, bool ignore_isolated=false)
 {
     assert(T);
-    fillIn<G_t> FI(G, ub, ignore_isolated);
+    treedec::obsolete::fillIn<G_t> FI(G, ub, ignore_isolated);
     FI.do_it();
     FI.get_tree_decomposition(*T);
 }
@@ -315,7 +315,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
 {
     trace3("fillIn_ordering", ignore_isolated_vertices, boost::num_vertices(G), elim_ordering.size());
 
-    impl::fillIn<G_t> FI(G, ignore_isolated_vertices, -1u);
+    obsolete::fillIn<G_t> FI(G, ignore_isolated_vertices, -1u);
     FI.do_it();
     auto o=FI.get_elimination_ordering();
     elim_ordering = o; // HACK

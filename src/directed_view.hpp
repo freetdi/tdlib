@@ -183,9 +183,18 @@ public: // unnecessary
 private:
 	backend_type _g;
 	bool _commit;
-};
+}; // directed_view
 
 } // draft
+
+#if 1
+// default directed view
+// there are better ways
+template<class G>
+struct directed_view_select{
+    typedef treedec::draft::directed_view<G> type;
+};
+#endif
 
 } // treedec
 

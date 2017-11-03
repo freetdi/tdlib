@@ -16,7 +16,7 @@
 //
 //
 //
-// greedy heuristics
+// induced subgraph
 #ifndef TD_IND_SG_HPP
 #define TD_IND_SG_HPP
 
@@ -29,6 +29,7 @@ namespace treedec{
 template<class G, class M, class D>
 class INDUCED_SUBGRAPH_1{
 public:
+	typedef void vertex_bundled; // incomplete
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 	typedef typename boost::graph_traits<G>::vertices_size_type vertices_size_type;
 	typedef typename boost::graph_traits<G>::adjacency_iterator all_adj_it;
@@ -54,6 +55,9 @@ public:
 	{
 	}
 public:
+	vertices_size_type num_vertices() const{
+        return boost::num_vertices(_g);
+	}
 	vertex_range vertices() const{
         auto p=boost::vertices(_g);
 
@@ -63,12 +67,12 @@ public:
 		  return vertex_range(fb, fe);
 	}
 	adjacency_range adjacent_vertices(vertex_descriptor v) const{
-        auto p=boost::adjacent_vertices(v, _g);
+		auto p=boost::adjacent_vertices(v, _g);
 
-        adjacency_iterator fb(_m, p.first, p.second);
-        adjacency_iterator fe(_m, p.second, p.second);
+		adjacency_iterator fb(_m, p.first, p.second);
+		adjacency_iterator fe(_m, p.second, p.second);
 
-		  return adjacency_range(fb, fe);
+		return adjacency_range(fb, fe);
 	}
 	vertices_size_type out_degree(vertex_descriptor v) const{
         return _d[v]; // bug. idmap??
@@ -107,6 +111,13 @@ typename property_map<typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::wrapped_typ
 get(vertex_index_t, treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
 {
 	return get(vertex_index, *g);
+}
+
+template<class G, class M, class D>
+typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::vertices_size_type
+num_vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g){
+untested();
+	return g.num_vertices();
 }
 
 template<class G, class M, class D>

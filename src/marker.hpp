@@ -15,7 +15,8 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-#pragma once
+#ifndef TREEDEC_MARKER_HPP
+#define TREEDEC_MARKER_HPP
 
 // inspired by boost/graph/md/marker
 // could just include if there was a seperate header...
@@ -60,6 +61,9 @@ public:
 	bool is_marked(key_type x) const{
 		return(_tags[x] == _tide);
 	}
+	bool operator()(key_type x) const{
+		return(_tags[x] == _tide);
+	}
 private:
 	void reset(){ untested();
 		std::fill(_tags.begin(), _tags.end(), 0);
@@ -73,5 +77,6 @@ private:
 
 } // draft
 
-
 } // treedec
+
+#endif

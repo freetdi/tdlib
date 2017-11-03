@@ -81,12 +81,6 @@ struct pp_cfg{
 
 } // draft
 
-// default directed view
-// there are better ways
-template<class G>
-struct directed_view_select{
-    typedef treedec::draft::directed_view<G> type;
-};
 
 namespace detail{
 

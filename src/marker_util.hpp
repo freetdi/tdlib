@@ -19,6 +19,7 @@
 #define TD_MARKER_UTIL_HPP
 
 #include "marker.hpp"
+//#include "graph_util.hpp" // no. used by graph_util
 
 namespace treedec{
 
@@ -27,6 +28,32 @@ void mark_range(I i, I e, M& marker)
 {
     for(; i!=e; ++i){
 		 marker.mark(*i);
+    }
+}
+
+// mark neighbours of v up to v.
+// count P, hack.
+template<class M, typename V, class G, class P>
+size_t mark_neighbours_c(M& marker, V v, G const& g, P const& p /*bug*/)
+{
+    size_t count=0;
+    auto pp=boost::adjacent_vertices(v, g);
+    for(; pp.first!=pp.second; ++pp.first){
+        marker.mark(*pp.first);
+        if(p(*pp.first)){
+            ++count;
+        }else{
+        }
+    }
+    return count;
+}
+
+template<class M, typename V, class G>
+void mark_neighbours(M& marker, V v, G const& g)
+{
+    auto pp=boost::adjacent_vertices(v, g);
+    for(; pp.first!=pp.second; ++pp.first){
+        marker.mark(*pp.first);
     }
 }
 

@@ -31,7 +31,7 @@ namespace treedec{
 
 namespace impl{
 
-#if 0
+#if 1
 // check: why is this in experimental?
 template<class G>
 struct directed_view_select{
@@ -162,10 +162,10 @@ protected: // implementation
 public:
 	 // dump a tree decomposition into t
 	 template<class T>
-    void tree_decomposition(T& t){
+    void get_tree_decomposition(T& t){
         assert(_o);
         _o->resize(_i);
-        elimination_ordering(*_o);
+        get_elimination_ordering(*_o);
 #ifndef NDEBUG
         for(auto x: *_o){
             trace1("order", x);

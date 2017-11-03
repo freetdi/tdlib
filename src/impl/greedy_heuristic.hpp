@@ -27,6 +27,7 @@
 #endif
 
 #include "../algo.hpp"
+#include "greedy_base.hpp"
 
 namespace treedec{
 
@@ -73,7 +74,7 @@ public:
 
     template<class T>
     void get_tree_decomposition(T& t)const{
-        std::cerr << "hmm " << _o->size() << " " << _bags.size() << "\n";
+        // std::cerr << "hmm " << _o->size() << " " << _bags.size() << "\n";
         assert(_o->size()<=_bags.size()); // this is obsolete anyway
         assert(_o->size()==_num_vert); // this is relevant.
 
@@ -285,13 +286,265 @@ private:
 
 }; // minDegree
 
+// the fillIn heuristic.
+template<typename G_t,
+         template<class GG, class ...> class CFGT=algo::default_config>
+class fillIn : public greedy_base<
+               G_t,
+               std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>,
+               CFGT>{
+public: //types
+    typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
+    typedef typename directed_view_select<G_t>::type D_t;
+    typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
+    typedef greedy_base<G_t, O_t, CFGT> baseclass;
+    typedef typename baseclass::vertex_descriptor vertex_descriptor;
+    typedef typename fill_chooser<typename baseclass::subgraph_type>::type fill_type;
 
+    struct fill_update_cb : public graph_callback<typename baseclass::subgraph_type>{
+        typedef typename baseclass::subgraph_type G;
+
+        fill_update_cb(fill_type* d, G const& g) :
+            _fill(d), _g(g)
+        {
+        }
+
+        void operator()(vertex_descriptor v){ untested();
+            unreachable();
+            _fill->q_eval(v);
+        }
+        // q_decrement nodes that are incident to both endpoints.
+        void operator()(vertex_descriptor, vertex_descriptor) { unreachable();
+        }
+    private:
+        fill_type* _fill;
+        G const& _g;
+    }; // update_cb
+
+public: // construct
+    fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
+        : baseclass(g, ub, ignore_isolated_vertices),
+          _fill(baseclass::_subgraph, boost::num_vertices(g))
+          // _cb(fill_update_cb(&_fill, baseclass::_subgraph))
+    {
+//        boost::print_graph(g);
+        treedec::check(g);
+    }
+
+    fillIn(G_t &g, bool ignore_isolated_vertices, unsigned ub=-1u)
+        : baseclass(g, ub, ignore_isolated_vertices),
+          _fill(baseclass::_subgraph, boost::num_vertices(g))
+          // _cb(fill_update_cb(&_fill, baseclass::_subgraph))
+    { untested();
+//        boost::print_graph(g);
+    }
+
+public: // implementation
+    using baseclass::_min;
+    using baseclass::_num_edges;
+    using baseclass::_degree; // bug?
+
+    // fillIn::
+    bool next(typename baseclass::vertex_descriptor &c){
+        trace1("next", _num_edges);
+        if(_num_edges){
+            // todo: what do we know about lower bound?
+            auto p=_fill.pick_min(0, -1u, true);
+            c = p.first;
+            _min = p.second; // the fill of c.
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    // TODO more useful specialisation?
+    // ... finish minDegree, then lets see.
+    void eliminate(typename baseclass::vertex_descriptor c){
+        long fill_c=_min;
+        trace4("elim", c, _num_edges, _degree[c], fill_c);
+
+        /// _min is fill(v).
+        // use remove_out_edge_if?
+        _fill.mark_neighbours(c, _min); // relevant in q_decrement
+                                       // different marker
+                                       //
+        // bug: idmap!
+        auto degc=baseclass::_degreemap[c];
+
+        assert(fill_c<=degc*(degc-1));
+
+        baseclass::_numbering.put(c);
+        baseclass::_numbering.increment();
+
+        { // make clique
+            // todo?: faster special cases for small numbers?!
+            // if(fill==1 && degree==2){
+            //    easy.
+            // }
+            //
+            assert(baseclass::_num_edges >= degc);
+            baseclass::_num_edges -= degc;
+            trace3("c...", c, fill_c, degc);
+            auto p=boost::adjacent_vertices(c, baseclass::_subgraph);
+            for(; p.first!=p.second; ++p.first){
+                auto n=*p.first;
+
+                baseclass::_marker.clear();
+                // count overlap with c neighbourhood
+                // use remove_out_edge_if?
+                size_t overlap = mark_neighbours_c(
+                        baseclass::_marker, n, baseclass::_subgraph,
+                        _fill.marked() );
+                long degn=baseclass::_degreemap[n];
+                auto const fill_n=_fill.get_value(n);
+                trace5("------------> ", n, degn, fill_n, degc, overlap);
+                assert(overlap<size_t(degn));
+                assert(overlap<size_t(degc));
+
+                long DC = degc - overlap - 1; // nodes connected to c but not (to) n
+                long DN = degn - overlap - 1; // nodes connected to n but not (to) c
+
+                trace5("DC?", fill_n, fill_c, degc, overlap, degn);
+                trace2("DC?", DC, DN);
+                long offset = - long(fill_c);
+#if 0
+              if(degc==2 && overlap==1){
+                  no need to queue.
+                  assert(fillc==0)
+                  offset = - long(DN);
+                }else
+#endif
+                    
+                if(DC){
+                    offset = - long(fill_c);
+//                    offset -= overlap*DC + (DC-1)*DC/2
+                    offset -= DN; // no more need to connect edges behind
+//                    offset = - long(fill_n); // TODO
+                    trace3("DC", n, fill_n, offset);
+
+                    _fill.shift(n, offset);
+                    _fill.q_eval(n); // treat as lb
+                }else{ // !DC
+                    // this is exact, unless an edge is missing.
+                    // (then it is flagged lb, later);
+                    offset = - long(fill_c) - DN;
+                    trace3("noDC", n, fill_n, offset);
+                    _fill.shift(n, offset);
+                }
+
+                auto q=adjacent_vertices(c, _subgraph);
+                ///q.first=next;
+
+                // iterate {n2,n} \subset 1-neighborhood
+                // n2 < n... add edges to previously visited n2 only
+                for(; q.first!=p.first; ++q.first){
+//                for(; q.first!=q.second; ++q.first) // careful!
+                    auto n2=*q.first;
+                    if(baseclass::_marker.is_marked(n2)){
+                        // done, neighbour of n
+                    }else{
+                        if(degc==2){
+                            // --- n2 --- c ---- n ---
+                            // no need to reevaluate them
+                            // neighbourhood does not change
+                        }else{
+                            // fill could decrease here.
+                            _fill.q_eval(n);
+                            _fill.q_eval(n2);
+                        }
+                        // assert(n2>n); // visit only once
+                        assert(n2 != n);
+
+                        trace2("addedge decfill", n, n2);
+                        // mark 2-neighbors that are incident to both endpoints.
+                        auto r=adjacent_vertices(n2, baseclass::_subgraph);
+                        for(; r.first!=r.second; ++r.first){
+                            if(!baseclass::_marker.is_marked(*r.first)){
+                                // not neighbour of n
+                                trace1("skip", *r.first);
+                            }else{
+                                trace3("--common neigh", n, n2, *r.first);
+                                assert(*r.first!=n);
+                                assert(*r.first!=n2);
+                                _fill.decrement_fill(*r.first);
+                            }
+                        }
+
+                        assert(!boost::edge(n, n2, baseclass::_g).second);
+                        assert(!boost::edge(n2, n, baseclass::_g).second);
+                        // why does it default to boost::??!
+                        treedec::add_edge(n, n2, baseclass::_g);
+                        assert(boost::edge(n, n2, baseclass::_g).second);
+                        assert(boost::edge(n2, n, baseclass::_g).second);
+                        // use _subgraph?!
+                        ++baseclass::_degreemap[n2];
+                        ++baseclass::_degreemap[n];
+                        ++baseclass::_num_edges;
+                        trace4("addedge", n, n2,
+                                baseclass::_degreemap[n], baseclass::_degreemap[n2]);
+
+                    }
+                } // n2
+                // disconnect center.
+                --baseclass::_degreemap[n];
+                trace2("incomplete n (missing edges)", n, baseclass::_degreemap[n]);
+                degn = baseclass::_degreemap[n];
+            } // n
+        }
+        trace2("elimd", c, baseclass::_num_edges);
+        treedec::check(_subgraph);
+
+#ifndef NDEBUG
+        auto p=boost::adjacent_vertices(c, _subgraph);
+        for(; p.first!=p.second; ++p.first){
+            auto n=*p.first;
+            long degn=baseclass::_degreemap[n];
+            trace3("check", n, _fill.get_value(n), degn);
+            assert(2*_fill.get_value(n)<=size_t(degn*(degn-1)));
+
+            auto q=boost::adjacent_vertices(n, _subgraph);
+            for(; q.first!=q.second; ++q.first){
+                auto n2=*q.first;
+                trace1("neigh", n2);
+                --degn;
+            }
+            trace2("check", n, degn);
+            assert(!degn);
+        }
+#endif
+    } // eliminate(c)
+
+    using baseclass::_i;
+    using baseclass::_subgraph;
+    void postprocessing(){
+        if(_i == baseclass::_num_vert){
+            // no nodes at all?!
+        }else{
+            // the last node is missing, but why?
+            ++_i;
+            auto v = _fill.pick_min(0, 0, true).first;
+            assert(_i == baseclass::_o->size());
+            baseclass::_o->back() = v;
+            baseclass::_numbering.put(v);
+        }
+        assert(baseclass::_i == baseclass::_num_vert);
+    }
+
+private:
+    fill_type _fill;
+//    fill_update_cb _cb;
+}; // fillIn
+
+} // impl
+
+namespace obsolete {
 // the fillIn heuristic.
 template <typename G_t, template<class G, class...> class CFGT_t=algo::default_config>
-class fillIn : public greedy_heuristic_base<G_t, CFGT_t>{
+class fillIn : public treedec::impl::greedy_heuristic_base<G_t, CFGT_t>{
 public: //types
-    typedef greedy_heuristic_base<G_t, CFGT_t> baseclass;
-    typedef typename fill_chooser<G_t>::type fill_type;
+    typedef treedec::impl::greedy_heuristic_base<G_t, CFGT_t> baseclass;
+    typedef typename treedec::obsolete::FILL<G_t> fill_type;
 
     struct fill_update_cb : public graph_callback<G_t>{
         typedef typename baseclass::vertex_descriptor vertex_descriptor;
@@ -380,9 +633,9 @@ private:
     fill_update_cb _cb;
 }; // fillIn
 
-} // namespace impl
+} // obsolete
 
-} // namespace treedec
+} // treedec
 
 #endif // guard
 
