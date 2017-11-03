@@ -1156,9 +1156,8 @@ EXTA_t
 template<class TD_>
 inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TD_* td) const
 {
-//  tassert(n()==::n);
-  BLOCK const* bStack[n()];
-  int aStack[n()];
+  std::vector<BLOCK const*> bStack(n());
+  std::vector<int> aStack(n());
 
   bStack[0]=block;
   aStack[0]=-1;
