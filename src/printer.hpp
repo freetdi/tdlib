@@ -21,7 +21,7 @@
 
 #include <ostream>
 #include <string>
-#include "graph_traits.hpp"
+#include "treedec_traits.hpp"
 #include "container.hpp"
 
 namespace treedec{
@@ -50,6 +50,7 @@ namespace draft {
 			auto ngv=boost::num_vertices(_g);
 			if(numbags==0 && bagsize==0 && ngv){ incomplete();
 				// need to cache results... not now.
+			}else{
 			}
 			std::cout << "s " << _reason << " " << numbags
 			          << " " << bagsize << " " << ngv;
@@ -81,6 +82,11 @@ namespace draft {
 			return std::make_pair(true, true);
 		}
 
+		printer& bag(unsigned i){ untested();
+			announce_bag(i);
+			return *this;
+		}
+
 	private:
 		unsigned _nva;
 		size_t _num_vertices;
@@ -88,23 +94,25 @@ namespace draft {
 		std::ostream& _s;
 		G const& _g;
 		std::string _reason;
-	};
+	}; // printer
 
 	// fill bags. one at a time.
 	template<class G>
 	printer<G>& bag(size_t i, printer<G>& g) { untested();
-		g.announce_bag(i);
-		return g;	
+		return g.bag(i);
 	}
 
 } // draft
 
+} // treedec
+
+namespace treedec{
+
 	template<class T>
-	struct treedec_traits<draft::printer<T> >{
+	struct treedec_traits<treedec::draft::printer<T> >{
 		// typedef size_t vertex_descriptor;
 		// typedef size_t edge_descriptor;
 	};
-
 
 	template<class T>
 	using grtdprinter=draft::printer<T>;
@@ -113,9 +121,15 @@ namespace draft {
 
 namespace boost{
 
+	template<class G>
+	treedec::grtdprinter<G>& get(treedec::bag_t,
+			treedec::grtdprinter<G>& g, unsigned i) { untested();
+		return g.bag(i);
+	}
+
 	// pass vertex_descriptors. for now
 	template<class G>
-	size_t add_vertex( treedec::draft::printer<G>& p)
+	size_t add_vertex( treedec::grtdprinter<G>& p)
 	{
 		return p.add_vertex();
 	}

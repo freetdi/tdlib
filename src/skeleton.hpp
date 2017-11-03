@@ -24,33 +24,75 @@
 #define TD_SKELETON_HPP
 
 #include <boost/graph/graph_traits.hpp>
+#include <boost/iterator/counting_iterator.hpp>
 #include "numbering.hpp"
+#include "treedec_traits.hpp"
 
-namespace treedec{ //
+namespace treedec{
 
 namespace draft{
 
 template<class G, class N, class O>
 class SKELETON{
 public: // types
-    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::graph_traits<G>::adjacency_iterator all_adj_it;
+    typedef unsigned vertex_descriptor;
+    typedef typename boost::graph_traits<G>::vertex_descriptor owner_type;
+    typedef typename boost::graph_traits<G>::vertices_size_type vertices_size_type;
+    struct sgm{
+        sgm(N const& n, owner_type v)
+          : _n(n), _x(v)
+        {
+        }
+        bool operator()(owner_type v) const{
+            // idea: add to bag, if not eliminated earlier.
+#ifdef DEBUG
+            if( !_n.is_before(_x, v)){
+                trace1("skip", v);
+            }else{
+                trace1("noskip", v);
+            }
+#endif
+
+            return _n.is_before(_x, v);
+        }
+        N const& _n;
+        owner_type _x;
+    };
+    typedef boost::filter_iterator<sgm, all_adj_it> bag_iterator;
+    typedef boost::iterator_range<bag_iterator> bag_type;
 public: // construct
     SKELETON(G const& g, N const& n, O const& o)
       : _g(g), _n(n), _o(o)
-    { untested();
+    {
     }
 public:
-    size_t size() const{ untested();
+    size_t size() const{
         return _o.size();
     }
 //    bag_range operator[](vertices_size_type x){
 //
 //    }
+    boost::iterator_range<bag_iterator> bag(vertex_descriptor i) const{
+        assert(i<_o.size());
+        auto p=boost::adjacent_vertices(_o[i], _g);
+
+        typedef boost::filter_iterator<sgm, all_adj_it> FilterIter;
+        sgm fP(_n, _o[i]);
+
+        FilterIter fb(fP, p.first, p.second);
+        FilterIter fe(fP, p.second, p.second);
+
+        return  make_iterator_range(std::make_pair(fb, fe));
+    }
+    owner_type owner(unsigned u) const {
+        return _o[u];
+    }
 private:
     G const& _g;
     N const& _n;
     O const& _o;
-};
+}; // SKELETON
 
 }
 
@@ -58,6 +100,12 @@ private:
 } // treedec
 
 namespace boost{
+
+template<class VD, class B>
+size_t num_vertices( std::vector< std::pair<VD, B> > const& skel )
+{ untested();
+    return skel.size();
+}
 
 template<class VD, class B>
 std::pair<typename std::vector< std::pair<VD, B> >::const_iterator,
@@ -88,57 +136,100 @@ B get(::treedec::bag_t, size_t u,
     return X[u].second;
 }
 
+template<class A, class B, class C>
+typename treedec::draft::SKELETON<A, B, C>::bag_type
+get(::treedec::bag_t, size_t u, treedec::draft::SKELETON<A, B, C> const& X )
+{
+    return X.bag(u);
+}
+
+template<class A, class B, class C>
+typename treedec::draft::SKELETON<A, B, C>::owner_type
+get(vertex_owner_t, size_t u, treedec::draft::SKELETON<A, B, C> const& X )
+{
+    return X.owner(u);
+}
+
+template<class A, class B, class C>
+typename treedec::draft::SKELETON<A, B, C>::vertices_size_type
+num_vertices( treedec::draft::SKELETON<A, B, C> const& skel )
+{
+    return skel.size();
+}
+
+template<class A, class B, class C>
+std::pair<boost::counting_iterator<unsigned>,
+          boost::counting_iterator<unsigned> >
+vertices( treedec::draft::SKELETON<A, B, C> const& skel )
+{
+    typedef counting_iterator<unsigned> ci;
+    return std::make_pair(ci(0), ci(skel.size()));
+}
+
 } // boost
 
 namespace treedec{
 
 namespace detail{
 
-// NOTE: G must be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
-
+// G is be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
 // if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename N_t>
 class skeleton_helper{
 public:
-    skeleton_helper(G_t const &G, T_t &T, B_t const &B, N_t const &numbering, unsigned n)
-      : _g(G), _t(T), _b(B), _numbering(numbering), _n(n)
+    skeleton_helper(G_t const& G, T_t &T, B_t const &B, N_t const &numbering)
+      : _g(G), _t(T), _b(B), _numbering(numbering)
     {
     }
 
-    template <typename X_t>
-    void bag_to_treedec(std::set<X_t> const &b, T_t &T, unsigned idx){
-        bag(idx, T) = MOVE(b);
+private: // impl
+    template <typename X_t, class B>
+    void bag_to_treedec(std::set<X_t> const &b, B &T){ untested();
+        T = MOVE(b);
     }
 
-    template <typename X_t>
-    void bag_to_treedec(std::vector<X_t> const &b, T_t &T, unsigned idx){
+    template <typename X_t, class B>
+    void bag_to_treedec(std::vector<X_t> const &b, B &T){ untested();
         for(auto bIt = b.begin(); bIt != b.end(); bIt++){
-            insert(bag(idx, T), *bIt);
+            insert(T, *bIt);
         }
     }
+    template <typename X_t, class B>
+    void bag_to_treedec(boost::iterator_range<X_t> const &b, B &T){
+        for(auto x : b){
+            push(T, x);
+        }
+    }
+public:
 
     void do_it(){
-        if(_n == 0){
+        if(boost::num_vertices(_b) == 0){ untested();
             return;
         }
 
         //Bag for the u-th elimination vertex will be stored in T[u].
-        for(unsigned u = 0; u < _n; u++){
+        for( auto x : boost::make_iterator_range(boost::vertices(_b))){
+            std::ignore = x;
             boost::add_vertex(_t);
         }
 
         //Since we made the neighbourhood N of the u-th vertex a clique,
         //the bag of the neighbour of this vertex with lowest elimination index
         //will have N as a subset.
-        unsigned max = _n-1u;
+        unsigned max = boost::num_vertices(_b)-1u;
+
+#if 0 // swapping ordering (HACK). td format... (incomplete tdprinter)
         for(unsigned u = 0; u < max; u++){
             unsigned min_index = max; //note: if there's an empty bag, we can glue
                                       //it together with an arbitrary bag.
 
             auto b=boost::get(treedec::bag_t(), u, _b);
             for(auto bIt : b ){
-                auto pos=boost::get(boost::vertex_index, _g, bIt);
-                unsigned index = _numbering.get_position( /*idmap?!*/ pos);
+                auto index=_numbering.get_position(bIt);
+
+                // BUG: get_position applies map
+                // auto pos=boost::get(boost::vertex_index, _g, bIt);
+                // unsigned index = _numbering.get_position( /*idmap?!*/ pos);
                 if(index < min_index){
                     min_index = index;
                 }
@@ -147,16 +238,38 @@ public:
             //directed.
             boost::add_edge(min_index, u, _t);
         }
+#endif
 
         //Bag for the u-th elimination vertex will be stored in T[u].
         auto p=::boost::vertices(_b);
-        size_t u=0;
+        size_t u=0; // does not work.
+//
         for(; p.first!=p.second; ++p.first){
-            auto b=boost::get(treedec::bag_t(), *p.first, _b);
             auto v=boost::get(boost::vertex_owner, *p.first, _b);
-            bag_to_treedec(b, _t, u);
-            insert(bag(u, _t), v);
+            auto b=boost::get(treedec::bag_t(), *p.first, _b);
+            auto& target_bag=boost::get(treedec::bag_t(), _t, u);
+            bag_to_treedec(b, target_bag);
+            push(target_bag, v); // insert?
             ++u;
+        }
+
+
+        for(unsigned u = 0; u < max; u++){
+            unsigned min_index = max; //note: if there's an empty bag, we can glue
+                                      //it toghether with an arbitrary bag.
+
+            auto b=boost::get(treedec::bag_t(), u, _b);
+            for(auto bIt : b ){
+                auto index=_numbering.get_position(bIt);
+
+                if(index < min_index){
+                    min_index = index;
+                }else{
+                }
+            }
+            //(min_index, u) will lead to a connected directed graph, if G_t is
+            //directed.
+            boost::add_edge(min_index, u, _t);
         }
     }
 
@@ -165,7 +278,6 @@ private:
     T_t &_t;
     B_t const &_b;
     N_t const &_numbering;
-    unsigned _n;
 }; // skeleton_helper
 
 #if 0 // WIP
@@ -201,7 +313,8 @@ void skeleton_to_treedec(G_t const &G, T_t &T, B_t const &B, O_t const &O, unsig
     }
 #endif
 
-    skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, B, n, n_);
+    assert(n_ == boost::num_vertices(B));
+    skeleton_helper<G_t, T_t, B_t, numbering_type> S(G, T, B, n);
     S.do_it();
 }
 
