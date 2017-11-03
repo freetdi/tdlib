@@ -30,8 +30,10 @@
 # include <unordered_set>
 #endif
 
-static bool const lazy_init=true;
-static bool const catch_zeroes_in_decrement=true;
+static bool const obs_lazy_init=true;
+static bool const lazy_init=false;
+static bool const obs_catch_zeroes_in_decrement=true;
+static bool const catch_zeroes_in_decrement=false;
 
 namespace treedec{
 
@@ -576,7 +578,7 @@ public: // construct
 
                 if (!missing_edges){
                     // faster by a few percent. sometimes?
-                    foundzero = lazy_init;
+                    foundzero = obs_lazy_init;
                 }
             }else{
                 //skip isolated vertices
@@ -648,7 +650,7 @@ public:
             assert(_vals[pos].value>0);
             q_eval(v, _vals[pos].value-1);
 
-            if(catch_zeroes_in_decrement &&_vals[pos].value==0){
+            if(obs_catch_zeroes_in_decrement &&_vals[pos].value==0){
                 // stash for fill, in bucket #0
                 reg(v, 0);
                 // extra hack: leave in queue, but mark unqueued.
