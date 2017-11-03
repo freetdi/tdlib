@@ -103,7 +103,7 @@ namespace boost{
 
 template<class VD, class B>
 size_t num_vertices( std::vector< std::pair<VD, B> > const& skel )
-{ untested();
+{
     return skel.size();
 }
 
@@ -184,12 +184,12 @@ public:
 
 private: // impl
     template <typename X_t, class B>
-    void bag_to_treedec(std::set<X_t> const &b, B &T){ untested();
+    void bag_to_treedec(std::set<X_t> const &b, B &T){
         T = MOVE(b);
     }
 
     template <typename X_t, class B>
-    void bag_to_treedec(std::vector<X_t> const &b, B &T){ untested();
+    void bag_to_treedec(std::vector<X_t> const &b, B &T){
         for(auto bIt = b.begin(); bIt != b.end(); bIt++){
             insert(T, *bIt);
         }

@@ -251,7 +251,7 @@ int get_width(T_t const &T){
 // Complexity: Linear in the number of vertices of T.
 template <typename T_t>
 typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
-{ untested();
+{
     typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
     std::vector<BOOL> visited(boost::num_vertices(T), false);
