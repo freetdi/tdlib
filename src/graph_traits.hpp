@@ -299,7 +299,6 @@ struct graph_helper{
 	}
 };
 
-
 } // treedec
 
 
@@ -379,8 +378,5 @@ namespace bagstuff {
 
 
 } // boost
-
-
-
 
 #endif

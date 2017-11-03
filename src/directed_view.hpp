@@ -22,8 +22,12 @@
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-// #include <boost/graph/copy.hpp>
+// #include <boost/graph/copy.hpp> BUG
 #include "treedec_traits.hpp"
+
+#ifdef USE_GALA
+#include <gala/boost.h>
+#endif
 
 namespace treedec{
 
@@ -37,15 +41,15 @@ struct dwt{
 
 	static std::string dbg(){ return "wrap directed\n"; }
 
-	static size_t init(G const& g){
+	static size_t init(G const& g){ untested();
 		return boost::num_vertices(g);
 	}
 
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){
+	static void copy(GG const& g, H& h){ untested();
 		assert(boost::is_undirected(g));
 		auto p=boost::edges(g);
-		for(; p.first!=p.second; ++p.first){
+		for(; p.first!=p.second; ++p.first){ untested();
 			auto V=boost::source(*p.first, g);
 			auto W=boost::target(*p.first, g);
 			boost::add_edge(V, W, h);
@@ -58,44 +62,71 @@ struct dwt{
 
 template<class G>
 struct dwt<G,
-	typename std::enable_if< std::is_convertible<
-	typename boost::graph_traits<G>::directed_category,
-  	boost::directed_tag>::value && !std::is_convertible<
-   typename boost::graph_traits<G>::directed_category,
-   boost::bidirectional_tag>::value, void >::type >
-{
+	typename std::enable_if<
+	   std::is_convertible< typename boost::graph_traits<G>::directed_category,
+	                        boost::directed_tag>::value
+	    && !std::is_convertible< typename boost::graph_traits<G>::directed_category,
+	                             boost::bidirectional_tag>::value, void >::type >
+{ //
 	typedef typename graph_traits<G>::directed_type& type;
 	static std::string dbg(){ return "dummy wrapper\n"; }
 
-	static G& init(G& g){
+	static G& init(G& g){ untested();
 		return g;
 	}
 
 	template<class GG, class H>
-	static void copy(GG const&, H&){
+	static void copy(GG const&, H&){ untested();
 	}
 };
 
+#ifdef USE_GALA // for now.
+VCTtemplate
+struct dwt< gala::graph<SGARGS>,
+	typename std::enable_if<
+	 std::is_convertible<
+	   typename boost::graph_traits<gala::graph<SGARGS> >::directed_category,
+		boost::directed_tag>::value
+	 && !std::is_convertible<
+	   typename boost::graph_traits<gala::graph<SGARGS> >::directed_category,
+		boost::bidirectional_tag>::value ,
+	 void >::type >
+{ //
+	typedef gala::graph<SGARGS> G;
+	typedef typename gala::graph<SGARGS>::directed_type type;
+	static std::string dbg(){ return "gala wrapper\n"; }
+
+	static type init(G&){ untested();
+		return type();
+	}
+
+	template<class GG, class H>
+	static void copy(GG && g, H& h){ untested();
+		h = std::move(g);
+	}
+};
+#else
+#endif
 template<class G>
 struct dwt<G,
 	typename std::enable_if< std::is_convertible<
 	typename boost::graph_traits<G>::directed_category,
   	boost::bidirectional_tag>::value, void >::type >
-{
+{ //
 	typedef typename graph_traits<G>::directed_type type;
 	static std::string dbg(){ return "bidir wrapper\n"; }
 
-	static size_t init(G&){
+	static size_t init(G&){ untested();
 		return 0;
 	}
 
 	// check: do we need this copy?
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){
+	static void copy(GG const& g, H& h){ untested();
 		assert(!boost::num_vertices(h));
 		assert(boost::is_directed(h));
 		auto p=boost::edges(g);
-		for(; p.first!=p.second; ++p.first){
+		for(; p.first!=p.second; ++p.first){ untested();
 			auto e=*p.first;
 			auto V=boost::source(e, g);
 			auto W=boost::target(e, g);
@@ -112,7 +143,6 @@ struct dwt<G,
 
 template<class G>
 class directed_view{
-
 public:
 	typedef detail::dwt<G> wrapper_help;
 	typedef typename detail::dwt<G>::type backend_type;
@@ -121,10 +151,10 @@ public:
 	typedef typename boost::graph_traits<wrapped_type> wrapped_traits;
 	typedef typename wrapped_traits::vertex_descriptor vertex_descriptor;
 	typedef typename wrapped_traits::edge_descriptor edge_descriptor;
-	typedef typename wrapped_traits::out_edge_iterator out_edge_iterator;
 	typedef typename wrapped_traits::adjacency_iterator adjacency_iterator;
 	typedef typename wrapped_traits::vertex_iterator vertex_iterator;
 	typedef typename wrapped_traits::edge_iterator edge_iterator;
+	typedef typename wrapped_traits::out_edge_iterator out_edge_iterator;
 	typedef typename wrapped_traits::vertices_size_type vertices_size_type;
 	typedef typename wrapped_traits::degree_size_type degree_size_type;
 	typedef typename wrapped_traits::edges_size_type edges_size_type;
@@ -132,8 +162,6 @@ public:
 	typedef typename wrapped_traits::edge_parallel_category edge_parallel_category;
 
 	typedef typename boost::directed_tag directed_category;
-
-//	typedef typename wrapped_traits::traversal_category traversal_category;
 	typedef typename boost::adjacency_graph_tag traversal_category;
 
 private:
@@ -143,7 +171,7 @@ public:
 	directed_view(G& g, bool commit=false)
 	 : _g(wrapper_help::init(g)),
 	   _commit(commit)
-	{
+	{ untested();
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge
@@ -154,26 +182,36 @@ public:
 		wrapper_help::copy(g, _g);
 	}
 
-	~directed_view(){
+	~directed_view(){ untested();
 		if(_commit){ untested();
 			incomplete();
-		}else{
+		}else{ untested();
 		}
 	}
 
 public: // dangerous?
-	wrapped_type* operator->(){ return &_g; }
-	wrapped_type& operator*(){ return _g; }
-	wrapped_type const& operator*() const{ return _g; }
+	wrapped_type* operator->(){ untested();
+		return &_g;
+	}
+	wrapped_type& operator*(){ itested();
+		return _g;
+	}
+	wrapped_type const& operator*() const{ itested();
+		return _g;
+	}
 public: // unnecessary
 	std::pair< typename boost::graph_traits<G>::vertex_iterator,
 		typename boost::graph_traits<G>::vertex_iterator>
-	vertices() const{
+	vertices() const{ untested();
 		return boost::vertices(_g);
 	}
 	std::pair<adjacency_iterator, adjacency_iterator>
-	adjacent_vertices(vertex_descriptor v) const{
+	adjacent_vertices(vertex_descriptor v) const{ untested();
 		return boost::adjacent_vertices(v, _g);
+	}
+	std::pair<out_edge_iterator, out_edge_iterator>
+	out_edges(vertex_descriptor v) const{ untested();
+		return boost::out_edges(v, _g);
 	}
 	typename boost::graph_traits<G>::vertices_size_type
 	degree(typename boost::graph_traits<G>::vertex_descriptor v) const{ untested();
@@ -183,18 +221,9 @@ public: // unnecessary
 private:
 	backend_type _g;
 	bool _commit;
-}; // directed_view
+};
 
 } // draft
-
-#if 1
-// default directed view
-// there are better ways
-template<class G>
-struct directed_view_select{
-    typedef treedec::draft::directed_view<G> type;
-};
-#endif
 
 } // treedec
 
@@ -215,7 +244,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::vertex_iterator vertex_iterator;
 	typedef typename B::edge_iterator edge_iterator;
-	typedef typename B::out_edge_iterator out_edge_iterator; //?
+	typedef typename B::out_edge_iterator out_edge_iterator;
 	typedef typename B::directed_category directed_category;
 	typedef typename B::adjacency_iterator adjacency_iterator;
 
@@ -225,7 +254,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::traversal_category traversal_category;
 
-	static vertex_descriptor null_vertex(){
+	static vertex_descriptor null_vertex(){ untested();
 		return 0; // graph_traits<W>::null_vertex();
 	}
 };
@@ -241,14 +270,14 @@ struct property_map<treedec::draft::directed_view<G>, T> {
 template<class G>
 degree_property_map<treedec::draft::directed_view<G> >
 get(vertex_degree_t t, treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return get(t, *g);
 }
 
 template<class G>
 degree_property_map<treedec::draft::directed_view<G> >
 get(vertex_degree_t t, treedec::draft::directed_view<G>& g)
-{
+{ untested();
 	return get(t, *g);
 }
 
@@ -256,15 +285,27 @@ template<class T, class G>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
                       T>::type
 get(T t, treedec::draft::directed_view<G>& g)
-{
+{ untested();
 	return get(t, *g);
 }
+
+#if 0
+template<class G>
+typename treedec::draft::directed_view<G>::vertices_size_type
+get(vertex_index_t,
+		treedec::draft::directed_view<G> const& g,
+		typename treedec::draft::directed_view<G>::vertex_descriptor v
+		)
+{ untested();
+	return get(get(vertex_index, *g), v);
+}
+#endif
 
 template<class T, class G>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
                       T>::const_type
 get(T t, treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return get(t, *g);
 }
 
@@ -272,13 +313,13 @@ template<class T, class G, class V>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
                       T>::value_type
 get(T t, treedec::draft::directed_view<G> const& g, V v)
-{
+{ untested();
 	return get(t, *g, v);
 }
 
 template<class T, class G, class V, class W>
 void put(T t, treedec::draft::directed_view<G>& g, V v, W w)
-{
+{ untested();
 	return put(t, *g, v, w);
 }
 
@@ -286,28 +327,29 @@ template<class G>
 typename property_map<typename treedec::draft::directed_view<G>::wrapped_type,
                       boost::edge_all_t>::const_type
 get(edge_all_t, treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return get(edge_all, *g);
 }
 
 template<class G>
 typename treedec::draft::directed_view<G>::vertices_size_type
 num_vertices(treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return num_vertices(*g);
 }
 
 template<class G>
 typename graph_traits<G>::edges_size_type
 num_edges(treedec::draft::directed_view<G> const& g)
-{
+{ untested();
+	untested();
 	return num_edges(*g);
 }
 
 template<class VD, class G>
 typename graph_traits<G>::vertices_size_type
 out_degree(VD v, treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return out_degree(v, *g);
 }
 
@@ -315,23 +357,23 @@ template<class VD, class G>
 typename graph_traits<G>::vertices_size_type
 	// BUG: out_degree!
 degree(VD v, treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return out_degree(v, *g);
 }
 
 template<class VD, class G>
 void clear_vertex(VD v, treedec::draft::directed_view<G>& g)
-{
+{ untested();
 	return clear_vertex(v, *g);
 }
 
 template<class VD, class G>
 std::pair<typename treedec::draft::directed_view<G>::edge_descriptor, bool >
 add_edge(VD v, VD w, treedec::draft::directed_view<G>& g)
-{
+{ untested();
 #ifndef NDEBUG
 	// hmm directed_view disallows multiedges.
-	if(edge(v, w, *g).second){
+	if(edge(v, w, *g).second){ untested();
 		incomplete();
 		// that will not work with vectors
 		return std::make_pair(edge(v, w, *g).first, true);
@@ -345,16 +387,15 @@ void remove_edge(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		typename treedec::draft::directed_view<G>::vertex_descriptor w,
 		treedec::draft::directed_view<G>& g)
-{
+{ untested();
 	return remove_edge(v, w, *g);
 }
 
 template<class G, class P>
 void remove_out_edge_if(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
-		P const& p,
-		treedec::draft::directed_view<G>& g)
-{
+		P p, treedec::draft::directed_view<G>& g)
+{ untested();
 	return remove_out_edge_if(v, p, *g);
 }
 
@@ -364,7 +405,17 @@ edge(
 	typename treedec::draft::directed_view<G>::vertex_descriptor v,
 	typename treedec::draft::directed_view<G>::vertex_descriptor w,
 	treedec::draft::directed_view<G>& g)
-{
+{ untested();
+	return edge(v, w, *g);
+}
+
+template<class G>
+std::pair<typename treedec::draft::directed_view<G>::edge_descriptor, bool >
+edge(
+	typename treedec::draft::directed_view<G>::vertex_descriptor v,
+	typename treedec::draft::directed_view<G>::vertex_descriptor w,
+	treedec::draft::directed_view<G> const& g)
+{ untested();
 	return edge(v, w, *g);
 }
 
@@ -372,15 +423,16 @@ template<class G>
 typename treedec::draft::directed_view<G>::vertex_descriptor
 source(typename treedec::draft::directed_view<G>::edge_descriptor w,
 		treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return source(w, *g);
 }
 
+// bug: disable if edge_descriptor is a pair?!
 template<class G>
 typename treedec::draft::directed_view<G>::vertex_descriptor
 target(typename treedec::draft::directed_view<G>::edge_descriptor w,
 		treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return target(w, *g);
 }
 
@@ -389,7 +441,7 @@ std::pair<
 	typename treedec::draft::directed_view<G>::vertex_iterator,
 	typename treedec::draft::directed_view<G>::vertex_iterator>
 vertices(treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return vertices(*g);
 }
 
@@ -398,7 +450,7 @@ std::pair<
 	typename treedec::draft::directed_view<G>::edge_iterator,
 	typename treedec::draft::directed_view<G>::edge_iterator>
 edges(treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return edges(*g);
 }
 
@@ -409,8 +461,8 @@ std::pair<
 out_edges(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		treedec::draft::directed_view<G> const& g)
-{
-	return out_edges(v, *g);
+{ untested();
+	return g.out_edges(v);
 }
 
 template<class G>
@@ -420,7 +472,7 @@ std::pair<
 adjacent_vertices(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		treedec::draft::directed_view<G> const& g)
-{
+{ untested();
 	return g.adjacent_vertices(v);
 }
 
@@ -431,4 +483,13 @@ adjacent_vertices(
 
 } // boost
 
-#endif
+namespace treedec {
+
+template<class G>
+struct directed_view_select{
+    typedef treedec::draft::directed_view<G> type;
+};
+
+}
+
+#endif // guard

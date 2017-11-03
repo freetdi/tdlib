@@ -31,14 +31,6 @@ namespace treedec{
 
 namespace impl{
 
-#if 1
-// check: why is this in experimental?
-template<class G>
-struct directed_view_select{
-    typedef treedec::draft::directed_view<G> type;
-};
-#endif
-
 template <typename G_t, typename O_t,
           template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_base : public ::treedec::algo::draft::algo1{
