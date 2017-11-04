@@ -836,6 +836,13 @@ void LEX_M_minimal_ordering(const G_t &G,
 */
 }
 
+// start heuristics.hpp?
+namespace he {
+    // yes, no camel case, as all the others.
+    template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
+    using fill_in=treedec::impl::fillIn<x, C>;
+}
+
 } //namespace treedec
 
 #undef get_pos

@@ -33,10 +33,11 @@ struct cfg_node
   cfg_alive_t alive;
   cfg_dying_t dying;
 };
+
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
-                              boost::bidirectionalS, cfg_node> cfg_t;
+                              GDIR, cfg_node> cfg_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
-                              boost::bidirectionalS, tree_dec_node> tree_dec_t;
+                              TDIR, tree_dec_node> tree_dec_t;
 
 REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
 
@@ -49,10 +50,11 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
 #include <tdlib/combinations.hpp>
 
 
+typedef treedec::he::fill_in<cfg_t> FI;
+typedef treedec::he::thorup<cfg_t> thorup;
 typedef treedec::comb::PP_MD<cfg_t> PP_MD;
 typedef treedec::comb::PP_FI<cfg_t> PP_FI;
 typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
-typedef treedec::thorup<cfg_t> thorup;
 
 #ifdef USE_GALA
 typedef treedec::comb::ex17<cfg_t> ppta;
@@ -72,9 +74,8 @@ static void do_it(G const& g_){
 	//assert(treedec::get_bagsize(t) == 3);
 	std::cout << treedec::get_bagsize(t) << "\n";
 	auto nt=boost::num_vertices(t);
-	assert(treedec::is_valid_treedecomposition(g, t));
-	treedec::nice::nicify(t);
 
+	assert(treedec::is_valid_treedecomposition(g, t));
 
 	for(unsigned i=0; i<nt; ++i){
 		std::cout << i << ":";
@@ -84,7 +85,12 @@ static void do_it(G const& g_){
 		std::cout << "\n";
 	}
 
+#ifndef NO_NICIFY
 	treedec::nice::nicify(t);
+	assert(treedec::is_valid_treedecomposition(g, t));
+#else
+	incomplete();
+#endif
 }
 
 #ifndef INLINE_CC
@@ -96,28 +102,28 @@ int main()
 	boost::print_graph(g);
 	std::cout << "====\n";
 
-	cfg_t h1(g);
-	cfg_t h2(g);
-	cfg_t h3(g);
-	cfg_t h4(g);
-	cfg_t h5(g);
+	std::cout << "FI\n";
+	do_it<cfg_t, FI>(g);
 
 	std::cout << "thorup\n";
-	do_it<cfg_t, thorup>(h1);
+	do_it<cfg_t, thorup>(g);
+
+	std::cout << "FI\n";
+	do_it<cfg_t, FI>(g);
 
 	std::cout << "skip PP+MD\n";
-//	do_it<cfg_t, PP_MD>(h2);
+//	do_it<cfg_t, PP_MD>(g);
 
 	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI>(h3);
+//	do_it<cfg_t, PP_FI>(g);
 
 	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI_TM>(h4);
+//	do_it<cfg_t, PP_FI_TM>(g);
 
 
 #ifdef USE_GALA
 	std::cout << "ppta\n";
-	do_it<cfg_t, ppta>(h5);
+	do_it<cfg_t, ppta>(g);
 #endif
 
 

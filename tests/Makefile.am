@@ -47,14 +47,17 @@ check_PROGRAMS = \
 	pp \
 	pp0 \
 	print_concept \
-	sdcc \
+	sdcc_bb \
+	sdcc_ub \
+	sdcc_uu \
+	sdcc_bu \
 	vec2tree
 
 # these fail. known bug...
 XFAIL_TESTS = \
 	bucket_sorter_2u
 
-inline_SOURCES=sdcc.cpp inline.cpp
+inline_SOURCES=sdcc_bb.cpp inline.cpp
 inline_CXXFLAGS=${AM_CXXFLAGS}
 
 notyets = \
@@ -73,13 +76,13 @@ AM_DEFAULT_SOURCE_EXT=.cpp
 BUILT_SOURCES = tdlib
 CLEANFILES = ${BUILT_SOURCES} *~
 
-AM_CPPFLAGS = -I. -DTRACE_UNTESTED -UNDEBUG
+AM_CPPFLAGS = -I. -I${srcdir} -DTRACE_UNTESTED -UNDEBUG
 AM_CXXFLAGS = -O0 -g
 
 tdlib:
 	-ln -sf $(top_srcdir)/src tdlib
 
-EXTRA_DIST = g.h
+EXTRA_DIST = g.h sdcc_.cpp
 # 	svbs_random.h
 
 ${TESTS:%=%.log}: .P

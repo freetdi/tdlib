@@ -395,6 +395,11 @@ private:
 	decomp_type _t;
 };
 
+namespace he {
+    template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
+    using thorup=treedec::thorup<x, C>;
+}
+
 } // treedec
 
 #endif
