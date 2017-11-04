@@ -64,6 +64,8 @@ notyets = \
 	dfs \
 	bfs
 
+${TESTS:%=%.o}: tdlib
+
 TESTS = $(check_PROGRAMS)
 
 AM_DEFAULT_SOURCE_EXT=.cpp
@@ -79,3 +81,10 @@ tdlib:
 
 EXTRA_DIST = g.h
 # 	svbs_random.h
+
+${TESTS:%=%.log}: .P
+
+.PHONY: .P
+
+.P:
+	@:
