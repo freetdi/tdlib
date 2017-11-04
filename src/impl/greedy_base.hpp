@@ -101,7 +101,7 @@ protected: // construct/destruct
         // yes: not necessary if we use subgraph with edge deletion.
         auto p=boost::vertices(g);
         for(; p.first!=p.second; ++p.first){
-            auto d=boost::out_degree(*p.first, g);
+            auto d=boost::out_degree(*p.first, _g);
             _degreemap[*p.first] = d;
         }
 
