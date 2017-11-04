@@ -132,9 +132,10 @@ namespace detail{
 
 template<class G_t>
 struct default_directed_select{
-   typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> type;
+   typedef void type; // bug?
 };
 
+// maybe just all? be conservative
 template<class X, class Y, class Z>
 struct default_directed_select< boost::adjacency_list<X, Y, boost::directedS, Z> >{
    typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
@@ -142,6 +143,11 @@ struct default_directed_select< boost::adjacency_list<X, Y, boost::directedS, Z>
 
 template<class X, class Y, class Z>
 struct default_directed_select< boost::adjacency_list<X, Y, boost::bidirectionalS, Z> >{
+   typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
+};
+
+template<class X, class Y, class Z>
+struct default_directed_select< boost::adjacency_list<X, Y, boost::undirectedS, Z> >{
    typedef boost::adjacency_list<X, Y, boost::directedS, Z> type;
 };
 
