@@ -217,7 +217,7 @@ public:
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
           _numbering(_g, _id)
-    {
+    { untested();
         assert(_num_edges ^ 1);
         _num_edges /= 2;
         _lb_bs = 1;
