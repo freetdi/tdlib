@@ -84,7 +84,6 @@ namespace detail{//
         // size?
         // is_ordered?
     };
-#ifndef NDEBUG // for now. (this is slow.)
     template<class C>
     struct container_inspect<C,
       typename std::enable_if<
@@ -96,7 +95,6 @@ namespace detail{//
           return std::find(c.begin(), c.end(), e) != c.end();
         }
     };
-#endif
     template<class C, class X=void>
     struct container_modify{//
         // push, insert new item
