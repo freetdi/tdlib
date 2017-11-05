@@ -285,13 +285,6 @@ inline void detach_neighborhood(
     boost::clear_vertex(c, g);
 }
 
-
-// count number of edges missing in 1-neighborhood of v
-// OBSOLETE
-// OBSOLETE
-// OBSOLETE
-
-
 // collect neighbors of c into bag
 // remove c from graph (i.e. isolate).
 // turn subgraph induced by bag into clique.
