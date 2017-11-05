@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef TD_SEPARATOR_ALGORITHM
-#define TD_SEPARATOR_ALGORITHM
+#ifndef TREEDEC_SEPARATOR_ALGORITHM_HPP
+#define TREEDEC_SEPARATOR_ALGORITHM_HPP
 
 #include <set>
 #include <vector>

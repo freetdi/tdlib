@@ -17,8 +17,8 @@
 
 // container access
 
-#ifndef TD_CONTAINER_TRAITS_HPP
-#define TD_CONTAINER_TRAITS_HPP
+#ifndef TREEDEC_CONTAINER_TRAITS_HPP
+#define TREEDEC_CONTAINER_TRAITS_HPP
 
 #include <vector>
 #include <assert.h>

@@ -15,8 +15,8 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-#ifndef TD_GRAPH_IMPL_H
-#define TD_GRAPH_IMPL_H
+#ifndef TREEDEC_GRAPH_IMPL_HPP
+#define TREEDEC_GRAPH_IMPL_HPP
 #include "graph_traits.hpp"
 
 namespace treedec{

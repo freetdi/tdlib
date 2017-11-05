@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_GENERIC_ELIM_SEARCH_CONFIGS
-#define TD_GENERIC_ELIM_SEARCH_CONFIGS
+#ifndef TREEDEC_GENERIC_ELIMINATION_SEARCH_CONFIGS_HPP
+#define TREEDEC_GENERIC_ELIMINATION_SEARCH_CONFIGS_HPP
 
 #include <vector>
 #include <limits.h>
@@ -408,5 +408,5 @@ struct CFG_DFS_p17_2 : generic_elimination_search_DFS<G_t, CFG_DFS_p17_2<G_t, CF
 
 } //namespace treedec
 
-#endif //TD_GENERIC_ELIM_SEARCH
+#endif // TREEDEC_GENERIC_ELIMINATION_SEARCH_CONFIGS_HPP
 // vim:ts=8:sw=4:et

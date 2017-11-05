@@ -17,8 +17,8 @@
 //
 // Configure degree tracker.
 
-#ifndef TD_DEGREE_CONFIG_H
-#define TD_DEGREE_CONFIG_H
+#ifndef TREEDEC_DEGREE_CONFIG_HPP
+#define TREEDEC_DEGREE_CONFIG_HPP
 #include <boost/graph/graph_traits.hpp>
 #include "trace.hpp"
 #include <set>

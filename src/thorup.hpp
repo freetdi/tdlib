@@ -1,4 +1,4 @@
-// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
+// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2017
 //
 // some changes:
 // Felix Salfelder 2017
@@ -51,8 +51,8 @@
 //        - bag access
 //        - list->vector
 //
-#ifndef TDLIB_PKK_THORUP_H
-#define TDLIB_PKK_THORUP_H
+#ifndef TREEDEC_THORUP_HPP
+#define TREEDEC_THORUP_HPP
 
 #include <map>
 #include <vector>

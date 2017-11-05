@@ -29,8 +29,8 @@
 
 /* WARNING: You should not use this algorithm (huge running time) */
 
-#ifndef TD_DYNAMICCR
-#define TD_DYNAMICCR
+#ifndef TREEDEC_DYNAMICCR_HPP
+#define TREEDEC_DYNAMICCR_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -284,6 +284,6 @@ static void CR_dynamic_decomp(G_t &G, T_t &T){
 
 } //namespace treedec
 
-#endif //ifdef TD_DYNAMICCR
+#endif //ifdef TREEDEC_DYNAMICCR_HPP
 
 // vim:ts=8:sw=4:et

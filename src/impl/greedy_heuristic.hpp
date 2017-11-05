@@ -19,10 +19,10 @@
 //
 // greedy heuristics
 
-#ifndef TD_IMPL_GREEDY_HPP
-#define TD_IMPL_GREEDY_HPP
+#ifndef TREEDEC_GREEDY_HEURISTIC_HPP
+#define TREEDEC_GREEDY_HEURISTIC_HPP
 
-#ifndef TD_ELIMINATION_ORDERINGS
+#ifndef TREEDEC_ELIMINATION_ORDERINGS_HPP
 #error "not intended to be used like that."
 #endif
 

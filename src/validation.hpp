@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_VALIDATION
-#define TD_VALIDATION
+#ifndef TREEDEC_VALIDATION_HPP
+#define TREEDEC_VALIDATION_HPP
 
 namespace treedec{
 
@@ -118,4 +118,4 @@ bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<type
 
 } //namespace treedec
 
-#endif //ifdef TD_VALIDATION
+#endif //ifdef TREEDEC_VALIDATION_HPP

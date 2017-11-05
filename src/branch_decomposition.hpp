@@ -17,8 +17,8 @@
 //
 //
 
-#ifndef TD_BRANCH_DECOMPOSITION
-#define TD_BRANCH_DECOMPOSITION
+#ifndef TREEDEC_BRANCH_DECOMPOSITION_HPP
+#define TREEDEC_BRANCH_DECOMPOSITION_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 #include "simple_graph_algos.hpp"
@@ -304,6 +304,6 @@ void tree_to_branch_decomposition(G_t &G, T_t &T){
 
 } //namespace treedec
 
-#endif //TD_BRANCH_DECOMPOSITION
+#endif //TREEDEC_BRANCH_DECOMPOSITION_HPP
 
 // vim:ts=8:sw=4:et

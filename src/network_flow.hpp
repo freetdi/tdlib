@@ -66,8 +66,8 @@ For a proof of correctness of the algorithm below, see e.g.
      Springer-Verlag New York, Inc., Secaucus, NJ, USA.
 */
 
-#ifndef TD_NETWORK_FLOW
-#define TD_NETWORK_FLOW
+#ifndef TREEDEC_NETWORK_FLOW_HPP
+#define TREEDEC_NETWORK_FLOW_HPP
 
 #include <vector>
 
@@ -506,6 +506,6 @@ void seperate_vertices(G_t &G, std::vector<BOOL> &disabled, unsigned num_dis,
 
 } //namespace treedec
 
-#endif //TD_NETWORK_FLOW
+#endif //TREEDEC_NETWORK_FLOW_HPP
 
 // vim:ts=8:sw=4:et

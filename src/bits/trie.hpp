@@ -22,8 +22,8 @@
  *
  * a trie based container (inspired by Hisao Tamakis tw-exact implementation)
  */
-#ifndef TDLIB_TRIE_HPP
-#define TDLIB_TRIE_HPP
+#ifndef TREEDEC_TRIE_HPP
+#define TREEDEC_TRIE_HPP
 /*--------------------------------------------------------------------------*/
 // #include "trace.hpp"
 #include "triealloc.hpp"

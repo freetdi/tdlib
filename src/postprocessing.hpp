@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef TD_POSTPROCESSING
-#define TD_POSTPROCESSING
+#ifndef TREEDEC_POSTPROCESSING_HPP
+#define TREEDEC_POSTPROCESSING_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 #include "elimination_orderings.hpp"
@@ -441,6 +441,6 @@ inline void minimalChordal(G_t &G,
 
 #undef get_pos
 
-#endif //ifdef TD_POSTPROCESSING
+#endif //ifdef TREEDEC_POSTPROCESSING_HPP
 
 // vim:ts=8:sw=4:et:
