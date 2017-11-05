@@ -216,7 +216,7 @@ public:
           _num_edges(boost::num_edges(_g)),
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
-          _numbering(_g)
+          _numbering(_g, _id)
     {
         assert(_num_edges ^ 1);
         _num_edges /= 2;

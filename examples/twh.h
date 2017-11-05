@@ -64,7 +64,8 @@ enum thread_n{
     nFITM = 10,
     nPPMD = 11,
     nPPFI = 12,
-    nTOTAL = 13
+    nPP = 13,
+    nTOTAL = 14
 };
 
 std::mutex best_mutex;
@@ -218,6 +219,9 @@ struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
 #if defined USE_SOME
 #include "some_thread.h"
 #endif
+#endif
+#ifdef USE_PP
+#include "pp_thread.h"
 #endif
 #ifdef USE_THORUP
 #include "th_thread.h"
@@ -549,6 +553,15 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
+#ifdef USE_PP
+    if(!(mask & ( 1 << nPP ))) {
+    }else if( m < M16){ untested();
+        reg_thread(threads, nPP, new PP_THREAD<uG16, grtd_algo_config>(g16, "PP_16"));
+    }else{ untested();
+        reg_thread(threads, nPP, new PP_THREAD<uG32, grtd_algo_config>(g32, "PP_32"));
+    }
+#endif
+/*--------------------------------------------------------------------------*/
 #ifdef USE_FIPPTM
     if(!(mask & ( 1 << nPPFITM ))) {
     }else if( m < M16){ untested();
@@ -776,6 +789,8 @@ static void parseargs(int argc, char * const * argv)
             errorlevel=bNOERROR;
         }else if(!strncmp("--dot", argv[i], 5)){ untested();
             fformat = f_DOT;
+        }else if(!strncmp("--pp", argv[i], 4)){ untested();
+            mask_in |= (1<<nPP);
         }else if(!strncmp("--he17", argv[i], 6)){ untested();
             mask_in |= (1<<nP17);
         }else if(!strncmp("--ex17", argv[i], 6)){ untested();
