@@ -265,7 +265,7 @@ public:
             for(; Is.first!=Is.second; ++Is.first){
                 assert(treedec::is_valid(*Is.first, _g));
                 if(_numbering.is_before(v, *Is.first)){
-                    B.insert(*Is.first);
+                    push(B, *Is.first);
                 }
             }
             // expensive?
