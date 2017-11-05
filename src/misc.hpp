@@ -608,12 +608,16 @@ void make_rooted(T_undir_t &T, T_dir_t &T_)
 
 //Glues a single bag with the current tree decomposition T according to subset relation.
 //Version used for preprocessing.
+// BUG: this is inefficient. there's already a better implementation
+// (where?)
 template<typename T_t>
 void glue_bag(
         typename treedec_traits<T_t>::bag_type &b,
         typename treedec_traits<T_t>::vd_type elim_vertex,
         T_t &T)
 {
+    // BOOST_STATIC_ASSERT(something_is_a_set);
+    typedef typename boost::graph_traits<T_t>::vertex_descriptor t_vertex_descriptor;
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
 
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
@@ -621,21 +625,23 @@ void glue_bag(
                          boost::get(bag_t(), T, *vIt).end(),
                          b.begin(), b.end()))
         {
-            if(boost::get(bag_t(), T, *vIt).find(elim_vertex) != BAG_(*vIt, T).end()){
-                return;
-            }
-            b.insert(elim_vertex);
-            typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-            BAG_(t_dec_node, T) = MOVE(b);
+            // BUG, inefficient for vectors.
+            if(!contains(BAG_(*vIt, T), elim_vertex)){
+                push(b, elim_vertex);
+                t_vertex_descriptor t_dec_node=boost::add_vertex(T);
+                BAG_(t_dec_node, T) = MOVE(b);
 
-            boost::add_edge(*vIt, t_dec_node, T);
+                boost::add_edge(*vIt, t_dec_node, T);
+            }else{ untested();
+            }
             return;
+        }else{ itested();
         }
     }
 
     //Case for a disconnected graph.
-    typename boost::graph_traits<T_t>::vertex_descriptor t_dec_node = boost::add_vertex(T);
-    b.insert(elim_vertex);
+    t_vertex_descriptor t_dec_node = boost::add_vertex(T);
+    push(b, elim_vertex);
     BAG_(t_dec_node, T) = MOVE(b);
 
     if(boost::num_vertices(T) > 1){
