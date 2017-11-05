@@ -84,12 +84,13 @@ bool trace=false;
 #include <gala/examples/ssg_random.h>
 #endif
 // #include <boost/graph/minimum_degree_ordering.hpp>
+//
+// move not possible yet
 #include <gala/examples/ssg32i.h> // -> td.h
 #include <gala/examples/ssg16i.h> // -> td.h
 #include <gala/examples/ssg16ia.h> // -> td.h
 #include <gala/examples/svbs.h> // -> td.h
 #include <gala/examples/svbs_random.h> // -> td.h
-#include <gala/td.h>
 
 #include <gala/immutable.h>
 #else
@@ -125,6 +126,7 @@ struct test{
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
+#include <gala/td.h>
 #endif
 #include "twthread.hpp"
 

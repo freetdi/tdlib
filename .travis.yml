@@ -32,7 +32,7 @@ install:
   - sudo pip install cython
 
 script:
-  - GALA_COMMIT=4e8827ab40
+  - GALA_COMMIT=93f5c2e11d7075
 
   - uname -a
   - g++ --version
@@ -51,10 +51,10 @@ script:
 
   # redo with gala
   - wget https://github.com/freetdi/gala/archive/${GALA_COMMIT}.tar.gz
-  - mkdir gala
-  - ( cd gala; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
-  - ( cd gala; ./configure )
-  - make -C gala install DESTDIR=${PWD} PREFIX=GP
+  - mkdir gala_src
+  - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
+  - ( cd gala_src; ./configure )
+  - make -C gala_src install DESTDIR=${PWD} prefix=GP
   - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}/GP/include
   - make check
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
