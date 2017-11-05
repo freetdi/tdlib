@@ -1,6 +1,6 @@
 
-#ifndef BUCKET_SORTER_DETAILS
-#define BUCKET_SORTER_DETAILS
+#ifndef TREEDEC_BUCKET_SORTER_BITS_HPP
+#define TREEDEC_BUCKET_SORTER_BITS_HPP
 
 #include "container_traits.hpp"
 #include "bucket_sorter.hpp"
