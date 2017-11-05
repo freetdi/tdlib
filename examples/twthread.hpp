@@ -19,8 +19,8 @@
  * graph decomposition thread
  */
 
-#ifndef TD_THREAD_HPP
-#define TD_THREAD_HPP
+#ifndef TREEDEC_THREAD_HPP
+#define TREEDEC_THREAD_HPP
 
 #include <boost/thread.hpp>
 #include <boost/graph/graph_traits.hpp>

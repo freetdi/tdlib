@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef TD_MISC
-#define TD_MISC
+#ifndef TREEDEC_MISC_HPP
+#define TREEDEC_MISC_HPP
 
 #include <stack>
 #include <queue>
@@ -824,6 +824,6 @@ void remove_isolated_vertices(G_t &G){
 
 #undef BAG_
 
-#endif //TD_MISC
+#endif //TREEDEC_MISC_HPP
 
 // vim:ts=8:sw=4:et

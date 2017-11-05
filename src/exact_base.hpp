@@ -22,8 +22,8 @@
 // #define NEWRANGE
 // ( TODO: move to pp_base, this way it does not work )
 
-#ifndef TD_EXACT_H
-#define TD_EXACT_H
+#ifndef TREEDEC_EXACT_BASE_HPP
+#define TREEDEC_EXACT_BASE_HPP
 
 #include "lower_bounds.hpp"
 #include "preprocessing.hpp"

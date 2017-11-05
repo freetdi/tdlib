@@ -17,8 +17,8 @@
 //
 //
 // induced subgraph
-#ifndef TD_IND_SG_HPP
-#define TD_IND_SG_HPP
+#ifndef TREEDEC_INDUCED_SUBGRAPH_HPP
+#define TREEDEC_INDUCED_SUBGRAPH_HPP
 
 // graph const&+member_pred const&=induced subgraph.
 //

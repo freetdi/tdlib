@@ -17,8 +17,8 @@
 
 // container access
 
-#ifndef TD_CONTAINER_HPP
-#define TD_CONTAINER_HPP
+#ifndef TREEDEC_CONTAINER_HPP
+#define TREEDEC_CONTAINER_HPP
 
 // #include "config.h" // not yet
 #include "container_traits.hpp"

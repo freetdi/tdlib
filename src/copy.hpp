@@ -1,7 +1,7 @@
 //TODO: header
 
-#ifndef TD_COPY_HPP
-#define TD_COPY_HPP
+#ifndef TREEDEC_COPY_HPP
+#define TREEDEC_COPY_HPP
 
 #include <boost/graph/copy.hpp>
 

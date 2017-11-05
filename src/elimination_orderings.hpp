@@ -39,8 +39,8 @@
  *
 */
 
-#ifndef TD_ELIMINATION_ORDERINGS
-#define TD_ELIMINATION_ORDERINGS
+#ifndef TREEDEC_ELIMINATION_ORDERINGS_HPP
+#define TREEDEC_ELIMINATION_ORDERINGS_HPP
 
 #include <cmath>
 #include <climits>
@@ -847,6 +847,6 @@ namespace he {
 
 #undef get_pos
 
-#endif //TD_ELIMINATION_ORDERINGS
+#endif //TREEDEC_ELIMINATION_ORDERINGS_HPP
 
 // vim:ts=8:sw=4:et

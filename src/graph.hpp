@@ -33,8 +33,8 @@
  *    G& g, typename outedge_set<G>::type& bag)
  */
 
-#ifndef TD_GRAPH_H
-#define TD_GRAPH_H
+#ifndef TREEDECGRAPH_HPP
+#define TREEDECGRAPH_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef TD_UTIL_H
-#define TD_UTIL_H
+#ifndef TREEDEC_UTIL_HPP
+#define TREEDEC_UTIL_HPP
 
 #include "marker_util.hpp"
 

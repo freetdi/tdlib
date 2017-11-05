@@ -19,8 +19,8 @@
  * graph decomposition algorithms, traits.
  */
 
-#ifndef TD_ALGO_HPP
-#define TD_ALGO_HPP
+#ifndef TREEDEC_ALGO_HPP
+#define TREEDEC_ALGO_HPP
 
 #include <limits>
 #include "timer.hpp"

@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_PRINTER_HPP
-#define TD_PRINTER_HPP
+#ifndef TREEDEC_PRINTER_HPP
+#define TREEDEC_PRINTER_HPP
 
 #include <ostream>
 #include <string>

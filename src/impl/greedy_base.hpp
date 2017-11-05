@@ -19,8 +19,8 @@
 //
 // greedy base
 //
-#ifndef TD_GREEDY_BASE_HPP
-#define TD_GREEDY_BASE_HPP
+#ifndef TREEDEC_GREEDY_BASE_HPP
+#define TREEDEC_GREEDY_BASE_HPP
 
 // FIXME, rearrange, maybe move all to bits?
 #include "../graph_traits.hpp"
