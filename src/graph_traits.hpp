@@ -20,6 +20,9 @@
 #ifndef TREEDEC_GRAPH_TRAITS_HPP
 #define TREEDEC_GRAPH_TRAITS_HPP
 
+// BUG, some old code depends on this (and shouldn't)
+#define TD_GRAPH_TRAITS_HPP
+
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/adjacency_list.hpp>
