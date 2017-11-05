@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef TD_COLORING
-#define TD_COLORING
+#ifndef TREEDEC_COLORING_HPP
+#define TREEDEC_COLORING_HPP
 
 #include "applications.hpp"
 
@@ -313,6 +313,6 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
 
 #undef get_pos
 
-#endif //TD_COLORING
+#endif //TREEDEC_COLORING_HPP
 
 // vim:ts=8:sw=4:et

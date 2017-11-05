@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef TD_VERTEX_COVER
-#define TD_VERTEX_COVER
+#ifndef TREEDEC_VERTEX_COVER_HPP
+#define TREEDEC_VERTEX_COVER_HPP
 
 #include "applications.hpp"
 
@@ -201,6 +201,6 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
 
 } //namespace treedec
 
-#endif //TD_VERTEX_COVER
+#endif //TREEDEC_VERTEX_COVER_HPP
 
 // vim:ts=8:sw=4:et

@@ -1,7 +1,7 @@
 //TODO: header
 
-#ifndef FREETDI_CONF_HPP
-#define FREETDI_CONF_HPP
+#ifndef TREEDEC_CONFIG_TRAITS_HPP
+#define TREEDEC_CONFIG_TRAITS_HPP
 
 // get types from config objects
 

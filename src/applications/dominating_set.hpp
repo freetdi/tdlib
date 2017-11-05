@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef TD_DOMINATING_SET
-#define TD_DOMINATING_SET
+#ifndef TREEDEC_DOMINATING_SET_HPP
+#define TREEDEC_DOMINATING_SET_HPP
 
 #include "applications.hpp"
 
@@ -424,6 +424,6 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
 
 #undef get_pos
 
-#endif //TD_DOMINATING_SET
+#endif //TREEDEC_DOMINATING_SET_HPP
 
 // vim:ts=8:sw=4:et
