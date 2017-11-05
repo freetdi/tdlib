@@ -36,7 +36,7 @@
 
 // these should work without gala
 //#define USE_P17 // 128
-// #define USE_THORUP almost
+#define USE_THORUP almost
 //#define USE_FIPPTM
 
 
