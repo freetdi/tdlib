@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef TD_APPLICATIONS
-#define TD_APPLICATIONS
+#ifndef TREEDEC_APPLICATIONS_HPP
+#define TREEDEC_APPLICATIONS_HPP
 
 #include <map>
 #include <set>
@@ -182,6 +182,6 @@ void top_down_computation(T_t &T,
 
 } //namespace treedec
 
-#endif //TD_APPLICATIONS
+#endif //TREEDEC_APPLICATIONS_HPP
 
 // vim:ts=8:sw=4:et

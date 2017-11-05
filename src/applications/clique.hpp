@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef TD_CLIQUE
-#define TD_CLIQUE
+#ifndef TREEDEC_CLIQUE_HPP
+#define TREEDEC_CLIQUE_HPP
 
 #include "applications.hpp"
 
@@ -110,6 +110,6 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
 
 } //namespace treedec
 
-#endif //TD_CLIQUE
+#endif //TREEDEC_CLIQUE_HPP
 
 // vim:ts=8:sw=4:et
