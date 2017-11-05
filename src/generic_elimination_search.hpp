@@ -17,8 +17,8 @@
 //
 //
 
-#ifndef TD_GENERIC_ELIM_SEARCH_H
-#define TD_GENERIC_ELIM_SEARCH_H
+#ifndef TREEDEC_GENERIC_ELIMINATION_SEARCH_HPP_H
+#define TREEDEC_GENERIC_ELIMINATION_SEARCH_HPP_H
 
 #include <vector>
 
@@ -354,6 +354,6 @@ void generic_elimination_search_DFS<G_t, CFG_t, CFGT_t>::do_it()
 } //namespace treedec
 
 
-#endif //TD_GENERIC_ELIM_SEARCH_H
+#endif //TREEDEC_GENERIC_ELIMINATION_SEARCH_HPP_H
 
 // vim:ts=8:sw=4:et

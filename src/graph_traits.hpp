@@ -17,7 +17,10 @@
 //
 //   traits for tdlib graphs.
 
-#ifndef TD_GRAPH_TRAITS_HPP
+#ifndef TREEDEC_GRAPH_TRAITS_HPP
+#define TREEDEC_GRAPH_TRAITS_HPP
+
+// BUG, some old code depends on this (and shouldn't)
 #define TD_GRAPH_TRAITS_HPP
 
 #include <boost/graph/graph_traits.hpp>
@@ -28,7 +31,14 @@
 #include "container.hpp" // HACK
 
 namespace treedec{
-#ifndef TD_DEFS_NETWORK_FLOW
+
+// BUG
+#if defined(TREEDEC_DEFS_NETWORK_FLOW) || defined(TD_DEFS_NETWORK_FLOW)
+#warning deprecated macro use
+#else
+#define TREEDEC_DEFS_NETWORK_FLOW
+
+// old BUG (already spread out)
 #define TD_DEFS_NETWORK_FLOW
 
 struct bagsize_t{
@@ -97,7 +107,7 @@ struct bag_t{ //
 };
 
 // dont define twice (in old code)
-#define TD_STRUCT_BAG
+#define TREEDEC_STRUCT_BAG
 
 }// treedec
 
@@ -227,7 +237,7 @@ struct treedec_traits{
 template<typename G>
 inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_descriptor& v )
 {
-    // works with "TD_graph_t" (augmented adj_list)
+    // works with "TREEDEC_graph_t" (augmented adj_list)
     //return g[v].id;
     return v;
 }

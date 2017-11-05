@@ -19,8 +19,8 @@
 //
 
 
-#ifndef TD_DEGREE_HPP
-#define TD_DEGREE_HPP
+#ifndef TREEDEC_DEGREE_HPP
+#define TREEDEC_DEGREE_HPP
 
 // use local copy
 #include "trace.hpp"

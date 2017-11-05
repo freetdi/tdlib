@@ -19,8 +19,8 @@
 //
 //
 
-#ifndef TD_TREEDEC_TRAITS_HPP
-#define TD_TREEDEC_TRAITS_HPP
+#ifndef TREEDEC_TREEDEC_TRAITS_HPP
+#define TREEDEC_TREEDEC_TRAITS_HPP
 
 #include "graph_traits.hpp"
 
@@ -93,7 +93,7 @@ size_t bag_size(V const & v, G const& g)
 // uses treedec::push, include container...
 // BUG: only works for "set" and "vector" of unsigned
 // BUG: BAG must be bag, still used in other traits :|
-#define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
+#define TREEDEC_TREEDEC_BAG_TRAITS(T, BAG)\
 namespace boost{\
 \
     inline \
@@ -193,7 +193,7 @@ namespace treedec{ \
         typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
     }; \
 } /* treedec */ \
-void TDLIB_DUMMY_FUNCTION_DECLARATION(void)
+void TREEDEC_DUMMY_FUNCTION_DECLARATION(void)
 
 #endif
 // vim:ts=8:sw=4:et

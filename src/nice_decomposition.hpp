@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef TD_NICE_DECOMPOSITION
-#define TD_NICE_DECOMPOSITION
+#ifndef TREEDEC_NICE_DECOMPOSITION_HPP
+#define TREEDEC_NICE_DECOMPOSITION_HPP
 
 #include <set>
 #include <vector>
@@ -397,7 +397,7 @@ private:
 
 #undef BAG_
 
-#endif //TD_NICE_DECOMPOSITION
+#endif //TREEDEC_NICE_DECOMPOSITION_HPP
 
 // vim:ts=8:sw=4:et
 

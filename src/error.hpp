@@ -18,8 +18,8 @@
 //
 //
 
-#ifndef TD_ERROR_HPP
-#define TD_ERROR_HPP
+#ifndef TREEDEC_ERROR_HPP
+#define TREEDEC_ERROR_HPP
 
 namespace treedec{
 

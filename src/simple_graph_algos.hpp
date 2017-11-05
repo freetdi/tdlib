@@ -22,8 +22,8 @@
  * vertex/edge deletion and other simple operations on graphs.
  */
 
-#ifndef TD_SIMPLE_GRAPH_ALGOS
-#define TD_SIMPLE_GRAPH_ALGOS
+#ifndef TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
+#define TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
 
 #include <set>
 #include <limits>
@@ -326,6 +326,6 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
 #undef get_pos
 
-#endif //TD_SIMPLE_GRAPH_ALGOS
+#endif //TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
 
 // vim:ts=8:sw=4:et

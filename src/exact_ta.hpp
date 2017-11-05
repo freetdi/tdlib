@@ -22,8 +22,8 @@
  * Hisao Tamaki tree decomposition kernel. C++ rewrite.
  */
 /*--------------------------------------------------------------------------*/
-#ifndef TD_EXACT_TA_HPP
-#define TD_EXACT_TA_HPP
+#ifndef TREEDEC_EXACT_TA_HPP
+#define TREEDEC_EXACT_TA_HPP
 
 #include "bits/trie.hpp"
 #include "bits/predicates.hpp"
@@ -457,8 +457,8 @@ public:
 	void make_td(t&) const;
 private:
 	bool try_decompose(unsigned bs); // try_it?!
-	template<class TD_>
-	unsigned make_td(BLOCK const* b, TD_* td) const;
+	template<class TREEDEC_>
+	unsigned make_td(BLOCK const* b, TREEDEC_* td) const;
 private: // i/o
 	graph_type _g;
 	unsigned _trieMax; // obsolete
@@ -1095,8 +1095,8 @@ inline void exact_ta<EXTA_a>::do_it(unsigned bs)
 #include "graph_traits.hpp"
 /*--------------------------------------------------------------------------*/
 EXTA_t
-template<class TD_t>
-inline void exact_ta<EXTA_a>::make_td(TD_t& td) const
+template<class TREEDEC_t>
+inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
 {
   auto component=solution->component;
   trace2("TDTDTDTD", component, cbset::size(component));
@@ -1143,8 +1143,8 @@ inline void exact_ta<EXTA_a>::make_td(TD_t& td) const
 #endif
 }
 /*--------------------------------------------------------------------------*/
-template<class T, class TD_>
-static unsigned addBag(T s, TD_* td)
+template<class T, class TREEDEC_>
+static unsigned addBag(T s, TREEDEC_* td)
 {
   unsigned k=boost::add_vertex(*td);
   auto& b=boost::get(treedec::bag_t(), *td, k);
@@ -1153,8 +1153,8 @@ static unsigned addBag(T s, TD_* td)
 }
 /*--------------------------------------------------------------------------*/
 EXTA_t
-template<class TD_>
-inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TD_* td) const
+template<class TREEDEC_>
+inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) const
 {
   std::vector<BLOCK const*> bStack(n());
   std::vector<int> aStack(n());

@@ -17,8 +17,8 @@
 //
 //
 
-#ifndef TD_FILL_HPP
-#define TD_FILL_HPP
+#ifndef TREEDEC_FILL_HPP
+#define TREEDEC_FILL_HPP
 
 #include <boost/graph/graph_traits.hpp>
 #include <assert.h>

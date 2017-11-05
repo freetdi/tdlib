@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef TD_COMBINATIONS
-#define TD_COMBINATIONS
+#ifndef TREEDEC_COMBINATIONS_HPP
+#define TREEDEC_COMBINATIONS_HPP
 
 #include <set>
 #include <vector>
@@ -720,6 +720,6 @@ void FI_MSVS(G_t &G, T_t &T){
 
 } //namespace treedec
 
-#endif //TD_COMBINATIONS
+#endif //TREEDEC_COMBINATIONS_HPP
 
 // vim:ts=8:sw=4:et

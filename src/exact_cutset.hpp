@@ -33,8 +33,8 @@
 // - move everthing to treedec
 // - leaf upper bounds
 
-#ifndef TD_EXACT_CUTSET
-#define TD_EXACT_CUTSET
+#ifndef TREEDEC_EXACT_CUTSET_HPP
+#define TREEDEC_EXACT_CUTSET_HPP
 
 #include "algo.hpp"
 #include "iter.hpp"
@@ -1138,5 +1138,5 @@ unsigned exact_cutset(G_t &G, T_t &T){ untested();
 
 #undef get_pos
 
-#endif //TD_EXACT_CUTSET
+#endif //TREEDEC_EXACT_CUTSET_HPP
 // vim:ts=8:sw=4:et

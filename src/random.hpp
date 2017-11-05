@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_RANDOM
-#define TD_RANDOM
+#ifndef TREEDEC_RANDOM_HPP
+#define TREEDEC_RANDOM_HPP
 
 #include <vector>
 #include <algorithm>    // std::random_shuffle
@@ -72,4 +72,4 @@ int try_some_elimination_orderings(G_t &G,
 
 } //namespace treedec
 
-#endif //TD_RANDOM
+#endif //TREEDEC_RANDOM_HPP

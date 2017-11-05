@@ -1,5 +1,5 @@
-#ifndef TD_GENERIC_BASE_H
-#define TD_GENERIC_BASE_H
+#ifndef TREEDEC_GENERIC_BASE_HPP_H
+#define TREEDEC_GENERIC_BASE_HPP_H
 
 // TODO: cleanup. sort out etc.
 #include "bits/bool.hpp"

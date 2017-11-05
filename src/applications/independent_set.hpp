@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef TD_INDEPENDENT_SET
-#define TD_INDEPENDENT_SET
+#ifndef TREEDEC_INDEPENDENT_SET_HPP
+#define TREEDEC_INDEPENDENT_SET_HPP
 
 #include "applications.hpp"
 
@@ -178,6 +178,6 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
 
 } //namespace treedec
 
-#endif //TD_INDEPENDENT_SET
+#endif //TREEDEC_INDEPENDENT_SET_HPP
 
 // vim:ts=8:sw=4:et

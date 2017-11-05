@@ -44,8 +44,8 @@
 //  - dormant on?
 //  - mass elimination
 
-#ifndef TD_PREPROCESSING
-#define TD_PREPROCESSING
+#ifndef TREEDEC_PREPROCESSING_HPP
+#define TREEDEC_PREPROCESSING_HPP
 
 #include <vector>
 #include <set>
@@ -1608,6 +1608,6 @@ void preprocessing(G_t &G, BV_t &bags)
 
 } //namespace treedec
 
-#endif //TD_PREPROCESSING
+#endif //TREEDEC_PREPROCESSING_HPP
 
 // vim:ts=8:sw=4:et

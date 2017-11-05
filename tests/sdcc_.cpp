@@ -39,7 +39,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               TDIR, tree_dec_node> tree_dec_t;
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
 
 #include <tdlib/graph.hpp>
 #include <tdlib/preprocessing.hpp>

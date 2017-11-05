@@ -23,8 +23,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::bidirectionalS, tree_dec_node2> vbib_tdt;
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(sbib_tdt, bag);
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(vbib_tdt, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(sbib_tdt, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_utility.hpp>

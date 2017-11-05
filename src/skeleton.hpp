@@ -20,8 +20,8 @@
 // almost-tree-decompositions
 // a skeleton is a list of vertices with vertices attached to it.
 
-#ifndef TD_SKELETON_HPP
-#define TD_SKELETON_HPP
+#ifndef TREEDEC_SKELETON_HPP
+#define TREEDEC_SKELETON_HPP
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/iterator/counting_iterator.hpp>

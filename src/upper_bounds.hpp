@@ -26,8 +26,8 @@
 
 */
 
-#ifndef TD_UPPER_BOUNDS
-#define TD_UPPER_BOUNDS
+#ifndef TREEDEC_UPPER_BOUNDS_HPP
+#define TREEDEC_UPPER_BOUNDS_HPP
 
 #include "elimination_orderings.hpp"
 
@@ -69,6 +69,6 @@ unsigned int fillIn(G_t& G)
 
 } //namespace treedec
 
-#endif //TD_UPPER_BOUNDS
+#endif //TREEDEC_UPPER_BOUNDS_HPP
 
 // vim:ts=8:sw=4:et

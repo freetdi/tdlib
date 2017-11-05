@@ -72,8 +72,8 @@
  *
  */
 
-#ifndef TD_LOWER_BOUNDS
-#define TD_LOWER_BOUNDS
+#ifndef TREEDEC_LOWER_BOUNDS_HPP
+#define TREEDEC_LOWER_BOUNDS_HPP
 
 #include <set>
 #include <vector>
@@ -1637,6 +1637,6 @@ int relation_edges_vertices(G_t &G){ untested();
 
 } //namespace treedec
 
-#endif //TD_LOWER_BOUNDS
+#endif //TREEDEC_LOWER_BOUNDS_HPP
 
 // vim:ts=8:sw=4:et
