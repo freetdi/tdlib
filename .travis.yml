@@ -53,6 +53,7 @@ script:
   - wget https://github.com/freetdi/gala/archive/${GALA_COMMIT}.tar.gz
   - mkdir gala
   - ( cd gala; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
-  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}
+  - make -C gala install DESTDIR=${PWD} PREFIX=GP
+  - ./configure --enable-debug CXXFLAGS=-std=c++11 CPPFLAGS=-I${PWD}/GP/include
   - make check
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
