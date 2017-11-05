@@ -81,4 +81,4 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
 
 you can make bags accessible from tdlib using
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(my_td_type, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(my_td_type, bag);

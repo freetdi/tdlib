@@ -29,13 +29,13 @@
 #include "graph.hpp"
 
 
-//REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, bag)
+//TREEDEC_TREEDEC_BAG_TRAITS(T, bag)
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
-// REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_t, bag)
+// TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag)
 
 // doesntwork yet
 #define COMMA ,
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(
+TREEDEC_TREEDEC_BAG_TRAITS(
 	  boost::adjacency_list<boost::vecS COMMA boost::vecS COMMA
 	                           boost::undirectedS COMMA treedec::bag_t>, bag);
 #undef COMMA

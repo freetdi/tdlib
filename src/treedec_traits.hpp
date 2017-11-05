@@ -93,7 +93,7 @@ size_t bag_size(V const & v, G const& g)
 // uses treedec::push, include container...
 // BUG: only works for "set" and "vector" of unsigned
 // BUG: BAG must be bag, still used in other traits :|
-#define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
+#define TREEDEC_TREEDEC_BAG_TRAITS(T, BAG)\
 namespace boost{\
 \
     inline \
