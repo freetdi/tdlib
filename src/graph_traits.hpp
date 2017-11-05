@@ -31,8 +31,15 @@
 #include "container.hpp" // HACK
 
 namespace treedec{
-#ifndef TREEDEC_DEFS_NETWORK_FLOW
+
+// BUG
+#if defined(TREEDEC_DEFS_NETWORK_FLOW) || defined(TD_DEFS_NETWORK_FLOW)
+#warning deprecated macro use
+#else
 #define TREEDEC_DEFS_NETWORK_FLOW
+
+// old BUG (already spread out)
+#define TD_DEFS_NETWORK_FLOW
 
 struct bagsize_t{
 	unsigned dummy;
