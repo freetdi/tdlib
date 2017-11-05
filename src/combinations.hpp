@@ -348,37 +348,18 @@ public: // algo interface
             boost::add_vertex(_t);
             return;
         }else{ untested();
+
+            // BUG, somehow need to cast CFGT to ppconfig
+            // "message" is getting lost here, need pp_cfg+CFGT
+            impl::preprocessing<G> A(_g);
+            A.set_treewidth(_low_tw, -1u);
+            A.do_it();
+
+            trace0("doing the rest");
+
+            // this is the rest from exact_base
+            A.template do_the_rest<T, treedec::impl::fillIn > (_t);
         }
-
-#ifndef NOBAGS
-        /// incomplete...
-        std::vector<boost::tuple<
-            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
-                     typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
-                         > > bags;
-
-        treedec::preprocessing(_g, bags, _low_tw);
-#else // later?
-        impl::preprocessing<G_t> A(G);
-        A.set_treewidth(_low_tw, -1u);
-        A.do_it();
-        _low_tw = A.get_treewidth();
-        A.get_graph(G);
-#endif
-
-        if(boost::num_edges(_g) > 0){
-            unsigned low2=-1;
-            treedec::impl::fillIn_decomp(_g, _t, low2, true); //ignore_isolated
-            _low_tw = low2;
-        }else{ untested();
-        }
-#ifndef NOBAGS
-        treedec::glue_bags(bags, _t);
-#else
-        skeleton<...> S(...)
-            S.do_it();
-#endif
-
     }
 
     template<class TT>
