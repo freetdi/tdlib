@@ -114,7 +114,7 @@ private:
     G& _g;
     T _t;
     int _low_tw;
-};
+}; // PP_MD
 
 
 // TODO: faster.
@@ -319,6 +319,81 @@ void PP_MD(G_t &G, T_t &T, int &low)
     low=a.lower_bound()-1;
     a.get_tree_decomposition(T);
 }
+
+namespace pending {
+
+// TODO: faster.
+// TODO: more generic
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
+class PP_FI{
+public:
+private:
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+public: // construct
+    PP_FI(G& g) : _g(g){
+        _low_tw = -1;
+    }
+public: // random stuff
+    void set_lower_bound(unsigned lb){
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{
+        return _low_tw + 1;
+    }
+public: // algo interface
+    void do_it(){
+        // incomplete(); // use comp::
+        if(boost::num_vertices(_g) == 0){ untested();
+            boost::add_vertex(_t);
+            return;
+        }else{ untested();
+        }
+
+#ifndef NOBAGS
+        /// incomplete...
+        std::vector<boost::tuple<
+            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+                     typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
+                         > > bags;
+
+        treedec::preprocessing(_g, bags, _low_tw);
+#else // later?
+        impl::preprocessing<G_t> A(G);
+        A.set_treewidth(_low_tw, -1u);
+        A.do_it();
+        _low_tw = A.get_treewidth();
+        A.get_graph(G);
+#endif
+
+        if(boost::num_edges(_g) > 0){
+            unsigned low2=-1;
+            treedec::impl::fillIn_decomp(_g, _t, low2, true); //ignore_isolated
+            _low_tw = low2;
+        }else{ untested();
+        }
+#ifndef NOBAGS
+        treedec::glue_bags(bags, _t);
+#else
+        skeleton<...> S(...)
+            S.do_it();
+#endif
+
+    }
+
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{
+        boost::copy_graph(_t, t);
+    }
+
+private:
+    G& _g;
+    T _t;
+    // std::vector<vertex_descriptor> _o;
+    int _low_tw;
+}; // PPFI
+
+} // pending
 
 //Recursively applies preprocessing rules and glues corresponding bags with
 //current tree decomposition this version applies the minDegree-heuristic on

@@ -84,11 +84,13 @@ bool trace=false;
 #include <gala/examples/ssg_random.h>
 #endif
 // #include <boost/graph/minimum_degree_ordering.hpp>
-#include <gala/examples/ssg32i.h>
-#include <gala/examples/ssg16i.h>
-#include <gala/examples/ssg16ia.h>
-#include <gala/examples/svbs.h>
-#include <gala/examples/svbs_random.h>
+#include <gala/examples/ssg32i.h> // -> td.h
+#include <gala/examples/ssg16i.h> // -> td.h
+#include <gala/examples/ssg16ia.h> // -> td.h
+#include <gala/examples/svbs.h> // -> td.h
+#include <gala/examples/svbs_random.h> // -> td.h
+#include <gala/td.h>
+
 #include <gala/immutable.h>
 #else
 #warning no gala. does not fully work
@@ -123,7 +125,6 @@ struct test{
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
-#include <gala/td.h>
 #endif
 #include "twthread.hpp"
 
