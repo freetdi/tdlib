@@ -32,6 +32,18 @@ template<class TT>
 void get_tree_decomposition(TT&) const;
 which is meant to work with treedecomposition types (see below).
 
+in namespace treedec we currently have (needs verification)
+
+prep::*        // preprocessing
+he::fill_in    // fill_in heuristic
+he::min_degree // fill_in heuristic
+he::thorup     // thorups heuristic
+ex::ta         // tamakis algorithm
+ex::cutset     // tamakis algorithm
+comb::PP_FI    // preprocessing + fill_in
+comb::PP_FI_TM // preprocessing + fill_in + triangulation
+comb::ex17     // PACE 17 exact (pp + tamaki)
+
 == graph types ==
 
 A graph is expected to be a model of AdjacencyGraph, but without self loops
@@ -82,3 +94,15 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
 you can make bags accessible from tdlib using
 
 TREEDEC_TREEDEC_BAG_TRAITS(my_td_type, bag);
+
+== tdecomp ==
+
+an example driver. reads in .gr files (PACE style) and ejects .td. supports
+several algorithms. these can be switched on individually, using options such
+as --pp, --fi, --ppfi, --ex17. selected algorithms run in parallel, some
+heuristics permit interruption using a TERM signal. in the interrupted case,
+the best currently known decomposition is printed.
+
+example:
+$ tdecomp --fi < my_graph.gr > my_decomposition.td
+$ td-validate my_graph.gr my_decomposition.td    # not included (yet).
