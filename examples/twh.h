@@ -117,13 +117,6 @@ struct uvv_config : gala::graph_cfg_default<G> {
 typedef gala::graph<std::vector, std::vector, uint16_t, uvv_config> sg_dvv16;
 typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
 
-struct test{
-    test(){
-        sg_dvv16 a;
-   treedec::draft::printer<sg_dvv16> x(std::cout, a);
-   boost::add_vertex(x);
-    }
-} x;
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
@@ -789,8 +782,6 @@ static void parseargs(int argc, char * const * argv)
             errorlevel=bNOERROR;
         }else if(!strncmp("--dot", argv[i], 5)){ untested();
             fformat = f_DOT;
-        }else if(!strncmp("--pp", argv[i], 4)){ untested();
-            mask_in |= (1<<nPP);
         }else if(!strncmp("--he17", argv[i], 6)){ untested();
             mask_in |= (1<<nP17);
         }else if(!strncmp("--ex17", argv[i], 6)){ untested();
@@ -807,6 +798,8 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nFITM);
         }else if(!strncmp("--ppmd", argv[i], 6)){ untested();
             mask_in |= (1<<nPPMD);
+        }else if(!strncmp("--pp", argv[i], 4)){ untested();
+            mask_in |= (1<<nPP);
         }else if(!strncmp("-T", argv[i], 2)){ untested();
             trace = true;
             errorlevel=bTRACE;
