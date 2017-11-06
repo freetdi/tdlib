@@ -151,7 +151,7 @@ public:
                 throw exception_unsuccessful();
             }
 
-            elim_vertices[_i] = get_vd(_g, c);
+            elim_vertices[_i] = c;
 
             if(_t){
                 _current_N = &_bags[_i];
@@ -596,7 +596,7 @@ public: // implementation
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
             if(boost::out_degree(*vIt, baseclass::_g) == 0){
                 if(!baseclass::_iiv){
-                    (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *vIt);
+                    (*baseclass::_o)[baseclass::_i++] = *vIt;
                 }
                 else{
                     --baseclass::_num_vert;

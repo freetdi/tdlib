@@ -843,7 +843,7 @@ bool preprocessing<G_t, CFG>::Buddy(
         unlink_1_neighbourhood(v);
         _degs.unlink(w, 3);
 
-        vd_type vd2 = get_vd(_g, w);
+        vd_type vd2 = w;
 
         make_neigh_clique(v);
         assert(_degree[v]);
