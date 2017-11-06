@@ -20,8 +20,6 @@
 #ifndef TREEDEC_OVERLAY_HPP
 #define TREEDEC_OVERLAY_HPP
 
-#define TREEDEC_GET_POS(a,b) ( boost::get(boost::vertex_index, b, a) )
-
 namespace treedec {
 
 namespace draft { // not exposed yet (for a reason)
@@ -69,7 +67,7 @@ inline IG_t const& immutable_clone(
         // FIXME: pos, vertex_index?
         assert(i < vdMap->size());
         (*vdMap)[i] = *bi;
-        reverse_map[TREEDEC_GET_POS(*bi, G)] = i;
+        reverse_map[boost::get(boost::vertex_index, G, *bi)] = i;
         ++i;
     }
     assert(i==bag_nv);
@@ -83,10 +81,10 @@ inline IG_t const& immutable_clone(
         ++vertices_count;
         
         if(!cb){
-            BOOST_AUTO(s, TREEDEC_GET_POS(*bi, G));
-            BOOST_AUTO(A, boost::adjacent_vertices(*bi,G));
+            auto s=boost::get(boost::vertex_index, G, *bi);
+            auto A=boost::adjacent_vertices(*bi,G);
             for(;A.first!=A.second;++A.first){
-                BOOST_AUTO(t, TREEDEC_GET_POS(*A.first, G));
+                auto t=boost::get(boost::vertex_index, G, *A.first);
                 boost::add_edge(reverse_map[s], reverse_map[t], ig);
             }
         }else{
@@ -105,13 +103,13 @@ inline IG_t const& immutable_clone(
                 }
 
                 if(edg){
-                    BOOST_AUTO(s, TREEDEC_GET_POS(*bi, G));
-                    BOOST_AUTO(t, TREEDEC_GET_POS(*vi, G));
+                    auto s=boost::get(boost::vertex_index, G, *bi);
+                    auto t=boost::get(boost::vertex_index, G, *vi);
                     boost::add_edge(reverse_map[s], reverse_map[t], ig);
                 }else if(s==-1u){
-                    assert(TREEDEC_GET_POS(*bi, G)!=-1u);
-                    s = TREEDEC_GET_POS(*bi, G);
-                    t = TREEDEC_GET_POS(*vi, G);
+                    s = boost::get(boost::vertex_index, G, *bi);
+                    assert(s != -1u);
+                    t = boost::get(boost::vertex_index, G, *vi);
                 }else{
                 }
             }
@@ -158,8 +156,6 @@ inline IG_t const& immutable_clone(
 } // draft
 
 } // treedec
-
-#undef TREEDEC_GET_POS
 
 #endif // guard
 
