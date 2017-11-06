@@ -90,6 +90,12 @@ void insert(C& c, E e)
     detail::container_modify<C>::insert(c, e);
 }
 
+template<class C, class B, class E>
+void merge(C& c, B b, E e)
+{
+    detail::container_modify<C>::merge(c, b, e);
+}
+
 template<class C, class E>
 bool contains(C const& c, E e)
 {

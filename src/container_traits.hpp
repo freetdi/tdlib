@@ -127,6 +127,20 @@ namespace detail{//
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }
+        template<class I>
+        static void push(C& c, I b, I e) {
+          for(; b!=e; ++b){
+            push(c, *b);
+          }
+        }
+        template<class I>
+        static void merge(C& c, I b, I e) { untested();
+          for(; b!=e; ++b){
+            if(!container_inspect<C>::contains(c, *b)){
+                insert(c, *b);
+            }
+          }
+        }
     };
     template<class C>
     struct container_modify<C,
@@ -143,16 +157,20 @@ namespace detail{//
           c.insert(e);
         }
         template<class I>
-        static void push(C& c, I b, I e)
-        {
-          while(b!=e){
+        static void push(C& c, I b, I e) { untested();
+          for(; b!=e; ++b){
             c.insert(*b);
-            ++b;
           }
         }
         static void insert(C& c, typename C::value_type e)
         {
           c.insert(e);
+        }
+        template<class I>
+        static void merge(C& c, I b, I e) { itested();
+          for(; b!=e; ++b){
+            insert(c, *b);
+          }
         }
     };
 } // detail

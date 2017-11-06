@@ -289,7 +289,7 @@ get(T t, treedec::draft::directed_view<G>& g)
 	return get(t, *g);
 }
 
-#if 0
+#if 1
 template<class G>
 typename treedec::draft::directed_view<G>::vertices_size_type
 get(vertex_index_t,
