@@ -61,6 +61,9 @@
 #include "copy.hpp"
 #include "config_traits.hpp"
 #include "graph.hpp"
+#include "misc.hpp"
+#include "overlay.hpp"
+#include "treedec_misc.hpp"
 
 namespace treedec{
 
@@ -628,12 +631,141 @@ private:
     degreemap_type _degreemap;
     degs_type _degs;
     std::deque<vertex_descriptor> _elims;
-    unsigned _lb_bs;
-    unsigned _num_edges;
+    vertices_size_type _lb_bs;
+    edges_size_type _num_edges;
     marker_type _marker;
     treedec::draft::sMARKER<vertices_size_type, vertices_size_type> _dormant;
     numbering_type _numbering;
+
+public: // draft, ongoing cleanup from exact_base.
+        // this must actually be free, but there is no interface yet.
+
+    template<class T, TREEDEC_ALGO_TC A>
+    void do_the_rest(T&);
+    template<class T, TREEDEC_ALGO_TC A>
+    void do_components(T& t, G_t const& gg) const;
 }; // preprocessing
+
+// put together the fragments. "get_tree_decomposition" like
+template<class G_t, template<class G_, class ...> class CFG>
+template<class T, TREEDEC_ALGO_TC A>
+void preprocessing<G_t, CFG>::do_the_rest(T& t)
+{
+    auto n=boost::num_vertices(_g);
+    if(n==0){ untested();
+        boost::add_vertex(t);
+        return;
+    }else{ untested();
+    }
+
+        // yikes
+    std::vector<boost::tuple<
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        std::set<vertex_descriptor> > > bags;
+
+    get_bags(bags); // FIXME: bags are already there
+    G_t g;
+    get_graph(g);
+
+    if(boost::num_edges(g) == 0){ untested();
+        treedec::glue_bags(bags, t);
+        return;
+    }else{ untested();
+    }
+
+    do_components<T, A>(t, g);
+
+    // no, g has been disassembled
+    // assert(is_valid_treedecomposition(g, t));
+
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+
+    treedec::glue_bags(bags, t);
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+} // do_the_rest
+
+template<class G, template<class G_, class ...> class CFGT>
+template<class T, TREEDEC_ALGO_TC A>
+void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
+{ untested();
+    // Compute a tree decomposition for each connected component of G and glue
+    // the decompositions together.
+    typedef std::vector<std::set<typename boost::graph_traits<G>::vertex_descriptor> > components_t;
+    components_t components;
+    treedec::get_components(gg, components);
+
+    // root
+    boost::add_vertex(t);
+    typename std::vector<typename boost::graph_traits<G>::vertex_descriptor> vdMap;
+    typename components_t::iterator i = components.begin();
+    for(; i!=components.end(); ++i) { itested();
+        // BUG: Ignore isolated vertices (already included in 'bags').
+        trace2("found component ", i->size(), components.size());
+        if(i->size() == 1){ itested();
+            incomplete();
+            continue;
+            auto nv=boost::add_vertex(t);
+            auto& B=boost::get(bag_t(), t, nv);
+            treedec::push(B, *(*i).begin());
+            trace2("isolated node ", nv,  *(*i).begin());
+            if(nv!=0){ untested();
+                // uuh hack
+                boost::add_edge(nv, nv-1, t);
+            }else{ untested();
+            }
+        }else{ untested();
+        }
+
+        typedef typename graph_traits<G>::immutable_type immutable_type;
+
+        unsigned compsize = i->size();
+        CFG::message(0, "component of size %d", compsize); // BUG: lost.
+#ifndef NDEBUG
+        std::cerr<<"component of size " << compsize << "\n";
+#endif
+
+
+        auto comp_range = *i;
+        immutable_type H(compsize);
+        immutable_type const& G_=treedec::draft::immutable_clone(_g, H,
+                std::begin(comp_range), std::end(comp_range), compsize,
+                &vdMap);
+
+        assert_connected(G_);
+
+        // BUG: sets don't seem to work. and T_t might bring sets
+        // T_t T_;
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> T_;
+
+        incomplete();
+        G gggg;
+        boost::copy_graph(G_, gggg); // avoid, fix immutable_clone
+        assert_connected(gggg);
+
+#ifndef NDEBUG
+        G backup;
+        boost::copy_graph(gggg, backup);
+#endif
+        A<G, CFGT> kern(gggg);
+
+        kern.do_it();
+        kern.get_tree_decomposition(T_);
+
+        assert(is_valid_treedecomposition(backup, T_));
+
+        assert(boost::num_vertices(T_) == boost::num_edges(T_)+1);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+
+#ifndef NDEBUG
+        unsigned tn=boost::num_vertices(t);
+        unsigned tn_=boost::num_vertices(T_);
+#endif
+        treedec::draft::append_decomposition(t, std::move(T_), G_, vdMap);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+        assert( tn+tn_ == boost::num_vertices(t));
+    }
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+} // do_it
 
 // Check if there exists a degree-0-vertex.
 template <typename G_t, typename B_t>
@@ -1603,6 +1735,7 @@ void preprocessing(G_t &G, BV_t &bags)
         // obsolete interface. possibly slow
         A.get_bags(bags);
         A.get_graph(G);
+    }else{ untested();
     }
 }
 
