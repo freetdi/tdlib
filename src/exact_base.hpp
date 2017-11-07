@@ -188,6 +188,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
 #ifndef NEWRANGE
         trace2("found component ", i->size(), components.size());
         if(i->size() == 1){
+            incomplete();
             continue;
             auto nv=boost::add_vertex(t);
             auto& B=boost::get(bag_t(), t, nv);
@@ -305,8 +306,16 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
          > > bags;
 
     // if config.preprocessing?
-    // fixme: instanciate.
-    treedec::preprocessing(_g, bags, low);
+    if(boost::num_vertices(_g)){ untested();
+        impl::preprocessing<G_t> A(_g);
+        A.set_treewidth(low, -1u);
+        A.do_it();
+        low = A.get_treewidth();
+        // obsolete interface. possibly slow
+        A.get_bags(bags);
+        A.get_graph(_g); //?
+    }else{ untested();
+    }
 
     if(boost::num_edges(_g) == 0){
         treedec::glue_bags(bags, T);
