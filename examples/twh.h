@@ -562,29 +562,33 @@ void twh(P& p, mag_t m, unsigned mask)
     }else{ untested();
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG32, grtd_algo_config>(g32, "FIPPTM_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
-#if 1
+#ifdef USE_FITM
     if(!(mask & ( 1 << nFITM ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nFITM, new FITM_THREAD<uG16, grtd_algo_config>(g16, "FITM_16"));
     }else{ untested();
         reg_thread(threads, nFITM, new FITM_THREAD<uG32, grtd_algo_config>(g32, "FITM_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
+#ifdef USE_PPFI
     if(!(mask & ( 1 << nPPFI ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG16, grtd_algo_config>(g16, "PPFI_16"));
     }else{ untested();
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG32, grtd_algo_config>(g32, "PPFI_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
+#if 0
     if(!(mask & ( 1 << nPPMD ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG16, grtd_algo_config>(g16, "PPMD_16"));
     }else{ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG32, grtd_algo_config>(g32, "PPMD_32"));
     }
-#endif
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_RANDOM_MD

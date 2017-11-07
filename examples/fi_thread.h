@@ -132,10 +132,10 @@ private:
 template<class G, template<class H, class ... >
                   class cfgt=treedec::algo::default_config>
 class PPFI_THREAD
-    : public SEVERAL_FI_THREAD<G, treedec::comb::PP_FI, cfgt>
+    : public SEVERAL_FI_THREAD<G, treedec::pending::PP_FI, cfgt>
 {
 public:
-	typedef SEVERAL_FI_THREAD<G, treedec::comb::PP_FI, cfgt> base;
+	typedef SEVERAL_FI_THREAD<G, treedec::pending::PP_FI, cfgt> base;
 	template<class A, class B>
 	explicit PPFI_THREAD(A const& a, B const& b) : base(a,b){}
 };

@@ -28,7 +28,8 @@ public:
 
     void do_print_results(std::ostream& o)
     { untested();
-        std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
+		 // message?
+        o << "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  // treedec::grtdprinter<G> P(o, _work);
 		  // size_t numbags = boost::num_vertices(_work); // ask P?!

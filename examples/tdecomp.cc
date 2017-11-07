@@ -36,9 +36,11 @@
 
 // these should work without gala
 //#define USE_P17 // 128
-// #define USE_THORUP almost
+//#define USE_THORUP almost
 //#define USE_FIPPTM
 #define USE_PP
+//#define USE_FIPPTM
+#define USE_PPFI
 
 
 typedef enum{
