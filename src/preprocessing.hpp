@@ -68,15 +68,16 @@ namespace impl{
 
 namespace draft{
 
-template<class G_t>
-struct pp_cfg{
+template<class G, // template<class GGG, class ... > class b=treedec::algo::default_config,
+         class ... rest>
+struct pp_cfg : treedec::algo::config_base {
     typedef typename
     std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
          > > bags_type;
-    //typedef typename deg_chooser<G_t>::type degs_type;
-    typedef typename misc::DEGS<G_t> degs_type;
+    //typedef typename deg_chooser<G>::type degs_type;
+    typedef typename misc::DEGS<G> degs_type;
 };
 
 } // draft
@@ -119,7 +120,7 @@ V deg_vector_init(V const&, N n, G const& g, M const& m)
 //and does not call further algorithms.
 //
 //TODO: bags is actually a tree decomposition tree.
-template<class G_t, template<class G_> class CFGT=draft::pp_cfg>
+template<class G_t, template<class G_, class ...> class CFGT=draft::pp_cfg>
 class preprocessing : public treedec::algo::draft::algo1 {
 private: // hmm, fetch from CFG.
     constexpr static bool disable_triangle=false;
@@ -668,7 +669,7 @@ void Islet(G_t &G, T_t &bags)
 }
 
 // check if a and b have the same neighbour set
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::check_twins_3(
         vertex_descriptor a, vertex_descriptor b) const
 {
@@ -742,7 +743,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
 }
 
 // eliminate vertex: turn neighbours into clique, remove center, update degrees.
-template<class G_t, template<class G_> class CFGT>
+template<class G_t, template<class G_, class ...> class CFGT>
 void preprocessing<G_t, CFGT>::eliminate_vertex_1(
         typename preprocessing<G_t, CFGT>::vertex_descriptor v)
 {
@@ -776,7 +777,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
     }
 }
 
-template<class G_t, template<class G_> class CFGT>
+template<class G_t, template<class G_, class ...> class CFGT>
 void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         typename preprocessing<G_t, CFGT>::vertex_descriptor v)
 {
@@ -831,7 +832,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
 // Apply the Buddy rule if possible
 // (checks if there exists two degree-3-vertices,
 //  such that they share their neighbours)
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Buddy(
         vertex_descriptor v, vertex_descriptor w)
 {
@@ -890,7 +891,7 @@ inline void rearrange_neighs(T* N, T x, I i)
 }
 
 //Apply the Cube rule if possible.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 {
 
@@ -1162,7 +1163,7 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
 #endif
 
 // Simplicial and AlmostSimplicial in one go.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
 {
     assert(!boost::edge(v, v, _g).second);
@@ -1336,7 +1337,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
 //Apply the Triangle rule if applicable (checks if there exists a
 //degree-3-vertex, such that at least one edge exists in its neighbourhood).
 //return true, if degs has been modified.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 {
     vertices_size_type deg=_degree[v];
@@ -1386,7 +1387,7 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 }
 
 
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 void preprocessing<G_t, CFG>::do_it()
 {
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(_g);
