@@ -752,7 +752,8 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         incomplete();
         G gggg;
         boost::copy_graph(G_, gggg,
-                boost::vertex_copy(detail::forgetprop())); // avoid, fix immutable_clone
+                boost::vertex_copy(detail::forgetprop()).
+                edge_copy(detail::forgetprop())); // avoid, fix immutable_clone
         // assert_connected(gggg); // BUG
 
 #ifndef NDEBUG
