@@ -270,7 +270,7 @@ void get_components_provided_map(G_t const &G,
 }
 
 template <typename G_t>
-void get_components(G_t &G,
+void get_components(G_t const& G,
              std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components)
 {
     std::vector<BOOL> visited(boost::num_vertices(G), false);
