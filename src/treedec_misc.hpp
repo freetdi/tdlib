@@ -50,15 +50,29 @@ private:
 
 // append one decomposition to another.
 // (take care of node mapping, mainly)
+// BUG: use boost::graph_copy with a sensible vertex_copier!!!1
 template <typename T_t, class S_t, class G_t, class M_t>
 void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t const& map)
 {
 	typedef typename boost::graph_traits<T_t>::vertex_descriptor treenode_descriptor;
+   if(boost::is_directed(src)){ itested();
+		if(boost::is_directed(tgt)){ untested();
+		}else{ untested();
+		}
+	}else{ itested();
+		if(boost::is_directed(tgt)){ untested();
+		}else{ untested();
+		}
+	}
 #ifdef DEBUG
 	for(auto& i: map){
 		std::cerr << "map " << i << "\n";
 	}
 #endif
+//        std::cout<<"tgt\n";
+  //      boost::print_graph(tgt);
+    //    std::cout<<"appending\n";
+      //  boost::print_graph(src);
     assert(boost::num_vertices(tgt) == boost::num_edges(tgt)+1);
     assert(boost::num_vertices(src) == boost::num_edges(src)+1);
     auto op=applyGmap<S_t, M_t>(src, map);
@@ -72,32 +86,32 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
         // no bags to fetch. done
     }else{
        treenode_descriptor new_tv;
-        auto next=SR.first;
 		  auto const& M=boost::get(bag_t(), src);
-        for(; SR.first!=SR.second; SR.first=next){
+        for(; SR.first!=SR.second; ++SR.first){
             trace1("appendfound", *SR.first);
-            ++next;
             new_tv=boost::add_vertex(tgt);
             auto& B=boost::get(bag_t(), tgt, new_tv);
             auto const& SB=boost::get(M, *SR.first);
 
             assert(boost::degree(*SR.first, src)>0);
-            assert(boost::out_degree(*SR.first, src)>0);
+//            assert(boost::out_degree(*SR.first, src)>0); //?
             auto srcnp=boost::adjacent_vertices(*SR.first, src);
-				assert(srcnp.first!=srcnp.second);
+				assert(srcnp.first!=srcnp.second || boost::is_directed(src));
 				for(;srcnp.first!=srcnp.second; ++srcnp.first){
-            auto target_in_copy = *srcnp.first;
-            assert(target_in_copy!=*SR.first);
-            if(target_in_copy<*SR.first){
-					trace2("copy edge", *SR.first, target_in_copy);
-					assert(!boost::edge(new_tv, target_in_copy+offset, tgt).second);
-					// this one seems correct?
-					boost::add_edge(target_in_copy+offset, new_tv, tgt);
-					//boost::add_edge(new_tv, target_in_copy+offset, tgt);
-            }else{
-					/// ???
-					trace1("no copy edge", *SR.first);
-				}
+					auto target_in_copy = *srcnp.first;
+					assert(target_in_copy!=*SR.first);
+					if(boost::is_directed(src)){ untested();
+						boost::add_edge(new_tv, target_in_copy+offset, tgt);
+					}else if(target_in_copy<*SR.first){
+						trace2("copy edge", *SR.first, target_in_copy);
+						assert(!boost::edge(new_tv, target_in_copy+offset, tgt).second);
+						// this one seems correct?
+						boost::add_edge(target_in_copy+offset, new_tv, tgt);
+						//boost::add_edge(new_tv, target_in_copy+offset, tgt);
+					}else{
+						/// ???
+						trace1("no copy edge", *SR.first);
+					}
 				}
 
 #if 0 // vector version (how to select?)
@@ -128,6 +142,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 	 trace2("done", boost::num_vertices(src), boost::num_edges(src));
 	 trace2("done", boost::num_vertices(tgt), boost::num_edges(tgt));
     assert(boost::num_vertices(tgt) == boost::num_edges(tgt)+1);
+//        boost::print_graph(tgt);
 } // append_decomposition
 
 #ifdef NDEBUG

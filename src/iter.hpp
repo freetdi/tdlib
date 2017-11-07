@@ -719,7 +719,7 @@ private:
                 return;
             }
             ++front_range().first;
-        } untested();
+        }
 
         if(_q.empty()){ untested();
         }else if(front_range().first==front_range().second){

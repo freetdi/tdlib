@@ -69,6 +69,18 @@ namespace treedec{
 
 namespace impl{
 
+namespace detail {
+
+struct forgetprop
+{
+  template <class G, class H>
+  void operator()(G, H) const
+  {
+  }
+};
+
+} // detail
+
 namespace draft{
 
 template<class G, // template<class GGG, class ... > class b=treedec::algo::default_config,
@@ -710,7 +722,8 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
             trace2("isolated node ", nv,  *(*i).begin());
             if(nv!=0){ untested();
                 // uuh hack
-                boost::add_edge(nv, nv-1, t);
+                // boost::add_edge(nv, nv-1, t);
+                boost::add_edge(nv-1, nv, t);
             }else{ untested();
             }
         }else{ untested();
@@ -733,14 +746,14 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
 
         assert_connected(G_);
 
-        // BUG: sets don't seem to work. and T_t might bring sets
-        // T_t T_;
-        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> T_;
+        // T_t T_; // doesn't work (probably should?)
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> T_;
 
         incomplete();
         G gggg;
-        boost::copy_graph(G_, gggg); // avoid, fix immutable_clone
-        assert_connected(gggg);
+        boost::copy_graph(G_, gggg,
+                boost::vertex_copy(detail::forgetprop())); // avoid, fix immutable_clone
+        // assert_connected(gggg); // BUG
 
 #ifndef NDEBUG
         G backup;

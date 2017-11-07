@@ -115,15 +115,15 @@ get(vertex_index_t, treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
 
 template<class G, class M, class D>
 typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::vertices_size_type
-num_vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g){
-untested();
+num_vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
+{ itested();
 	return g.num_vertices();
 }
 
 template<class G, class M, class D>
 typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::vertex_range
-vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g){
-untested();
+vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
+{ untested();
 	return g.vertices();
 }
 

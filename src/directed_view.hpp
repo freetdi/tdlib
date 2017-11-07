@@ -296,7 +296,7 @@ get(vertex_index_t,
 		treedec::draft::directed_view<G> const& g,
 		typename treedec::draft::directed_view<G>::vertex_descriptor v
 		)
-{ untested();
+{ itested();
 	return get(get(vertex_index, *g), v);
 }
 #endif

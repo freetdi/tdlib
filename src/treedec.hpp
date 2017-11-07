@@ -29,15 +29,13 @@
 #include "graph.hpp"
 
 
-//TREEDEC_TREEDEC_BAG_TRAITS(T, bag)
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
-// TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag)
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_dir_tree_dec_t;
 
 // doesntwork yet
 #define COMMA ,
-TREEDEC_TREEDEC_BAG_TRAITS(
-	  boost::adjacency_list<boost::vecS COMMA boost::vecS COMMA
-	                           boost::undirectedS COMMA treedec::bag_t>, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(TD_dir_tree_dec_t, bag);
 #undef COMMA
 
 namespace treedec{

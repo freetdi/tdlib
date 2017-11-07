@@ -53,7 +53,7 @@ TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
 typedef treedec::he::fill_in<cfg_t> FI;
 typedef treedec::he::thorup<cfg_t> thorup;
 typedef treedec::comb::PP_MD<cfg_t> PP_MD;
-typedef treedec::comb::PP_FI<cfg_t> PP_FI;
+typedef treedec::pending::PP_FI<cfg_t> PP_FI;
 typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
 
 #ifdef USE_GALA
@@ -113,18 +113,19 @@ int main()
 
 	std::cout << "skip PP+MD\n";
 //	do_it<cfg_t, PP_MD>(g);
+//
+#ifdef USE_GALA
+	std::cout << "ppta\n";
+	do_it<cfg_t, ppta>(g);
+#endif
 
-	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI>(g);
+	std::cout << "PP+FI\n";
+	do_it<cfg_t, PP_FI>(g);
 
 	std::cout << "skip PP+FI\n";
 //	do_it<cfg_t, PP_FI_TM>(g);
 
 
-#ifdef USE_GALA
-	std::cout << "ppta\n";
-	do_it<cfg_t, ppta>(g);
-#endif
 
 
 }
