@@ -610,9 +610,8 @@ void make_rooted(T_undir_t &T, T_dir_t &T_)
 //Version used for preprocessing.
 // BUG: this is inefficient. there's already a better implementation
 // (where?)
-template<typename T_t>
-void glue_bag(
-        typename treedec_traits<T_t>::bag_type &b,
+template<typename T_t, class B>
+void glue_bag( B &b,
         typename treedec_traits<T_t>::vd_type elim_vertex,
         T_t &T)
 {
@@ -629,7 +628,7 @@ void glue_bag(
             if(!contains(BAG_(*vIt, T), elim_vertex)){
                 push(b, elim_vertex);
                 t_vertex_descriptor t_dec_node=boost::add_vertex(T);
-                BAG_(t_dec_node, T) = MOVE(b);
+                push( BAG_(t_dec_node, T), b.begin(), b.end() ); // hmm, move doesnt work yet.
 
                 boost::add_edge(*vIt, t_dec_node, T);
             }else{ untested();
@@ -642,7 +641,7 @@ void glue_bag(
     //Case for a disconnected graph.
     t_vertex_descriptor t_dec_node = boost::add_vertex(T);
     push(b, elim_vertex);
-    BAG_(t_dec_node, T) = MOVE(b);
+    push( BAG_(t_dec_node, T), b.begin(), b.end() ); // hmm, move doesnt work yet.
 
     if(boost::num_vertices(T) > 1){
         boost::tie(vIt, vEnd) = boost::vertices(T);
@@ -692,10 +691,10 @@ void glue_two_bags(T_t &T,
 //Glues bags with the current tree decomposition.
 template<class B, typename T_t>
 void glue_bags(B& bags, T_t &T)
-{
-    for(unsigned int i = bags.size(); i > 0; i--){
+{ untested();
+    for(unsigned int i = bags.size(); i > 0; i--){ untested();
         typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
-        typename treedec_traits<T_t>::bag_type& second = boost::get<1>(bags[i-1]);
+        auto& second=boost::get<1>(bags[i-1]);
 /*
         if(ignore_isolated_vertices && second.empty()){
             continue;
