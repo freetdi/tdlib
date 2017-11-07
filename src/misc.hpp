@@ -191,7 +191,7 @@ bool is_tree(G_t const& G){
 template <typename G_t, typename T_t>
 int check_treedec(G_t const& G, T_t const& T)
 {
-//    typedef  typename boost::graph_traits<T_t>::vertex_descriptor vertex_descriptor;
+    typedef  typename boost::graph_traits<T_t>::vertex_descriptor vertex_descriptor;
     if(boost::num_vertices(T) == 0){
         //The empty graph has a treedecomposition with 1 vertex and an empty bag.
         return -5;
@@ -205,14 +205,14 @@ int check_treedec(G_t const& G, T_t const& T)
     }
 
     //Checks if exactly the vertices of G are covered.
-    typename treedec_traits<T_t>::bag_type coded_vertices;
+    typename std::set<vertex_descriptor> coded_vertices;
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        coded_vertices.insert(BAG_(*tIt, T).begin(),
+        merge(coded_vertices, BAG_(*tIt, T).begin(),
                               BAG_(*tIt, T).end());
     }
 
-    typename treedec_traits<T_t>::bag_type vertices;
+    typename std::set<vertex_descriptor> vertices;
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
         typename treedec_traits<T_t>::bag_type::value_type v;
@@ -227,6 +227,7 @@ int check_treedec(G_t const& G, T_t const& T)
         std::set_symmetric_difference(coded_vertices.begin(), coded_vertices.end(),
                                       vertices.begin(), vertices.end(),
                                       std::inserter(sym_diff, sym_diff.begin()));
+
         for(typename treedec_traits<T_t>::bag_type::iterator sIt=sym_diff.begin(); sIt != sym_diff.end(); sIt++){
             std::cerr << *sIt << " ";
         } std::cerr << std::endl;
@@ -250,8 +251,8 @@ int check_treedec(G_t const& G, T_t const& T)
                 vd_type v(*vIt);
                 vd_type n(*nIt);
 
-                if(BAG_(*tIt, T).find(v) != BAG_(*tIt, T).end() &&
-                   BAG_(*tIt, T).find(n) != BAG_(*tIt, T).end()){
+                if(contains( BAG_(*tIt, T), v) &&
+                   contains( BAG_(*tIt, T), n) ) {
                     is_contained = true;
                     break;
                 }
