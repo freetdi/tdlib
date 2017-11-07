@@ -378,4 +378,23 @@ namespace boost{
     }
 } // boost
 
+namespace treedec{
+namespace draft{
+template<class T>
+void dump_tree_decomposition(T const& t){
+	auto p=boost::vertices(t);
+	for(;p.first!=p.second; ++p.first){
+		std::cout << *p.first << ":";
+		auto q=boost::get(bag_t(), t, *p.first);
+		for(auto i : q){
+			std::cout << " " << i;
+		}
+		std::cout <<"\n";
+	}
+}
+
+}
+
+}
+
 #endif
