@@ -796,6 +796,8 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nPPFITM);
         }else if(!strncmp("--ppfi", argv[i], 6)){ untested();
             mask_in |= (1<<nPPFI);
+        }else if(!strncmp("--bmd", argv[i], 5)){ untested();
+            mask_in |= (1<<nBMD);
         }else if(!strncmp("--fi", argv[i], 4)){ untested();
             mask_in |= (1<<nFI);
         }else if(!strncmp("--fitm", argv[i], 6)){ untested();
