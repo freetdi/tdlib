@@ -56,6 +56,7 @@
 #include "exact_cutset.hpp"
 #include "separator_algorithm.hpp"
 #include "misc.hpp"
+#include "util.hpp"
 #ifdef USE_GALA
 #include "exact_ta.hpp"
 #endif
@@ -238,7 +239,7 @@ public: // algo interface
 
             unsigned c = 0;
             for(unsigned i = 0; i < new_elim_ordering.size(); i++){
-                if(boost::out_degree(new_elim_ordering[i], _g) > 0){
+                if(boost::out_degree(new_elim_ordering[i], _g) > 0){ untested();
                     new_elim_ordering_[c++] = new_elim_ordering[i];
                 }
             }
@@ -373,6 +374,111 @@ private:
     // std::vector<vertex_descriptor> _o;
     int _low_tw;
 }; // PPFI
+
+// pending
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
+class PP_FI_TM{
+private:
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+public: // construct
+    PP_FI_TM(G& g) : _g(g){
+        _low_tw = -1;
+    }
+
+public: // random stuff
+    void set_lower_bound(unsigned lb){
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{
+        return _low_tw + 1;
+    }
+
+public: // algo interface
+    void do_it(){ untested();
+
+        if(boost::num_vertices(_g) == 0){
+            boost::add_vertex(_t);
+            return;
+        }
+
+        std::vector<boost::tuple<
+            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+                     std::vector<vertex_descriptor> > > bags;
+
+#if 0
+        treedec::preprocessing(_g, bags, _low_tw);
+#else
+            impl::preprocessing<G> A(_g);
+            A.set_treewidth(_low_tw, -1u);
+            A.do_it();
+            A.get_bags(bags);
+            A.get_graph(_g);
+#endif
+
+        for(auto const& x : bags){
+            auto& B=boost::get<1>(x);
+            trace1("B", B.size());
+        }
+
+        // BUG: _g is much too big. only need the connected components
+
+        if(boost::num_edges(_g) > 0){
+//            typename std::vector<vertex_descriptor> old_elim_ordering;
+            typename std::vector<vertex_descriptor> new_elim_ordering;
+
+            // BUG
+            boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> H;
+            boost::copy_graph(_g, H);
+
+            treedec::impl::fillIn<G> a(_g);
+            a.set_ignore_isolated();
+            a.do_it();
+            auto& old_elim_ordering = a.get_elimination_ordering();
+
+            trace2("mC", boost::num_edges(H), boost::num_vertices(H));
+            treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
+            trace3("", old_elim_ordering.size(), new_elim_ordering.size(), boost::num_vertices(_g));
+            assert(is_vertex_permutation(new_elim_ordering, _g));
+
+
+            typename std::vector<vertex_descriptor>
+            new_elim_ordering_(old_elim_ordering.size());
+
+            unsigned c = 0;
+            for(unsigned i = 0; i < new_elim_ordering.size(); i++){
+                if(boost::out_degree(new_elim_ordering[i], _g) > 0){
+                    new_elim_ordering_[c++] = new_elim_ordering[i];
+                }else{
+                }
+            }
+            assert(is_vertex_permutation(new_elim_ordering, H));
+
+//            boost::print_graph(H);
+            trace2("to_treedec", new_elim_ordering.size(), c);
+            trace3("", boost::num_edges(H), new_elim_ordering.size(), boost::num_vertices(H));
+            treedec::ordering_to_treedec(H, new_elim_ordering_, _t);
+            trace0("ordered_to_treedec");
+            boost::print_graph(_t);
+        }
+
+        trace0("gluing");
+        treedec::glue_bags(bags, _t);
+    }
+
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{
+        // todo: assemble td here.
+        boost::copy_graph(_t, t);
+    }
+
+private:
+    G& _g;
+    // T _t;
+    TD_tree_dec_t _t; // BUG
+    int _low_tw;
+}; // PP_FI_TM
 
 } // pending
 

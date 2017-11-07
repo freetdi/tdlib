@@ -144,6 +144,7 @@ protected: // implementation
                     // just ignore them, so they don't show up in the order
                     assert(_num_vert);
                     --_num_vert;
+                    // _zeroes.push_back(*p.first); // HACK
                 }
             }else{
             }
@@ -185,7 +186,12 @@ public:
     }
 
     // later
-    O_t& get_elimination_ordering() const { untested();
+    O_t& get_elimination_ordering() { untested();
+        for (auto x: _zeroes){ untested();
+            // HACK
+            _o->push_back(x); // HACK
+        } // HACK
+        _zeroes.resize(0); // HACK
         return *_o;
     }
 
@@ -233,11 +239,8 @@ public:
 #endif
 
         initialize();
-
         _o->resize(_num_vert);
-
         assert(elim_vertices.size() == _num_vert);
-
         vertex_descriptor c;
 
         while(next(c)){
@@ -281,6 +284,10 @@ public:
 
     } // do_it
 
+    void set_ignore_isolated(bool v=true){
+        _iiv = v;
+    }
+
 protected:
     D_t _g;
     //T_t* _t;
@@ -305,6 +312,7 @@ protected:
     degreemap_type _degreemap;
     subgraph_type _subgraph;
     marker_type _marker; // here? recheck: need another marker in fill?
+    std::vector<vertex_descriptor> _zeroes;
 }; // greedy_base
 
 } // impl

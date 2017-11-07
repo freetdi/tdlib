@@ -61,7 +61,8 @@ public:
         }
     }
 
-    O_t& get_elimination_ordering() const {
+    O_t& get_elimination_ordering() {
+
         return *_o;
     }
 
@@ -239,8 +240,7 @@ public:
             for(; it!=zerodegbag1.end(); ++it){
                 (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
             }
-        }
-        else{
+        }else{
             baseclass::_num_vert -= zerodegbag1.size();
         }
 
@@ -631,6 +631,7 @@ public: // implementation
 private:
     fill_type _fill;
     fill_update_cb _cb;
+
 }; // fillIn
 
 } // obsolete

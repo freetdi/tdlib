@@ -422,10 +422,10 @@ inline void impl::minimalChordal<G_t, O_t, CFGT>::do_it()
 
 /* minimalChordal-algorithm
  *
- * Computes possibly redundant fill-in-edges and runs LEX-M to check,
+ * Compute possibly redundant fill-in-edges and runs LEX-M to check,
  * if the graph after removal of a fill-in-edge is chordal.
- * Finally, the algorithm computes a new perfect elimination ordering, that
- * possibly causes lower width than '_o'.
+ * Finally, compute a perfect elimination ordering,
+ * possibly of lower width than '_o'.
  */
 template <typename G_t, class O_t>
 inline void minimalChordal(G_t &G,

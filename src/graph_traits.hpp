@@ -77,6 +77,8 @@ struct Edge_NF{
 // how to fix that now?
 // "bag" is also used as shorthand for bag access...
 
+// BUG: move to treedec_traits
+
 struct bag_t{ //
   typedef boost::vertex_property_tag kind;
   std::set<unsigned int> bag; // yikes. old way.
@@ -103,6 +105,10 @@ struct bag_t{ //
   { untested();
 	  bag = b.m_value;
 	  return *this;
+  }
+
+  operator std::set<unsigned>() const{
+	  return bag;
   }
 };
 
