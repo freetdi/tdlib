@@ -26,6 +26,8 @@
 #include "timer.hpp"
 #include "graph_traits.hpp"
 
+#define TREEDEC_ALGO_TC template <typename GGG, template<class GG_, class...> class CFGG> class
+
 namespace treedec{
 
 namespace algo{
