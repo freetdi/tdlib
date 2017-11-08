@@ -54,7 +54,7 @@ typedef treedec::he::fill_in<cfg_t> FI;
 typedef treedec::he::thorup<cfg_t> thorup;
 typedef treedec::comb::PP_MD<cfg_t> PP_MD;
 typedef treedec::pending::PP_FI<cfg_t> PP_FI;
-typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
+typedef treedec::pending::PP_FI_TM<cfg_t> PP_FI_TM;
 
 #ifdef USE_GALA
 typedef treedec::comb::ex17<cfg_t> ppta;
@@ -102,6 +102,9 @@ int main()
 	boost::print_graph(g);
 	std::cout << "====\n";
 
+	std::cout << "PP+FI+TM\n";
+	do_it<cfg_t, PP_FI_TM>(g);
+
 	std::cout << "FI\n";
 	do_it<cfg_t, FI>(g);
 
@@ -121,9 +124,6 @@ int main()
 
 	std::cout << "PP+FI\n";
 	do_it<cfg_t, PP_FI>(g);
-
-	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI_TM>(g);
 
 
 

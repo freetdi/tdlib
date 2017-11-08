@@ -770,15 +770,15 @@ bool is_tree(G_t const &G){ untested();
 //TODO: use vec<bool>
 template <typename O_t, typename G>
 bool is_vertex_permutation(O_t const &O, G const &g)
-{ untested();
+{ itested();
     std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V;
 
     auto p=boost::vertices(g);
-    for(; p.first!=p.second; ++p.first){ untested();
+    for(; p.first!=p.second; ++p.first){ itested();
         V.insert(*p.first);
     }
 
-    for(auto x : O) { untested();
+    for(auto x : O) { itested();
         S.insert(x);
     }
 

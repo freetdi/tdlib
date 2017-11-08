@@ -223,6 +223,7 @@ public:
     // greedy_base::
     void do_it(){
         trace2("do_it", _i, _num_vert);
+        print_graph(_g);
         timer_on();
 
         if(!_num_vert){

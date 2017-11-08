@@ -453,6 +453,7 @@ void ordering_to_treedec(G_t &G, V_t const& O, T_t &T)
     for(unsigned int i = 0; i < O.size(); i++){
         bags[i].first = O[i];
         make_clique_and_detach(O[i], G, bags[i].second);
+        trace2("picked", O[i], bags[i].second.size());
     }
 
     treedec::detail::skeleton_to_treedec(G, T, bags, O, n);

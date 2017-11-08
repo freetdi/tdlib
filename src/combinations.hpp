@@ -62,6 +62,8 @@
 #endif
 #include "treedec_copy.hpp"
 
+#include <boost/graph/graph_utility.hpp>
+
 namespace treedec{
 
 namespace comb{
@@ -435,6 +437,8 @@ public: // algo interface
             A.do_it();
             A.get_bags(bags);
             A.get_graph(_g);
+
+            trace1("done PP in PPFITM", boost::num_edges(_g));
 #endif
 
         for(auto const& x : bags){ untested();
@@ -448,16 +452,23 @@ public: // algo interface
 //            typename std::vector<vertex_descriptor> old_elim_ordering;
             typename std::vector<vertex_descriptor> new_elim_ordering;
 
-            // BUG
-            boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> H;
-            boost::copy_graph(_g, H);
+            // BUG this must work in ordering_to_treedec
+            boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> H;
+            boost::copy_graph(_g, H,
+				 boost::vertex_copy(hack::forgetprop()).
+				 edge_copy(hack::forgetprop()));
 
+            trace0("backedup to H");
+            trace0("doit");
             treedec::impl::fillIn<G> a(_g);
             a.set_ignore_isolated();
             a.do_it();
+            trace0("done fi");
             auto& old_elim_ordering = a.get_elimination_ordering();
 
             trace2("mC", boost::num_edges(H), boost::num_vertices(H));
+
+            // changes H, but doesn't matter
             treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
             trace3("", old_elim_ordering.size(), new_elim_ordering.size(), boost::num_vertices(_g));
             assert(is_vertex_permutation(new_elim_ordering, _g));
@@ -467,19 +478,23 @@ public: // algo interface
             new_elim_ordering_(old_elim_ordering.size());
 
             unsigned c = 0;
-            for(unsigned i = 0; i < new_elim_ordering.size(); i++){
-                if(boost::out_degree(new_elim_ordering[i], _g) > 0){
-                    new_elim_ordering_[c++] = new_elim_ordering[i];
+            for(auto n=new_elim_ordering.begin(); n!=new_elim_ordering.end(); ++n){
+                if(boost::degree(*n, _g) > 0){
+                    trace2("eo", c, *n);
+                    new_elim_ordering_[c++] = *n;
                 }else{
                 }
             }
+            assert(new_elim_ordering_.size() == boost::num_vertices(H));
+
             assert(is_vertex_permutation(new_elim_ordering, H));
 
-//            boost::print_graph(H);
-            trace2("to_treedec", new_elim_ordering.size(), c);
+            assert(is_permutation(new_elim_ordering));
+
+            trace3("to_treedec", c, new_elim_ordering.size(), boost::num_vertices(H));
             trace3("", boost::num_edges(H), new_elim_ordering.size(), boost::num_vertices(H));
             treedec::ordering_to_treedec(H, new_elim_ordering_, _t);
-            trace0("ordered_to_treedec");
+            trace0("PPFITM ordered_to_treedec");
             // boost::print_graph(_t);
         }
 
@@ -502,7 +517,8 @@ private:
     // T _t; // FIXME. does not work yet
 
     // TD_tree_dec_t _t; // BUG
-    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+    // needs to work with ordering_to_treedec... (which?!)
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::property<treedec::bag_t, std::set<unsigned> > > _t; // BUG
 
     int _low_tw;

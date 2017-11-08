@@ -232,6 +232,7 @@ public:
           _num_edges(boost::num_edges(_g)),
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
+          _lb_bs(0),
           _numbering(_g, _id)
     {
         assert(_num_edges ^ 1);
@@ -643,10 +644,10 @@ private:
     degreemap_type _degreemap;
     degs_type _degs;
     std::deque<vertex_descriptor> _elims;
-    vertices_size_type _lb_bs;
     edges_size_type _num_edges;
     marker_type _marker;
     treedec::draft::sMARKER<vertices_size_type, vertices_size_type> _dormant;
+    vertices_size_type _lb_bs;
     numbering_type _numbering;
 
 public: // draft, ongoing cleanup from exact_base.
@@ -1675,6 +1676,8 @@ void preprocessing<G_t, CFG>::do_it()
                 ;
         }
         {
+
+        std::cerr << "v" << _lb_bs << "\n";
 
             if (_lb_bs < 5){
                 _lb_bs = 5;

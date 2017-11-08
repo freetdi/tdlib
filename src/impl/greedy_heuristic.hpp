@@ -289,8 +289,7 @@ private:
 // the fillIn heuristic.
 template<typename G_t,
          template<class GG, class ...> class CFGT=algo::default_config>
-class fillIn : public greedy_base<
-               G_t,
+class fillIn : public greedy_base< G_t,
                std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>,
                CFGT>{
 public: //types
@@ -325,7 +324,6 @@ public: // construct
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
           _fill(baseclass::_subgraph, boost::num_vertices(g))
-          // _cb(fill_update_cb(&_fill, baseclass::_subgraph))
     {
 //        boost::print_graph(g);
         treedec::check(g);
@@ -462,7 +460,6 @@ public: // implementation
                         for(; r.first!=r.second; ++r.first){
                             if(!baseclass::_marker.is_marked(*r.first)){
                                 // not neighbour of n
-                                trace1("skip", *r.first);
                             }else{
                                 trace3("--common neigh", n, n2, *r.first);
                                 assert(*r.first!=n);

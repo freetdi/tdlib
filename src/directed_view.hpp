@@ -116,23 +116,27 @@ struct dwt<G,
 	typedef typename graph_traits<G>::directed_type type;
 	static std::string dbg(){ return "bidir wrapper\n"; }
 
-	static size_t init(G&){
-		return 0;
+	static size_t init(G& g){
+		return boost::num_vertices(g);
 	}
 
 	// check: do we need this copy?
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){
-		assert(!boost::num_vertices(h));
+	static void copy(GG const& g, H& h){ untested();
+		trace2("bidir cp", boost::is_bidirectional_graph<GG>::value,
+				             boost::is_bidirectional_graph<H>::value);
+		assert(boost::is_directed(g));
+//		assert(!boost::num_vertices(h));
 		assert(boost::is_directed(h));
 		auto p=boost::edges(g);
 		for(; p.first!=p.second; ++p.first){
 			auto e=*p.first;
 			auto V=boost::source(e, g);
 			auto W=boost::target(e, g);
+			trace2("bidir cp", W, V);
+			assert(!boost::edge(V, W, h).second);
 			boost::add_edge(V, W, h);
 			boost::add_edge(W, V, h);
-			trace2("bidir cp", W, V);
 		}
 		trace2("bidir cp", boost::num_edges(g), boost::num_edges(h));
 		assert(2*boost::num_edges(g) == boost::num_edges(h));
@@ -171,7 +175,7 @@ public:
 	directed_view(G& g, bool commit=false)
 	 : _g(wrapper_help::init(g)),
 	   _commit(commit)
-	{
+	{ untested();
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge
