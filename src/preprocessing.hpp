@@ -304,6 +304,10 @@ public:
 #endif
         assert(bags.size()==_elims.size());
     }
+
+    edges_size_type num_edges()const{
+        return _num_edges;
+    }
     // legacy support. don't use. don't touch.
     template<class GG>
     void get_graph(GG& gg) {

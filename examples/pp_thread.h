@@ -28,8 +28,6 @@ public:
 
     void do_print_results(std::ostream& o)
     { untested();
-		 // message?
-        o << "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  // treedec::grtdprinter<G> P(o, _work);
 		  // size_t numbags = boost::num_vertices(_work); // ask P?!
@@ -41,6 +39,7 @@ public:
     void run() { untested();
 		_PP->do_it();
 
+		  CFG::message(bLOG, "PP done, edges left: %d", _PP->num_edges());
         unsigned r = _PP->get_bagsize();
         // assert(boost::num_vertices(_work) || r==0);
 		  incomplete();
