@@ -393,6 +393,7 @@ void dump_tree_decomposition(T const& t){
 
 }
 
-}
+
+} // treedec
 
 #endif

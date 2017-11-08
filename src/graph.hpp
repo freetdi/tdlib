@@ -278,7 +278,8 @@ inline void detach_neighborhood(
 
     unsigned i = 0;
     for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++) { untested();
-        bag.push_back(*nIt1);
+        assert(i<bag.size());
+        bag[i++]=*nIt1;
     }
     boost::clear_vertex(c, g);
 }

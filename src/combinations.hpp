@@ -60,6 +60,7 @@
 #ifdef USE_GALA
 #include "exact_ta.hpp"
 #endif
+#include "treedec_copy.hpp"
 
 namespace treedec{
 
@@ -260,7 +261,7 @@ private:
     G& _g;
     T _t;
     int _low_tw;
-}; // PP_FI_TM
+}; // PP_FI_TM (old)
 
 
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
@@ -383,15 +384,15 @@ private:
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
 public: // construct
-    PP_FI_TM(G& g) : _g(g){
+    PP_FI_TM(G& g) : _g(g){ untested();
         _low_tw = -1;
     }
 
 public: // random stuff
-    void set_lower_bound(unsigned lb){
+    void set_lower_bound(unsigned lb){ untested();
         _low_tw = lb-1;
     }
-    unsigned lower_bound()const{
+    unsigned lower_bound()const{ untested();
         return _low_tw + 1;
     }
 
@@ -417,14 +418,14 @@ public: // algo interface
             A.get_graph(_g);
 #endif
 
-        for(auto const& x : bags){
+        for(auto const& x : bags){ untested();
             auto& B=boost::get<1>(x);
             trace1("B", B.size());
         }
 
         // BUG: _g is much too big. only need the connected components
 
-        if(boost::num_edges(_g) > 0){
+        if(boost::num_edges(_g) > 0){ untested();
 //            typename std::vector<vertex_descriptor> old_elim_ordering;
             typename std::vector<vertex_descriptor> new_elim_ordering;
 
@@ -460,7 +461,7 @@ public: // algo interface
             trace3("", boost::num_edges(H), new_elim_ordering.size(), boost::num_vertices(H));
             treedec::ordering_to_treedec(H, new_elim_ordering_, _t);
             trace0("ordered_to_treedec");
-            boost::print_graph(_t);
+            // boost::print_graph(_t);
         }
 
         trace0("gluing");
@@ -470,13 +471,21 @@ public: // algo interface
     template<class TT>
     void get_tree_decomposition(TT& t) const{
         // todo: assemble td here.
-        boost::copy_graph(_t, t);
+#if 0
+        // boost::copy_graph(_t, t); // FIXME
+#else
+        treedec::obsolete_copy_treedec(_t, t);
+#endif
     }
 
 private:
     G& _g;
-    // T _t;
-    TD_tree_dec_t _t; // BUG
+    // T _t; // FIXME. does not work yet
+
+    // TD_tree_dec_t _t; // BUG
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+        boost::property<treedec::bag_t, std::set<unsigned> > > _t; // BUG
+
     int _low_tw;
 }; // PP_FI_TM
 
