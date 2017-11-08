@@ -238,7 +238,7 @@ public:
 
         if(!baseclass::_iiv){
             for(; it!=zerodegbag1.end(); ++it){
-                (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
+                (*baseclass::_o)[baseclass::_i++] = *it;
             }
         }else{
             baseclass::_num_vert -= zerodegbag1.size();
@@ -277,7 +277,7 @@ public:
         BOOST_AUTO(it, zerodegbag.begin());
 
         for(; it!=zerodegbag.end(); ++it){
-            (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
+            (*baseclass::_o)[baseclass::_i++] = *it;
         }
     }
 

@@ -582,7 +582,7 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
-#if 0
+#ifdef USE_PPMD
     if(!(mask & ( 1 << nPPMD ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG16, grtd_algo_config>(g16, "PPMD_16"));
