@@ -73,7 +73,10 @@ public: // types
 
     typedef typename treedec::graph_traits<G>::treedec_type T;
 public: // construct
-    PP_MD(G& g) : _g(g){
+    PP_MD(G& g) :
+        _g(g),
+        _low_tw(-1)
+    {
     }
 
 public: // random stuff, should be in algo. later
