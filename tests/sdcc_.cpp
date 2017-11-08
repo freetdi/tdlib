@@ -111,8 +111,8 @@ int main()
 	std::cout << "FI\n";
 	do_it<cfg_t, FI>(g);
 
-	std::cout << "skip PP+MD\n";
-//	do_it<cfg_t, PP_MD>(g);
+	std::cout << "PP+MD\n";
+	do_it<cfg_t, PP_MD>(g);
 //
 #ifdef USE_GALA
 	std::cout << "ppta\n";

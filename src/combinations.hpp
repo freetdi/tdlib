@@ -84,10 +84,11 @@ public: // random stuff, should be in algo. later
         return _low_tw + 1;
     }
 
-    void do_it(){
+    void do_it(){ untested();
         if(boost::num_vertices(_g) == 0){
             boost::add_vertex(_t);
             return;
+        }else{ untested();
         }
 
         // TODO: cleanup
@@ -97,11 +98,19 @@ public: // random stuff, should be in algo. later
                          > > bags;
 
         treedec::preprocessing(_g, bags, _low_tw);
-        if(boost::num_edges(_g) > 0){
+        if(boost::num_edges(_g) > 0){ untested();
+
+            // HACK. old mindegree does not work on bidirectional graphs
+        boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ug;
+        boost::copy_graph(_g, ug,
+				 boost::vertex_copy(hack::forgetprop()).
+				 edge_copy(hack::forgetprop()));
+
             treedec::minDegree_decomp(
-                    _g, _t,
+                    ug, _t,
                     (typename std::vector<typename treedec_chooser<G>::value_type>*)NULL,
                     UINT_MAX, true); //ignore_isolated_vertices
+        }else{ untested();
         }
         treedec::glue_bags(bags, _t);
     }
@@ -109,12 +118,19 @@ public: // random stuff, should be in algo. later
     template<class TT>
     void get_tree_decomposition(TT& t) const{
         // todo: assemble td here.
-        boost::copy_graph(_t, t);
+#if 0
+        // boost::copy_graph(_t, t); // FIXME
+#else
+        treedec::obsolete_copy_treedec(_t, t);
+#endif
     }
 
 private:
     G& _g;
-    T _t;
+    // T _t; // FIXME. does not work yet
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+        boost::property<treedec::bag_t, std::set<unsigned> > > _t; // BUG
+
     int _low_tw;
 }; // PP_MD
 
