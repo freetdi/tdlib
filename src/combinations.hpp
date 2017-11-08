@@ -84,11 +84,11 @@ public: // random stuff, should be in algo. later
         return _low_tw + 1;
     }
 
-    void do_it(){ untested();
+    void do_it(){
         if(boost::num_vertices(_g) == 0){
             boost::add_vertex(_t);
             return;
-        }else{ untested();
+        }else{
         }
 
         // TODO: cleanup
@@ -98,7 +98,7 @@ public: // random stuff, should be in algo. later
                          > > bags;
 
         treedec::preprocessing(_g, bags, _low_tw);
-        if(boost::num_edges(_g) > 0){ untested();
+        if(boost::num_edges(_g) > 0){
 
             // HACK. old mindegree does not work on bidirectional graphs
         boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ug;
@@ -110,7 +110,7 @@ public: // random stuff, should be in algo. later
                     ug, _t,
                     (typename std::vector<typename treedec_chooser<G>::value_type>*)NULL,
                     UINT_MAX, true); //ignore_isolated_vertices
-        }else{ untested();
+        }else{
         }
         treedec::glue_bags(bags, _t);
     }
@@ -256,7 +256,7 @@ public: // algo interface
 
             unsigned c = 0;
             for(unsigned i = 0; i < new_elim_ordering.size(); i++){
-                if(boost::out_degree(new_elim_ordering[i], _g) > 0){ untested();
+                if(boost::out_degree(new_elim_ordering[i], _g) > 0){
                     new_elim_ordering_[c++] = new_elim_ordering[i];
                 }
             }
@@ -365,7 +365,7 @@ public: // algo interface
         if(boost::num_vertices(_g) == 0){ untested();
             boost::add_vertex(_t);
             return;
-        }else{ untested();
+        }else{
 
             // BUG, somehow need to cast CFGT to ppconfig
             // "message" is getting lost here, need pp_cfg+CFGT

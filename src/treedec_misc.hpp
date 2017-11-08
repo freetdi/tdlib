@@ -57,11 +57,11 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 	typedef typename boost::graph_traits<T_t>::vertex_descriptor treenode_descriptor;
    if(boost::is_directed(src)){ itested();
 		if(boost::is_directed(tgt)){ untested();
-		}else{ untested();
+		}else{
 		}
 	}else{ itested();
 		if(boost::is_directed(tgt)){ untested();
-		}else{ untested();
+		}else{
 		}
 	}
 #ifdef DEBUG
@@ -100,7 +100,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 				for(;srcnp.first!=srcnp.second; ++srcnp.first){
 					auto target_in_copy = *srcnp.first;
 					assert(target_in_copy!=*SR.first);
-					if(boost::is_directed(src)){ untested();
+					if(boost::is_directed(src)){
 						boost::add_edge(new_tv, target_in_copy+offset, tgt);
 					}else if(target_in_copy<*SR.first){
 						trace2("copy edge", *SR.first, target_in_copy);

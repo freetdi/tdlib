@@ -157,7 +157,7 @@ namespace detail{//
           c.insert(e);
         }
         template<class I>
-        static void push(C& c, I b, I e) { untested();
+        static void push(C& c, I b, I e) {
           for(; b!=e; ++b){
             c.insert(*b);
           }

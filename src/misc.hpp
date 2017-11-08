@@ -692,8 +692,8 @@ void glue_two_bags(T_t &T,
 //Glues bags with the current tree decomposition.
 template<class B, typename T_t>
 void glue_bags(B& bags, T_t &T)
-{ untested();
-    for(unsigned int i = bags.size(); i > 0; i--){ untested();
+{
+    for(unsigned int i = bags.size(); i > 0; i--){
         typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
         auto& second=boost::get<1>(bags[i-1]);
 /*

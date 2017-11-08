@@ -306,7 +306,7 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
          > > bags;
 
     // if config.preprocessing?
-    if(boost::num_vertices(_g)){ untested();
+    if(boost::num_vertices(_g)){
         impl::preprocessing<G_t> A(_g);
         A.set_treewidth(low, -1u);
         A.do_it();

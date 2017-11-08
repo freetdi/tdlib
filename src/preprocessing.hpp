@@ -233,7 +233,7 @@ public:
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
           _numbering(_g, _id)
-    { untested();
+    {
         assert(_num_edges ^ 1);
         _num_edges /= 2;
         _lb_bs = 1;
@@ -667,7 +667,7 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
     if(n==0){ untested();
         boost::add_vertex(t);
         return;
-    }else{ untested();
+    }else{
     }
 
         // yikes
@@ -682,7 +682,7 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
     if(boost::num_edges(g) == 0){ untested();
         treedec::glue_bags(bags, t);
         return;
-    }else{ untested();
+    }else{
     }
 
     do_components<T, A>(t, g);
@@ -699,7 +699,7 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
 template<class G, template<class G_, class ...> class CFGT>
 template<class T, TREEDEC_ALGO_TC A>
 void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
-{ untested();
+{
     // Compute a tree decomposition for each connected component of G and glue
     // the decompositions together.
     typedef std::vector<std::set<typename boost::graph_traits<G>::vertex_descriptor> > components_t;
@@ -726,7 +726,7 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
                 boost::add_edge(nv-1, nv, t);
             }else{ untested();
             }
-        }else{ untested();
+        }else{
         }
 
         typedef typename graph_traits<G>::immutable_type immutable_type;

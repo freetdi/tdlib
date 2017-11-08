@@ -123,7 +123,7 @@ num_vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
 template<class G, class M, class D>
 typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::vertex_range
 vertices(treedec::INDUCED_SUBGRAPH_1<G, M, D> const& g)
-{ untested();
+{
 	return g.vertices();
 }
 
