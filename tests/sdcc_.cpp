@@ -102,10 +102,9 @@ int main()
 	boost::print_graph(g);
 	std::cout << "====\n";
 
-	// does not work on travis?!
-//	std::cout << "PP+FI+TM\n";
-//	do_it<cfg_t, PP_FI_TM>(g);
-//
+	std::cout << "PP+FI+TM\n";
+	do_it<cfg_t, PP_FI_TM>(g);
+
 	std::cout << "FI\n";
 	do_it<cfg_t, FI>(g);
 

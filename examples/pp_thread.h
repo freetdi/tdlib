@@ -39,7 +39,7 @@ public:
     void run() { untested();
 		_PP->do_it();
 
-		  CFG::message(bLOG, "PP done, edges left: %d", _PP->num_edges());
+		  CFG::message(bLOG, "PP edges left %d\n", _PP->num_edges());
         unsigned r = _PP->get_bagsize();
         // assert(boost::num_vertices(_work) || r==0);
 		  incomplete();
