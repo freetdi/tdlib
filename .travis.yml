@@ -1,5 +1,4 @@
 language: cpp
-# sudo: required
 dist: trusty
 
 os:
@@ -7,7 +6,7 @@ os:
 
 compiler:
   - gcc
-    #  - clang
+  - clang
 
 python:
   - "2.7"
@@ -21,35 +20,14 @@ env:
 addons:
   apt:
     sources:
-       #      - trusty
-      - boost-latest # too old, actually.
-        #      - debian-sid
-        #      - ubuntu-toolchain-r-test
-        #      - deadsnakes
-        #      - sourceline: 'ppa:kzemek/boost'
+      - boost-latest # too old, actually
     packages:
-       # - libboost1.62-dev
-      # - libboost-thread1.62-dev
-      # - libboost-graph1.62-dev
+      - libboost1.55-dev
+      - libboost-thread1.55-dev
+      - libboost-graph1.55-dev
       - stx-btree-dev
 
 install:
-  - |-
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      if [[ "$CXX" == "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-      pushd "$HOME"
-      wget 'https://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.bz2/download'
-      mkdir boost_src
-      ( cd boost_src; tar --strip-components=1 -xjf ../download )
-      cd boost_src
-      export BOOST_HOME=`pwd`
-      ./bootstrap.sh
-      ./b2 --with-system --with-graph --with-thread --with-regex
-      export BOOST_PARAM="--with-boost=$LOCAL_INSTALL"
-      popd
-      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
-    fi
-  - for i in ${BOOST_HOME}/stage/lib/*; do echo $i; ldd $i; done
 
 
   - sudo pip install cython
@@ -76,14 +54,36 @@ script:
   - make check
 
   # redo with gala
+  - LD_LIBRARY_PATH_OLD="$LD_LIBRARY_PATH"
+  - |-
+    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "g++" ]; then
+      export CXX="g++-4.8" CC="gcc-4.8";
+      pushd "$HOME"
+      wget 'https://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.bz2/download'
+      mkdir boost_src
+      ( cd boost_src; tar --strip-components=1 -xjf ../download )
+      cd boost_src
+      export BOOST_HOME=`pwd`
+      ./bootstrap.sh
+      ./b2 --with-system --with-graph --with-thread --with-regex
+      export BOOST_PARAM="--with-boost=$LOCAL_INSTALL"
+      popd
+      export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
+      for i in ${BOOST_HOME}/stage/lib/*; do echo $i; ldd $i; done
+    fi
   - wget https://github.com/freetdi/gala/archive/${GALA_COMMIT}.tar.gz
   - mkdir gala_src
   - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
   - ( cd gala_src; ./configure )
   - make -C gala_src install DESTDIR=${PWD} prefix=GP
-  - "./configure --enable-debug CXXFLAGS=-std=c++11
-                CXXFLAGS=-std=c++11
-                CPPFLAGS=-I${PWD}/GP/include\\ -I$BOOST_HOME
-                LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
-  - make check
-  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11\ CPPFLAGS=-I$BOOST_HOME
+  - |-
+    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "gcc" ]; then
+       "./configure --enable-debug CXXFLAGS=-std=c++11
+                    CXXFLAGS=-std=c++11
+                    CPPFLAGS=-I${PWD}/GP/include\\ -I$BOOST_HOME
+                    LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
+       cat config.log
+       make check
+    fi
+  - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
+  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
