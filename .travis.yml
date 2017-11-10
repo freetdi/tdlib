@@ -49,6 +49,7 @@ install:
       popd
       export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
     fi
+  - for i in ${BOOST_HOME}/stage/lib/*; do echo $i; ldd $i; done
 
 
   - sudo pip install cython
@@ -83,6 +84,6 @@ script:
   - "./configure --enable-debug CXXFLAGS=-std=c++11
                 CXXFLAGS=-std=c++11
                 CPPFLAGS=-I${PWD}/GP/include\\ -I$BOOST_HOME
-                LDFLAGS=-L$BOOST_HOME/stage/lib"
+                LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
   - make check
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11\ CPPFLAGS=-I$BOOST_HOME
