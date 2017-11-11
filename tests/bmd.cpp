@@ -1,14 +1,14 @@
 
-#include <tdlib/graph_traits.hpp>
+#include <treedec/graph_traits.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/random.hpp>
 #include <boost/random.hpp>
 #include <iostream>
 #include <stdlib.h>
-#include <tdlib/elimination_orderings.hpp>
-#include <tdlib/graph.hpp>
-#include <tdlib/trace.hpp>
-#include <tdlib/treedec.hpp>
+#include <treedec/elimination_orderings.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/trace.hpp>
+#include <treedec/treedec.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> bald_t;
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu_t;

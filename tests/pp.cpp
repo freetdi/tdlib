@@ -3,8 +3,8 @@
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
 #include <boost/graph/copy.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ALSVU;

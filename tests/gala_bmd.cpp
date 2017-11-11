@@ -15,13 +15,13 @@
 #include <boost/random.hpp>
 #include <iostream>
 #include <stdlib.h>
-#include <tdlib/elimination_orderings.hpp>
-#include <tdlib/graph.hpp>
-#include <tdlib/minimum_degree_ordering.hpp>
-#include <tdlib/trace.hpp>
+#include <treedec/elimination_orderings.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/minimum_degree_ordering.hpp>
+#include <treedec/trace.hpp>
 // not in development yet
-//#include <tdlib/printer.hpp>
-#include <tdlib/treedec.hpp>
+//#include <treedec/printer.hpp>
+#include <treedec/treedec.hpp>
 
 
 #ifdef USE_GALA

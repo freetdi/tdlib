@@ -1,6 +1,6 @@
 #include "config.h"
 #include <set>
-#include <tdlib/trace.hpp>
+#include <treedec/trace.hpp>
 
 namespace treedec{
 	struct bag_t;
@@ -15,7 +15,7 @@ struct tree_dec_node
   unsigned weight;
 };
 
-#include <tdlib/treedec_traits.hpp>
+#include <treedec/treedec_traits.hpp>
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -41,13 +41,13 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 
 TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
 
-#include <tdlib/graph.hpp>
-#include <tdlib/preprocessing.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/preprocessing.hpp>
 #include <boost/graph/copy.hpp>
 
 
-#include <tdlib/thorup.hpp>
-#include <tdlib/combinations.hpp>
+#include <treedec/thorup.hpp>
+#include <treedec/combinations.hpp>
 
 
 typedef treedec::he::fill_in<cfg_t> FI;
@@ -61,7 +61,7 @@ typedef treedec::comb::ex17<cfg_t> ppta;
 #endif
 
 
-#include <tdlib/nice_decomposition.hpp>
+#include <treedec/nice_decomposition.hpp>
 
 template<class G, class A>
 static void do_it(G const& g_){

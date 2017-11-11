@@ -16,7 +16,7 @@ struct tree_dec_node2 {
   unsigned weight;
 };
 
-#include <tdlib/treedec_traits.hpp>
+#include <treedec/treedec_traits.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::bidirectionalS, tree_dec_node> sbib_tdt;
@@ -34,11 +34,11 @@ TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
-#include <tdlib/thorup.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/thorup.hpp>
 #ifdef USE_GALA
-#include <tdlib/exact_ta.hpp>
+#include <treedec/exact_ta.hpp>
 #endif
 
 
@@ -100,7 +100,7 @@ namespace boost{
 #endif
 
 // too late?
-#include <tdlib/thorup.hpp>
+#include <treedec/thorup.hpp>
 
 int main(int, char**)
 {

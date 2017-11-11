@@ -3,10 +3,10 @@
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
 #include <boost/graph/copy.hpp>
-#include <tdlib/combinations.hpp>
+#include <treedec/combinations.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> G;
 typedef treedec::graph_traits<G>::treedec_type T;

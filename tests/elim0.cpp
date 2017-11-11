@@ -1,6 +1,6 @@
 
 
-#include <tdlib/combinations.hpp>
+#include <treedec/combinations.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> graph_t;
 

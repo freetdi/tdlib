@@ -1,4 +1,4 @@
-#include <tdlib/bucket_sorter.hpp>
+#include <treedec/bucket_sorter.hpp>
 #include <boost/property_map/property_map.hpp>
 
 

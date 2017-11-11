@@ -1,5 +1,5 @@
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/preprocessing.hpp>
+#include <treedec/preprocessing.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> G;
 

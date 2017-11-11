@@ -1,11 +1,11 @@
-#include <tdlib/graph_traits.hpp>
-#include <tdlib/elimination_orderings.hpp>
+#include <treedec/graph_traits.hpp>
+#include <treedec/elimination_orderings.hpp>
 #include <iostream>
 
 #include <boost/graph/adjacency_list.hpp>
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> G;
 
-#include <tdlib/treedec.hpp>
+#include <treedec/treedec.hpp>
 
 int main()
 {

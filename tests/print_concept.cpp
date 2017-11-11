@@ -2,8 +2,8 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <tdlib/treedec_traits.hpp>
-#include <tdlib/graph_traits.hpp>
+#include <treedec/treedec_traits.hpp>
+#include <treedec/graph_traits.hpp>
 
 #ifdef USE_GALA
 #include <gala/graph.h>
@@ -12,7 +12,7 @@
 
 #ifdef USE_GALA
 #include <gala/boost.h>
-#include <tdlib/printer.hpp>
+#include <treedec/printer.hpp>
 #include <boost/graph/copy.hpp>
 #include <gala/boost_copy.h>
 // undirected simple loopless graph
@@ -35,8 +35,8 @@ struct test{
     }
 } x;
 #endif
-#include <tdlib/treedec.hpp>
-#include <tdlib/printer.hpp>
+#include <treedec/treedec.hpp>
+#include <treedec/printer.hpp>
 #include <boost/graph/copy.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> ALVVD;

@@ -1,7 +1,7 @@
-#include <tdlib/directed_view.hpp>
+#include <treedec/directed_view.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_concepts.hpp>
-#include <tdlib/graph.hpp> // num_edges
+#include <treedec/graph.hpp> // num_edges
 #include <boost/graph/graph_utility.hpp>
 
 struct cfg_node
