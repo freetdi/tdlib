@@ -446,8 +446,6 @@ public: // algo interface
             trace1("B", B.size());
         }
 
-        // BUG: _g is much too big. only need the connected components
-
         if(boost::num_edges(_g) > 0){
 //            typename std::vector<vertex_descriptor> old_elim_ordering;
             typename std::vector<vertex_descriptor> new_elim_ordering;
@@ -475,19 +473,18 @@ public: // algo interface
 
 
             typename std::vector<vertex_descriptor>
-            new_elim_ordering_(old_elim_ordering.size());
+            
+            new_elim_ordering_(boost::num_vertices(H));
 
             unsigned c = 0;
             for(auto n=new_elim_ordering.begin(); n!=new_elim_ordering.end(); ++n){
                 if(boost::degree(*n, _g) > 0){
                     trace2("eo", c, *n);
+                    assert(c<new_elim_ordering_.size());
                     new_elim_ordering_[c++] = *n;
                 }else{
                 }
             }
-
-            // wtf?
-            // assert(new_elim_ordering_.size() == boost::num_vertices(H));
 
             assert(is_vertex_permutation(new_elim_ordering, H));
 
