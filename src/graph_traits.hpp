@@ -15,7 +15,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-//   traits for tdlib graphs.
+//   traits for treedec graphs.
 
 #ifndef TREEDEC_GRAPH_TRAITS_HPP
 #define TREEDEC_GRAPH_TRAITS_HPP

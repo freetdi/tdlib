@@ -346,7 +346,7 @@ private:
 	void extendByIterative(NODE *node, vertex_t v, T const& c, T const& neighb, NODE* from);
 	bool is_valid(vertex_t v) const{ return v!=-1u && v<n(); }
 
-private: // graph access. ideally forward to tdlib
+private: // graph access. ideally forward to treedec
 	const T& out_edges(vertex_t v) const{
 		return _g.out_edges(v);
 	}

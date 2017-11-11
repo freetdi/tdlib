@@ -1,4 +1,4 @@
-// platform/machine dependent definitions for tdlib
+// platform/machine dependent definitions for treedec
 #ifndef TREEDEC_PLATFORM_HPP
 #define TREEDEC_PLATFORM_HPP
 

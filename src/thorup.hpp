@@ -46,7 +46,7 @@
 // Changelog:
 //
 // 2011 - initial
-// 2017 - merged into tdlib
+// 2017 - merged into treedec
 //        - namespace
 //        - bag access
 //        - list->vector
@@ -65,8 +65,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/algo.hpp>
-#include <tdlib/treedec.hpp>
+#include <treedec/algo.hpp>
+#include <treedec/treedec.hpp>
 
 // namespace boost {
 // // some hacks. perhaps wrong place
