@@ -405,7 +405,7 @@ private:
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
 public: // construct
-    PP_FI_TM(G& g) : _g(g){ untested();
+    PP_FI_TM(G& g) : _g(g){
         _low_tw = -1;
     }
 
@@ -418,7 +418,7 @@ public: // random stuff
     }
 
 public: // algo interface
-    void do_it(){ untested();
+    void do_it(){
 
         if(boost::num_vertices(_g) == 0){
             boost::add_vertex(_t);
@@ -448,7 +448,7 @@ public: // algo interface
 
         // BUG: _g is much too big. only need the connected components
 
-        if(boost::num_edges(_g) > 0){ untested();
+        if(boost::num_edges(_g) > 0){
 //            typename std::vector<vertex_descriptor> old_elim_ordering;
             typename std::vector<vertex_descriptor> new_elim_ordering;
 
@@ -466,7 +466,7 @@ public: // algo interface
             trace0("done fi");
             auto& old_elim_ordering = a.get_elimination_ordering();
 
-            trace2("mC", boost::num_edges(H), boost::num_vertices(H));
+            trace2("mC", boost::num_edges(H), boost::num_vertices(_g));
 
             // changes H, but doesn't matter
             treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
@@ -485,7 +485,9 @@ public: // algo interface
                 }else{
                 }
             }
-            assert(new_elim_ordering_.size() == boost::num_vertices(H));
+
+            // wtf?
+            // assert(new_elim_ordering_.size() == boost::num_vertices(H));
 
             assert(is_vertex_permutation(new_elim_ordering, H));
 

@@ -5,7 +5,7 @@ namespace treedec{
 
 template <typename S>
 bool is_permutation(S const &s)
-{ untested();
+{
 
 	std::set<typename S::value_type> X(s.begin(), s.end());
 

@@ -186,7 +186,7 @@ public:
     }
 
     // later
-    O_t& get_elimination_ordering() { untested();
+    O_t& get_elimination_ordering() {
         for (auto x: _zeroes){ untested();
             // HACK
             _o->push_back(x); // HACK

@@ -23,20 +23,20 @@ void copy_trace(const S& s, T& t /*, M map=identity */)
     // TODO template metamagic...
     if(boost::num_vertices(t)){ untested();
         assert(false);
-    }else if(!boost::is_multigraph<T>()){ untested();
+    }else if(!boost::is_multigraph<T>()){
         boost::copy_graph(s, t);
-    }else if(boost::is_directed(t) && !boost::is_bidirectional_graph<T>::value) { untested();
+    }else if(boost::is_directed(t) && !boost::is_bidirectional_graph<T>::value) {
         boost::copy_graph(s, t);
-    }else{ untested();
+    }else{
         t = MOVE(T(boost::num_vertices(s)));
         auto b=boost::edges(s);
         for(; b.first!=b.second; ++b.first){
             typename boost::graph_traits<S>::edge_descriptor f = *b.first;
             auto u=boost::source(f, s);
             auto v=boost::target(*b.first, s);
-            if(u<v){ untested();
+            if(u<v){
                 boost::add_edge(u, v, t);
-            }else{ untested();
+            }else{
             }
         }
     }

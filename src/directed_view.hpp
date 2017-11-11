@@ -122,7 +122,7 @@ struct dwt<G,
 
 	// check: do we need this copy?
 	template<class GG, class H>
-	static void copy(GG const& g, H& h){ untested();
+	static void copy(GG const& g, H& h){
 		trace2("bidir cp", boost::is_bidirectional_graph<GG>::value,
 				             boost::is_bidirectional_graph<H>::value);
 		assert(boost::is_directed(g));
@@ -175,7 +175,7 @@ public:
 	directed_view(G& g, bool commit=false)
 	 : _g(wrapper_help::init(g)),
 	   _commit(commit)
-	{ untested();
+	{
 		assert(boost::is_directed(_g));
 
 		// no, only copies one edge per edge

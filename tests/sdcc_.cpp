@@ -97,8 +97,14 @@ static void do_it(G const& g_){
 int main()
 {
 	const unsigned n=16;
-	cfg_t g(n);
+	cfg_t h(n);
 #include "g.h"
+	cfg_t g;
+	boost::copy_graph(h, g);
+//	boost::copy_graph(h, g);
+	boost::add_vertex(g);
+
+	std::cout << "==test graph==\n";
 	boost::print_graph(g);
 	std::cout << "====\n";
 

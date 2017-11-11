@@ -65,7 +65,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 		}
 	}
 #ifdef DEBUG
-	for(auto& i: map){
+	for(auto& i: map){ untested();
 		std::cerr << "map " << i << "\n";
 	}
 #endif
@@ -131,7 +131,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 #endif
         }
 
-        if(offset){
+        if(offset){ untested();
             // connect new stuff to existing.
 				trace2("connecting existing ", new_tv, *boost::vertices(tgt).first);
             assert(!boost::edge(new_tv, *boost::vertices(tgt).first, tgt).second);
@@ -162,7 +162,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 
 template<class V, class P>
 void permute_vector(V& vec, P &perm)
-{
+{ untested();
 	assert_permutation(perm);
 	unsigned seek=0;
 	unsigned n=vec.size();
@@ -171,7 +171,7 @@ void permute_vector(V& vec, P &perm)
 
 		if(perm[seek]<=seek){ untested();
 			// already done.
-		}else{
+		}else{ untested();
 			typename V::value_type tmp = vec[seek];
 			unsigned i = perm[seek];
 			while(i!=seek){ untested();
@@ -186,9 +186,9 @@ void permute_vector(V& vec, P &perm)
 }
 
 template<class V, class P>
-void concat_maps(V& first, P const&second){
+void concat_maps(V& first, P const&second){ untested();
 	unsigned n=first.size();
-	for(unsigned i=0; i<n; ++i){
+	for(unsigned i=0; i<n; ++i){ untested();
 		first[i]=second[first[i]];
 	}
 }
