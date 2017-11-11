@@ -65,8 +65,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <treedec/algo.hpp>
-#include <treedec/treedec.hpp>
+#include "algo.hpp"
+#include "treedec.hpp"
 
 // namespace boost {
 // // some hacks. perhaps wrong place
