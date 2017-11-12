@@ -1,4 +1,5 @@
 //TODO: header
+//TODO: this is algo_traits.hpp
 
 #ifndef TREEDEC_CONFIG_TRAITS_HPP
 #define TREEDEC_CONFIG_TRAITS_HPP

@@ -1,4 +1,4 @@
-// Felix Salfelder 2016
+// Felix Salfelder 2016-2017
 // Lukas Larisch 2016
 //
 // This program is free software; you can redistribute it and/or modify it
@@ -131,8 +131,7 @@ private:
         size_t nv=_vals.size();
 
         long mm=nv*sqrt(nv);
-        //CFG::message(bLOG, "FI max missing: %l\n", mm)
-        std::cerr << "FI max missing " << mm << "\n";
+        // TODO CFG::message(1, "FI max missing: %ld\n", mm);
         return mm;
     }
 public: // construct

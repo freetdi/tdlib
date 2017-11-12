@@ -298,6 +298,7 @@ public: //types
     typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
     typedef greedy_base<G_t, O_t, CFGT> baseclass;
     typedef typename baseclass::vertex_descriptor vertex_descriptor;
+    // BUG:: use CFGT::fill or fallback to current fill
     typedef typename fill_chooser<typename baseclass::subgraph_type>::type fill_type;
 
     struct fill_update_cb : public graph_callback<typename baseclass::subgraph_type>{
