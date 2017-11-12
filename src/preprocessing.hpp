@@ -1681,8 +1681,6 @@ void preprocessing<G_t, CFG>::do_it()
         }
         {
 
-        std::cerr << "v" << _lb_bs << "\n";
-
             if (_lb_bs < 5){
                 _lb_bs = 5;
             }else{
