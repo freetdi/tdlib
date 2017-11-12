@@ -608,7 +608,7 @@ void make_rooted(T_undir_t &T, T_dir_t &T_)
 }
 
 //Glues a single bag with the current tree decomposition T according to subset relation.
-//Version used for preprocessing.
+//used for preprocessing.
 // BUG: this is inefficient. there's already a better implementation
 // (where?)
 template<typename T_t, class B>
@@ -630,7 +630,9 @@ void glue_bag( B &b,
                 push(b, elim_vertex);
                 t_vertex_descriptor t_dec_node=boost::add_vertex(T);
                 push( BAG_(t_dec_node, T), b.begin(), b.end() ); // hmm, move doesnt work yet.
-
+#ifdef TREEDEC_DEBUG
+    std::cout << "glue edg2" << *vIt << " " <<  t_dec_node << "\n";
+#endif
                 boost::add_edge(*vIt, t_dec_node, T);
             }else{ untested();
             }
@@ -686,6 +688,9 @@ void glue_two_bags(T_t &T,
         BAG_(b2, T) = bag2;
     }
 
+#ifdef TREEDEC_DEBUG
+    std::cout << "glue edg " << b1 << " " <<  b2 << "\n";
+#endif
     boost::add_edge(b1, b2, T);
 }
 

@@ -101,8 +101,13 @@ int main()
 #include "g.h"
 	cfg_t g;
 	boost::copy_graph(h, g);
-//	boost::copy_graph(h, g);
 	boost::add_vertex(g);
+	boost::add_vertex(g);
+	boost::add_vertex(g);
+	boost::add_vertex(g);
+//	boost::copy_graph(h, g);
+//	boost::copy_graph(h, g);
+//	boost::add_vertex(g);
 
 	std::cout << "==test graph==\n";
 	boost::print_graph(g);

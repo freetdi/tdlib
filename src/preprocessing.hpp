@@ -775,13 +775,12 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         assert(boost::num_vertices(T_) == boost::num_edges(T_)+1);
         assert(boost::num_vertices(t) == boost::num_edges(t)+1);
 
-#ifndef NDEBUG
-        unsigned tn=boost::num_vertices(t);
-        unsigned tn_=boost::num_vertices(T_);
+#ifdef DEBUG
+        std::cout << "appending\n";
+        boost::print_graph(T_);
 #endif
         treedec::draft::append_decomposition(t, std::move(T_), G_, vdMap);
         assert(boost::num_vertices(t) == boost::num_edges(t)+1);
-        assert( tn+tn_ == boost::num_vertices(t));
     }
     assert(boost::num_vertices(t) == boost::num_edges(t)+1);
 } // do_it

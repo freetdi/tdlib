@@ -54,6 +54,21 @@ private:
 template <typename T_t, class S_t, class G_t, class M_t>
 void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t const& map)
 {
+
+	// find a leaf in tgt (hack)
+	auto back=boost::vertices(tgt).first + (boost::num_vertices(tgt) - 1);
+	if(boost::out_degree(*back, tgt)){ untested();
+		back = boost::vertices(tgt).first;
+	}else{ untested();
+	}
+
+
+#ifdef TREEDEC_DEBUG
+	std::cout << " appending\n";
+	boost::print_graph(src);
+	treedec::draft::dump_tree_decomposition(src);
+	std::cout << " ---- \n";
+#endif
 	typedef typename boost::graph_traits<T_t>::vertex_descriptor treenode_descriptor;
    if(boost::is_directed(src)){ itested();
 		if(boost::is_directed(tgt)){ untested();
@@ -78,6 +93,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
     auto op=applyGmap<S_t, M_t>(src, map);
 //    assert(undirected_tree)...
     unsigned offset=boost::num_vertices(tgt);
+    unsigned sn=boost::num_vertices(src);
     auto SR=boost::vertices(src);
     auto TR=boost::vertices(tgt);
     trace4("append", offset, SR.second-SR.first, TR.second-TR.first, map.size());
@@ -85,11 +101,20 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
     if(SR.first==SR.second){ untested();
         // no bags to fetch. done
     }else{
-       treenode_descriptor new_tv;
+		 treenode_descriptor new_tv;
 		  auto const& M=boost::get(bag_t(), src);
+		  unsigned n=0;
+		  std::vector<treenode_descriptor> tmap(sn);
         for(; SR.first!=SR.second; ++SR.first){
+            new_tv = boost::add_vertex(tgt);
+				tmap[n] = new_tv;
+				++n;
+		  }
+		  n = 0;
+		  SR = boost::vertices(src);
+        for(; SR.first!=SR.second; ++SR.first) {
             trace1("appendfound", *SR.first);
-            new_tv=boost::add_vertex(tgt);
+            new_tv=tmap[n];
             auto& B=boost::get(bag_t(), tgt, new_tv);
             auto const& SB=boost::get(M, *SR.first);
 
@@ -100,7 +125,8 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 				for(;srcnp.first!=srcnp.second; ++srcnp.first){
 					auto target_in_copy = *srcnp.first;
 					assert(target_in_copy!=*SR.first);
-					if(boost::is_directed(src)){
+					if(boost::is_directed(src)){ untested();
+						// assert(target_in_copy+offset <= new_tv);
 						boost::add_edge(new_tv, target_in_copy+offset, tgt);
 					}else if(target_in_copy<*SR.first){
 						trace2("copy edge", *SR.first, target_in_copy);
@@ -129,13 +155,23 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
             push(B, make_transform_iterator(SB.begin(), op ),
                     make_transform_iterator(SB.end(),   op ));
 #endif
+				++n;
         }
 
         if(offset){ untested();
             // connect new stuff to existing.
 				trace2("connecting existing ", new_tv, *boost::vertices(tgt).first);
             assert(!boost::edge(new_tv, *boost::vertices(tgt).first, tgt).second);
-            boost::add_edge(new_tv, *boost::vertices(tgt).first, tgt);
+            //boost::add_edge(new_tv, *boost::vertices(tgt).first, tgt);
+				//
+				// hack/heuristic: find a root in src
+				// should use rooted graphs instead
+				// (currently, the root is either front or back in all outputs...)
+				if(boost::out_degree(tmap.back(), tgt)){ untested();
+					boost::add_edge(*back, tmap.back(), tgt);
+				}else{ untested();
+					boost::add_edge(*back, tmap.front(), tgt);
+				}
         }else{ untested();
         }
     }

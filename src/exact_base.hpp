@@ -29,6 +29,7 @@
 #include "preprocessing.hpp"
 #include "overlay.hpp"
 #include "treedec_misc.hpp"
+#include "treedec.hpp"
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/bandwidth.hpp>
 #include "treedec.hpp"
@@ -99,7 +100,7 @@ public:
         try_it(_t, lb_bs);
     }
     template<class T>
-    void get_tree_decomposition(T& t) const{
+    void get_tree_decomposition(T& t) const{ untested();
         boost::copy_graph(_t, t);
     }
     template<class T>
@@ -111,9 +112,11 @@ private:
     void do_components(T_t&, unsigned lb_bs);
 private:
     G_t& _g;
-    typename graph_traits<G_t>::treedec_type _t;
+    //typename graph_traits<G_t>::treedec_type _t; // BUG, we may need directions...
+    //                                                but we don't know yet.
+    TD_dir_tree_dec_t _t; // BUG, this must not be hardcoded.
     bool _cleanup_g;
-};
+}; // exact_decomposition
 
 
 template<typename G_t,
@@ -123,6 +126,7 @@ template<class G_t_, class T_t>
 inline void exact_decomposition<G_t, config, kernel>::run_kernel(
         G_t_ const& G, T_t& T, unsigned& lb_bs)
 {
+    trace1("ex::do_it", boost::is_directed(T));
 
     auto numv=boost::num_vertices(G);
     // std::cout << "c kernel " << numv << "\n";
@@ -158,6 +162,7 @@ template<class T_t>
 inline void exact_decomposition<G_t, config, kernel>::do_components(
         T_t& t, unsigned lb_bs)
 {
+    trace1("ex::do_comp", boost::is_directed(t));
 
     // Compute a tree decomposition for each connected component of G and glue
     // the decompositions together.
@@ -188,7 +193,7 @@ inline void exact_decomposition<G_t, config, kernel>::do_components(
 #ifndef NEWRANGE
         trace2("found component ", i->size(), components.size());
         if(i->size() == 1){
-            incomplete();
+            // incomplete(); see BUGS
             continue;
             auto nv=boost::add_vertex(t);
             auto& B=boost::get(bag_t(), t, nv);

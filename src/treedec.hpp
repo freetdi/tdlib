@@ -29,10 +29,10 @@
 #include "graph.hpp"
 
 
+// BUG. missing namespace
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_dir_tree_dec_t;
 
-// doesntwork yet
 #define COMMA ,
 TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag);
 TREEDEC_TREEDEC_BAG_TRAITS(TD_dir_tree_dec_t, bag);

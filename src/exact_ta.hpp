@@ -1173,7 +1173,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) cons
       <= _bag_size) {
       int j = addBag(cbset::union_(b->component, b->neighbours()), td);
       if (k >= 0) {
-			boost::add_edge(j, k, *td);
+			boost::add_edge(k, j, *td);
       }else{ untested();
 			r = j;
 		}
@@ -1185,7 +1185,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) cons
 
     unsigned j=addBag(s, td);
     if(k >= 0){
-      boost::add_edge(j, k, *td);
+      boost::add_edge(k, j, *td);
     }else{
       r = j;
     }
