@@ -57,7 +57,7 @@
 #include "separator_algorithm.hpp"
 #include "misc.hpp"
 #include "util.hpp"
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include "exact_ta.hpp"
 #endif
 #include "treedec_copy.hpp"
@@ -317,7 +317,7 @@ private:
     int _low_tw;
 }; // FI_TM
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 namespace ex17choice{
   template<class G, template<class G_, class ...> class C=treedec::algo::default_config>
   using exact_ta_=treedec::exact_ta<G, C>;
@@ -551,7 +551,7 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     a.get_tree_decomposition(T);
 }
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 template <typename G_t, typename T_t>
 void exact_decomposition_ex17(G_t &G, T_t &T, int lb_tw)
 {

@@ -56,7 +56,7 @@ typedef treedec::comb::PP_MD<cfg_t> PP_MD;
 typedef treedec::pending::PP_FI<cfg_t> PP_FI;
 typedef treedec::pending::PP_FI_TM<cfg_t> PP_FI_TM;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 typedef treedec::comb::ex17<cfg_t> ppta;
 #endif
 
@@ -128,7 +128,7 @@ int main()
 	std::cout << "PP+MD\n";
 	do_it<cfg_t, PP_MD>(g);
 //
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 	std::cout << "ppta\n";
 	do_it<cfg_t, ppta>(g);
 #endif

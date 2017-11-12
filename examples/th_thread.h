@@ -46,7 +46,7 @@ public:
 		 base::unlock_results();
     }
 private:
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 	algo_type* _TH;
 	//(_work);
 #else

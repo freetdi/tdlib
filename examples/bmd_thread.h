@@ -33,14 +33,14 @@ public:
 
     void do_print_results(std::ostream& o)
     {
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
         _g.make_symmetric(true);
 #endif
         base::print_results_order(o, _elimord);
     }
 
     void run() { untested();
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
         // TODO: faster with "remove-only" stuffed vector-graph...
         sg_dvv16* pg16;
         sg_dvv32* pg32;

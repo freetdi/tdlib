@@ -22,7 +22,7 @@
 #include <boost/graph/graphviz.hpp>
 #include <boost/property_map/property_map.hpp>
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 // #define USE_RANDOM_MD // 1
 #define USE_FI
 // #define USE_MSVS_TRIVIAL // 4

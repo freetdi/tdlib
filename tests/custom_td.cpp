@@ -37,7 +37,7 @@ TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 #include <treedec/preprocessing.hpp>
 #include <treedec/graph.hpp>
 #include <treedec/thorup.hpp>
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <treedec/exact_ta.hpp>
 #endif
 

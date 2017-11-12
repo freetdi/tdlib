@@ -105,21 +105,17 @@ have_gala=no
 
 AC_ARG_WITH([gala], AS_HELP_STRING([--without-gala], [Disable gala]))
 
-AC_CHECK_HEADERS([gala/graph.h],
-					  [ have_gala=yes ]
-									 AC_MSG_NOTICE([consider installing gala])
-						 )
-
-AS_IF([test "x$with_gala" = xno], [ have_gala=no ])
-AS_IF([test "x$with_gala" = xyes -a x$have_gala = xno], [
+AS_IF([test "x$with_gala" != xno], [
+	AC_CHECK_HEADERS([gala/graph.h],
+	                 [ have_gala=yes ],
+	                   AC_MSG_NOTICE([consider installing gala])
+	)
+   AS_IF([test "x$with_gala" = xyes -a x$have_gala = xno], [
 									 AC_MSG_ERROR([gala not found, but set])
-
 		 ])
+])
 
 AM_CONDITIONAL([USE_GALA], [test $have_gala = yes])
-AS_IF([test "x$have_gala" = xyes], [
-						AC_DEFINE([USE_GALA], [1], [Define to use gala])
-		 ])
 
 AC_CHECK_HEADERS([stx/btree_set.h])
 AC_LANG_POP([C++])

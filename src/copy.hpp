@@ -5,7 +5,7 @@
 
 #include <boost/graph/copy.hpp>
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
 #endif
 

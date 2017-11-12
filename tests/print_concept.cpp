@@ -5,12 +5,12 @@
 #include <treedec/treedec_traits.hpp>
 #include <treedec/graph_traits.hpp>
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/graph.h>
 #endif
 
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #include <treedec/printer.hpp>
 #include <boost/graph/copy.hpp>
@@ -52,7 +52,7 @@ int main(){
 	treedec::grtdprinter<ALVVD> P(std::cerr, g);
 
 	boost::copy_graph(t, P);
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 	 typedef gala::graph<std::vector, std::vector, unsigned int> GG;
 	 gala::graph<std::vector, std::vector, unsigned int> gg;
 	 decomp_t<GG> TT;

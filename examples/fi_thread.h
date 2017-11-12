@@ -23,7 +23,7 @@ public:
         treedec::check(g);
         treedec::check(_work);
 		trace2("FI_THREAD3", boost::num_vertices(_g), boost::num_edges(_g));
-// #ifdef USE_GALA
+// #ifdef HAVE_GALA_GRAPH_H
 //         h = g;
 // #endif
         base::go();
@@ -62,7 +62,7 @@ public:
 //
     }
 private:
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
    // work on svbs
    // INCOMPLETE, hardwire 16bit!
    GWORKFI _work;

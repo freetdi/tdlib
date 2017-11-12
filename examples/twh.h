@@ -141,7 +141,7 @@ using boost::source;
 using boost::target;
 ////////////////////////////////////
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 BOOST_CONCEPT_ASSERT(( boost::IncidenceGraphConcept<ssg_16i> ));
 typedef typename treedec::graph_traits<ssg_16i>::immutable_type check_type;
 // boost::iterator_traits<check_type::out_edge_iterator>::value_type A;
@@ -192,7 +192,7 @@ struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
 /*--------------------------------------------------------------------------*/
 
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #define FIgraph_t ssg_16i
 #define MDgraph_t ssg16_random
 #else
@@ -200,12 +200,12 @@ struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
 #define MDgraph_t balu_t
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include "gala_graphs.h"
 
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_BMD
 #include "bmd_thread.h"
 #endif
@@ -277,13 +277,13 @@ static void fin(volatile unsigned & finished)
 #include "random_md.h"
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_EX17
 #include "ex17_thread.h"
 #endif
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_FI
 #include "fi_thread.h"
 #endif
@@ -473,7 +473,7 @@ void twh(P& p, mag_t m, unsigned mask)
     std::vector<TWTHREAD_BASE*> threads(nTOTAL);
     TWTHREAD_BASE::_running=1;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 //    typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
 
     typedef sg_dvv16 uG16;
@@ -527,7 +527,7 @@ void twh(P& p, mag_t m, unsigned mask)
 
 
     std::cout << "c n: " << n << ", e: " << e << std::endl;
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
     std::cout << "c gala on" << std::endl;
 #endif
 
@@ -655,7 +655,7 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
-#if defined(USE_EX17) && defined(USE_GALA)
+#if defined(USE_EX17) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX17 ))) {
     }else if(m > M15){ untested();
         // does this even make sense?
@@ -666,7 +666,7 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
-#if defined(USE_EX) && defined(USE_GALA)
+#if defined(USE_EX) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX ))) {
     }else if(m > M16){ untested();
         // does this even make sense?
@@ -723,7 +723,7 @@ void twh(P& p, mag_t m, unsigned mask)
         switch(best_tid){
         case nSOME:
         case nBMD:
-#ifdef USE_GALA // tmp hack
+#ifdef HAVE_GALA_GRAPH_H // tmp hack
             // g.make_symmetric(true);
 #endif
         default:

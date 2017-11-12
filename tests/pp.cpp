@@ -12,7 +12,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> ALVV
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::directedS> ALSVD;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> ALVVD;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 // ... later
 #endif
 

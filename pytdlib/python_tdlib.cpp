@@ -48,7 +48,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, t
 #include "applications/coloring.hpp"
 #include "misc.hpp"
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 
@@ -458,7 +458,7 @@ int gc_exact_decomposition_ex17(std::vector<unsigned int> &V_G, std::vector<unsi
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G); // BUG. why is there no graph yet?
     std::cerr << "ta G " << boost::num_vertices(G) << " " << boost::num_edges(G) << "\n";
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
     treedec::exact_decomposition_ex17(G, T, lb);
 #else
     incomplete();

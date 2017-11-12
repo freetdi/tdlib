@@ -25,7 +25,7 @@
 // #include <boost/graph/copy.hpp> BUG
 #include "treedec_traits.hpp"
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 
@@ -80,7 +80,7 @@ struct dwt<G,
 	}
 };
 
-#ifdef USE_GALA // for now.
+#ifdef HAVE_GALA_GRAPH_H // for now.
 VCTtemplate
 struct dwt< gala::graph<SGARGS>,
 	typename std::enable_if<
