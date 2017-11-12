@@ -510,6 +510,45 @@ def lower_bound(G, algorithm = "deltaC_least_c"):
 ##############################################################
 ############ EXACT ALGORITHMS ################################
 
+def exact_decomposition_ex17(G, lb=-1):
+    """
+    see ..._cutset
+
+    INPUTS:
+
+    - G : input graph
+
+    - lb : a lower bound to the treewidth of G,
+           e.g. computed by lower_bound (default: '-1')
+
+    OUTPUTS:
+
+    - T : treedecomposition of G
+
+    - width : the width of T
+
+    EXAMPLES:
+
+        T, width = tdlib.exact_decomposition_ex17(G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef int c_lb = lb
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_exact_decomposition_ex17(V_G, E_G, V_T, E_T, c_lb, graphtype)
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
+
 def exact_decomposition_cutset(G, lb=-1):
     """
     Computes a tree decomposition of exact width, iff the given lower bound

@@ -551,6 +551,17 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     a.get_tree_decomposition(T);
 }
 
+#ifdef USE_GALA
+template <typename G_t, typename T_t>
+void exact_decomposition_ex17(G_t &G, T_t &T, int lb_tw)
+{
+    using draft::exact_decomposition;
+    auto alg=exact_decomposition<G_t, algo::default_config, exact_ta>(G);
+                                   // really^?
+    return alg.try_it(T, lb_tw+1);
+}
+#endif
+
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
 {

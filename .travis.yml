@@ -71,19 +71,22 @@ script:
       export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
       for i in ${BOOST_HOME}/stage/lib/*; do echo $i; ldd $i; done
     fi
+  - pushd "$HOME"
   - wget https://github.com/freetdi/gala/archive/${GALA_COMMIT}.tar.gz
   - mkdir gala_src
   - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
   - ( cd gala_src; ./configure )
   - make -C gala_src install DESTDIR=${PWD} prefix=GP
+  - popd
   - |-
-    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "gcc" ]; then
+    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "g++" ]; then
        "./configure --enable-debug CXXFLAGS=-std=c++11
                     CXXFLAGS=-std=c++11
                     CPPFLAGS=-I${PWD}/GP/include\\ -I$BOOST_HOME
                     LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
        cat config.log
        make check
+       cat pytdlib/tests/exact_ta.log
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11

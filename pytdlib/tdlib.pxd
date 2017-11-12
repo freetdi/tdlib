@@ -30,6 +30,8 @@ cdef extern from "python_tdlib.hpp":
 ##############################################################
 ############ EXACT ALGORITHMS ################################
 
+    int gc_exact_decomposition_ex17(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                                      vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb, unsigned graphtype)
     int gc_exact_decomposition_cutset(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb, unsigned graphtype)
     int gc_exact_decomposition_cutset_decision(vector[unsigned int] &V_G, vector[unsigned int] &E_G,

@@ -1,4 +1,9 @@
 
+if USE_GALA
+GALA_TESTS = \
+	exact_ta.py
+endif
+
 TESTS = $(LONG_TESTS) \
 	dclc_g5.py \
 	test_generic_search_CFG1.py \
