@@ -96,7 +96,7 @@ static void do_it(G const& g_){
 #ifndef INLINE_CC
 int main()
 {
-	const unsigned n=16;
+	const unsigned n=17;
 	cfg_t h(n);
 #include "g.h"
 	cfg_t g;
