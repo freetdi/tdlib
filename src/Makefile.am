@@ -69,6 +69,9 @@ pkginclude_HEADERS = \
   util.hpp \
   validation.hpp
 
+uninstall-hook:
+	rmdir ${DESTDIR}/${pkgincludedir}
+
 EXTRA_DIST = \
   bucket_sorter.hpp.orig \
   minimum_degree_ordering.hpp.orig

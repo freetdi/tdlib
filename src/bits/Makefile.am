@@ -5,3 +5,6 @@ pkgincludebits_HEADERS = \
 	predicates.hpp \
 	trie.hpp \
 	triealloc.hpp
+
+uninstall-hook:
+	rmdir ${DESTDIR}/${pkgincludebitsdir}
