@@ -7,4 +7,4 @@ pkgincludebits_HEADERS = \
 	triealloc.hpp
 
 uninstall-hook:
-	rmdir ${DESTDIR}/${pkgincludebitsdir}
+	-rmdir ${DESTDIR}/${pkgincludebitsdir}

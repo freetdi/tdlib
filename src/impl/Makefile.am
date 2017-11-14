@@ -5,4 +5,4 @@ pkgincludeimpl_HEADERS = \
 	greedy_heuristic.hpp
 
 uninstall-hook:
-	rmdir ${DESTDIR}/${pkgincludeimpldir}
+	-rmdir ${DESTDIR}/${pkgincludeimpldir}

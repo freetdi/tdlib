@@ -70,7 +70,7 @@ pkginclude_HEADERS = \
   validation.hpp
 
 uninstall-hook:
-	rmdir ${DESTDIR}/${pkgincludedir}
+	-rmdir ${DESTDIR}/${pkgincludedir}
 
 EXTRA_DIST = \
   bucket_sorter.hpp.orig \

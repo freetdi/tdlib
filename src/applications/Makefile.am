@@ -9,4 +9,4 @@ pkgincludeapps_HEADERS = \
 	coloring.hpp
 
 uninstall-hook:
-	rmdir ${DESTDIR}/${pkgincludeappsdir}
+	-rmdir ${DESTDIR}/${pkgincludeappsdir}
