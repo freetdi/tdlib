@@ -1,4 +1,4 @@
-tdlib provides tree decomposition algorithms
+treedec provides tree decomposition algorithms
 
 A tree decomposition of a simple loopless graph G is a tree T with bags at its
 nodes containing vertices from G. The usual conditions apply. By convention,
@@ -74,7 +74,7 @@ accessible e.g. using a property tag such as treedec::root_t (or similar).
 
 a possible model is
 
-#include <tdlib/treedec_traits>
+#include <treedec/treedec_traits.hpp>
 typedef std::vector<vertex_descriptor> bag_container_type;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::property<treedec::bag_t, bag_container_type> > T;
@@ -91,7 +91,7 @@ struct mybundle{
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                               mybundle> my_td_type;
 
-you can make bags accessible from tdlib using
+you can make bags accessible from treedec using
 
 TREEDEC_TREEDEC_BAG_TRAITS(my_td_type, bag);
 

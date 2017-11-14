@@ -79,14 +79,14 @@ $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile
 		td-validate $< $(PROFILE_GRAPH).td$$i || : ; \
 	done
 
-BUILT_SOURCES = tdlib
+BUILT_SOURCES = treedec
 CLEANFILES = \
 	${BUILT_SOURCES} *~ \
    $(TWEXP_AMNAME).gcda \
 	$(GRTDP_AMNAME).gcda \
 	HoffmanGraph.gr.td*
 
-tdlib:
+treedec:
 	-$(LN_S) $(top_srcdir)/src $@
 
 #here?
