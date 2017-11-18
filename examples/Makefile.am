@@ -35,7 +35,7 @@ BOOST_LIBS = -lboost_thread -lboost_system -lpthread
 
 PROFILE_GEN = -fprofile-generate
 PROFILE_FLAGS = -fprofile-use=.
-PROFILE_GRAPH = HoffmanGraph.gr
+PROFILE_GRAPH = gr/h.gr
 
 COMMON_CXXFLAGS = -Os -march=native
 
@@ -43,8 +43,16 @@ tdecompdir=$(pkglibexecdir)
 
 if !CLANG
 tdecomp_PROGRAMS = ${GALA_APPS}
-check_PROGRAMS = ${GALA_NOINST_APPS}
+check_PROGRAMS = ${GALA_NOINST_APPS} td-validate
 endif
+
+td_validate_CPPFLAGS=${AM_CPPFLAGS} -I${top_srcdir}/src
+
+if TDECOMP
+TDECOMP_TESTS = test-fi.sh test-ppfi.sh
+endif
+
+TESTS = ${TDECOMP_TESTS}
 
 tdecomp_profile_SOURCES = tdecomp.cc
 tdecomp_profile_CXXFLAGS = $(AM_CXXFLAGS) $(PROFILE_GEN) $(COMMON_CXXFLAGS)
@@ -70,13 +78,13 @@ TIME=1
 
 $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile
 	rm -f $@
-	@for i in 1 2 8 32 64 128 256 512; do \
-		echo "./tdecomp-profile -m $$i < $< > $(PROFILE_GRAPH).td$$i & p=\$$!; sleep $(TIME); kill -TERM \$$p;"; \
-		./tdecomp-profile -m $$i < $< > $(PROFILE_GRAPH).i.td$$i & p=$$!; sleep $(TIME); kill -TERM $$p; \
+	@for i in --ex17 --fi --ppfi; do \
+		echo "./tdecomp-profile -m $$i < $< > $<.td$$i & p=\$$!; sleep $(TIME); kill -TERM \$$p;"; \
+		./tdecomp-profile -m $$i < $< > $<.i.td$$i & p=$$!; sleep $(TIME); kill -TERM $$p; \
       wait $$p; \
-		grep -v incomplete $(PROFILE_GRAPH).i.td$$i > $(PROFILE_GRAPH).td$$i; \
-		rm $(PROFILE_GRAPH).i.td$$i; \
-		td-validate $< $(PROFILE_GRAPH).td$$i || : ; \
+		grep -v incomplete $<.i.td$$i > $<.td$$i; \
+		rm $<.i.td$$i; \
+		td-validate $< $<.td$$i || : ; \
 	done
 
 BUILT_SOURCES = treedec
@@ -91,6 +99,7 @@ treedec:
 
 #here?
 EXTRA_DIST = \
+	${TESTS} \
 	gala_graphs.h \
 	grparse.h twthread.hpp twh.h
 
@@ -101,3 +110,9 @@ EXTRA_DIST = \
 # AM_CPPFLAGS = -I. -DTRACE_UNTESTED
 AM_CPPFLAGS = $(LOCAL_CPPFLAGS)
 # AM_CXXFLAGS = -O0 -g
+#
+$(TESTS:%=%.log): .P
+.PHONY: .P
+
+.P:
+	@:

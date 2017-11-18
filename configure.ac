@@ -132,6 +132,9 @@ AS_IF([test x"$PYTHON" != x], [
 # it doesnt with clang.
 AM_CONDITIONAL([CLANG], [test "x$ax_cv_cxx_compiler_vendor" = "xclang"])
 
+# HACK. does old automake not support nested conditionals??
+AM_CONDITIONAL([TDECOMP], [test "$have_gala" = yes -a "x$ax_cv_cxx_compiler_vendor" != "xclang"])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
 

@@ -48,10 +48,9 @@ script:
   # run all checks
   - ./bootstrap
   - "./configure --enable-debug
-                CXXFLAGS=-std=c++11
-                CPPFLAGS=-I$BOOST_HOME\\ -DBOOST_DISABLE_ASSERTS
-                LDFLAGS=-L$BOOST_HOME/stage/lib"
+                CXXFLAGS=-std=c++11"
   - make check
+  - cat examples/*.log
 
   # redo with gala
   - LD_LIBRARY_PATH_OLD="$LD_LIBRARY_PATH"
@@ -76,17 +75,16 @@ script:
   - mkdir gala_src
   - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
   - ( cd gala_src; ./configure )
-  - make -C gala_src install DESTDIR=${PWD} prefix=GP
+  - make -C gala_src install DESTDIR=${HOME} prefix=GP
   - popd
   - |-
     if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "g++" ]; then
        "./configure --enable-debug CXXFLAGS=-std=c++11
                     CXXFLAGS=-std=c++11
-                    CPPFLAGS=-I${PWD}/GP/include\\ -I$BOOST_HOME
+                    CPPFLAGS=-I${HOME}/GP/include\\ -I$BOOST_HOME
                     LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
-       cat config.log
        make check
-       cat pytdlib/tests/exact_ta.log
+       cat examples/*.log
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11

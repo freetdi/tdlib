@@ -684,11 +684,14 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
     G_t g;
     get_graph(g);
 
+#if 1
     if(boost::num_edges(g) == 0){ untested();
+        // BUG
         treedec::glue_bags(bags, t);
         return;
     }else{
     }
+#endif
 
     do_components<T, A>(t, g);
 
