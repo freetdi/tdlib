@@ -160,7 +160,7 @@ public:
 		friend class PARSE; //??
 	public:
 		typedef std::pair<unsigned, unsigned> value_type;
-		iterator() : _p(NULL) { untested();
+		iterator() : _p(NULL) {
 		}
 		iterator(PARSE& p, bool end=false) : _p(&p) {
 			if(end){

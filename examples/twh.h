@@ -176,16 +176,16 @@ enum mag_t{
 int errorlevel=bLOG;
 template<class X=balu_t, class ... rest>
 struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
-    static void message(int badness, const char* fmt, ...) { untested();
+    static void message(int badness, const char* fmt, ...) {
         trace3("message", badness, fmt, errorlevel);
-        if (badness >= errorlevel){ untested();
+        if (badness >= errorlevel){
             char buffer[2048] = "c ";
             va_list arg_ptr;
             va_start(arg_ptr,fmt);
             vsprintf(buffer+2,fmt,arg_ptr);
             va_end(arg_ptr);
             std::cout << buffer;
-        }else{ untested();
+        }else{
         }
     }
 };
@@ -387,7 +387,7 @@ void mainloop()
             // all threads masked?
             // all threads completed (that was quick!)
             break;
-        }else if(!sig_received()){ untested();
+        }else if(!sig_received()){
             trace0("pause");
             pause();
         }
@@ -575,7 +575,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_PPFI
     if(!(mask & ( 1 << nPPFI ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG16, grtd_algo_config>(g16, "PPFI_16"));
     }else{ untested();
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG32, grtd_algo_config>(g32, "PPFI_32"));
@@ -610,7 +610,7 @@ void twh(P& p, mag_t m, unsigned mask)
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FI
-    if(! ( mask & ( 1 << nFI ))) { untested();
+    if(! ( mask & ( 1 << nFI ))) {
     }else if( m < M16){
         reg_thread(threads, nFI, new FI_THREAD<uG16, grtd_algo_config>(g16, "FI16"));
     }else if( m < M32){ untested();
@@ -794,11 +794,11 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nTH);
         }else if(!strncmp("--ppfitm", argv[i], 8)){ untested();
             mask_in |= (1<<nPPFITM);
-        }else if(!strncmp("--ppfi", argv[i], 6)){ untested();
+        }else if(!strncmp("--ppfi", argv[i], 6)){
             mask_in |= (1<<nPPFI);
         }else if(!strncmp("--bmd", argv[i], 5)){ untested();
             mask_in |= (1<<nBMD);
-        }else if(!strncmp("--fi", argv[i], 4)){ untested();
+        }else if(!strncmp("--fi", argv[i], 4)){
             mask_in |= (1<<nFI);
         }else if(!strncmp("--fitm", argv[i], 6)){ untested();
             mask_in |= (1<<nFITM);

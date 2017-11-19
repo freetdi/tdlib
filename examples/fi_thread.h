@@ -18,7 +18,7 @@ public:
     FI_THREAD( G const&g, const std::string& name )
         : base(g, name, 0), _work(g) // <= stored here
 			 , _FI(NULL)
-    { untested();
+    {
         _FI = new algo_type(_work);
         treedec::check(g);
         treedec::check(_work);
@@ -30,7 +30,7 @@ public:
     }
 
     void do_print_results(std::ostream& o)
-    { untested();
+    {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
@@ -40,7 +40,7 @@ public:
 		  _FI->get_tree_decomposition(P);
     }
 
-    void run() { untested();
+    void run() {
 #if 1
 		_FI->do_it();
 
@@ -97,7 +97,7 @@ public:
     }
 
     void do_print_results(std::ostream& o)
-    { untested();
+    {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
@@ -106,7 +106,7 @@ public:
 		  boost::copy_graph(_t, P);
     }
 
-    void run() { untested();
+    void run() {
 		 A <GWORKFI, cfgt> a(_work);
 		 a.do_it();
 		 a.get_tree_decomposition(_t);

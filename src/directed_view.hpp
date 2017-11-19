@@ -258,7 +258,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::traversal_category traversal_category;
 
-	static vertex_descriptor null_vertex(){ untested();
+	static vertex_descriptor null_vertex(){
 		return 0; // graph_traits<W>::null_vertex();
 	}
 };

@@ -99,7 +99,7 @@ namespace detail{//
     struct container_modify{//
         // push, insert new item
         template<class E>
-        static void push(C& c, E e) { untested();
+        static void push(C& c, E e) {
           // incomplete(); // not supported by all containers.
           // assert(!container_inspect<C>::contains(c, e));
           c.insert(e);

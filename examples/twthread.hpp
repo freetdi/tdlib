@@ -212,7 +212,7 @@ private:
 	  	incomplete();
 		unreachable();
 	}
-	virtual void run_timed(){ untested();
+	virtual void run_timed(){
 		// CFG::TIMER!
 		DOUBLE_TIMER t;
 		t.start();
