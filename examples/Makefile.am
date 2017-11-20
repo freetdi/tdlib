@@ -22,6 +22,8 @@
 # Boston, MA 02110-1301, USA.
 #
 
+SUBDIRS = gr
+
 AM_DEFAULT_SOURCE_EXT = .cc
 
 if USE_GALA
@@ -101,7 +103,13 @@ treedec:
 EXTRA_DIST = \
 	${TESTS} \
 	gala_graphs.h \
-	grparse.h twthread.hpp twh.h
+	grparse.h twthread.hpp twh.h \
+	timer.h \
+   ex17_thread.h \
+   fi_thread.h \
+   pp_thread.h \
+   th_thread.h \
+   bmd_thread.h
 
 # TESTS = $(check_PROGRAMS)
 

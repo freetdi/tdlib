@@ -26,7 +26,7 @@ public:
         base::go();
     }
 
-    void do_print_results(std::ostream& o)
+    void do_print_results(std::ostream&)
     { untested();
         // auto &g=TWTHREAD<G>::_g;
 		  // treedec::grtdprinter<G> P(o, _work);
