@@ -40,15 +40,6 @@ namespace app{
 
 namespace detail{
 
-template <typename T_t>
-class Intermediate_Results {
-
-}
-
-} //namespace detail
-
-namespace detail{
-
 //bit-encoding of the subset relative to power_set
 //TODO: what if |power_set| > available wordlength?
 //TODO: other possibility: pos of subset in enumeration of a power set. 
@@ -140,6 +131,43 @@ void test_encoding()
 
     std::cout << "end test encoding" << std::endl;
 }
+
+} //namespace detail
+
+namespace detail{
+
+template <typename T_t>
+class Intermediate_Results {
+public: // types
+    typedef unsigned Encoded_t; //TODO: should be choosable
+    typedef typename treedec_traits<T_t>::bag_type Decoded_t;
+    typedef int Value_t; //TODO: for now
+
+    typedef typename boost::graph_traits<T_t>::vertex_descriptor vd_t;
+
+public: // construct
+    Intermediate_Results(const T_t &t) : _t(t) {
+        _results.resize(boost::num_vertices(t));
+    }
+
+public: //interface
+    void add(vd_t node, Encoded_t key, Value_t value){
+        _results[node][key] = value;
+    }
+
+    unsigned encode(vd_t node, Decoded_t key){
+        return treedec::app::detail::encode_set<T_t>(bag(node, _t), key);
+    }
+
+    void decode(vd_t node, Encoded_t key, Decoded_t &result){
+        treedec::app::detail::decode_set<T_t>(bag(node, _t), result, key);
+    }
+
+private:
+    const T_t &_t;
+    typename std::vector<std::map<Encoded_t, Value_t> > _results;
+
+}; //Intermediate_Results
 
 } //namespace detail
 
