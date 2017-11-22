@@ -283,6 +283,7 @@ void top_down_computation2(T_t &T,
 
 namespace detail{
 
+//TODO: more efficient
 template <typename G_t>
 bool is_vertex_cover2(G_t &G, 
     typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &bag,
@@ -301,6 +302,24 @@ bool is_vertex_cover2(G_t &G,
             }
         }
     }
+    return true;
+}
+
+template <typename G_t>
+bool is_valid_extension(G_t &G, 
+    typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &bag,
+    const typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &old_VC,
+    typename boost::graph_traits<G_t>::vertex_descriptor new_vertex)
+{
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(new_vertex, G); nIt != nEnd; nIt++){
+        if(bag.find(*nIt) != bag.end()){ //restriction to the current bag
+            if(old_VC.find(*nIt) == old_VC.end()){ //the edge {new_vertex, *nIt} is not covered by old_VC
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -340,7 +359,7 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
             typename boost::graph_traits<G_t>::vertex_descriptor new_vertex =
                              treedec::nice::get_introduced_vertex(cur, T);
 
-            //check for old set in new graph
+            //check if old VC is still valid, if new_vertex is added to the considered graph
             for(typename std::map<unsigned, int>::iterator it =
                          iRes._results[child].begin(); it != iRes._results[child].end(); it++)
             {
@@ -350,8 +369,7 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
 
                 unsigned new_encoded = iRes.encode(cur, decoded_set);
 
-                //TODO: just necessary to check for the new edges introduced by new_vertex
-                if(is_vertex_cover2(G, bag(cur, T), decoded_set)){
+                if(iRes.get(child, old_encoded) >= 0 && is_valid_extension(G, bag(cur, T), decoded_set, new_vertex)){
                     iRes.add(cur, new_encoded, iRes.get(child, old_encoded));
                 }
                 else{
@@ -375,7 +393,6 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
                 if(it->second != -1){
                     iRes.add(cur, new_encoded, iRes.get(child, old_encoded) + 1);
                 }
-                //TODO: just necessary to check for the new edges introduced by new_vertex
                 else{
                     if(is_vertex_cover2(G, bag(cur, T), new_set)){
                         iRes.add(cur, new_encoded, new_set.size());
