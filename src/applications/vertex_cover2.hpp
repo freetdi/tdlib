@@ -62,7 +62,7 @@ unsigned encode_set(B_t &power_set, B_t &subset){
 
     for(; subIt != subset.end();){
         if(*subIt == *powIt){
-            number += pow(2, exp);
+            number += 1 << exp;
             subIt++;
         }
         powIt++;
@@ -72,9 +72,13 @@ unsigned encode_set(B_t &power_set, B_t &subset){
     return number;
 }
 
+unsigned min(unsigned a, unsigned b){
+    return (a < b)? a : b;
+}
+
 template <typename B_t>
 void decode_set(B_t &power_set, B_t &subset, unsigned number){    
-    for(unsigned i = 0; i < CHAR_BIT*sizeof(number); i++){
+    for(unsigned i = 0; i < min(CHAR_BIT*sizeof(number), power_set.size()); i++){
         if(number & 1){
             typename B_t::iterator it = power_set.begin();
             std::advance(it, i);
@@ -136,6 +140,10 @@ public: //interface
 
     Value_t get(vd_t node, Encoded_t key){
         return _results[node][key];
+    }
+
+    bool exists(vd_t node, Encoded_t key){
+        return _results[node].find(key) != _results[node].end();
     }
 
     unsigned encode(vd_t node, Decoded_t key){
@@ -306,7 +314,7 @@ bool is_vertex_cover2(G_t &G,
 }
 
 template <typename G_t>
-bool is_valid_extension(G_t &G, 
+bool is_valid_extension(G_t &G,
     typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &bag,
     const typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &old_VC,
     typename boost::graph_traits<G_t>::vertex_descriptor new_vertex)
@@ -369,7 +377,7 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
 
                 unsigned new_encoded = iRes.encode(cur, decoded_set);
 
-                if(iRes.get(child, old_encoded) >= 0 && is_valid_extension(G, bag(cur, T), decoded_set, new_vertex)){
+                if(is_valid_extension(G, bag(cur, T), decoded_set, new_vertex)){
                     iRes.add(cur, new_encoded, iRes.get(child, old_encoded));
                 }
                 else{

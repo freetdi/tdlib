@@ -1144,7 +1144,7 @@ def min_vertex_cover_with_treedecomposition(G, T):
 
     return py_VC
 
-def min_vertex_cover_with_treedecomposition2(G, T):
+def min_vertex_cover_with_treedecomposition2(G, T, certificate=True):
     """
     Computes a minimum vertex cover with help of a tree decomposition.
 
@@ -1176,7 +1176,7 @@ def min_vertex_cover_with_treedecomposition2(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_min_vertex_cover_with_treedecomposition2(V_G, E_G, V_T, E_T, VC_, graphtype);
+    cdef unsigned size = gc_min_vertex_cover_with_treedecomposition2(V_G, E_G, V_T, E_T, VC_, certificate, graphtype);
 
     py_VC = []
     cdef i;
@@ -1184,7 +1184,7 @@ def min_vertex_cover_with_treedecomposition2(G, T):
         pyVCi = VC_[i]
         py_VC.append(pyVCi)
 
-    return py_VC
+    return size, py_VC
 
 
 def min_dominating_set_with_treedecomposition(G, T):
