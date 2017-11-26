@@ -28,3 +28,7 @@ EXTRA_DIST = \
 	python_tdlib.hpp \
 	tdlib.pxd \
 	tdlib.pyx
+
+uninstall-hook:
+	-rmdir ${DESTDIR}/${instdir}
+	-rmdir ${DESTDIR}/${pythondir}

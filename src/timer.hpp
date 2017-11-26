@@ -19,8 +19,8 @@
  *------------------------------------------------------------------
  * CPU time accounting, inspired by gnucap/l_timer.h
  */
-#ifndef TD_TIMER_H
-#define TD_TIMER_H
+#ifndef TREEDEC_TIMER_HPP
+#define TREEDEC_TIMER_HPP
 #include <iostream>
 #include <time.h>
 #include "trace.hpp"

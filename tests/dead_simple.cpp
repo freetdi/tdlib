@@ -1,6 +1,6 @@
-#include <tdlib/thorup.hpp>
-#include <tdlib/nice_decomposition.hpp> // nicify
-#include <tdlib/misc.hpp> // is_valid_td
+#include <treedec/thorup.hpp>
+#include <treedec/nice_decomposition.hpp> // nicify
+#include <treedec/misc.hpp> // is_valid_td
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::undirectedS> G;

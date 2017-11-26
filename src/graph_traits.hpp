@@ -15,9 +15,12 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-//   traits for tdlib graphs.
+//   traits for treedec graphs.
 
-#ifndef TD_GRAPH_TRAITS_HPP
+#ifndef TREEDEC_GRAPH_TRAITS_HPP
+#define TREEDEC_GRAPH_TRAITS_HPP
+
+// BUG, some old code depends on this (and shouldn't)
 #define TD_GRAPH_TRAITS_HPP
 
 #include <boost/graph/graph_traits.hpp>
@@ -28,7 +31,14 @@
 #include "container.hpp" // HACK
 
 namespace treedec{
-#ifndef TD_DEFS_NETWORK_FLOW
+
+// BUG
+#if defined(TREEDEC_DEFS_NETWORK_FLOW) || defined(TD_DEFS_NETWORK_FLOW)
+#warning deprecated macro use
+#else
+#define TREEDEC_DEFS_NETWORK_FLOW
+
+// old BUG (already spread out)
 #define TD_DEFS_NETWORK_FLOW
 
 struct bagsize_t{
@@ -41,7 +51,7 @@ namespace boost{
 
 // this is forbidden?
 template<class G>
-unsigned& get(treedec::bagsize_t, G&){
+inline unsigned& get(treedec::bagsize_t, G&){ untested();
 	unreachable();
 	static unsigned udummy;
 	return udummy;
@@ -67,10 +77,12 @@ struct Edge_NF{
 // how to fix that now?
 // "bag" is also used as shorthand for bag access...
 
+// BUG: move to treedec_traits
+
 struct bag_t{ //
   typedef boost::vertex_property_tag kind;
   std::set<unsigned int> bag; // yikes. old way.
-  bag_t& operator=(std::set<unsigned int> const& b){
+  bag_t& operator=(std::set<unsigned int> const& b){ untested();
 	  bag = b;
 	  return *this;
   }
@@ -82,7 +94,7 @@ struct bag_t{ //
 	  return *this;
   }
   bag_t& operator=(boost::property<bag_t, std::vector<unsigned int> > const& b)
-  {
+  { untested();
 	  bag.clear();
 	 	for( auto& i : b.m_value){ untested();
 			bag.insert(i);
@@ -94,10 +106,14 @@ struct bag_t{ //
 	  bag = b.m_value;
 	  return *this;
   }
+
+  operator std::set<unsigned>() const{ untested();
+	  return bag;
+  }
 };
 
 // dont define twice (in old code)
-#define TD_STRUCT_BAG
+#define TREEDEC_STRUCT_BAG
 
 }// treedec
 
@@ -174,7 +190,7 @@ struct outedge_set{
 template<typename G>
 inline bool is_valid(typename boost::graph_traits<G>::vertex_iterator const &,
 		const G&)
-{
+{ untested();
     return true;
 }
 template<typename G>
@@ -226,8 +242,8 @@ struct treedec_traits{
 // (transitional interface)
 template<typename G>
 inline unsigned get_vd(const G&, const typename boost::graph_traits<G>::vertex_descriptor& v )
-{
-    // works with "TD_graph_t" (augmented adj_list)
+{ untested();
+    // works with "TREEDEC_graph_t" (augmented adj_list)
     //return g[v].id;
     return v;
 }
@@ -247,7 +263,7 @@ template<class G_t>
 struct deg_chooser;
 
 template<class G>
-void check(G const&)
+inline void check(G const&)
 {
 }
 
@@ -296,11 +312,11 @@ struct graph_helper{
 	static_assert(sizeof(G)==0, "need specialization");
 
 	template<class S>
-	static void close_neighbourhood(S&, G const&){
+	static void close_neighbourhood(S&, G const&){ untested();
 		static_assert(sizeof(S)==0, "need specialization");
 	}
 	template<class S>
-	static void open_neighbourhood(S&, G const&){
+	static void open_neighbourhood(S&, G const&){ untested();
 		static_assert(sizeof(S)==0, "need specialization");
 	}
 };
@@ -311,7 +327,7 @@ struct graph_helper{
 //  template <class PropertyMap, class Reference, class K, class V>
 //  inline void
 //  put(const put_get_helper<Reference, PropertyMap>& pa, K k, const V& v)
-//  {
+//  { untested();
 //    static_cast<const PropertyMap&>(pa)[k] = v;
 //  }
 //
@@ -344,11 +360,9 @@ namespace bagstuff {
 		G const&_g;
 	};
 	template<class G>
-	struct treebagpmap : public put_get_helper<typename gtob<G>::type, treebagpmap<G> >
-	{
+	struct treebagpmap : public put_get_helper<typename gtob<G>::type, treebagpmap<G> > {
 		typedef typename gtob<G>::type B;
-		treebagpmap(G& g) : _g(g){
-			untested();
+		treebagpmap(G& g) : _g(g){ untested();
 		}
 		B & operator[](unsigned v) const{
 			auto& g=const_cast<G&>(_g); // huh?
@@ -377,7 +391,7 @@ namespace bagstuff {
 							>::type
 		 >::type
 		 >
-	{
+	{ //
 		typedef bagstuff::treebagpmap<G>  type;
 		typedef bagstuff::const_treebagpmap<G> const_type;
 	};

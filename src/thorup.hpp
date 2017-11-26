@@ -1,4 +1,4 @@
-// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
+// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2017
 //
 // some changes:
 // Felix Salfelder 2017
@@ -46,13 +46,13 @@
 // Changelog:
 //
 // 2011 - initial
-// 2017 - merged into tdlib
+// 2017 - merged into treedec
 //        - namespace
 //        - bag access
 //        - list->vector
 //
-#ifndef TDLIB_PKK_THORUP_H
-#define TDLIB_PKK_THORUP_H
+#ifndef TREEDEC_THORUP_HPP
+#define TREEDEC_THORUP_HPP
 
 #include <map>
 #include <vector>
@@ -65,8 +65,8 @@
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <tdlib/algo.hpp>
-#include <tdlib/treedec.hpp>
+#include "algo.hpp"
+#include "treedec.hpp"
 
 // namespace boost {
 // // some hacks. perhaps wrong place

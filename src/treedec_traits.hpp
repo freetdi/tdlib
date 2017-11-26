@@ -15,12 +15,12 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //
-//   traits for tdlib treedecs.
+//   traits for treedec treedecs.
 //
 //
 
-#ifndef TD_TREEDEC_TRAITS_HPP
-#define TD_TREEDEC_TRAITS_HPP
+#ifndef TREEDEC_TREEDEC_TRAITS_HPP
+#define TREEDEC_TREEDEC_TRAITS_HPP
 
 #include "graph_traits.hpp"
 
@@ -31,23 +31,23 @@ namespace detail{ //
 template<class B, class T, class V>
 struct tmpbaghack{ //
     static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v)
-    {
+    { incomplete();
         return t[v];
     }
-    static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v)
-    {
+    static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v) {
+        incomplete();
         return t[v];
     }
 };
 
 template<class T_t, class V>
-struct tmpbaghack<bag_t, T_t, V>{ //
-    static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v)
-    {
+struct tmpbaghack<bag_t, T_t, V>{
+    static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v) {
+        incomplete();
         return t[v].bag;
     }
-    static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v)
-    {
+    static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v) {
+        incomplete();
         return t[v].bag;
     }
 };
@@ -58,6 +58,7 @@ inline typename treedec_traits<T_t>::bag_type& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t& T)
 {
+    incomplete();
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
@@ -67,6 +68,7 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t const& T)
 {
+    incomplete();
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
@@ -93,7 +95,7 @@ size_t bag_size(V const & v, G const& g)
 // uses treedec::push, include container...
 // BUG: only works for "set" and "vector" of unsigned
 // BUG: BAG must be bag, still used in other traits :|
-#define REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, BAG)\
+#define TREEDEC_TREEDEC_BAG_TRAITS(T, BAG)\
 namespace boost{\
 \
     inline \
@@ -193,7 +195,7 @@ namespace treedec{ \
         typedef typename boost::bagstuff::gtob<T>::type::value_type vd_type; \
     }; \
 } /* treedec */ \
-void TDLIB_DUMMY_FUNCTION_DECLARATION(void)
+void TREEDEC_DUMMY_FUNCTION_DECLARATION(void)
 
 #endif
 // vim:ts=8:sw=4:et

@@ -16,15 +16,15 @@ struct tree_dec_node2 {
   unsigned weight;
 };
 
-#include <tdlib/treedec_traits.hpp>
+#include <treedec/treedec_traits.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::bidirectionalS, tree_dec_node> sbib_tdt;
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               boost::bidirectionalS, tree_dec_node2> vbib_tdt;
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(sbib_tdt, bag);
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(vbib_tdt, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(sbib_tdt, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_utility.hpp>
@@ -34,11 +34,11 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(vbib_tdt, bag);
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
-#include <tdlib/thorup.hpp>
-#ifdef USE_GALA
-#include <tdlib/exact_ta.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/thorup.hpp>
+#ifdef HAVE_GALA_GRAPH_H
+#include <treedec/exact_ta.hpp>
 #endif
 
 
@@ -100,7 +100,7 @@ namespace boost{
 #endif
 
 // too late?
-#include <tdlib/thorup.hpp>
+#include <treedec/thorup.hpp>
 
 int main(int, char**)
 {

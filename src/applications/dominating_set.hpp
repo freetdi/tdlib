@@ -27,12 +27,12 @@
  *
  */
 
-#ifndef TD_DOMINATING_SET
-#define TD_DOMINATING_SET
+#ifndef TREEDEC_DOMINATING_SET_HPP
+#define TREEDEC_DOMINATING_SET_HPP
 
 #include "applications.hpp"
 
-#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+#define TREEDEC_GET_POS(a,b) ( boost::get(boost::vertex_index, b, a) )
 
 namespace treedec{
 
@@ -144,7 +144,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                 bool applied = false;
                 boost::tie(nIt, nEnd) = boost::adjacent_vertices(new_vertex, G);
                 for(; nIt != nEnd; nIt++){
-                    unsigned int posn = get_pos(*nIt, G);
+                    unsigned int posn = TREEDEC_GET_POS(*nIt, G);
                     if(it->first[posn] == 2){
                         std::vector<int> result(it->first);
                         result[pos] = 0;
@@ -207,7 +207,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
 
             typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex =
                                        treedec::nice::get_forgotten_vertex(cur, T);
-            unsigned int pos = get_pos(forgotten_vertex, G);
+            unsigned int pos = TREEDEC_GET_POS(forgotten_vertex, G);
 
             for(std::map<std::vector<int>, boost::tuple<int, std::vector<int>, std::vector<int> > >::iterator it
                         = results[child].begin(); it != results[child].end(); it++)
@@ -249,7 +249,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
             for(typename treedec_traits<T_t>::bag_type::iterator bIt =
                         bag(cur, T).begin(); bIt != bag(cur, T).end(); bIt++)
             {
-                unsigned int pos = get_pos(*bIt, G);
+                unsigned int pos = TREEDEC_GET_POS(*bIt, G);
                 M.insert(pos);
             }
             std::vector<std::vector<int> > colorings(pow(3, M.size()));
@@ -359,7 +359,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
         typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex =
                                  treedec::nice::get_forgotten_vertex(cur, T);
 
-        unsigned int pos = get_pos(forgotten_vertex, G);
+        unsigned int pos = TREEDEC_GET_POS(forgotten_vertex, G);
 
         std::vector<int> htt(boost::get<1>(results[cur][have_to_take]));
         int assignment = htt[pos];
@@ -422,8 +422,8 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
 
 } //namespace treedec
 
-#undef get_pos
+#undef TREEDEC_GET_POS
 
-#endif //TD_DOMINATING_SET
+#endif //TREEDEC_DOMINATING_SET_HPP
 
 // vim:ts=8:sw=4:et

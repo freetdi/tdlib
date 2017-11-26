@@ -28,8 +28,8 @@
 //     iterate through "onion layers" around vertex range
 //
 
-#ifndef TD_ITER_H
-#define TD_ITER_H
+#ifndef TREEDEC_ITER_HPP
+#define TREEDEC_ITER_HPP
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp> // adjacent_vertices
@@ -719,7 +719,7 @@ private:
                 return;
             }
             ++front_range().first;
-        } untested();
+        }
 
         if(_q.empty()){ untested();
         }else if(front_range().first==front_range().second){

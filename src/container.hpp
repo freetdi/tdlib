@@ -17,8 +17,8 @@
 
 // container access
 
-#ifndef TD_CONTAINER_HPP
-#define TD_CONTAINER_HPP
+#ifndef TREEDEC_CONTAINER_HPP
+#define TREEDEC_CONTAINER_HPP
 
 // #include "config.h" // not yet
 #include "container_traits.hpp"
@@ -88,6 +88,12 @@ void insert(C& c, E e)
 {
     // assert(!contains...)
     detail::container_modify<C>::insert(c, e);
+}
+
+template<class C, class B, class E>
+void merge(C& c, B b, E e)
+{
+    detail::container_modify<C>::merge(c, b, e);
 }
 
 template<class C, class E>

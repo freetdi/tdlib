@@ -44,8 +44,8 @@
 //  - dormant on?
 //  - mass elimination
 
-#ifndef TD_PREPROCESSING
-#define TD_PREPROCESSING
+#ifndef TREEDEC_PREPROCESSING_HPP
+#define TREEDEC_PREPROCESSING_HPP
 
 #include <vector>
 #include <set>
@@ -61,22 +61,38 @@
 #include "copy.hpp"
 #include "config_traits.hpp"
 #include "graph.hpp"
+#include "misc.hpp"
+#include "overlay.hpp"
+#include "treedec_misc.hpp"
 
 namespace treedec{
 
 namespace impl{
 
+namespace detail {
+
+struct forgetprop
+{
+  template <class G, class H>
+  void operator()(G, H) const
+  {
+  }
+};
+
+} // detail
+
 namespace draft{
 
-template<class G_t>
-struct pp_cfg{
+template<class G, // template<class GGG, class ... > class b=treedec::algo::default_config,
+         class ... rest>
+struct pp_cfg : treedec::algo::config_base {
     typedef typename
     std::vector<boost::tuple<
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
-        typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type
+        typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+        typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
          > > bags_type;
-    //typedef typename deg_chooser<G_t>::type degs_type;
-    typedef typename misc::DEGS<G_t> degs_type;
+    //typedef typename deg_chooser<G>::type degs_type;
+    typedef typename misc::DEGS<G> degs_type;
 };
 
 } // draft
@@ -119,7 +135,7 @@ V deg_vector_init(V const&, N n, G const& g, M const& m)
 //and does not call further algorithms.
 //
 //TODO: bags is actually a tree decomposition tree.
-template<class G_t, template<class G_> class CFGT=draft::pp_cfg>
+template<class G_t, template<class G_, class ...> class CFGT=draft::pp_cfg>
 class preprocessing : public treedec::algo::draft::algo1 {
 private: // hmm, fetch from CFG.
     constexpr static bool disable_triangle=false;
@@ -216,7 +232,8 @@ public:
           _num_edges(boost::num_edges(_g)),
           _marker(boost::num_vertices(_g)),
           _dormant(boost::num_vertices(_g)),
-          _numbering(_g)
+          _lb_bs(0),
+          _numbering(_g, _id)
     {
         assert(_num_edges ^ 1);
         _num_edges /= 2;
@@ -265,7 +282,7 @@ public:
             for(; Is.first!=Is.second; ++Is.first){
                 assert(treedec::is_valid(*Is.first, _g));
                 if(_numbering.is_before(v, *Is.first)){
-                    B.insert(*Is.first);
+                    push(B, *Is.first);
                 }
             }
             // expensive?
@@ -286,6 +303,10 @@ public:
         }
 #endif
         assert(bags.size()==_elims.size());
+    }
+
+    edges_size_type num_edges()const{
+        return _num_edges;
     }
     // legacy support. don't use. don't touch.
     template<class GG>
@@ -627,12 +648,145 @@ private:
     degreemap_type _degreemap;
     degs_type _degs;
     std::deque<vertex_descriptor> _elims;
-    unsigned _lb_bs;
-    unsigned _num_edges;
+    edges_size_type _num_edges;
     marker_type _marker;
     treedec::draft::sMARKER<vertices_size_type, vertices_size_type> _dormant;
+    vertices_size_type _lb_bs;
     numbering_type _numbering;
+
+public: // draft, ongoing cleanup from exact_base.
+        // this must actually be free, but there is no interface yet.
+
+    template<class T, TREEDEC_ALGO_TC A>
+    void do_the_rest(T&);
+    template<class T, TREEDEC_ALGO_TC A>
+    void do_components(T& t, G_t const& gg) const;
 }; // preprocessing
+
+// put together the fragments. "get_tree_decomposition" like
+template<class G_t, template<class G_, class ...> class CFG>
+template<class T, TREEDEC_ALGO_TC A>
+void preprocessing<G_t, CFG>::do_the_rest(T& t)
+{
+    auto n=boost::num_vertices(_g);
+    if(n==0){ untested();
+        boost::add_vertex(t);
+        return;
+    }else{
+    }
+
+        // yikes
+    std::vector<boost::tuple<
+        typename treedec_traits<typename treedec_chooser<G_t>::type>::vd_type,
+        std::set<vertex_descriptor> > > bags;
+
+    get_bags(bags); // FIXME: bags are already there
+    G_t g;
+    get_graph(g);
+
+#if 1
+    if(boost::num_edges(g) == 0){ untested();
+        // BUG
+        treedec::glue_bags(bags, t);
+        return;
+    }else{
+    }
+#endif
+
+    do_components<T, A>(t, g);
+
+    // no, g has been disassembled
+    // assert(is_valid_treedecomposition(g, t));
+
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+
+    treedec::glue_bags(bags, t);
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+} // do_the_rest
+
+template<class G, template<class G_, class ...> class CFGT>
+template<class T, TREEDEC_ALGO_TC A>
+void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
+{
+    // Compute a tree decomposition for each connected component of G and glue
+    // the decompositions together.
+    typedef std::vector<std::set<typename boost::graph_traits<G>::vertex_descriptor> > components_t;
+    components_t components;
+    treedec::get_components(gg, components);
+
+    // root
+    boost::add_vertex(t);
+    typename std::vector<typename boost::graph_traits<G>::vertex_descriptor> vdMap;
+    typename components_t::iterator i = components.begin();
+    for(; i!=components.end(); ++i) { itested();
+        // BUG: Ignore isolated vertices (already included in 'bags').
+        trace2("found component ", i->size(), components.size());
+        if(i->size() == 1){ itested();
+            incomplete();
+            continue;
+            auto nv=boost::add_vertex(t);
+            auto& B=boost::get(bag_t(), t, nv);
+            treedec::push(B, *(*i).begin());
+            trace2("isolated node ", nv,  *(*i).begin());
+            if(nv!=0){ untested();
+                // uuh hack
+                // boost::add_edge(nv, nv-1, t);
+                boost::add_edge(nv-1, nv, t);
+            }else{ untested();
+            }
+        }else{
+        }
+
+        typedef typename graph_traits<G>::immutable_type immutable_type;
+
+        unsigned compsize = i->size();
+        CFG::message(0, "component of size %d", compsize); // BUG: lost.
+#ifndef NDEBUG
+        std::cerr<<"component of size " << compsize << "\n";
+#endif
+
+
+        auto comp_range = *i;
+        immutable_type H(compsize);
+        immutable_type const& G_=treedec::draft::immutable_clone(_g, H,
+                std::begin(comp_range), std::end(comp_range), compsize,
+                &vdMap);
+
+        assert_connected(G_);
+
+        // T_t T_; // doesn't work (probably should?)
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> T_;
+
+        incomplete();
+        G gggg;
+        boost::copy_graph(G_, gggg,
+                boost::vertex_copy(detail::forgetprop()).
+                edge_copy(detail::forgetprop())); // avoid, fix immutable_clone
+        // assert_connected(gggg); // BUG
+
+#ifndef NDEBUG
+        G backup;
+        boost::copy_graph(gggg, backup);
+#endif
+        A<G, CFGT> kern(gggg);
+
+        kern.do_it();
+        kern.get_tree_decomposition(T_);
+
+        assert(is_valid_treedecomposition(backup, T_));
+
+        assert(boost::num_vertices(T_) == boost::num_edges(T_)+1);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+
+#ifdef DEBUG
+        std::cout << "appending\n";
+        boost::print_graph(T_);
+#endif
+        treedec::draft::append_decomposition(t, std::move(T_), G_, vdMap);
+        assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+    }
+    assert(boost::num_vertices(t) == boost::num_edges(t)+1);
+} // do_it
 
 // Check if there exists a degree-0-vertex.
 template <typename G_t, typename B_t>
@@ -668,7 +822,7 @@ void Islet(G_t &G, T_t &bags)
 }
 
 // check if a and b have the same neighbour set
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::check_twins_3(
         vertex_descriptor a, vertex_descriptor b) const
 {
@@ -742,7 +896,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
 }
 
 // eliminate vertex: turn neighbours into clique, remove center, update degrees.
-template<class G_t, template<class G_> class CFGT>
+template<class G_t, template<class G_, class ...> class CFGT>
 void preprocessing<G_t, CFGT>::eliminate_vertex_1(
         typename preprocessing<G_t, CFGT>::vertex_descriptor v)
 {
@@ -776,7 +930,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
     }
 }
 
-template<class G_t, template<class G_> class CFGT>
+template<class G_t, template<class G_, class ...> class CFGT>
 void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         typename preprocessing<G_t, CFGT>::vertex_descriptor v)
 {
@@ -831,7 +985,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
 // Apply the Buddy rule if possible
 // (checks if there exists two degree-3-vertices,
 //  such that they share their neighbours)
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Buddy(
         vertex_descriptor v, vertex_descriptor w)
 {
@@ -843,7 +997,7 @@ bool preprocessing<G_t, CFG>::Buddy(
         unlink_1_neighbourhood(v);
         _degs.unlink(w, 3);
 
-        vd_type vd2 = get_vd(_g, w);
+        vd_type vd2 = w;
 
         make_neigh_clique(v);
         assert(_degree[v]);
@@ -890,7 +1044,7 @@ inline void rearrange_neighs(T* N, T x, I i)
 }
 
 //Apply the Cube rule if possible.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 {
 
@@ -1162,7 +1316,7 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
 #endif
 
 // Simplicial and AlmostSimplicial in one go.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
 {
     assert(!boost::edge(v, v, _g).second);
@@ -1336,7 +1490,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
 //Apply the Triangle rule if applicable (checks if there exists a
 //degree-3-vertex, such that at least one edge exists in its neighbourhood).
 //return true, if degs has been modified.
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 {
     vertices_size_type deg=_degree[v];
@@ -1386,7 +1540,7 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 }
 
 
-template<class G_t, template<class G_> class CFG>
+template<class G_t, template<class G_, class ...> class CFG>
 void preprocessing<G_t, CFG>::do_it()
 {
     typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(_g);
@@ -1602,12 +1756,13 @@ void preprocessing(G_t &G, BV_t &bags)
         // obsolete interface. possibly slow
         A.get_bags(bags);
         A.get_graph(G);
+    }else{ untested();
     }
 }
 
 
 } //namespace treedec
 
-#endif //TD_PREPROCESSING
+#endif //TREEDEC_PREPROCESSING_HPP
 
 // vim:ts=8:sw=4:et

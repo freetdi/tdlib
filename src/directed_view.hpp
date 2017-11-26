@@ -25,7 +25,7 @@
 // #include <boost/graph/copy.hpp> BUG
 #include "treedec_traits.hpp"
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 
@@ -80,7 +80,7 @@ struct dwt<G,
 	}
 };
 
-#ifdef USE_GALA // for now.
+#ifdef HAVE_GALA_GRAPH_H // for now.
 VCTtemplate
 struct dwt< gala::graph<SGARGS>,
 	typename std::enable_if<
@@ -116,23 +116,27 @@ struct dwt<G,
 	typedef typename graph_traits<G>::directed_type type;
 	static std::string dbg(){ return "bidir wrapper\n"; }
 
-	static size_t init(G&){
-		return 0;
+	static size_t init(G& g){
+		return boost::num_vertices(g);
 	}
 
 	// check: do we need this copy?
 	template<class GG, class H>
 	static void copy(GG const& g, H& h){
-		assert(!boost::num_vertices(h));
+		trace2("bidir cp", boost::is_bidirectional_graph<GG>::value,
+				             boost::is_bidirectional_graph<H>::value);
+		assert(boost::is_directed(g));
+//		assert(!boost::num_vertices(h));
 		assert(boost::is_directed(h));
 		auto p=boost::edges(g);
 		for(; p.first!=p.second; ++p.first){
 			auto e=*p.first;
 			auto V=boost::source(e, g);
 			auto W=boost::target(e, g);
+			trace2("bidir cp", W, V);
+			assert(!boost::edge(V, W, h).second);
 			boost::add_edge(V, W, h);
 			boost::add_edge(W, V, h);
-			trace2("bidir cp", W, V);
 		}
 		trace2("bidir cp", boost::num_edges(g), boost::num_edges(h));
 		assert(2*boost::num_edges(g) == boost::num_edges(h));
@@ -254,7 +258,7 @@ struct graph_traits<treedec::draft::directed_view<G> > {
 
 	typedef typename B::traversal_category traversal_category;
 
-	static vertex_descriptor null_vertex(){ untested();
+	static vertex_descriptor null_vertex(){
 		return 0; // graph_traits<W>::null_vertex();
 	}
 };
@@ -289,14 +293,14 @@ get(T t, treedec::draft::directed_view<G>& g)
 	return get(t, *g);
 }
 
-#if 0
+#if 1
 template<class G>
 typename treedec::draft::directed_view<G>::vertices_size_type
 get(vertex_index_t,
 		treedec::draft::directed_view<G> const& g,
 		typename treedec::draft::directed_view<G>::vertex_descriptor v
 		)
-{ untested();
+{ itested();
 	return get(get(vertex_index, *g), v);
 }
 #endif

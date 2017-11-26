@@ -1,4 +1,4 @@
-tdlib provides tree decomposition algorithms
+treedec provides tree decomposition algorithms
 
 A tree decomposition of a simple loopless graph G is a tree T with bags at its
 nodes containing vertices from G. The usual conditions apply. By convention,
@@ -32,6 +32,18 @@ template<class TT>
 void get_tree_decomposition(TT&) const;
 which is meant to work with treedecomposition types (see below).
 
+in namespace treedec we currently have (needs verification)
+
+prep::*        // preprocessing
+he::fill_in    // fill_in heuristic
+he::min_degree // fill_in heuristic
+he::thorup     // thorups heuristic
+ex::ta         // tamakis algorithm
+ex::cutset     // tamakis algorithm
+comb::PP_FI    // preprocessing + fill_in
+comb::PP_FI_TM // preprocessing + fill_in + triangulation
+comb::ex17     // PACE 17 exact (pp + tamaki)
+
 == graph types ==
 
 A graph is expected to be a model of AdjacencyGraph, but without self loops
@@ -62,7 +74,7 @@ accessible e.g. using a property tag such as treedec::root_t (or similar).
 
 a possible model is
 
-#include <tdlib/treedec_traits>
+#include <treedec/treedec_traits.hpp>
 typedef std::vector<vertex_descriptor> bag_container_type;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::property<treedec::bag_t, bag_container_type> > T;
@@ -79,6 +91,18 @@ struct mybundle{
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                               mybundle> my_td_type;
 
-you can make bags accessible from tdlib using
+you can make bags accessible from treedec using
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(my_td_type, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(my_td_type, bag);
+
+== tdecomp ==
+
+an example driver. reads in .gr files (PACE style) and ejects .td. supports
+several algorithms. these can be switched on individually, using options such
+as --pp, --fi, --ppfi, --ex17. selected algorithms run in parallel, some
+heuristics permit interruption using a TERM signal. in the interrupted case,
+the best currently known decomposition is printed.
+
+example:
+$ tdecomp --fi < my_graph.gr > my_decomposition.td
+$ td-validate my_graph.gr my_decomposition.td    # not included (yet).

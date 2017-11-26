@@ -1,6 +1,6 @@
 #include "config.h"
 #include <set>
-#include <tdlib/trace.hpp>
+#include <treedec/trace.hpp>
 
 namespace treedec{
 	struct bag_t;
@@ -15,7 +15,7 @@ struct tree_dec_node
   unsigned weight;
 };
 
-#include <tdlib/treedec_traits.hpp>
+#include <treedec/treedec_traits.hpp>
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -39,29 +39,29 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               TDIR, tree_dec_node> tree_dec_t;
 
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(tree_dec_t, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
 
-#include <tdlib/graph.hpp>
-#include <tdlib/preprocessing.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/preprocessing.hpp>
 #include <boost/graph/copy.hpp>
 
 
-#include <tdlib/thorup.hpp>
-#include <tdlib/combinations.hpp>
+#include <treedec/thorup.hpp>
+#include <treedec/combinations.hpp>
 
 
 typedef treedec::he::fill_in<cfg_t> FI;
 typedef treedec::he::thorup<cfg_t> thorup;
 typedef treedec::comb::PP_MD<cfg_t> PP_MD;
-typedef treedec::comb::PP_FI<cfg_t> PP_FI;
-typedef treedec::comb::PP_FI_TM<cfg_t> PP_FI_TM;
+typedef treedec::pending::PP_FI<cfg_t> PP_FI;
+typedef treedec::pending::PP_FI_TM<cfg_t> PP_FI_TM;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 typedef treedec::comb::ex17<cfg_t> ppta;
 #endif
 
 
-#include <tdlib/nice_decomposition.hpp>
+#include <treedec/nice_decomposition.hpp>
 
 template<class G, class A>
 static void do_it(G const& g_){
@@ -96,11 +96,25 @@ static void do_it(G const& g_){
 #ifndef INLINE_CC
 int main()
 {
-	const unsigned n=16;
-	cfg_t g(n);
+	const unsigned n=17;
+	cfg_t h(n);
 #include "g.h"
+	cfg_t g;
+	boost::copy_graph(h, g);
+	boost::add_vertex(g);
+	boost::add_vertex(g);
+	boost::add_vertex(g);
+	boost::add_vertex(g);
+//	boost::copy_graph(h, g);
+//	boost::copy_graph(h, g);
+//	boost::add_vertex(g);
+
+	std::cout << "==test graph==\n";
 	boost::print_graph(g);
 	std::cout << "====\n";
+
+	std::cout << "PP+FI+TM\n";
+	do_it<cfg_t, PP_FI_TM>(g);
 
 	std::cout << "FI\n";
 	do_it<cfg_t, FI>(g);
@@ -111,20 +125,18 @@ int main()
 	std::cout << "FI\n";
 	do_it<cfg_t, FI>(g);
 
-	std::cout << "skip PP+MD\n";
-//	do_it<cfg_t, PP_MD>(g);
-
-	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI>(g);
-
-	std::cout << "skip PP+FI\n";
-//	do_it<cfg_t, PP_FI_TM>(g);
-
-
-#ifdef USE_GALA
+	std::cout << "PP+MD\n";
+	do_it<cfg_t, PP_MD>(g);
+//
+#ifdef HAVE_GALA_GRAPH_H
 	std::cout << "ppta\n";
 	do_it<cfg_t, ppta>(g);
 #endif
+
+	std::cout << "PP+FI\n";
+	do_it<cfg_t, PP_FI>(g);
+
+
 
 
 }

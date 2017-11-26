@@ -22,8 +22,8 @@
  * vertex/edge deletion and other simple operations on graphs.
  */
 
-#ifndef TD_SIMPLE_GRAPH_ALGOS
-#define TD_SIMPLE_GRAPH_ALGOS
+#ifndef TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
+#define TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
 
 #include <set>
 #include <limits>
@@ -270,7 +270,7 @@ void get_components_provided_map(G_t const &G,
 }
 
 template <typename G_t>
-void get_components(G_t &G,
+void get_components(G_t const& G,
              std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > &components)
 {
     std::vector<BOOL> visited(boost::num_vertices(G), false);
@@ -326,6 +326,6 @@ inline typename boost::graph_traits<G_t>::vertex_descriptor
 
 #undef get_pos
 
-#endif //TD_SIMPLE_GRAPH_ALGOS
+#endif //TREEDEC_SIMPLE_GRAPH_ALGOS_HPP
 
 // vim:ts=8:sw=4:et

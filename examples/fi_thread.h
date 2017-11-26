@@ -18,19 +18,19 @@ public:
     FI_THREAD( G const&g, const std::string& name )
         : base(g, name, 0), _work(g) // <= stored here
 			 , _FI(NULL)
-    { untested();
+    {
         _FI = new algo_type(_work);
         treedec::check(g);
         treedec::check(_work);
 		trace2("FI_THREAD3", boost::num_vertices(_g), boost::num_edges(_g));
-// #ifdef USE_GALA
+// #ifdef HAVE_GALA_GRAPH_H
 //         h = g;
 // #endif
         base::go();
     }
 
     void do_print_results(std::ostream& o)
-    { untested();
+    {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
@@ -40,7 +40,7 @@ public:
 		  _FI->get_tree_decomposition(P);
     }
 
-    void run() { untested();
+    void run() {
 #if 1
 		_FI->do_it();
 
@@ -62,7 +62,7 @@ public:
 //
     }
 private:
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
    // work on svbs
    // INCOMPLETE, hardwire 16bit!
    GWORKFI _work;
@@ -97,7 +97,7 @@ public:
     }
 
     void do_print_results(std::ostream& o)
-    { untested();
+    {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
@@ -106,7 +106,7 @@ public:
 		  boost::copy_graph(_t, P);
     }
 
-    void run() { untested();
+    void run() {
 		 A <GWORKFI, cfgt> a(_work);
 		 a.do_it();
 		 a.get_tree_decomposition(_t);
@@ -132,10 +132,10 @@ private:
 template<class G, template<class H, class ... >
                   class cfgt=treedec::algo::default_config>
 class PPFI_THREAD
-    : public SEVERAL_FI_THREAD<G, treedec::comb::PP_FI, cfgt>
+    : public SEVERAL_FI_THREAD<G, treedec::pending::PP_FI, cfgt>
 {
 public:
-	typedef SEVERAL_FI_THREAD<G, treedec::comb::PP_FI, cfgt> base;
+	typedef SEVERAL_FI_THREAD<G, treedec::pending::PP_FI, cfgt> base;
 	template<class A, class B>
 	explicit PPFI_THREAD(A const& a, B const& b) : base(a,b){}
 };
@@ -143,10 +143,10 @@ public:
 template<class G, template<class H, class ... >
                   class cfgt=treedec::algo::default_config>
 class PPFITM_THREAD
-    : public SEVERAL_FI_THREAD<G, treedec::comb::PP_FI_TM, cfgt>
+    : public SEVERAL_FI_THREAD<G, treedec::pending::PP_FI_TM, cfgt>
 {
 public:
-	typedef SEVERAL_FI_THREAD<G, treedec::comb::PP_FI_TM, cfgt> base;
+	typedef SEVERAL_FI_THREAD<G, treedec::pending::PP_FI_TM, cfgt> base;
 	template<class A, class B>
 	explicit PPFITM_THREAD(A const& a, B const& b) : base(a,b){}
 };

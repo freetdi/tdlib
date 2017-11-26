@@ -48,7 +48,13 @@ public:
 #endif
 
 	void put(vertex_descriptor v) {
-		_data[get(_idmap, v)] = _current;
+		auto id=get(_idmap, v);
+		trace3("NUMBERING", v, id, _current);
+		if(_data[id]){
+			trace3("eek, already numbered", v, id, _current);
+		}else{
+		}
+		_data[id] = _current;
 	}
 	void increment(value_type i=1) {
 	  	_current -= i;
@@ -66,8 +72,10 @@ public:
 		return _data[get(_idmap, v)] > _data[get(_idmap, w)];
 	}
 	value_type get_position(vertex_descriptor v) const{
+		trace2("NUMBERING hack", v, sizeof(value_type));
 		// HACK. cleanup later. NUMBERING_2?
-		assert(_data[get(_idmap, v)]);
+		auto id=get(_idmap, v);
+		assert(_data[id]);
 		return -1 - _data[get(_idmap, v)];
 	}
 private:

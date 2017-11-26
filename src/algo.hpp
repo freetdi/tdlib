@@ -19,12 +19,14 @@
  * graph decomposition algorithms, traits.
  */
 
-#ifndef TD_ALGO_HPP
-#define TD_ALGO_HPP
+#ifndef TREEDEC_ALGO_HPP
+#define TREEDEC_ALGO_HPP
 
 #include <limits>
 #include "timer.hpp"
 #include "graph_traits.hpp"
+
+#define TREEDEC_ALGO_TC template <typename GGG, template<class GG_, class...> class CFGG> class
 
 namespace treedec{
 

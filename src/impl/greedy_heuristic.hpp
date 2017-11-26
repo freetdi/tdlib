@@ -19,10 +19,10 @@
 //
 // greedy heuristics
 
-#ifndef TD_IMPL_GREEDY_HPP
-#define TD_IMPL_GREEDY_HPP
+#ifndef TREEDEC_GREEDY_HEURISTIC_HPP
+#define TREEDEC_GREEDY_HEURISTIC_HPP
 
-#ifndef TD_ELIMINATION_ORDERINGS
+#ifndef TREEDEC_ELIMINATION_ORDERINGS_HPP
 #error "not intended to be used like that."
 #endif
 
@@ -61,7 +61,8 @@ public:
         }
     }
 
-    O_t& get_elimination_ordering() const {
+    O_t& get_elimination_ordering() {
+
         return *_o;
     }
 
@@ -151,7 +152,7 @@ public:
                 throw exception_unsuccessful();
             }
 
-            elim_vertices[_i] = get_vd(_g, c);
+            elim_vertices[_i] = c;
 
             if(_t){
                 _current_N = &_bags[_i];
@@ -237,10 +238,9 @@ public:
 
         if(!baseclass::_iiv){
             for(; it!=zerodegbag1.end(); ++it){
-                (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
+                (*baseclass::_o)[baseclass::_i++] = *it;
             }
-        }
-        else{
+        }else{
             baseclass::_num_vert -= zerodegbag1.size();
         }
 
@@ -277,7 +277,7 @@ public:
         BOOST_AUTO(it, zerodegbag.begin());
 
         for(; it!=zerodegbag.end(); ++it){
-            (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *it);
+            (*baseclass::_o)[baseclass::_i++] = *it;
         }
     }
 
@@ -289,8 +289,7 @@ private:
 // the fillIn heuristic.
 template<typename G_t,
          template<class GG, class ...> class CFGT=algo::default_config>
-class fillIn : public greedy_base<
-               G_t,
+class fillIn : public greedy_base< G_t,
                std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>,
                CFGT>{
 public: //types
@@ -299,6 +298,7 @@ public: //types
     typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
     typedef greedy_base<G_t, O_t, CFGT> baseclass;
     typedef typename baseclass::vertex_descriptor vertex_descriptor;
+    // BUG:: use CFGT::fill or fallback to current fill
     typedef typename fill_chooser<typename baseclass::subgraph_type>::type fill_type;
 
     struct fill_update_cb : public graph_callback<typename baseclass::subgraph_type>{
@@ -325,7 +325,6 @@ public: // construct
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
           _fill(baseclass::_subgraph, boost::num_vertices(g))
-          // _cb(fill_update_cb(&_fill, baseclass::_subgraph))
     {
 //        boost::print_graph(g);
         treedec::check(g);
@@ -462,7 +461,6 @@ public: // implementation
                         for(; r.first!=r.second; ++r.first){
                             if(!baseclass::_marker.is_marked(*r.first)){
                                 // not neighbour of n
-                                trace1("skip", *r.first);
                             }else{
                                 trace3("--common neigh", n, n2, *r.first);
                                 assert(*r.first!=n);
@@ -596,7 +594,7 @@ public: // implementation
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
             if(boost::out_degree(*vIt, baseclass::_g) == 0){
                 if(!baseclass::_iiv){
-                    (*baseclass::_o)[baseclass::_i++] = get_vd(baseclass::_g, *vIt);
+                    (*baseclass::_o)[baseclass::_i++] = *vIt;
                 }
                 else{
                     --baseclass::_num_vert;
@@ -631,6 +629,7 @@ public: // implementation
 private:
     fill_type _fill;
     fill_update_cb _cb;
+
 }; // fillIn
 
 } // obsolete

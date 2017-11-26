@@ -67,20 +67,20 @@ notyets = \
 	dfs \
 	bfs
 
-${TESTS:%=%.o}: tdlib
+${TESTS:%=%.o}: treedec
 
 TESTS = $(check_PROGRAMS)
 
 AM_DEFAULT_SOURCE_EXT=.cpp
 
-BUILT_SOURCES = tdlib
+BUILT_SOURCES = treedec
 CLEANFILES = ${BUILT_SOURCES} *~
 
 AM_CPPFLAGS = -I. -I${srcdir} -DTRACE_UNTESTED -UNDEBUG
 AM_CXXFLAGS = -O0 -g
 
-tdlib:
-	-ln -sf $(top_srcdir)/src tdlib
+treedec:
+	-ln -sf $(top_srcdir)/src treedec
 
 EXTRA_DIST = g.h sdcc_.cpp
 # 	svbs_random.h

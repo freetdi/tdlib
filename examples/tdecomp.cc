@@ -22,11 +22,11 @@
 #include <boost/graph/graphviz.hpp>
 #include <boost/property_map/property_map.hpp>
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 // #define USE_RANDOM_MD // 1
 #define USE_FI
 // #define USE_MSVS_TRIVIAL // 4
-// #define USE_BMD // 8
+#define USE_BMD // 8
 // #define USE_SOME // maybe
 // #define USE_EX // 32
 #define USE_EX17 // 64
@@ -36,8 +36,11 @@
 
 // these should work without gala
 //#define USE_P17 // 128
-#define USE_THORUP almost
-//#define USE_FIPPTM
+#define USE_PPMD
+#define USE_THORUP
+#define USE_PP
+#define USE_FIPPTM
+#define USE_PPFI
 
 
 typedef enum{

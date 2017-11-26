@@ -3,22 +3,15 @@
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
 #include <boost/graph/copy.hpp>
-#include <tdlib/exact_ta.hpp>
+#include <treedec/combinations.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> G;
+typedef treedec::graph_traits<G>::treedec_type T;
 
-namespace choice{
-  template<class G,
-		template<class G_, class ...> class C>
-  using exact_ta_=treedec::exact_ta<G, C>;
-}
-
-typedef treedec::draft::exact_decomposition<G,
-             treedec::algo::default_config,
-             choice::exact_ta_> alg_A;
+typedef treedec::comb::ex17<G, treedec::algo::default_config> alg_A;
 
 int main()
 {
@@ -35,7 +28,11 @@ int main()
 	boost::copy_graph(g, alsvu1);
 	assert(boost::num_edges(alsvu1)==3);
 
-	A.do_it(1);
+	A.do_it();
 
-//	std::cout << A.get_treewidth();
+	T t;
+	A.get_tree_decomposition(t);
+
+	std::cout << "tw is " << treedec::get_bagsize(t)-1 << "\n";
+	assert(3==treedec::get_bagsize(t));
 }

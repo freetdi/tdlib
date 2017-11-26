@@ -33,8 +33,8 @@
  *    G& g, typename outedge_set<G>::type& bag)
  */
 
-#ifndef TD_GRAPH_H
-#define TD_GRAPH_H
+#ifndef TREEDECGRAPH_HPP
+#define TREEDECGRAPH_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -259,9 +259,8 @@ inline void detach_neighborhood(
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nIt2, nEnd;
     // inefficient.
 
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
-    {
-        bag.insert(get_vd(g, *nIt1));
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++) {
+        bag.insert(*nIt1);
     }
     boost::clear_vertex(c, g);
 }
@@ -278,9 +277,9 @@ inline void detach_neighborhood(
     // inefficient.
 
     unsigned i = 0;
-    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++)
-    {
-        bag[i++] = get_vd(g, *nIt1);
+    for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g); nIt1 != nEnd; nIt1++) {
+        assert(i<bag.size());
+        bag[i++]=*nIt1;
     }
     boost::clear_vertex(c, g);
 }
@@ -561,7 +560,7 @@ struct edge_helper<G, typename std::enable_if< std::is_convertible<
         return boost::num_edges(g);
     }
     static std::pair<typename boost::graph_traits<G>::edge_descriptor, bool>
-    add(vertex_descriptor x, vertex_descriptor y, G& g){
+    add(vertex_descriptor x, vertex_descriptor y, G& g){ untested();
 
         BOOST_STATIC_ASSERT(
                 std::is_convertible<typename boost::graph_traits<G>::traversal_category*,
@@ -770,20 +769,20 @@ bool is_tree(G_t const &G){ untested();
 //checks if O is a permutation of V(G)
 //TODO: use vec<bool>
 template <typename O_t, typename G>
-bool is_permutation(O_t const &O, G const &g){ untested();
+bool is_vertex_permutation(O_t const &O, G const &g)
+{ itested();
     std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V;
 
     auto p=boost::vertices(g);
-    for(; p.first!=p.second; ++p.first){ untested();
+    for(; p.first!=p.second; ++p.first){ itested();
         V.insert(*p.first);
     }
 
-    typename O_t::const_iterator oIt;
-    for(oIt = O.begin(); oIt != O.End(); oIt++){ untested();
-        S.insert(*oIt);
+    for(auto x : O) { itested();
+        S.insert(x);
     }
 
-    return O == V;
+    return S == V;
 }
 
 } // treedec

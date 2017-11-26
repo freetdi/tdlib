@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef TD_COMBINATIONS
-#define TD_COMBINATIONS
+#ifndef TREEDEC_COMBINATIONS_HPP
+#define TREEDEC_COMBINATIONS_HPP
 
 #include <set>
 #include <vector>
@@ -56,9 +56,13 @@
 #include "exact_cutset.hpp"
 #include "separator_algorithm.hpp"
 #include "misc.hpp"
-#ifdef USE_GALA
+#include "util.hpp"
+#ifdef HAVE_GALA_GRAPH_H
 #include "exact_ta.hpp"
 #endif
+#include "treedec_copy.hpp"
+
+#include <boost/graph/graph_utility.hpp>
 
 namespace treedec{
 
@@ -71,7 +75,10 @@ public: // types
 
     typedef typename treedec::graph_traits<G>::treedec_type T;
 public: // construct
-    PP_MD(G& g) : _g(g){
+    PP_MD(G& g) :
+        _g(g),
+        _low_tw(-1)
+    {
     }
 
 public: // random stuff, should be in algo. later
@@ -86,6 +93,7 @@ public: // random stuff, should be in algo. later
         if(boost::num_vertices(_g) == 0){
             boost::add_vertex(_t);
             return;
+        }else{
         }
 
         // TODO: cleanup
@@ -96,10 +104,18 @@ public: // random stuff, should be in algo. later
 
         treedec::preprocessing(_g, bags, _low_tw);
         if(boost::num_edges(_g) > 0){
+
+            // HACK. old mindegree does not work on bidirectional graphs
+        boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ug;
+        boost::copy_graph(_g, ug,
+				 boost::vertex_copy(hack::forgetprop()).
+				 edge_copy(hack::forgetprop()));
+
             treedec::minDegree_decomp(
-                    _g, _t,
+                    ug, _t,
                     (typename std::vector<typename treedec_chooser<G>::value_type>*)NULL,
                     UINT_MAX, true); //ignore_isolated_vertices
+        }else{
         }
         treedec::glue_bags(bags, _t);
     }
@@ -107,12 +123,19 @@ public: // random stuff, should be in algo. later
     template<class TT>
     void get_tree_decomposition(TT& t) const{
         // todo: assemble td here.
-        boost::copy_graph(_t, t);
+#if 0
+        // boost::copy_graph(_t, t); // FIXME
+#else
+        treedec::obsolete_copy_treedec(_t, t);
+#endif
     }
 
 private:
     G& _g;
-    T _t;
+    // T _t; // FIXME. does not work yet
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+        boost::property<treedec::bag_t, std::set<unsigned> > > _t; // BUG
+
     int _low_tw;
 }; // PP_MD
 
@@ -259,7 +282,7 @@ private:
     G& _g;
     T _t;
     int _low_tw;
-}; // PP_FI_TM
+}; // PP_FI_TM (old)
 
 
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
@@ -294,7 +317,7 @@ private:
     int _low_tw;
 }; // FI_TM
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 namespace ex17choice{
   template<class G, template<class G_, class ...> class C=treedec::algo::default_config>
   using exact_ta_=treedec::exact_ta<G, C>;
@@ -347,38 +370,19 @@ public: // algo interface
         if(boost::num_vertices(_g) == 0){ untested();
             boost::add_vertex(_t);
             return;
-        }else{ untested();
+        }else{
+
+            // BUG, somehow need to cast CFGT to ppconfig
+            // "message" is getting lost here, need pp_cfg+CFGT
+            impl::preprocessing<G> A(_g);
+            A.set_treewidth(_low_tw, -1u);
+            A.do_it();
+
+            trace0("doing the rest");
+
+            // this is the rest from exact_base
+            A.template do_the_rest<T, treedec::impl::fillIn > (_t);
         }
-
-#ifndef NOBAGS
-        /// incomplete...
-        std::vector<boost::tuple<
-            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
-                     typename treedec_traits<typename treedec_chooser<G>::type>::bag_type
-                         > > bags;
-
-        treedec::preprocessing(_g, bags, _low_tw);
-#else // later?
-        impl::preprocessing<G_t> A(G);
-        A.set_treewidth(_low_tw, -1u);
-        A.do_it();
-        _low_tw = A.get_treewidth();
-        A.get_graph(G);
-#endif
-
-        if(boost::num_edges(_g) > 0){
-            unsigned low2=-1;
-            treedec::impl::fillIn_decomp(_g, _t, low2, true); //ignore_isolated
-            _low_tw = low2;
-        }else{ untested();
-        }
-#ifndef NOBAGS
-        treedec::glue_bags(bags, _t);
-#else
-        skeleton<...> S(...)
-            S.do_it();
-#endif
-
     }
 
     template<class TT>
@@ -392,6 +396,132 @@ private:
     // std::vector<vertex_descriptor> _o;
     int _low_tw;
 }; // PPFI
+
+// pending
+template<class G, template<class G_, class ...> class CFGT=algo::default_config>
+class PP_FI_TM{
+private:
+    typedef typename treedec::graph_traits<G>::treedec_type T;
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+public: // construct
+    PP_FI_TM(G& g) : _g(g){
+        _low_tw = -1;
+    }
+
+public: // random stuff
+    void set_lower_bound(unsigned lb){ untested();
+        _low_tw = lb-1;
+    }
+    unsigned lower_bound()const{ untested();
+        return _low_tw + 1;
+    }
+
+public: // algo interface
+    void do_it(){
+
+        if(boost::num_vertices(_g) == 0){
+            boost::add_vertex(_t);
+            return;
+        }
+
+        std::vector<boost::tuple<
+            typename treedec_traits<typename treedec_chooser<G>::type>::vd_type,
+                     std::vector<vertex_descriptor> > > bags;
+
+#if 0
+        treedec::preprocessing(_g, bags, _low_tw);
+#else
+            impl::preprocessing<G> A(_g);
+            A.set_treewidth(_low_tw, -1u);
+            A.do_it();
+            A.get_bags(bags);
+            A.get_graph(_g);
+
+            trace1("done PP in PPFITM", boost::num_edges(_g));
+#endif
+
+        for(auto const& x : bags){ untested();
+            auto& B=boost::get<1>(x);
+            trace1("B", B.size());
+        }
+
+        if(boost::num_edges(_g) > 0){
+//            typename std::vector<vertex_descriptor> old_elim_ordering;
+            typename std::vector<vertex_descriptor> new_elim_ordering;
+
+            // BUG this must work in ordering_to_treedec
+            boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> H;
+            boost::copy_graph(_g, H,
+				 boost::vertex_copy(hack::forgetprop()).
+				 edge_copy(hack::forgetprop()));
+
+            trace0("backedup to H");
+            trace0("doit");
+            treedec::impl::fillIn<G> a(_g);
+            a.set_ignore_isolated();
+            a.do_it();
+            trace0("done fi");
+            auto& old_elim_ordering = a.get_elimination_ordering();
+
+            trace2("mC", boost::num_edges(H), boost::num_vertices(_g));
+
+            // changes H, but doesn't matter
+            treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
+            trace3("", old_elim_ordering.size(), new_elim_ordering.size(), boost::num_vertices(_g));
+            assert(is_vertex_permutation(new_elim_ordering, _g));
+
+
+            typename std::vector<vertex_descriptor>
+            
+            new_elim_ordering_(boost::num_vertices(H));
+
+            unsigned c = 0;
+            for(auto n=new_elim_ordering.begin(); n!=new_elim_ordering.end(); ++n){
+                if(boost::degree(*n, _g) > 0){
+                    trace2("eo", c, *n);
+                    assert(c<new_elim_ordering_.size());
+                    new_elim_ordering_[c++] = *n;
+                }else{
+                }
+            }
+
+            assert(is_vertex_permutation(new_elim_ordering, H));
+
+            assert(is_permutation(new_elim_ordering));
+
+            trace3("to_treedec", c, new_elim_ordering.size(), boost::num_vertices(H));
+            trace3("", boost::num_edges(H), new_elim_ordering.size(), boost::num_vertices(H));
+            treedec::ordering_to_treedec(H, new_elim_ordering_, _t);
+            trace0("PPFITM ordered_to_treedec");
+            // boost::print_graph(_t);
+        }
+
+        trace0("gluing");
+        treedec::glue_bags(bags, _t);
+    }
+
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{
+        // todo: assemble td here.
+#if 0
+        // boost::copy_graph(_t, t); // FIXME
+#else
+        treedec::obsolete_copy_treedec(_t, t);
+#endif
+    }
+
+private:
+    G& _g;
+    // T _t; // FIXME. does not work yet
+
+    // TD_tree_dec_t _t; // BUG
+    // needs to work with ordering_to_treedec... (which?!)
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::property<treedec::bag_t, std::set<unsigned> > > _t; // BUG
+
+    int _low_tw;
+}; // PP_FI_TM
 
 } // pending
 
@@ -420,6 +550,17 @@ void PP_FI_TM(G_t &G, T_t &T, int &low){
     low=a.lower_bound()-1;
     a.get_tree_decomposition(T);
 }
+
+#ifdef HAVE_GALA_GRAPH_H
+template <typename G_t, typename T_t>
+void exact_decomposition_ex17(G_t &G, T_t &T, int lb_tw)
+{
+    using draft::exact_decomposition;
+    auto alg=exact_decomposition<G_t, algo::default_config, exact_ta>(G);
+                                   // really^?
+    return alg.try_it(T, lb_tw+1);
+}
+#endif
 
 template <typename G_t, typename T_t>
 void exact_decomposition_cutset(G_t &G, T_t &T, int lb)
@@ -720,6 +861,6 @@ void FI_MSVS(G_t &G, T_t &T){
 
 } //namespace treedec
 
-#endif //TD_COMBINATIONS
+#endif //TREEDEC_COMBINATIONS_HPP
 
 // vim:ts=8:sw=4:et

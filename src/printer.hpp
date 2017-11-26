@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_PRINTER_HPP
-#define TD_PRINTER_HPP
+#ifndef TREEDEC_PRINTER_HPP
+#define TREEDEC_PRINTER_HPP
 
 #include <ostream>
 #include <string>
@@ -43,7 +43,7 @@ namespace draft {
 			_nva=0;
 		}
 		~printer() {
-			std::cout << "\n";
+			_s << "\n";
 		}
 
 		virtual void head(size_t numbags=0, size_t bagsize=0, size_t numvert=0) {
@@ -52,7 +52,7 @@ namespace draft {
 				// need to cache results... not now.
 			}else{
 			}
-			std::cout << "s " << _reason << " " << numbags
+			_s << "s " << _reason << " " << numbags
 			          << " " << bagsize << " " << ngv;
 			_num_vertices=numvert;
 		}
@@ -61,28 +61,28 @@ namespace draft {
 			return _nva;
 		}
 		void edge(size_t x, size_t y) { itested();
-			std::cout << "\n" << x+_offset << " " << y+_offset;
+			_s << "\n" << x+_offset << " " << y+_offset;
 		}
 		void announce_bag(size_t x) {
 			if(_nva==x){
 			}else{ untested();
 				incomplete(); //?
 			}
-			std::cout << "\nb " << ++_nva;
+			_s << "\nb " << ++_nva;
 		}
 		void push_back(size_t x)
 		{
-			std::cout << " " << x+_offset;
+			_s << " " << x+_offset;
 		}
 		// kludge: just tell something has been added.
 		// (which is not completely wrong)
 		std::pair<bool, bool> insert(size_t x)
-		{ untested();
-			std::cout << " " << x+_offset;
+		{
+			_s << " " << x+_offset;
 			return std::make_pair(true, true);
 		}
 
-		printer& bag(unsigned i){ untested();
+		printer& bag(unsigned i){
 			announce_bag(i);
 			return *this;
 		}
@@ -98,7 +98,7 @@ namespace draft {
 
 	// fill bags. one at a time.
 	template<class G>
-	printer<G>& bag(size_t i, printer<G>& g) { untested();
+	printer<G>& bag(size_t i, printer<G>& g) {
 		return g.bag(i);
 	}
 
@@ -123,7 +123,7 @@ namespace boost{
 
 	template<class G>
 	treedec::grtdprinter<G>& get(treedec::bag_t,
-			treedec::grtdprinter<G>& g, unsigned i) { untested();
+			treedec::grtdprinter<G>& g, unsigned i) {
 		return g.bag(i);
 	}
 
@@ -156,7 +156,7 @@ namespace boost{
 	public:
 		property_map<treedec::grtdprinter<G>, vertex_all_t>(
 				treedec::grtdprinter<G>& g) : _g(g)
-		{ untested();
+		{
 		}
 
 	public: // for now
@@ -189,14 +189,14 @@ namespace boost{
 	}
 	template<class G>
 	property_map<treedec::grtdprinter<G>, edge_all_t>
-	get(edge_all_t, treedec::grtdprinter<G>&) { untested();
+	get(edge_all_t, treedec::grtdprinter<G>&) {
 		return property_map<treedec::grtdprinter<G>, edge_all_t>();
 	}
 
 	template<class G>
 	void put(property_map<treedec::grtdprinter<G>, edge_all_t> const&,
 	         std::pair<size_t, size_t>&, const no_property)
-	{ untested();
+	{
 	}
 
 	template<class G>
@@ -243,7 +243,7 @@ namespace boost{
 			property<treedec::bag_t, std::vector<U> > const& p)
 	{
 		auto& b=bag(v, m._g);
-		for(auto i : p.m_value){ untested();
+		for(auto i : p.m_value){
 			treedec::push(b, i);
 		}
 	}

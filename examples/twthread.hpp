@@ -19,14 +19,13 @@
  * graph decomposition thread
  */
 
-#ifndef TD_THREAD_HPP
-#define TD_THREAD_HPP
+#ifndef TREEDEC_THREAD_HPP
+#define TREEDEC_THREAD_HPP
 
 #include <boost/thread.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <gala/trace.h>
-#include <tdlib/message.hpp>
-// #include <tdlib/elimination_orderings.hpp>
+#include <treedec/message.hpp>
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
@@ -35,8 +34,7 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#include <tdlib/timer.hpp>
-// #include <tdlib/printer.hpp>
+#include <treedec/timer.hpp>
 
 #ifdef NDEBUG
 #define assert_permutation(P)
@@ -109,7 +107,7 @@ extern std::atomic<unsigned> global_result;
  * - to handle TWTHREAD::print_results call from main thread
  */
 
-#include <tdlib/algo.hpp>
+#include <treedec/algo.hpp>
 namespace treedec{
 
 namespace draft{
@@ -214,7 +212,7 @@ private:
 	  	incomplete();
 		unreachable();
 	}
-	virtual void run_timed(){ untested();
+	virtual void run_timed(){
 		// CFG::TIMER!
 		DOUBLE_TIMER t;
 		t.start();

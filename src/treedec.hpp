@@ -29,15 +29,13 @@
 #include "graph.hpp"
 
 
-//REGISTER_GRAPH_WITH_BUNDLED_BAGS(T, bag)
+// BUG. missing namespace
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
-// REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_t, bag)
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_dir_tree_dec_t;
 
-// doesntwork yet
 #define COMMA ,
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(
-	  boost::adjacency_list<boost::vecS COMMA boost::vecS COMMA
-	                           boost::undirectedS COMMA treedec::bag_t>, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag);
+TREEDEC_TREEDEC_BAG_TRAITS(TD_dir_tree_dec_t, bag);
 #undef COMMA
 
 namespace treedec{
@@ -377,5 +375,25 @@ namespace boost{
 		 return (intptr_t(v) - intptr_t(*g.begin()))/s;
     }
 } // boost
+
+namespace treedec{
+namespace draft{
+template<class T>
+void dump_tree_decomposition(T const& t){
+	auto p=boost::vertices(t);
+	for(;p.first!=p.second; ++p.first){
+		std::cout << *p.first << ":";
+		auto q=boost::get(bag_t(), t, *p.first);
+		for(auto i : q){
+			std::cout << " " << i;
+		}
+		std::cout <<"\n";
+	}
+}
+
+}
+
+
+} // treedec
 
 #endif

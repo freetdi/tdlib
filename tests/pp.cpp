@@ -3,8 +3,8 @@
 #include <tuple>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tdlib/preprocessing.hpp>
-#include <tdlib/graph.hpp>
+#include <treedec/preprocessing.hpp>
+#include <treedec/graph.hpp>
 #include <boost/graph/copy.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> ALSVU;
@@ -12,7 +12,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> ALVV
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::directedS> ALSVD;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> ALVVD;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 // ... later
 #endif
 

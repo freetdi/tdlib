@@ -30,9 +30,9 @@
 #include "treedec.hpp"
 
 // typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, treedec::bag_t> TD_tree_dec_t;
-// REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_t, bag)
+// TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_t, bag)
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> TD_tree_dec_directed_t;
-REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_directed_t, bag);
+// TREEDEC_TREEDEC_BAG_TRAITS(TD_tree_dec_directed_t, bag);
 
 #include "generic_base.hpp"
 #include "graph.hpp"
@@ -48,7 +48,7 @@ REGISTER_GRAPH_WITH_BUNDLED_BAGS(TD_tree_dec_directed_t, bag);
 #include "applications/coloring.hpp"
 #include "misc.hpp"
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 
@@ -448,6 +448,32 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
 
 
 /* EXACT TREE DECOMPOSITIONS */
+
+int gc_exact_decomposition_ex17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)
+{
+  std::cerr << "gc_exact_decomposition_ex17 graphtype " << graphtype << "\n";
+    TD_tree_dec_t T;
+    // TD_graph_vec_t G;
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G); // BUG. why is there no graph yet?
+    std::cerr << "ta G " << boost::num_vertices(G) << " " << boost::num_edges(G) << "\n";
+#ifdef HAVE_GALA_GRAPH_H
+    treedec::exact_decomposition_ex17(G, T, lb);
+#else
+    incomplete();
+#endif
+    std::cerr << "ta T " << boost::num_vertices(T) << " " << boost::num_edges(T) << "\n";
+    incomplete();
+//    assert(is_valid_treedec(G, T));
+
+    // treedec::make_small(T); ??
+    make_python_decomp(T, V_T, E_T);
+    std::cerr << "pythondecomp nvT" << boost::num_vertices(T) << "\n";
+    std::cerr << "pythondecomp " << V_T.size() << " " << E_T.size() << "\n";
+
+    return treedec::get_width(T);
+}
 
 int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype)

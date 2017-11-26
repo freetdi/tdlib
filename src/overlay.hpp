@@ -17,10 +17,8 @@
 // graph overlays through views or (partial) copies.
 //
 
-#ifndef OVERLAY_H
-#define OVERLAY_H
-
-#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+#ifndef TREEDEC_OVERLAY_HPP
+#define TREEDEC_OVERLAY_HPP
 
 namespace treedec {
 
@@ -69,7 +67,7 @@ inline IG_t const& immutable_clone(
         // FIXME: pos, vertex_index?
         assert(i < vdMap->size());
         (*vdMap)[i] = *bi;
-        reverse_map[get_pos(*bi, G)] = i;
+        reverse_map[boost::get(boost::vertex_index, G, *bi)] = i;
         ++i;
     }
     assert(i==bag_nv);
@@ -83,10 +81,10 @@ inline IG_t const& immutable_clone(
         ++vertices_count;
         
         if(!cb){
-            BOOST_AUTO(s, get_pos(*bi, G));
-            BOOST_AUTO(A, boost::adjacent_vertices(*bi,G));
+            auto s=boost::get(boost::vertex_index, G, *bi);
+            auto A=boost::adjacent_vertices(*bi,G);
             for(;A.first!=A.second;++A.first){
-                BOOST_AUTO(t, get_pos(*A.first, G));
+                auto t=boost::get(boost::vertex_index, G, *A.first);
                 boost::add_edge(reverse_map[s], reverse_map[t], ig);
             }
         }else{
@@ -105,13 +103,13 @@ inline IG_t const& immutable_clone(
                 }
 
                 if(edg){
-                    BOOST_AUTO(s, get_pos(*bi, G));
-                    BOOST_AUTO(t, get_pos(*vi, G));
+                    auto s=boost::get(boost::vertex_index, G, *bi);
+                    auto t=boost::get(boost::vertex_index, G, *vi);
                     boost::add_edge(reverse_map[s], reverse_map[t], ig);
                 }else if(s==-1u){
-                    assert(get_pos(*bi, G)!=-1u);
-                    s = get_pos(*bi, G);
-                    t = get_pos(*vi, G);
+                    s = boost::get(boost::vertex_index, G, *bi);
+                    assert(s != -1u);
+                    t = boost::get(boost::vertex_index, G, *vi);
                 }else{
                 }
             }
@@ -158,8 +156,6 @@ inline IG_t const& immutable_clone(
 } // draft
 
 } // treedec
-
-#undef get_pos
 
 #endif // guard
 

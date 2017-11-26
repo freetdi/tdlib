@@ -34,6 +34,9 @@ int gc_LBPC_deltaC(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_
 
 /* EXACT TREE DECOMPOSITIONS */
 
+int gc_exact_decomposition_ex17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype);
+
 int gc_exact_decomposition_cutset(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, int lb, unsigned graphtype);
 

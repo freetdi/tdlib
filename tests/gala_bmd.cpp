@@ -3,7 +3,7 @@
 #include "config.h"
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #include <gala/graph.h>
 #include <gala/td.h>
@@ -15,16 +15,16 @@
 #include <boost/random.hpp>
 #include <iostream>
 #include <stdlib.h>
-#include <tdlib/elimination_orderings.hpp>
-#include <tdlib/graph.hpp>
-#include <tdlib/minimum_degree_ordering.hpp>
-#include <tdlib/trace.hpp>
+#include <treedec/elimination_orderings.hpp>
+#include <treedec/graph.hpp>
+#include <treedec/minimum_degree_ordering.hpp>
+#include <treedec/trace.hpp>
 // not in development yet
-//#include <tdlib/printer.hpp>
-#include <tdlib/treedec.hpp>
+//#include <treedec/printer.hpp>
+#include <treedec/treedec.hpp>
 
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
@@ -48,7 +48,7 @@ typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu
 
 int main(int argc, char** argv)
 {
-#ifndef USE_GALA
+#ifndef HAVE_GALA_GRAPH_H
 	(void) argc;
 	(void) argv;
 	return 77;

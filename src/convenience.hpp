@@ -6,7 +6,7 @@
 #include "generic_elimination_search_configs.hpp"
 #include "preprocessing.hpp"
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 

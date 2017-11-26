@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef TD_RANDOM_GENERATORS
-#define TD_RANDOM_GENERATORS
+#ifndef TREEDEC_RANDOM_GENERATORS_HPP
+#define TREEDEC_RANDOM_GENERATORS_HPP
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>

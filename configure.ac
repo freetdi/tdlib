@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([tdlib], [0.8.7], [larisch.larisch@kaust.edu.sa,felix@salfelder.org])
+AC_INIT([treedec], [0.8.8], [larisch.larisch@kaust.edu.sa,felix@salfelder.org])
 AC_CONFIG_SRCDIR([src/graph_traits.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -105,21 +105,17 @@ have_gala=no
 
 AC_ARG_WITH([gala], AS_HELP_STRING([--without-gala], [Disable gala]))
 
-AC_CHECK_HEADERS([gala/graph.h],
-					  [ have_gala=yes ]
-									 AC_MSG_NOTICE([consider installing gala])
-						 )
-
-AS_IF([test "x$with_gala" = xno], [ have_gala=no ])
-AS_IF([test "x$with_gala" = xyes -a x$have_gala = xno], [
+AS_IF([test "x$with_gala" != xno], [
+	AC_CHECK_HEADERS([gala/graph.h],
+	                 [ have_gala=yes ],
+	                   AC_MSG_NOTICE([consider installing gala])
+	)
+   AS_IF([test "x$with_gala" = xyes -a x$have_gala = xno], [
 									 AC_MSG_ERROR([gala not found, but set])
-
 		 ])
+])
 
 AM_CONDITIONAL([USE_GALA], [test $have_gala = yes])
-AS_IF([test "x$have_gala" = xyes], [
-						AC_DEFINE([USE_GALA], [1], [Define to use gala])
-		 ])
 
 AC_CHECK_HEADERS([stx/btree_set.h])
 AC_LANG_POP([C++])
@@ -135,6 +131,9 @@ AS_IF([test x"$PYTHON" != x], [
 # HACK. actually we only check if profiling works.
 # it doesnt with clang.
 AM_CONDITIONAL([CLANG], [test "x$ax_cv_cxx_compiler_vendor" = "xclang"])
+
+# HACK. does old automake not support nested conditionals??
+AM_CONDITIONAL([TDECOMP], [test "$have_gala" = yes -a "x$ax_cv_cxx_compiler_vendor" != "xclang"])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

@@ -27,12 +27,12 @@
  *
  */
 
-#ifndef TD_COLORING
-#define TD_COLORING
+#ifndef TREEDEC_COLORING_HPP
+#define TREEDEC_COLORING_HPP
 
 #include "applications.hpp"
 
-#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+#define TREEDEC_GET_POS(a,b) ( boost::get(boost::vertex_index, b, a) )
 
 namespace treedec{
 
@@ -106,7 +106,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
         if(node_type == treedec::nice::LEAF){
             //Store all k colorings.
             unsigned int leaf = *(bag(cur, T).begin());
-            unsigned int pos = get_pos(leaf, G);
+            unsigned int pos = TREEDEC_GET_POS(leaf, G);
 
             std::vector<int> coloring(boost::num_vertices(G), -1);
             for(unsigned int i = 0; i < k; i++){
@@ -124,7 +124,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
 
             typename boost::graph_traits<G_t>::vertex_descriptor new_vertex =
                                 treedec::nice::get_introduced_vertex(cur, T);
-            unsigned int pos = get_pos(new_vertex, G);
+            unsigned int pos = TREEDEC_GET_POS(new_vertex, G);
 
             for(unsigned int i = 0; i < results[child].size(); i++){
                 std::vector<int> ext_coloring = results[child][i];
@@ -148,7 +148,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
 
             typename boost::graph_traits<G_t>::vertex_descriptor forgotten_vertex =
                                        treedec::nice::get_forgotten_vertex(cur, T);
-            unsigned int pos = get_pos(forgotten_vertex, G);
+            unsigned int pos = TREEDEC_GET_POS(forgotten_vertex, G);
 
             std::vector<BOOL> visited(results[child].size(), false);
             unsigned int colorings_size = boost::num_vertices(G);
@@ -234,7 +234,7 @@ void top_down_computation_min_coloring(G_t &G, T_t &T,
                 }
             }
             if(valid){
-                unsigned int pos = get_pos(forgotten_vertex, G);
+                unsigned int pos = TREEDEC_GET_POS(forgotten_vertex, G);
                 global_result[pos] = results[child][i][pos];
                 break;
             }
@@ -311,8 +311,8 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
 
 } //namespace treedec
 
-#undef get_pos
+#undef TREEDEC_GET_POS
 
-#endif //TD_COLORING
+#endif //TREEDEC_COLORING_HPP
 
 // vim:ts=8:sw=4:et

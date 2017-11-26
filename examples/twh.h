@@ -64,7 +64,8 @@ enum thread_n{
     nFITM = 10,
     nPPMD = 11,
     nPPFI = 12,
-    nTOTAL = 13
+    nPP = 13,
+    nTOTAL = 14
 };
 
 std::mutex best_mutex;
@@ -116,13 +117,6 @@ struct uvv_config : gala::graph_cfg_default<G> {
 typedef gala::graph<std::vector, std::vector, uint16_t, uvv_config> sg_dvv16;
 typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
 
-struct test{
-    test(){
-        sg_dvv16 a;
-   treedec::draft::printer<sg_dvv16> x(std::cout, a);
-   boost::add_vertex(x);
-    }
-} x;
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
@@ -147,7 +141,7 @@ using boost::source;
 using boost::target;
 ////////////////////////////////////
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 BOOST_CONCEPT_ASSERT(( boost::IncidenceGraphConcept<ssg_16i> ));
 typedef typename treedec::graph_traits<ssg_16i>::immutable_type check_type;
 // boost::iterator_traits<check_type::out_edge_iterator>::value_type A;
@@ -182,23 +176,23 @@ enum mag_t{
 int errorlevel=bLOG;
 template<class X=balu_t, class ... rest>
 struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
-    static void message(int badness, const char* fmt, ...) { untested();
+    static void message(int badness, const char* fmt, ...) {
         trace3("message", badness, fmt, errorlevel);
-        if (badness >= errorlevel){ untested();
+        if (badness >= errorlevel){
             char buffer[2048] = "c ";
             va_list arg_ptr;
             va_start(arg_ptr,fmt);
             vsprintf(buffer+2,fmt,arg_ptr);
             va_end(arg_ptr);
             std::cout << buffer;
-        }else{ untested();
+        }else{
         }
     }
 };
 /*--------------------------------------------------------------------------*/
 
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #define FIgraph_t ssg_16i
 #define MDgraph_t ssg16_random
 #else
@@ -206,18 +200,21 @@ struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
 #define MDgraph_t balu_t
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #include "gala_graphs.h"
 
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_BMD
 #include "bmd_thread.h"
 #endif
 #if defined USE_SOME
 #include "some_thread.h"
 #endif
+#endif
+#ifdef USE_PP
+#include "pp_thread.h"
 #endif
 #ifdef USE_THORUP
 #include "th_thread.h"
@@ -280,13 +277,13 @@ static void fin(volatile unsigned & finished)
 #include "random_md.h"
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_EX17
 #include "ex17_thread.h"
 #endif
 #endif
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_FI
 #include "fi_thread.h"
 #endif
@@ -390,7 +387,7 @@ void mainloop()
             // all threads masked?
             // all threads completed (that was quick!)
             break;
-        }else if(!sig_received()){ untested();
+        }else if(!sig_received()){
             trace0("pause");
             pause();
         }
@@ -476,7 +473,7 @@ void twh(P& p, mag_t m, unsigned mask)
     std::vector<TWTHREAD_BASE*> threads(nTOTAL);
     TWTHREAD_BASE::_running=1;
 
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
 //    typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
 
     typedef sg_dvv16 uG16;
@@ -530,7 +527,7 @@ void twh(P& p, mag_t m, unsigned mask)
 
 
     std::cout << "c n: " << n << ", e: " << e << std::endl;
-#ifdef USE_GALA
+#ifdef HAVE_GALA_GRAPH_H
     std::cout << "c gala on" << std::endl;
 #endif
 
@@ -549,6 +546,15 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
+#ifdef USE_PP
+    if(!(mask & ( 1 << nPP ))) {
+    }else if( m < M16){ untested();
+        reg_thread(threads, nPP, new PP_THREAD<uG16, grtd_algo_config>(g16, "PP_16"));
+    }else{ untested();
+        reg_thread(threads, nPP, new PP_THREAD<uG32, grtd_algo_config>(g32, "PP_32"));
+    }
+#endif
+/*--------------------------------------------------------------------------*/
 #ifdef USE_FIPPTM
     if(!(mask & ( 1 << nPPFITM ))) {
     }else if( m < M16){ untested();
@@ -556,29 +562,33 @@ void twh(P& p, mag_t m, unsigned mask)
     }else{ untested();
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG32, grtd_algo_config>(g32, "FIPPTM_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
-#if 1
+#ifdef USE_FITM
     if(!(mask & ( 1 << nFITM ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nFITM, new FITM_THREAD<uG16, grtd_algo_config>(g16, "FITM_16"));
     }else{ untested();
         reg_thread(threads, nFITM, new FITM_THREAD<uG32, grtd_algo_config>(g32, "FITM_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
+#ifdef USE_PPFI
     if(!(mask & ( 1 << nPPFI ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG16, grtd_algo_config>(g16, "PPFI_16"));
     }else{ untested();
         reg_thread(threads, nPPFI, new PPFI_THREAD<uG32, grtd_algo_config>(g32, "PPFI_32"));
     }
+#endif
 /*--------------------------------------------------------------------------*/
+#ifdef USE_PPMD
     if(!(mask & ( 1 << nPPMD ))) {
     }else if( m < M16){ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG16, grtd_algo_config>(g16, "PPMD_16"));
     }else{ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG32, grtd_algo_config>(g32, "PPMD_32"));
     }
-#endif
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_RANDOM_MD
@@ -600,7 +610,7 @@ void twh(P& p, mag_t m, unsigned mask)
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FI
-    if(! ( mask & ( 1 << nFI ))) { untested();
+    if(! ( mask & ( 1 << nFI ))) {
     }else if( m < M16){
         reg_thread(threads, nFI, new FI_THREAD<uG16, grtd_algo_config>(g16, "FI16"));
     }else if( m < M32){ untested();
@@ -645,7 +655,7 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
-#if defined(USE_EX17) && defined(USE_GALA)
+#if defined(USE_EX17) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX17 ))) {
     }else if(m > M15){ untested();
         // does this even make sense?
@@ -656,7 +666,7 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
-#if defined(USE_EX) && defined(USE_GALA)
+#if defined(USE_EX) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX ))) {
     }else if(m > M16){ untested();
         // does this even make sense?
@@ -713,7 +723,7 @@ void twh(P& p, mag_t m, unsigned mask)
         switch(best_tid){
         case nSOME:
         case nBMD:
-#ifdef USE_GALA // tmp hack
+#ifdef HAVE_GALA_GRAPH_H // tmp hack
             // g.make_symmetric(true);
 #endif
         default:
@@ -784,14 +794,18 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nTH);
         }else if(!strncmp("--ppfitm", argv[i], 8)){ untested();
             mask_in |= (1<<nPPFITM);
-        }else if(!strncmp("--ppfi", argv[i], 6)){ untested();
+        }else if(!strncmp("--ppfi", argv[i], 6)){
             mask_in |= (1<<nPPFI);
-        }else if(!strncmp("--fi", argv[i], 4)){ untested();
+        }else if(!strncmp("--bmd", argv[i], 5)){ untested();
+            mask_in |= (1<<nBMD);
+        }else if(!strncmp("--fi", argv[i], 4)){
             mask_in |= (1<<nFI);
         }else if(!strncmp("--fitm", argv[i], 6)){ untested();
             mask_in |= (1<<nFITM);
         }else if(!strncmp("--ppmd", argv[i], 6)){ untested();
             mask_in |= (1<<nPPMD);
+        }else if(!strncmp("--pp", argv[i], 4)){ untested();
+            mask_in |= (1<<nPP);
         }else if(!strncmp("-T", argv[i], 2)){ untested();
             trace = true;
             errorlevel=bTRACE;

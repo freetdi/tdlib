@@ -1,4 +1,4 @@
-#include <tdlib/graph.hpp>
+#include <treedec/graph.hpp>
 #include <iostream>
 
 #ifndef TESTGRAPH_T

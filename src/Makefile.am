@@ -61,12 +61,16 @@ pkginclude_HEADERS = \
   timer.hpp \
   trace.hpp \
   treedec.hpp \
+  treedec_copy.hpp \
   treedec_misc.hpp \
   treedec_traits.hpp \
   tuple_td.hpp \
   upper_bounds.hpp \
   util.hpp \
   validation.hpp
+
+uninstall-hook:
+	-rmdir ${DESTDIR}/${pkgincludedir}
 
 EXTRA_DIST = \
   bucket_sorter.hpp.orig \

@@ -17,8 +17,8 @@
 
 // container access
 
-#ifndef TD_CONTAINER_TRAITS_HPP
-#define TD_CONTAINER_TRAITS_HPP
+#ifndef TREEDEC_CONTAINER_TRAITS_HPP
+#define TREEDEC_CONTAINER_TRAITS_HPP
 
 #include <vector>
 #include <assert.h>
@@ -84,7 +84,6 @@ namespace detail{//
         // size?
         // is_ordered?
     };
-#ifndef NDEBUG // for now. (this is slow.)
     template<class C>
     struct container_inspect<C,
       typename std::enable_if<
@@ -96,12 +95,11 @@ namespace detail{//
           return std::find(c.begin(), c.end(), e) != c.end();
         }
     };
-#endif
     template<class C, class X=void>
     struct container_modify{//
         // push, insert new item
         template<class E>
-        static void push(C& c, E e) { untested();
+        static void push(C& c, E e) {
           // incomplete(); // not supported by all containers.
           // assert(!container_inspect<C>::contains(c, e));
           c.insert(e);
@@ -129,6 +127,20 @@ namespace detail{//
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }
+        template<class I>
+        static void push(C& c, I b, I e) {
+          for(; b!=e; ++b){
+            push(c, *b);
+          }
+        }
+        template<class I>
+        static void merge(C& c, I b, I e) { untested();
+          for(; b!=e; ++b){
+            if(!container_inspect<C>::contains(c, *b)){
+                insert(c, *b);
+            }
+          }
+        }
     };
     template<class C>
     struct container_modify<C,
@@ -145,16 +157,20 @@ namespace detail{//
           c.insert(e);
         }
         template<class I>
-        static void push(C& c, I b, I e)
-        {
-          while(b!=e){
+        static void push(C& c, I b, I e) {
+          for(; b!=e; ++b){
             c.insert(*b);
-            ++b;
           }
         }
         static void insert(C& c, typename C::value_type e)
         {
           c.insert(e);
+        }
+        template<class I>
+        static void merge(C& c, I b, I e) { itested();
+          for(; b!=e; ++b){
+            insert(c, *b);
+          }
         }
     };
 } // detail

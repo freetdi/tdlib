@@ -20,8 +20,8 @@
 // almost-tree-decompositions
 // a skeleton is a list of vertices with vertices attached to it.
 
-#ifndef TD_SKELETON_HPP
-#define TD_SKELETON_HPP
+#ifndef TREEDEC_SKELETON_HPP
+#define TREEDEC_SKELETON_HPP
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/iterator/counting_iterator.hpp>
@@ -172,7 +172,7 @@ namespace treedec{
 
 namespace detail{
 
-// G is be the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
+// G is the fill in graph with respect to O (that is: N_G(v) = bag[v] in the algo above)
 // if B is not provided
 template <typename G_t, typename T_t, typename B_t, typename N_t>
 class skeleton_helper{
