@@ -779,8 +779,8 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         assert(boost::num_vertices(t) == boost::num_edges(t)+1);
 
 #ifdef DEBUG
-        std::cout << "appending\n";
-        boost::print_graph(T_);
+        //std::cout << "appending\n";
+        //boost::print_graph(T_);
 #endif
         treedec::draft::append_decomposition(t, std::move(T_), G_, vdMap);
         assert(boost::num_vertices(t) == boost::num_edges(t)+1);

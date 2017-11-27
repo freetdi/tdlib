@@ -56,6 +56,70 @@ bool is_clique(G_t &G, A_t A, B_t B){
     return true;
 }
 
+
+//for all vertices included in the test set, increment
+//a counter for all neighbours
+//check if counter is size-1 for all vertices in that set
+//at the end.
+template <typename G_t, typename A_t, typename B_t>
+bool is_clique2(G_t &G, A_t A, B_t B, unsigned size, typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &vdMap){
+    std::vector<unsigned> counter(boost::num_vertices(G), 0);
+
+    BOOST_AUTO(vIt, A);
+    for(; vIt != B; ++vIt){
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(vdMap[*vIt], G); nIt != nEnd; ++nIt){
+            if(boost::degree(*nIt, G) < size-1u){
+                return false;
+            }
+
+            counter[*nIt]++;
+        }
+    }
+
+    vIt = A;
+    for(; vIt != B; ++vIt){
+        if(counter[vdMap[*vIt]] != size-1u){
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
+
+//for all vertices included in the test set, increment
+//a counter for all neighbours
+//check if counter is size-1 for all vertices in that set
+//at the end.
+template <typename G_t, typename A_t, typename B_t>
+bool is_clique3(G_t &G, A_t A, B_t B, unsigned size){
+    std::vector<unsigned> counter(boost::num_vertices(G), 0);
+
+    BOOST_AUTO(vIt, A);
+    for(; vIt != B; ++vIt){
+        typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*vIt, G); nIt != nEnd; ++nIt){
+            if(boost::degree(*nIt, G) < size-1u){
+                return false;
+            }
+
+            counter[*nIt]++;
+        }
+    }
+
+    vIt = A;
+    for(; vIt != B; ++vIt){
+        if(counter[*vIt] != size-1u){
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
 } //namespace detail (for max_clique)
 
 
@@ -63,12 +127,45 @@ template <typename G_t, typename T_t>
 unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
                                typename treedec_traits<T_t>::bag_type &global_result)
 {
-    unsigned int max = 0;
+
+    assert(treedec::is_undirected_type(G));
+    assert(treedec::is_edge_set_type(G));
+    assert(treedec::no_loops(G));
+
+    assert(treedec::is_valid_treedecomposition(G, T));
+
+    if(boost::num_edges(G) == 0){
+        if(boost::num_vertices(G) > 0){
+            global_result.insert(*(boost::vertices(G).first));
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    unsigned int max = 1;
 
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         //We wouldn't find a larger clique.
-        if(bag(*vIt, T).size() <= max){ continue; }
+        if(bag(*vIt, T).size() <= max){
+            continue;
+        }
+
+
+        //there should be a combination of width and n, such that using an induced subgraph is faster..
+        bool use_induced_subgraph = false;
+        G_t H;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap;
+        typename std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> vdMap2;
+
+#if 0
+        if(bag(*vIt, T).size() > 20 && boost::num_vertices(G) > 100){
+            use_induced_subgraph = true;
+            treedec::copy_induced_subgraph(H, G, bag(*vIt, T), &vdMap, &vdMap2);
+        }
+#endif 
 
         //Search for a clique of size greater than 'size' by inspecting all subsets
         //of size exactly 'size' for size = max+1,max+2,..
@@ -78,7 +175,10 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
             bool changed = false;
 
             for(; I != bag(*vIt, T).end(); ++I){
-                if(treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
+                if((use_induced_subgraph && treedec::app::detail::is_clique2(H, (*I).first, (*I).second, size, vdMap2))
+                || treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
+//                  if(treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
+//                  if(treedec::app::detail::is_clique3(G, (*I).first, (*I).second, size)){
                     max = size;
 
                     global_result.clear();
@@ -101,7 +201,7 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         }
     }
 
-    // assert(treedec::validation::is_valid_clique(G, result));
+    assert(treedec::validation::is_valid_clique(G, global_result));
 
     return max;
 }

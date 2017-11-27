@@ -466,9 +466,10 @@ int gc_exact_decomposition_ex17(std::vector<unsigned int> &V_G, std::vector<unsi
 #endif
     std::cerr << "ta T " << boost::num_vertices(T) << " " << boost::num_edges(T) << "\n";
     incomplete();
-//    assert(is_valid_treedec(G, T));
 
-    // treedec::make_small(T); ??
+    assert(treedec::is_valid_treedecomposition(G, T));
+
+    treedec::make_small(T);
     make_python_decomp(T, V_T, E_T);
     std::cerr << "pythondecomp nvT" << boost::num_vertices(T) << "\n";
     std::cerr << "pythondecomp " << V_T.size() << " " << E_T.size() << "\n";
@@ -826,6 +827,7 @@ void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::v
 {
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
+    treedec::make_small(T);
 
     std::set<unsigned int> result;
 
