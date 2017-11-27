@@ -895,7 +895,7 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
     }
 }
 
-void gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                    std::vector<unsigned int> &IS, unsigned graphtype)
 {
@@ -907,21 +907,22 @@ void gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V
 
     treedec::nice::I_nicify<TD_tree_dec_directed_t> N(T_, false);
     N.do_it();
-//    treedec::nice::nicify(T_);
 
     std::set<unsigned int> result;
+
+    unsigned size = 0;
 
     if(graphtype == 0){
         TD_graph_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
+        size = treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
     }
     else if(graphtype == 1){
         TD_graph_vec_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
+        size = treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
     }
     else{
         assert(false);
@@ -932,6 +933,8 @@ void gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V
     for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
         IS[i++] = *sIt;
     }
+
+    return size;
 }
 
 

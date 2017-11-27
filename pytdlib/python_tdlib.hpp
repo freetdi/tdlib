@@ -89,7 +89,7 @@ void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                    std::vector<unsigned int> &IS, unsigned graphtype);
 
-void gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                    std::vector<unsigned int> &IS, unsigned graphtype);
 

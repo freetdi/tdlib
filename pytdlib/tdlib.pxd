@@ -80,7 +80,7 @@ cdef extern from "python_tdlib.hpp":
     void gc_max_independent_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                        vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                        vector[unsigned int] &IS, unsigned graphtype)
-    void gc_max_independent_set_with_treedecomposition2(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+    unsigned gc_max_independent_set_with_treedecomposition2(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                        vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                        vector[unsigned int] &IS, unsigned graphtype)
     void gc_min_vertex_cover_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,

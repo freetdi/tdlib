@@ -139,7 +139,6 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap, M_t* 
 template <typename G_t, class S_t, class M_t>
 void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     if(boost::num_vertices(H)==0){
         return copy_induced_subgraph(H, G, X, vdMap);
     }

@@ -1134,7 +1134,7 @@ def max_independent_set_with_treedecomposition2(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_max_independent_set_with_treedecomposition2(V_G, E_G, V_T, E_T, IS_, graphtype);
+    cdef unsigned size = gc_max_independent_set_with_treedecomposition2(V_G, E_G, V_T, E_T, IS_, graphtype);
 
     py_IS = []
     cdef i;
@@ -1142,7 +1142,7 @@ def max_independent_set_with_treedecomposition2(G, T):
         pyISi = IS_[i]
         py_IS.append(pyISi)
 
-    return py_IS
+    return size, py_IS
 
 
 def min_vertex_cover_with_treedecomposition(G, T):

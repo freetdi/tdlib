@@ -74,7 +74,9 @@ public:
 	value_type get_position(vertex_descriptor v) const{
 		trace2("NUMBERING hack", v, sizeof(value_type));
 		// HACK. cleanup later. NUMBERING_2?
+#ifndef NDEBUG
 		auto id=get(_idmap, v);
+#endif
 		assert(_data[id]);
 		return -1 - _data[get(_idmap, v)];
 	}
