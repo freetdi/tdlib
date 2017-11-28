@@ -106,7 +106,7 @@ typename treedec_traits<T_t>::bag_type::value_type
 }
 
 
-enum enum_node_type { LEAF, INTRODUCE, FORGET, JOIN, INVALID };
+enum enum_node_type { LEAF, INTRODUCE, FORGET, JOIN, INVALID};
 
 //Returns the type of a node in a nice tree decomposition.
 template <typename T_t>
@@ -134,6 +134,22 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
         return INVALID;
     }
 }
+
+//Returns the type of a node in a nice tree decomposition.
+template <typename T_t>
+enum_node_type get_type_parent(typename boost::graph_traits<T_t>::vertex_descriptor v, T_t &T){
+    if(boost::in_degree(v, T) == 0){
+        return INVALID;
+    }
+    else if(boost::in_degree(v, T) == 1){
+        return get_type(boost::source(*(boost::in_edges(v, T).first), T), T);
+    }
+    else{
+        assert(false);
+    }
+}
+
+
 
 template <typename T_t>
 void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
