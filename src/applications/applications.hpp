@@ -58,34 +58,9 @@ namespace app{
 
 namespace detail{
 
-/* The top-down computation on tree decompositions is equal for some problems.
- *
- *   - 'cur' denotes the current node in T.
- *   - 'results' stores the computed table for all nodes of T.
- *   - 'val' denotes the value of a set that has to be choosen from tables of
- *       nodes in the subtree of 'T' with root 'cur'.
- *   - 'S' denotes the so far choosen set.
- *   - 'S_comp' denotes the complement of 'S' with respect to V(G).
- *   - according to (nice treedecomposition-) node types, the choice in the
- *       table of the child of 'cur' must be restricted:
- *         take_flag = 0 -> no restriction
- *         take_flag = 1 -> 'subset' must be choosen
- *         take_flag = 2 -> 'subset' must be a subset
- */
-
 
 unsigned min(unsigned a, unsigned b){
     return (a < b)? a : b;
-}
-
-template <typename I_t, typename B_t>
-void make_set(I_t I, B_t &B){
-    auto x = (*I).first;
-    auto y = (*I).second;
-
-    for(; x != y; ++x){
-        B.insert(*x);
-    }
 }
 
 /*
@@ -118,6 +93,96 @@ bool test_encoding(){
 
 */
 
+template <typename I_t>
+class encoded_iterator{
+public:
+    encoded_iterator(unsigned number, I_t superIt, I_t superEnd)
+     : _num(number), _supIt(superIt), _supEnd(superEnd){
+        if(_num == 0){
+             _supIt = _supEnd;
+        }
+        else{
+            while(_num != 0){
+                if(_num & 1){
+                    _last = *_supIt;
+                    _num >>= 1;
+                    break;
+                }
+                _num >>= 1;
+                _supIt++;
+            }
+        }      
+    }
+
+    bool operator==(const encoded_iterator& o) const{
+        return _supIt == o._supIt;
+    }
+
+    bool operator!=(const encoded_iterator& o) const{
+        return !operator==(o);
+    }
+
+    bool operator==(const I_t& o) const{
+        return _supIt == o;
+    }
+
+    bool operator!=(const I_t& o) const{
+        return !operator==(o);
+    }
+
+    template <typename R_t>
+    bool operator==(const R_t& o) const{
+        return _supIt == o;
+    }
+
+    template <typename R_t>
+    bool operator!=(const R_t& o) const{
+        return !operator==(o);
+    }
+
+    void operator++(){
+        if(_num == 0){
+             _supIt = _supEnd;
+        }
+        else{
+            while(_num != 0){
+                if(_num & 1){
+                    _supIt++;
+                    _last = *_supIt;
+                    _num >>= 1;
+                    break;
+                }
+                _num >>= 1;
+                _supIt++;
+            }
+        }
+    }
+
+    unsigned operator*() const{
+        return _last;
+    }
+
+private:
+    unsigned _num;
+    unsigned _last;
+
+    I_t _supIt;
+    I_t _supEnd;
+};
+
+
+template <typename R_t>
+unsigned get_size(R_t sIt, R_t sEnd){
+    unsigned n;
+    while(sIt != sEnd){
+        sIt++;
+        n++;
+    }
+    return n;
+}
+
+
+
 template <typename T_t>
 class Intermediate_Results {
 public: // types
@@ -141,14 +206,17 @@ public: //interface
         return _results[node][key];
     }
 
+#if 0
     bool exists(vd_t node, Encoded_t key){
         return _results[node].find(key) != _results[node].end();
     }
+#endif
 
     //bit-encoding of the subset relative to power set
     //TODO: what if |power_set| > available wordlength?
     //TODO: other possibility: pos of subset in enumeration of a power set. 
     //TODO: whatever works, must be constant amout of work
+    //encode from set
     unsigned encode(vd_t node, Decoded_t key){
         typename Decoded_t::iterator subIt, powIt;
 
@@ -174,21 +242,149 @@ public: //interface
         return number;
     }
 
+    //encode from iterator range
+    template <typename R_t>
+    unsigned encode(vd_t node, R_t sIt, R_t sEnd){
+        typename Decoded_t::iterator subIt, powIt;
+
+        if(sIt == sEnd){
+            return 0;
+        }
+
+        powIt = bag(node, _t).begin();
+        
+        unsigned number = 0;
+        unsigned summand = 1;
+
+        for(; sIt != sEnd;){
+            if(*sIt == *powIt){
+                number += summand;
+                sIt++;
+            }
+            powIt++;
+            summand <<= 1;
+        }
+
+        return number;
+    }
+
+    //different supersets
+    unsigned encode(vd_t node, vd_t old_node, encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt){
+        auto powIt = bag(node, _t).begin();
+
+        if(encIt == bag(old_node, _t).end()){
+            return 0;
+        }
+        
+        unsigned number = 0;
+        unsigned summand = 1;
+
+        for(; encIt != bag(old_node, _t).end();){
+            if(*encIt == *powIt){
+                number += summand;
+                ++encIt;
+            }
+            powIt++;
+            summand <<= 1;
+        }
+
+        return number;
+    }
+
+    //different supersets and new vertex (same as e = encode(new_node, old_node, encIt); update_encoding(new_node, e, new_vertex))
+    unsigned encode(vd_t node, vd_t old_node, encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt, vd_t new_vertex){
+        auto powIt = bag(node, _t).begin();
+        
+        unsigned number = 0;
+        unsigned summand = 1;
+        bool found = false;
+
+        for(; encIt != bag(old_node, _t).end();){
+            if(*encIt == *powIt){
+                number += summand;
+                ++encIt;
+            }
+            else if(!found && new_vertex == *powIt){
+                number += summand;
+                found = true;
+            }
+            powIt++;
+            summand <<= 1;
+        }
+
+        if(!found){
+            for(; powIt != bag(node, _t).end();){
+                if(new_vertex == *powIt){
+                    number += summand;
+                    break;
+                }
+                powIt++;
+                summand <<= 1;
+            }
+        }
+
+        return number;
+    }
+
+    //same superset, but new vertex (find bitpos and set it to 1)
+    unsigned update_encoding(vd_t node, Encoded_t key, vd_t new_vertex){
+        unsigned number = key;
+        unsigned summand = 1;
+
+        auto powIt = bag(node, _t).begin();
+        for(; powIt != bag(node, _t).end(); ++powIt){
+            if(new_vertex == *powIt){
+                number += summand;
+                break;
+            }
+            summand <<= 1;
+        }
+
+        return number;
+    }
+
     void decode(vd_t node, Encoded_t key, Decoded_t &result){
+        typename Decoded_t::iterator it = bag(node, _t).begin();
         for(unsigned i = 0; i < min(CHAR_BIT*sizeof(key), bag(node, _t).size()); i++){
             if(key & 1){
-                typename Decoded_t::iterator it = bag(node, _t).begin();
-                std::advance(it, i);
                 result.insert(*it);
+            }
+            ++it;
+            key >>= 1;
+        }
+    }
+
+    unsigned get_size(vd_t node, Encoded_t key){
+        unsigned s = 0;
+        for(unsigned i = 0; i < min(CHAR_BIT*sizeof(key), bag(node, _t).size()); i++){
+            if(key & 1){
+                s++;
             }
             key >>= 1;
         }
+        return s;
     }
 
     T_t &_t;
     typename std::vector<std::map<Encoded_t, Value_t> > _results;
 
 }; //Intermediate_Results
+
+
+/* The top-down computation on tree decompositions is equal for some problems.
+ *
+ *   - 'cur' denotes the current node in T.
+ *   - 'results' stores the computed table for all nodes of T.
+ *   - 'val' denotes the value of a set that has to be choosen from tables of
+ *       nodes in the subtree of 'T' with root 'cur'.
+ *   - 'S' denotes the so far choosen set.
+ *   - 'S_comp' denotes the complement of 'S' with respect to V(G).
+ *   - according to (nice treedecomposition-) node types, the choice in the
+ *       table of the child of 'cur' must be restricted:
+ *         take_flag = 0 -> no restriction
+ *         take_flag = 1 -> 'subset' must be choosen
+ *         take_flag = 2 -> 'subset' must be a subset
+ */
 
 
 template <typename T_t>
@@ -293,6 +489,22 @@ void top_down_computation(T_t &T,
     }
 }
 
+/* The top-down computation on tree decompositions is equal for some problems.
+ *
+ *   - 'cur' denotes the current node in T.
+ *   - 'results' stores the computed table for all nodes of T.
+ *   - 'val' denotes the value of a set that has to be choosen from tables of
+ *       nodes in the subtree of 'T' with root 'cur'.
+ *   - 'S' denotes the so far choosen set.
+ *   - 'S_comp' denotes the complement of 'S' with respect to V(G).
+ *   - according to (nice treedecomposition-) node types, the choice in the
+ *       table of the child of 'cur' must be restricted:
+ *         take_flag = 0 -> no restriction
+ *         take_flag = 1 -> 'subset' must be choosen
+ *         take_flag = 2 -> 'subset' must be a subset
+ */
+
+
 template <typename T_t>
 void top_down_computation2(T_t &T,
                     typename boost::graph_traits<T_t>::vertex_descriptor cur,
@@ -300,47 +512,49 @@ void top_down_computation2(T_t &T,
                     unsigned int val, typename treedec_traits<T_t>::bag_type &S,
                     typename treedec_traits<T_t>::bag_type &S_comp,
                     typename treedec_traits<T_t>::bag_type subset,
-                    unsigned int take_flag)
+                    unsigned int take_flag, unsigned parents_choice=0)
 {
     treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
     if(node_type == treedec::nice::LEAF){
-        for(typename std::map<unsigned, int>::iterator it =
-                iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
-        {
-            if(it->second == (int)val){
-                unsigned encoded = it->first;
-                typename treedec_traits<T_t>::bag_type decoded_set;
-                iRes.decode(cur, encoded, decoded_set);
-
-                S.insert(decoded_set.begin(), decoded_set.end());
-                return;
-            }
+        if(val == 1){
+             S.insert(*bag(cur, T).begin());
         }
+        return;
     }
-    else if(node_type == treedec::nice::INTRODUCE || node_type == treedec::nice::FORGET){
-
+    else if(node_type == treedec::nice::INTRODUCE){
         //TODO: necessary? subset could be the encoded one here
         unsigned subset_encoded = iRes.encode(cur, subset);
 
-        if(take_flag == 1){
+        if(take_flag == 1){ //child of a join node
             val = iRes.get(cur, subset_encoded);
         }
+
+        unsigned encoded;
 
         for(typename std::map<unsigned, int>::iterator it =
                    iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
         {
-            unsigned encoded = it->first;
+            encoded = it->first;
             typename treedec_traits<T_t>::bag_type decoded_set;
             iRes.decode(cur, encoded, decoded_set);
 
-            //TODO: cleanup and comment
-            if((take_flag == 1 && decoded_set == subset)
-              || (take_flag == 2 && it->second == (int)val 
-              && std::includes(decoded_set.begin(), decoded_set.end(),
-                                subset.begin(), subset.end()))
-              || (take_flag == 0 && it->second == (int)val))
-            {
+            bool condition = false;
+
+            if(take_flag == 0 && it->second == (int)val){
+                std::cout << "case 1" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 1 && decoded_set == subset){
+                std::cout << "case 2" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
+                std::cout << "case 3" << std::endl;
+                condition = true;
+            }
+
+            if(condition){
                 typename treedec_traits<T_t>::bag_type intersection;
                 std::set_intersection(decoded_set.begin(), decoded_set.end(),
                                       S_comp.begin(), S_comp.end(),
@@ -357,38 +571,102 @@ void top_down_computation2(T_t &T,
             }
         }
 
-        if(node_type == treedec::nice::INTRODUCE){
-            if(S.find(treedec::nice::get_introduced_vertex(cur, T)) != S.end()){
-                val = val - 1;
+        if(S.find(treedec::nice::get_introduced_vertex(cur, T)) != S.end()){
+            val = val - 1;
+        }
+
+        typename boost::graph_traits<T_t>::vertex_descriptor child =
+                               *(boost::adjacent_vertices(cur, T).first);
+
+
+        subset.erase(treedec::nice::get_introduced_vertex(cur, T));
+        top_down_computation2(T, child, iRes, val, S, S_comp, subset, 2, encoded);
+    }
+    else if(node_type == treedec::nice::FORGET){
+        //TODO: necessary? subset could be the encoded one here
+        unsigned subset_encoded = iRes.encode(cur, subset);
+
+        if(take_flag == 1){ //child of a join node
+            val = iRes.get(cur, subset_encoded);
+        }
+
+        unsigned encoded;
+
+        for(typename std::map<unsigned, int>::iterator it =
+                   iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
+        {
+            encoded = it->first;
+            typename treedec_traits<T_t>::bag_type decoded_set;
+            iRes.decode(cur, encoded, decoded_set);
+
+            bool condition = false;
+
+            if(take_flag == 0 && it->second == (int)val){
+                std::cout << "case 1" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 1 && decoded_set == subset){
+                std::cout << "case 2" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
+                std::cout << "case 3" << std::endl;
+                condition = true;
+            }
+
+            if(condition){
+                typename treedec_traits<T_t>::bag_type intersection;
+                std::set_intersection(decoded_set.begin(), decoded_set.end(),
+                                      S_comp.begin(), S_comp.end(),
+                                      std::inserter(intersection, intersection.begin()));
+
+                if(intersection.size() == 0){
+                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
+                                        decoded_set.begin(), decoded_set.end(),
+                                        std::inserter(S_comp, S_comp.begin()));
+                    S.insert(decoded_set.begin(), decoded_set.end());
+                    subset = decoded_set;
+                    break;
+                }
             }
         }
 
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                *(boost::adjacent_vertices(cur, T).first);
 
-        if(node_type == treedec::nice::FORGET){
-            top_down_computation2(T, child, iRes, val, S, S_comp, subset, 2);
-        }
-        else{
-            subset.erase(treedec::nice::get_introduced_vertex(cur, T));
-            top_down_computation2(T, child, iRes, val, S, S_comp, subset, 2);
-        }
+        top_down_computation2(T, child, iRes, val, S, S_comp, subset, 2, encoded);
     }
     else if(node_type == treedec::nice::JOIN){
         for(typename std::map<unsigned, int>::iterator it =
                           iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
         {
 
+/* why not?!
+            if(it->second != (int)val){
+                continue;
+            }
+*/
+
             unsigned encoded = it->first;
             typename treedec_traits<T_t>::bag_type decoded_set;
             iRes.decode(cur, encoded, decoded_set);
 
-            if((take_flag == 1 && decoded_set == subset)
-            || (take_flag == 2 && it->second == (int)val
-              && std::includes(decoded_set.begin(), decoded_set.end(),
-                               subset.begin(), subset.end()))
-            || (take_flag == 0 && it->second == (int)val))
-            {
+            bool condition = false;
+
+            if(take_flag == 0 && it->second == (int)val){
+                std::cout << "case 1" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 1 && decoded_set == subset){
+                std::cout << "case 2" << std::endl;
+                condition = true;
+            }
+            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
+                std::cout << "case 3" << std::endl;
+                condition = true;
+            }
+
+            if(condition){
                 typename treedec_traits<T_t>::bag_type intersection;
                 std::set_intersection(decoded_set.begin(), decoded_set.end(),
                                       S_comp.begin(), S_comp.end(),
@@ -402,11 +680,14 @@ void top_down_computation2(T_t &T,
                                         decoded_set.begin(), decoded_set.end(),
                                         std::inserter(S_comp, S_comp.begin()));
 
-                    typename boost::graph_traits<T_t>::adjacency_iterator nIt, nEnd;
-                    for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(cur, T); nIt != nEnd; nIt++){
-                        unsigned encoded = iRes.encode(*nIt, must_take);
-                        top_down_computation2(T, *nIt, iRes, iRes.get(*nIt, encoded), S, S_comp, must_take, 1);
-                    }
+
+                    auto adjIt = boost::adjacent_vertices(cur, T).first;
+
+                    auto child1 = *(adjIt++);
+                    auto child2 = *adjIt;
+
+                    top_down_computation2(T, child1, iRes, it->second, S, S_comp, must_take, 1, encoded);
+                    top_down_computation2(T, child2, iRes, it->second, S, S_comp, must_take, 1, encoded);
                     return;
                 }
             }

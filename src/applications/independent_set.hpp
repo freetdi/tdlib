@@ -169,7 +169,7 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
         treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
 
-    // assert(treedec::validation::is_valid_independent_set(G, result));
+    assert(treedec::validation::is_valid_independent_set(G, global_result));
 
     return max;
 }

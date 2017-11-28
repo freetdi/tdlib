@@ -37,6 +37,7 @@ namespace treedec{
 namespace app{
 
 
+
 /* MAX INDEPENDENT SET */
 
 namespace detail{
@@ -69,36 +70,35 @@ unsigned int bottom_up_computation_independent_set2(G_t &G, T_t &T,
             typename boost::graph_traits<G_t>::vertex_descriptor new_vertex =
                                      treedec::nice::get_introduced_vertex(cur, T);
 
-
-            iRes._results[cur] = iRes._results[child];
-
             for(typename std::map<unsigned, int>::iterator it =
                          iRes._results[child].begin(); it != iRes._results[child].end(); it++)
             {
                 bool extensible = true;
 
                 unsigned old_encoded = it->first;
-                typename treedec_traits<T_t>::bag_type decoded_set;
-                iRes.decode(child, old_encoded, decoded_set);
+                encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt(old_encoded, bag(child, T).begin(), bag(child, T).end());
 
-                for(typename treedec_traits<T_t>::bag_type::iterator sIt =
-                         decoded_set.begin(); sIt != decoded_set.end(); sIt++)
-                {
-                    if(boost::edge(*sIt, new_vertex, G).second){
+                for(; encIt != bag(child, T).end(); ++encIt){
+                    if(boost::edge(*encIt, new_vertex, G).second){
                         extensible = false;
                         break;
                     }
                 }
 
-                decoded_set.insert(new_vertex);
-                unsigned new_encoded = iRes.encode(cur, decoded_set);
+                encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt2(old_encoded, bag(child, T).begin(), bag(child, T).end());
+                unsigned new_encoded1 = iRes.encode(cur, child, encIt2);
+
+                encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt3(old_encoded, bag(child, T).begin(), bag(child, T).end());
+                unsigned new_encoded2 = iRes.encode(cur, child, encIt3, new_vertex);
 
                 if(extensible){
-                    iRes.add(cur, new_encoded, iRes.get(child, old_encoded) + 1);
+                    iRes.add(cur, new_encoded2, it->second + 1);
                 }
                 else{
-                    iRes.add(cur, new_encoded, -1);
+                    iRes.add(cur, new_encoded2, -1);
                 }
+
+                iRes.add(cur, new_encoded1, it->second);
             }
         }
         else if(node_type == treedec::nice::FORGET){
@@ -113,18 +113,21 @@ unsigned int bottom_up_computation_independent_set2(G_t &G, T_t &T,
             BOOST_AUTO(subset_iters_it, make_subsets_range(bag(cur, T).begin(), bag(cur, T).end(), 0, bag(cur, T).size()).first);
 
             for(; subset_iters_it != bag(cur, T).end(); ++subset_iters_it){
-                typename treedec_traits<T_t>::bag_type subset((*subset_iters_it).first, (*subset_iters_it).second);
+//                typename treedec_traits<T_t>::bag_type subset((*subset_iters_it).first, (*subset_iters_it).second);
 
-                typename treedec_traits<T_t>::bag_type new_set = subset;
-                new_set.insert(forgotten_vertex);
+//                typename treedec_traits<T_t>::bag_type new_set = subset;
+//                new_set.insert(forgotten_vertex);
 
-                unsigned old_encoded1 = iRes.encode(child, subset);
-                unsigned old_encoded2 = iRes.encode(child, new_set);
+
+                unsigned old_encoded1 = iRes.encode(child, (*subset_iters_it).first, (*subset_iters_it).second);
+
+                unsigned old_encoded2 = iRes.update_encoding(child, old_encoded1, forgotten_vertex);
+//                unsigned old_encoded2 = iRes.encode(child, new_set);
 
                 int val_without = iRes.get(child, old_encoded1);
                 int val_with = iRes.get(child, old_encoded2);
 
-                unsigned new_encoded = iRes.encode(cur, subset);
+                unsigned new_encoded = iRes.encode(cur, (*subset_iters_it).first, (*subset_iters_it).second);
 
                 if(val_with == -1){
                     iRes.add(cur, new_encoded, val_without);
@@ -153,19 +156,18 @@ unsigned int bottom_up_computation_independent_set2(G_t &G, T_t &T,
             typename boost::graph_traits<T_t>::vertex_descriptor child2 =
                                      *(++boost::adjacent_vertices(cur, T).first);
 
-            BOOST_AUTO(subset_iters_it, make_subsets_range(bag(cur, T).begin(), bag(cur, T).end(), 0, bag(cur, T).size()).first);
 
-            for(; subset_iters_it != bag(cur, T).end(); ++subset_iters_it){
-                typename treedec_traits<T_t>::bag_type subset((*subset_iters_it).first, (*subset_iters_it).second);
+            for(typename std::map<unsigned, int>::iterator it =
+                         iRes._results[child1].begin(); it != iRes._results[child1].end(); it++)
+            {
+                unsigned encoded = it->first;
 
-                unsigned encoded = iRes.encode(cur, subset);
-
-
-                if(iRes.get(child1, encoded) < 0 || iRes.get(child2, encoded) < 0){
+                if(it->second < 0 || iRes.get(child2, encoded) < 0){
                     iRes.add(cur, encoded, -1);
                 }
                 else{
-                    iRes.add(cur, encoded, iRes.get(child1, encoded) + iRes.get(child2, encoded) - subset.size());
+                    unsigned subset_size = iRes.get_size(cur, encoded);
+                    iRes.add(cur, encoded, it->second + iRes.get(child2, encoded) - subset_size);
                 }
             }
         }
@@ -189,17 +191,33 @@ unsigned int max_independent_set_with_treedecomposition2(G_t &G, T_t &T,
 
     assert(treedec::is_valid_treedecomposition(G, T));
 
+    if(boost::num_edges(G) == 0){
+        if(boost::num_vertices(G) > 0){
+            global_result.insert(boost::vertices(G).first, boost::vertices(G).second);
+            return boost::num_vertices(G);
+        }
+        else{
+            return 0;
+        }
+    }
+
+//    std::vector<std::map<typename treedec_traits<T_t>::bag_type, int> > results(boost::num_vertices(T));
+
     treedec::app::detail::Intermediate_Results<T_t> iRes(T);
 
+//    unsigned int max = treedec::app::detail::bottom_up_computation_independent_set2(G, T, results);
+
     unsigned int max = treedec::app::detail::bottom_up_computation_independent_set2(G, T, iRes);
+
 
     if(certificate && max > 0){
         typename treedec_traits<T_t>::bag_type a, b;
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-        treedec::app::detail::top_down_computation2(T, root, iRes, max, global_result, a, b, 0);
+//        treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
+        treedec::app::detail::top_down_computation2(T, root, iRes, max, global_result, a, b, 0);  
     }
 
-    assert(treedec::validation::is_valid_independent_set(G, result));
+    assert(treedec::validation::is_valid_independent_set(G, global_result));
 
     return max;
 }

@@ -82,7 +82,7 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_MD(G)
                 S = tdlib.max_clique_with_treedecomposition(G, T)
 
-
+    """
     def test_max_independent_set_with_treedecomposition_0a(self):
         V, E = cornercases[0]
         G = Graph(V, E)
@@ -169,7 +169,7 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_MD(G)
                 s, S = tdlib.max_independent_set_with_treedecomposition2(G, T)
                 self.assertEqual(len(S), s)
-
+    """
 
     def test_min_vertex_cover_with_treedecomposition_0a(self):
         V, E = cornercases[0]
