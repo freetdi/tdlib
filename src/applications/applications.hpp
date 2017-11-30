@@ -291,8 +291,7 @@ public: //interface
         return number;
     }
 
-    //different supersets and new vertex (same as e = encode(new_node, old_node, encIt); update_encoding(new_node, e, new_vertex))
-    unsigned encode(vd_t node, vd_t old_node, encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt, vd_t new_vertex){
+    unsigned encode_more(vd_t node, vd_t old_node, encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt, vd_t new_vertex){
         auto powIt = bag(node, _t).begin();
         
         unsigned number = 0;
@@ -394,6 +393,9 @@ public: //interface
 }; //Intermediate_Results
 
 
+
+namespace obsolete{
+
 /* The top-down computation on tree decompositions is equal for some problems.
  *
  *   - 'cur' denotes the current node in T.
@@ -408,7 +410,6 @@ public: //interface
  *         take_flag = 1 -> 'subset' must be choosen
  *         take_flag = 2 -> 'subset' must be a subset
  */
-
 
 template <typename T_t>
 void top_down_computation(T_t &T,
@@ -512,31 +513,12 @@ void top_down_computation(T_t &T,
     }
 }
 
-/* The top-down computation on tree decompositions is equal for some problems.
- *
- *   - 'cur' denotes the current node in T.
- *   - 'results' stores the computed table for all nodes of T.
- *   - 'val' denotes the value of a set that has to be choosen from tables of
- *       nodes in the subtree of 'T' with root 'cur'.
- *   - 'S' denotes the so far choosen set.
- *   - 'S_comp' denotes the complement of 'S' with respect to V(G).
- *   - according to (nice treedecomposition-) node types, the choice in the
- *       table of the child of 'cur' must be restricted:
- *         take_flag = 0 -> no restriction
- *         take_flag = 1 -> 'subset' must be choosen
- *         take_flag = 2 -> 'subset' must be a subset
+} //namespace obsolete
+
+/* The top-down computation on tree decompositions.
+ *  Traces back the decisions that have been made in bottom-up run
+ *  Running time O(n*(width(T)+1))
  */
-
-template <typename S_t>
-void print_set(S_t &S, bool endl=true){
-    for(auto sIt = S.begin(); sIt != S.end(); sIt++){
-        std::cout << *sIt << " ";
-    }
-    if(endl){
-        std::cout << std::endl;
-    }
-}
-
 
 template <typename T_t>
 void top_down_computation2(T_t &T,
@@ -573,7 +555,7 @@ void top_down_computation2(T_t &T,
         encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt(parents_choice, bag(parent, T).begin(), bag(parent, T).end());
         
         unsigned encoded_without = iRes.encode(cur, parent, encIt);
-        unsigned encoded_with = iRes.encode(cur, parent, encIt, new_vertex);
+        unsigned encoded_with = iRes.encode_more(cur, parent, encIt, new_vertex);
 
         int val_without = iRes.get(cur, encoded_without);
         int val_with = iRes.get(cur, encoded_with);
@@ -637,200 +619,7 @@ void top_down_computation2(T_t &T,
     }
 }
 
-
-
-template <typename T_t>
-void top_down_computation2_old(T_t &T,
-                    typename boost::graph_traits<T_t>::vertex_descriptor cur,
-                    treedec::app::detail::Intermediate_Results<T_t> &iRes,
-                    unsigned int val, typename treedec_traits<T_t>::bag_type &S,
-                    typename treedec_traits<T_t>::bag_type &S_comp,
-                    typename treedec_traits<T_t>::bag_type subset,
-                    unsigned int take_flag)
-{
-    treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
-
-    if(node_type == treedec::nice::LEAF){
-        if(val == 1){
-             S.insert(*bag(cur, T).begin());
-        }
-        return;
-    }
-    else if(node_type == treedec::nice::INTRODUCE){
-        //TODO: necessary? subset could be the encoded one here
-        unsigned subset_encoded = iRes.encode(cur, subset);
-
-        if(take_flag == 1){ //child of a join node
-            val = iRes.get(cur, subset_encoded);
-        }
-
-        unsigned encoded;
-
-        for(typename std::map<unsigned, int>::iterator it =
-                   iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
-        {
-            encoded = it->first;
-            typename treedec_traits<T_t>::bag_type decoded_set;
-            iRes.decode(cur, encoded, decoded_set);
-
-            bool condition = false;
-
-            if(take_flag == 0 && it->second == (int)val){
-                std::cout << "case 1" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 1 && decoded_set == subset){
-                std::cout << "case 2" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
-                std::cout << "case 3" << std::endl;
-                condition = true;
-            }
-
-            if(condition){
-                typename treedec_traits<T_t>::bag_type intersection;
-                std::set_intersection(decoded_set.begin(), decoded_set.end(),
-                                      S_comp.begin(), S_comp.end(),
-                                      std::inserter(intersection, intersection.begin()));
-
-                if(intersection.size() == 0){
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
-                                        decoded_set.begin(), decoded_set.end(),
-                                        std::inserter(S_comp, S_comp.begin()));
-                    S.insert(decoded_set.begin(), decoded_set.end());
-                    subset = decoded_set;
-                    break;
-                }
-            }
-        }
-
-        if(S.find(treedec::nice::get_introduced_vertex(cur, T)) != S.end()){
-            val = val - 1;
-        }
-
-        typename boost::graph_traits<T_t>::vertex_descriptor child =
-                               *(boost::adjacent_vertices(cur, T).first);
-
-
-        subset.erase(treedec::nice::get_introduced_vertex(cur, T));
-        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2);
-    }
-    else if(node_type == treedec::nice::FORGET){
-        //TODO: necessary? subset could be the encoded one here
-        unsigned subset_encoded = iRes.encode(cur, subset);
-
-        if(take_flag == 1){ //child of a join node
-            val = iRes.get(cur, subset_encoded);
-        }
-
-        unsigned encoded;
-
-        for(typename std::map<unsigned, int>::iterator it =
-                   iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
-        {
-            encoded = it->first;
-            typename treedec_traits<T_t>::bag_type decoded_set;
-            iRes.decode(cur, encoded, decoded_set);
-
-            bool condition = false;
-
-            if(take_flag == 0 && it->second == (int)val){
-                std::cout << "case 1" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 1 && decoded_set == subset){
-                std::cout << "case 2" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
-                std::cout << "case 3" << std::endl;
-                condition = true;
-            }
-
-            if(condition){
-                typename treedec_traits<T_t>::bag_type intersection;
-                std::set_intersection(decoded_set.begin(), decoded_set.end(),
-                                      S_comp.begin(), S_comp.end(),
-                                      std::inserter(intersection, intersection.begin()));
-
-                if(intersection.size() == 0){
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
-                                        decoded_set.begin(), decoded_set.end(),
-                                        std::inserter(S_comp, S_comp.begin()));
-                    S.insert(decoded_set.begin(), decoded_set.end());
-                    subset = decoded_set;
-                    break;
-                }
-            }
-        }
-
-        typename boost::graph_traits<T_t>::vertex_descriptor child =
-                               *(boost::adjacent_vertices(cur, T).first);
-
-        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2);
-    }
-    else if(node_type == treedec::nice::JOIN){
-        for(typename std::map<unsigned, int>::iterator it =
-                          iRes._results[cur].begin(); it != iRes._results[cur].end(); it++)
-        {
-
-/* why not?!
-            if(it->second != (int)val){
-                continue;
-            }
-*/
-
-            unsigned encoded = it->first;
-            typename treedec_traits<T_t>::bag_type decoded_set;
-            iRes.decode(cur, encoded, decoded_set);
-
-            bool condition = false;
-
-            if(take_flag == 0 && it->second == (int)val){
-                std::cout << "case 1" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 1 && decoded_set == subset){
-                std::cout << "case 2" << std::endl;
-                condition = true;
-            }
-            else if(take_flag == 2 && it->second == (int)val && std::includes(decoded_set.begin(), decoded_set.end(), subset.begin(), subset.end())){
-                std::cout << "case 3" << std::endl;
-                condition = true;
-            }
-
-            if(condition){
-                typename treedec_traits<T_t>::bag_type intersection;
-                std::set_intersection(decoded_set.begin(), decoded_set.end(),
-                                      S_comp.begin(), S_comp.end(),
-                                      std::inserter(intersection, intersection.begin()));
-
-                if(intersection.size() == 0){
-                    typename treedec_traits<T_t>::bag_type must_take = decoded_set;
-                    S.insert(decoded_set.begin(), decoded_set.end());
-
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
-                                        decoded_set.begin(), decoded_set.end(),
-                                        std::inserter(S_comp, S_comp.begin()));
-
-
-                    auto adjIt = boost::adjacent_vertices(cur, T).first;
-
-                    auto child1 = *(adjIt++);
-                    auto child2 = *adjIt;
-
-                    top_down_computation2_old(T, child1, iRes, it->second, S, S_comp, must_take, 1);
-                    top_down_computation2_old(T, child2, iRes, it->second, S, S_comp, must_take, 1);
-                    return;
-                }
-            }
-        }
-    }
-}
-
 } //namespace detail
-
 
 } //namespace app
 

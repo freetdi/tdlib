@@ -136,7 +136,7 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
                 unsigned old_encoded = it->first;
 
                 encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt(old_encoded, bag(child, T).begin(), bag(child, T).end());
-                unsigned new_encoded = iRes.encode(cur, child, encIt, new_vertex);
+                unsigned new_encoded = iRes.encode_more(cur, child, encIt, new_vertex);
 
                 if(it->second != -1){
                     iRes.add(cur, new_encoded, it->second + 1);

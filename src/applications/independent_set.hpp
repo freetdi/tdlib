@@ -166,7 +166,7 @@ unsigned int max_independent_set_with_treedecomposition(G_t &G, T_t &T,
     if(max > 0){
         typename treedec_traits<T_t>::bag_type a, b;
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-        treedec::app::detail::top_down_computation(T, root, results, max, global_result, a, b, 0);
+        treedec::app::detail::obsolete::top_down_computation(T, root, results, max, global_result, a, b, 0);
     }
 
     assert(treedec::validation::is_valid_independent_set(G, global_result));
