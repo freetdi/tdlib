@@ -1145,7 +1145,7 @@ def max_independent_set_with_treedecomposition2(G, T):
     return size, py_IS
 
 
-def min_vertex_cover_with_treedecomposition(G, T):
+def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
     """
     Computes a minimum vertex cover with help of a tree decomposition.
 
@@ -1177,49 +1177,7 @@ def min_vertex_cover_with_treedecomposition(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, graphtype);
-
-    py_VC = []
-    cdef i;
-    for i in range(0, len(VC_)):
-        pyVCi = VC_[i]
-        py_VC.append(pyVCi)
-
-    return py_VC
-
-def min_vertex_cover_with_treedecomposition2(G, T, certificate=True):
-    """
-    Computes a minimum vertex cover with help of a tree decomposition.
-
-    INPUTS:
-
-    - G : input graph
-
-    - T : a treedecomposition of G
-
-    OUTPUT:
-
-    - VC:    a minimal vertex cover in G
-
-    EXAMPLES:
-
-        T, w = tdlib.seperator_algorithm(G)
-        VC = tdlib.min_vertex_cover_with_treedecomposition(G, T)
-    """
-
-    cdef vector[unsigned int] V_G, E_G, E_T, VC_
-    cdef vector[vector[int]] V_T
-
-    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
-    inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
-
-    if(rtn is False):
-        return
-
-    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
-
-    cdef unsigned size = gc_min_vertex_cover_with_treedecomposition2(V_G, E_G, V_T, E_T, VC_, certificate, graphtype);
+    cdef unsigned size = gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, certificate, graphtype);
 
     py_VC = []
     cdef i;

@@ -203,14 +203,15 @@ public: //interface
     }
 
     Value_t get(vd_t node, Encoded_t key){
+        if(_results[node].find(key) == _results[node].end()){
+            return -1;
+        }
         return _results[node][key];
     }
 
-#if 0
     bool exists(vd_t node, Encoded_t key){
         return _results[node].find(key) != _results[node].end();
     }
-#endif
 
     //bit-encoding of the subset relative to power set
     //TODO: what if |power_set| > available wordlength?

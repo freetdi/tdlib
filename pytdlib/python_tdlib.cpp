@@ -45,7 +45,6 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, t
 #include "applications/independent_set.hpp"
 #include "applications/independent_set2.hpp"
 #include "applications/vertex_cover.hpp"
-#include "applications/vertex_cover2.hpp"
 #include "applications/dominating_set.hpp"
 #include "applications/coloring.hpp"
 #include "misc.hpp"
@@ -938,44 +937,7 @@ unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int
 }
 
 
-void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                                std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                std::vector<unsigned int> &VC, unsigned graphtype)
-{
-    TD_tree_dec_t T;
-    make_tdlib_decomp(T, V_T, E_T);
-
-    TD_tree_dec_directed_t T_;
-    treedec::make_rooted(T, T_);
-
-    treedec::nice::nicify(T_);
-
-    std::set<unsigned int> result;
-
-    if(graphtype == 0){
-        TD_graph_t G;
-        make_tdlib_graph(G, V_G, E_G);
-
-        treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
-    }
-    else if(graphtype == 1){
-        TD_graph_vec_t G;
-        make_tdlib_graph(G, V_G, E_G);
-
-        treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result);
-    }
-    else{
-        assert(false);
-    }
-
-    VC.resize(result.size());
-    unsigned int i = 0;
-    for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
-        VC[i++] = *sIt;
-    }
-}
-
-unsigned gc_min_vertex_cover_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                 std::vector<unsigned int> &VC, bool certificate, unsigned graphtype)
 {
@@ -995,13 +957,13 @@ unsigned gc_min_vertex_cover_with_treedecomposition2(std::vector<unsigned int> &
         TD_graph_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        size = treedec::app::min_vertex_cover_with_treedecomposition2(G, T_, result, certificate);
+        size = treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result, certificate);
     }
     else if(graphtype == 1){
         TD_graph_vec_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        size = treedec::app::min_vertex_cover_with_treedecomposition2(G, T_, result, certificate);
+        size = treedec::app::min_vertex_cover_with_treedecomposition(G, T_, result, certificate);
     }
     else{
         assert(false);

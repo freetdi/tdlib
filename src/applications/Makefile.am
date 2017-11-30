@@ -6,7 +6,6 @@ pkgincludeapps_HEADERS = \
 	independent_set.hpp \
 	independent_set2.hpp \
 	vertex_cover.hpp \
-	vertex_cover2.hpp \
 	dominating_set.hpp \
 	coloring.hpp
 

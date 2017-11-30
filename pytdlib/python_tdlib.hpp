@@ -93,11 +93,7 @@ unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                    std::vector<unsigned int> &IS, unsigned graphtype);
 
-void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                                std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                std::vector<unsigned int> &VC, unsigned graphtype);
-
-unsigned gc_min_vertex_cover_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
                                                 std::vector<unsigned int> &VC, bool certificate, unsigned graphtype);
 
