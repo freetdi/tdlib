@@ -326,6 +326,29 @@ public: //interface
         return number;
     }
 
+    unsigned encode_less(vd_t node, vd_t old_node, encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt, vd_t skip_vertex){
+        auto powIt = bag(node, _t).begin();
+        
+        unsigned number = 0;
+        unsigned summand = 1;
+
+        for(; encIt != bag(old_node, _t).end();){
+            if(*encIt == skip_vertex){
+                ++encIt;
+                continue;
+            }
+
+            if(*encIt == *powIt){
+                number += summand;
+                ++encIt;
+            }
+            powIt++;
+            summand <<= 1;
+        }
+
+        return number;
+    }
+
     //same superset, but new vertex (find bitpos and set it to 1)
     unsigned update_encoding(vd_t node, Encoded_t key, vd_t new_vertex){
         unsigned number = key;
@@ -504,6 +527,16 @@ void top_down_computation(T_t &T,
  *         take_flag = 2 -> 'subset' must be a subset
  */
 
+template <typename S_t>
+void print_set(S_t &S, bool endl=true){
+    for(auto sIt = S.begin(); sIt != S.end(); sIt++){
+        std::cout << *sIt << " ";
+    }
+    if(endl){
+        std::cout << std::endl;
+    }
+}
+
 
 template <typename T_t>
 void top_down_computation2(T_t &T,
@@ -514,7 +547,7 @@ void top_down_computation2(T_t &T,
 {
     treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
     treedec::nice::enum_node_type parent_type = treedec::nice::get_type_parent(cur, T);
-
+ 
     if(parent_type == treedec::nice::INVALID){
         assert(bag(cur, T).size() == 0);
 
@@ -535,9 +568,7 @@ void top_down_computation2(T_t &T,
         return;
     }
     else if(parent_type == treedec::nice::FORGET){
-        unsigned new_vertex =
-                                 treedec::nice::get_forgotten_vertex(parent, T);
-
+        unsigned new_vertex = treedec::nice::get_forgotten_vertex(parent, T);
 
         encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt(parents_choice, bag(parent, T).begin(), bag(parent, T).end());
         
@@ -549,87 +580,60 @@ void top_down_computation2(T_t &T,
 
         if(val_with == -1){
             parents_choice = encoded_without;
+            val = val_without;
         }
         else if(val_without == -1){
             parents_choice = encoded_with;
+            val = val_with;
             solution.insert(new_vertex);
         }
         else{
             if(val_with <= val_without){
                 parents_choice = minimizing? encoded_with : encoded_without;
+                solution.insert(new_vertex);
+                val = val_with;
             }
             else{
                 parents_choice = minimizing? encoded_without : encoded_with;
+                val = val_without;
             }
         }
-
-        if(node_type == treedec::nice::JOIN){
-            auto adjIt = boost::adjacent_vertices(cur, T).first;
-
-            auto child1 = *(adjIt++);
-            auto child2 = *adjIt;
-
-            top_down_computation2(T, child1, iRes, val, solution, parents_choice, minimizing);
-            top_down_computation2(T, child2, iRes, val, solution, parents_choice, minimizing);
-            return;
-
-        }
-        else{
-            typename boost::graph_traits<T_t>::vertex_descriptor child =
-                                   *(boost::adjacent_vertices(cur, T).first);
-
-            top_down_computation2(T, child, iRes, val, solution, parents_choice, minimizing);
-        }
     }
-
-
-
-
     else if(parent_type == treedec::nice::INTRODUCE){
         unsigned new_vertex = treedec::nice::get_introduced_vertex(parent, T);
 
         encoded_iterator<typename treedec_traits<T_t>::bag_type::iterator> encIt(parents_choice, bag(parent, T).begin(), bag(parent, T).end());
-        
-        unsigned encoded_without = iRes.encode(cur, parent, encIt);
-        unsigned encoded_with = iRes.encode(cur, parent, encIt, new_vertex);
+        unsigned encoded_without = iRes.encode_less(cur, parent, encIt, new_vertex);
 
         int val_without = iRes.get(cur, encoded_without);
-        int val_with = iRes.get(cur, encoded_with);
 
+        val = val_without;
 
-//TODO: choice, add to solution..
-
-        if(node_type == treedec::nice::JOIN){
-            auto adjIt = boost::adjacent_vertices(cur, T).first;
-
-            auto child1 = *(adjIt++);
-            auto child2 = *adjIt;
-
-            top_down_computation2(T, child1, iRes, val, solution, parents_choice, minimizing);
-            top_down_computation2(T, child2, iRes, val, solution, parents_choice, minimizing);
-            return;
-
-        }
-        else{
-            typename boost::graph_traits<T_t>::vertex_descriptor child =
-                                   *(boost::adjacent_vertices(cur, T).first);
-
-            top_down_computation2(T, child, iRes, val, solution, parents_choice, minimizing);
-        }
-
-        incomplete();
+        parents_choice = encoded_without;
+    }
+    else if(parent_type == treedec::nice::JOIN){
     }
 
 
-    else if(parent_type == treedec::nice::JOIN){
+    if(node_type == treedec::nice::INTRODUCE){
+            unsigned intro_vertex = treedec::nice::get_introduced_vertex(cur, T);
+            val = (solution.find(intro_vertex) != solution.end())? val-1u : val;
+    }
+
+    if(node_type == treedec::nice::JOIN){
         auto adjIt = boost::adjacent_vertices(cur, T).first;
 
         auto child1 = *(adjIt++);
         auto child2 = *adjIt;
 
-        top_down_computation2(T, child1, iRes, val, solution, parents_choice, minimizing);
-        top_down_computation2(T, child2, iRes, val, solution, parents_choice, minimizing);
-        return;
+        top_down_computation2(T, child1, iRes, iRes.get(child1, parents_choice), solution, parents_choice, minimizing);
+        top_down_computation2(T, child2, iRes, iRes.get(child2, parents_choice), solution, parents_choice, minimizing);
+    }
+    else{
+        typename boost::graph_traits<T_t>::vertex_descriptor child =
+                               *(boost::adjacent_vertices(cur, T).first);
+
+        top_down_computation2(T, child, iRes, val, solution, parents_choice, minimizing);
     }
 }
 
@@ -642,7 +646,7 @@ void top_down_computation2_old(T_t &T,
                     unsigned int val, typename treedec_traits<T_t>::bag_type &S,
                     typename treedec_traits<T_t>::bag_type &S_comp,
                     typename treedec_traits<T_t>::bag_type subset,
-                    unsigned int take_flag, unsigned parents_choice=0)
+                    unsigned int take_flag)
 {
     treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
@@ -710,7 +714,7 @@ void top_down_computation2_old(T_t &T,
 
 
         subset.erase(treedec::nice::get_introduced_vertex(cur, T));
-        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2, encoded);
+        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2);
     }
     else if(node_type == treedec::nice::FORGET){
         //TODO: necessary? subset could be the encoded one here
@@ -764,7 +768,7 @@ void top_down_computation2_old(T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                *(boost::adjacent_vertices(cur, T).first);
 
-        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2, encoded);
+        top_down_computation2_old(T, child, iRes, val, S, S_comp, subset, 2);
     }
     else if(node_type == treedec::nice::JOIN){
         for(typename std::map<unsigned, int>::iterator it =
@@ -816,8 +820,8 @@ void top_down_computation2_old(T_t &T,
                     auto child1 = *(adjIt++);
                     auto child2 = *adjIt;
 
-                    top_down_computation2_old(T, child1, iRes, it->second, S, S_comp, must_take, 1, encoded);
-                    top_down_computation2_old(T, child2, iRes, it->second, S, S_comp, must_take, 1, encoded);
+                    top_down_computation2_old(T, child1, iRes, it->second, S, S_comp, must_take, 1);
+                    top_down_computation2_old(T, child2, iRes, it->second, S, S_comp, must_take, 1);
                     return;
                 }
             }

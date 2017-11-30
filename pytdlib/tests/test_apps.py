@@ -169,6 +169,7 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_MD(G)
                 s, S = tdlib.max_independent_set_with_treedecomposition2(G, T)
                 self.assertEqual(len(S), s)
+
     """
 
     def test_min_vertex_cover_with_treedecomposition_0a(self):
@@ -249,7 +250,6 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_MD(G)
                 S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
 
-
     def test_min_vertex_cover_with_treedecomposition2_0a(self):
         V, E = cornercases[0]
         G = Graph(V, E)
@@ -287,6 +287,7 @@ class TestTdLib_app(unittest.TestCase):
         T, w = tdlib.PP_MD(G)
         s, S = tdlib.min_vertex_cover_with_treedecomposition2(G, T)
         self.assertEqual(len(S), 3)
+        self.assertEqual(len(S), s)
 
     def test_min_vertex_cover_with_treedecomposition2_2(self):
         G = Graph(V_K5, E_K5)
@@ -337,6 +338,7 @@ class TestTdLib_app(unittest.TestCase):
                 G = Graph(V, E)
                 T, w = tdlib.PP_MD(G)
                 s, S = tdlib.min_vertex_cover_with_treedecomposition2(G, T)
+                self.assertEqual(len(S), s)
                 self.assertEqual(len(S), s)
 
     def test_min_dominating_set_with_treedecomposition_0a(self):
@@ -416,7 +418,6 @@ class TestTdLib_app(unittest.TestCase):
                 G = Graph(V, E)
                 T, w = tdlib.PP_MD(G)
                 S = tdlib.min_dominating_set_with_treedecomposition(G, T)
-
 
     def test_min_coloring_with_treedecomposition_0a(self):
         V, E = cornercases[0]

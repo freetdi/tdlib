@@ -141,7 +141,8 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
                 if(it->second != -1){
                     iRes.add(cur, new_encoded, it->second + 1);
                 }
-                else{ //TODO: is this really correct?!, use encoding..
+                else{ //TODO: is this really correct?!
+/*
                     typename treedec_traits<T_t>::bag_type new_set;
                     iRes.decode(child, old_encoded, new_set);
                     new_set.insert(new_vertex);
@@ -149,8 +150,9 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
                         iRes.add(cur, new_encoded, new_set.size());
                     }
                     else{
+*/
                         iRes.add(cur, new_encoded, -1);
-                    }
+//                    }
                 }
             }
         }
@@ -223,6 +225,7 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
 } //namespace detail (min_vertex_cover)
 
 
+
 template <typename G_t, typename T_t>
 unsigned int min_vertex_cover_with_treedecomposition2(G_t &G, T_t &T,
               typename treedec_traits<T_t>::bag_type &global_result, bool certificate=true)
@@ -234,21 +237,20 @@ unsigned int min_vertex_cover_with_treedecomposition2(G_t &G, T_t &T,
 
     assert(treedec::is_valid_treedecomposition(G, T));
 
-//    assert(treedec::app::detail::test_encoding<T_t>());
 
     treedec::app::detail::Intermediate_Results<T_t> iRes(T);
 
-    unsigned int max = treedec::app::detail::bottom_up_computation_vertex_cover2(G, T, iRes);
+    unsigned int min = treedec::app::detail::bottom_up_computation_vertex_cover2(G, T, iRes);
 
-    if(certificate && max > 0){
+    if(certificate && min > 0){
         typename treedec_traits<T_t>::bag_type a, b;
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-        treedec::app::detail::top_down_computation2(T, root, iRes, max, global_result, 0, true);
+        treedec::app::detail::top_down_computation2(T, root, iRes, min, global_result, 0, true);
     }
 
-    assert(treedec::validation::is_valid_vertex_cover(G, global_result));
+    assert(certificate && treedec::validation::is_valid_vertex_cover(G, global_result));
 
-    return max;
+    return min;
 }
 
 
