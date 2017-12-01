@@ -72,10 +72,10 @@ int main(int argc, char** argv)
 	if(argc>2){
 		rng.seed(atoi(argv[2]));
 	}
-	bool print=false;
-	if(argc>3){
-		print = true;
-	}
+	// bool print=false;
+	// if(argc>3){
+	// 	print = true;
+	// }
 
 	typedef sg_dvv G;
 	sg_dvv g(size);

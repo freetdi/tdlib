@@ -25,6 +25,7 @@
 // FIXME, rearrange, maybe move all to bits?
 #include "../graph_traits.hpp"
 #include "../skeleton.hpp"
+#include "../generic_elimination_search_overlay.hpp"
 #include "../induced_subgraph.hpp"
 
 namespace treedec{

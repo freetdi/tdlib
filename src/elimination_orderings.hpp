@@ -58,7 +58,6 @@
 #include "fill.hpp"
 #include "platform.hpp"
 
-#include "simple_graph_algos.hpp"
 #include "misc.hpp"
 #include "skeleton.hpp"
 #include "treedec.hpp"
