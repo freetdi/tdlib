@@ -259,7 +259,7 @@ void top_down_computation_min_coloring(G_t &G, T_t &T,
 
 template <typename G_t, typename T_t>
 unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
-                          std::vector<typename treedec_traits<T_t>::bag_type> &global_result)
+                          std::vector<typename treedec_traits<T_t>::bag_type> &global_result, bool certificate=true)
 {
     std::vector<std::vector<std::vector<int> > > results(boost::num_vertices(T));
 
@@ -286,23 +286,26 @@ unsigned int min_coloring_with_treedecomposition(G_t &G, T_t &T,
 
     std::vector<int> global_results_map(boost::num_vertices(G), -1);
     typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-    treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_results_map);
 
-    typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
+    if(certificate){ 
+        treedec::app::detail::top_down_computation_min_coloring(G, T, root, results, global_results_map);
 
-    typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-    for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
-        auto pos=boost::get(boost::vertex_index, G, *vIt);
-        inv_map[pos] = *vIt;
+        typename std::map<unsigned int, typename boost::graph_traits<G_t>::vertex_descriptor> inv_map;
+
+        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
+        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){
+            auto pos=boost::get(boost::vertex_index, G, *vIt);
+            inv_map[pos] = *vIt;
+        }
+
+        global_result.resize(k);
+        for(unsigned int i = 0; i < global_results_map.size(); i++){
+            unsigned int col = global_results_map[i];
+            global_result[col].insert(inv_map[i]);
+        }
     }
 
-    global_result.resize(k);
-    for(unsigned int i = 0; i < global_results_map.size(); i++){
-        unsigned int col = global_results_map[i];
-        global_result[col].insert(inv_map[i]);
-    }
-
-    // assert(treedec::validation::is_valid_coloring(G, result));
+    assert(certificate && treedec::validation::is_valid_coloring(G, global_result));
 
     return k;
 }

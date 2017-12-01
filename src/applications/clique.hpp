@@ -125,7 +125,7 @@ bool is_clique3(G_t &G, A_t A, B_t B, unsigned size){
 
 template <typename G_t, typename T_t>
 unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
-                               typename treedec_traits<T_t>::bag_type &global_result)
+                               typename treedec_traits<T_t>::bag_type &global_result, bool certificate=true)
 {
 
     assert(treedec::is_undirected_type(G));
@@ -181,11 +181,13 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
 //                  if(treedec::app::detail::is_clique3(G, (*I).first, (*I).second, size)){
                     max = size;
 
-                    global_result.clear();
-                    BOOST_AUTO(p, (*I).first);
+                    if(certificate){
+                        global_result.clear();
+                        BOOST_AUTO(p, (*I).first);
 
-                    for(; p != (*I).second; p++){
-                        global_result.insert(*p);
+                        for(; p != (*I).second; p++){
+                            global_result.insert(*p);
+                        }
                     }
 
                     changed = true;
@@ -201,7 +203,7 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
         }
     }
 
-    assert(treedec::validation::is_valid_clique(G, global_result));
+    assert(certificate && treedec::validation::is_valid_clique(G, global_result));
 
     return max;
 }

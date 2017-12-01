@@ -1016,24 +1016,25 @@ def minimalChordal_decomp(G, T):
 ##############################################################
 ############ APPLICATIONS ####################################
 
-def max_clique_with_treedecomposition(G, T):
+def max_clique_with_treedecomposition(G, T, certificate=True):
     """
     Computes a maximum clique with help of a tree decomposition.
 
     INPUTS:
 
     - G : input graph
-
     - T : a treedecomposition of G
+    - certificate: computes the clique if enabled (default=True)
 
     OUTPUT:
 
+    - s:    size of maximum sized clique in G
     - C:    a maximum clique in G
 
     EXAMPLES:
 
         T, w = tdlib.seperator_algorithm(G)
-        C = tdlib.max_clique_with_treedecomposition(G, T)
+        s, C = tdlib.max_clique_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, C_
@@ -1048,7 +1049,7 @@ def max_clique_with_treedecomposition(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
+    cdef unsigned size = gc_max_clique_with_treedecomposition(V_G, E_G, V_T, E_T, C_, certificate, graphtype);
 
     py_C = []
     cdef i;
@@ -1056,7 +1057,7 @@ def max_clique_with_treedecomposition(G, T):
         pyCi = C_[i]
         py_C.append(pyCi)
 
-    return py_C
+    return size, py_C
 
 def max_independent_set_with_treedecomposition(G, T, certificate=True):
     """
@@ -1066,7 +1067,7 @@ def max_independent_set_with_treedecomposition(G, T, certificate=True):
 
     - G : input graph
     - T : a treedecomposition of G
-    - certificate: computed the IS if enabled (default=True)
+    - certificate: computes the IS if enabled (default=True)
 
     OUTPUT:
 
@@ -1110,11 +1111,11 @@ def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
 
     - G : input graph
     - T : a treedecomposition of G
-    - certificate: computed the IS if enabled (default=True)
+    - certificate: computes the VC if enabled (default=True)
 
     OUTPUT:
 
-    - s:     size of maximum sized independent set in G
+    - s:     size of minimum sized vertex cover in G
     - VC:    a minimal vertex cover in G
 
     EXAMPLES:
@@ -1146,24 +1147,25 @@ def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
     return size, py_VC
 
 
-def min_dominating_set_with_treedecomposition(G, T):
+def min_dominating_set_with_treedecomposition(G, T, certificate=True):
     """
     Computes a minimal dominating set based on a tree decomposition.
 
     INPUTS:
 
     - G : input graph
-
     - T : a treedecomposition of G
+    - certificate: computes the dominating set if enabled (default=True)
 
-    OUTPUTS:
+    OUTPUT:
 
+    - s:    size of minimal sized dominating set in G
     - DS : a list of vertices of a minimal dominating set in G
 
     EXAMPLES:
 
         T, w = tdlib.seperator_algorithm(G)
-        DS = tdlib.min_dominating_set_with_treedecomposition(G, T)
+        s, DS = tdlib.min_dominating_set_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, DS
@@ -1178,34 +1180,35 @@ def min_dominating_set_with_treedecomposition(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS, graphtype)
+    cdef unsigned size = gc_min_dominating_set_with_treedecomposition(V_G, E_G, V_T, E_T, DS, certificate, graphtype)
 
     py_DS = []
     cdef i;
     for i in range(0, len(DS)):
         py_DS.append(DS[i])
 
-    return py_DS
+    return size, py_DS
 
 
-def min_coloring_with_treedecomposition(G, T):
+def min_coloring_with_treedecomposition(G, T, certificate=True):
     """
     Computes a minimum coloring with help of a tree decomposition.
 
     INPUTS:
 
     - G : input graph
-
     - T : a treedecomposition of G
+    - certificate: computes coloring if enabled (default=True)
 
     OUTPUT:
 
-    - VC:    a minimal coloring of G
+    - s:    size of minimum coloring in G
+    - COL:    a minimal coloring of G
 
     EXAMPLES:
 
         T, w = tdlib.seperator_algorithm(G)
-        VC = tdlib.min_coloring_with_treedecomposition(G, T)
+        s, COL = tdlib.min_coloring_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T
@@ -1220,7 +1223,7 @@ def min_coloring_with_treedecomposition(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_, graphtype);
+    cdef unsigned size = gc_min_coloring_with_treedecomposition(V_G, E_G, V_T, E_T, C_, certificate, graphtype);
 
     py_C = []
     cdef i;
@@ -1231,7 +1234,7 @@ def min_coloring_with_treedecomposition(G, T):
             pyCi.append(pyCij)
         py_C.append(pyCi)
 
-    return py_C
+    return size, py_C
 
 
 ##############################################################

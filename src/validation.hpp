@@ -19,6 +19,8 @@
 #ifndef TREEDEC_VALIDATION_HPP
 #define TREEDEC_VALIDATION_HPP
 
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 namespace treedec{
 
 namespace validation{
@@ -117,5 +119,7 @@ bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<type
 } //namespace validation
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //ifdef TREEDEC_VALIDATION_HPP
