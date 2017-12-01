@@ -103,6 +103,8 @@ bool test_encoding(){
     for(unsigned i = 0; i < subs.size(); i++){
         typename treedec_traits<T_t>::bag_type result;
 
+incomplete();
+#if 0 // compiler error here
         unsigned number = treedec::app::detail::encode_set<T_t>(S, subs[i]);
         treedec::app::detail::decode_set<T_t>(S, result, number);
 
@@ -110,6 +112,7 @@ bool test_encoding(){
             std::cerr << "error in encoding!" << std::endl;
             return false;
         }
+#endif
     }
 
     return true;
@@ -502,7 +505,8 @@ unsigned int min_vertex_cover_with_treedecomposition2(G_t &G, T_t &T,
         treedec::app::detail::top_down_computation2(T, root, iRes, max, global_result, a, b, 0);
     }
 
-    assert(treedec::validation::is_valid_vertex_cover(G, result));
+    incomplete(); // compiler error
+//    assert(treedec::validation::is_valid_vertex_cover(G, result));
 
     return max;
 }
