@@ -250,7 +250,7 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
 
     if(certificate && min > 0){
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
-        treedec::app::detail::top_down_computation2(T, root, iRes, min, global_result, 0, true);
+        treedec::app::detail::top_down_computation2(T, root, iRes, min, global_result, 0, treedec::app::MINIMIZING);
     }
 
     assert(certificate && treedec::validation::is_valid_vertex_cover(G, global_result));

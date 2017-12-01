@@ -101,7 +101,7 @@ namespace boost{\
     inline \
     typename property_map< T, vertex_all_t>::type\
     get(vertex_all_t, T& g) \
-    { untested(); \
+    { \
         typedef typename property_map< T, vertex_all_t>::type\
           pmap_type;\
         return pmap_type(g);\
@@ -110,7 +110,7 @@ namespace boost{\
     inline \
     bagstuff::const_treebagpmap<T>\
     get(vertex_all_t, T const& g) \
-    { untested(); \
+    { \
         typedef typename property_map< T, vertex_all_t>::const_type\
             pmap_type;\
         return pmap_type(g);\

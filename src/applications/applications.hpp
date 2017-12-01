@@ -56,6 +56,8 @@ static void powerset(std::set<unsigned int> &X, std::vector<std::set<unsigned in
 
 namespace app{
 
+enum optimization_type { MINIMIZING, MAXIMIZING };
+
 namespace detail{
 
 
@@ -526,7 +528,7 @@ void top_down_computation2(T_t &T,
                     typename boost::graph_traits<T_t>::vertex_descriptor cur,
                     treedec::app::detail::Intermediate_Results<T_t> &iRes,
                     unsigned int val, typename treedec_traits<T_t>::bag_type &solution,
-                    unsigned parents_choice=0, bool minimizing=true)
+                    unsigned parents_choice, optimization_type opt_type)
 {
     treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
     treedec::nice::enum_node_type parent_type = treedec::nice::get_type_parent(cur, T);
@@ -537,7 +539,7 @@ void top_down_computation2(T_t &T,
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                *(boost::adjacent_vertices(cur, T).first);
 
-        top_down_computation2(T, child, iRes, val, solution, parents_choice, minimizing);
+        top_down_computation2(T, child, iRes, val, solution, parents_choice, opt_type);
         return;
     }
 
@@ -572,13 +574,26 @@ void top_down_computation2(T_t &T,
         }
         else{
             if(val_with <= val_without){
-                parents_choice = minimizing? encoded_with : encoded_without;
-                solution.insert(new_vertex);
-                val = val_with;
+                if(opt_type==treedec::app::MINIMIZING){
+                    parents_choice = encoded_with;
+                    solution.insert(new_vertex);
+                    val = val_with;
+                }
+                else{
+                    parents_choice = encoded_without;
+                    val = val_without;
+                }
             }
             else{
-                parents_choice = minimizing? encoded_without : encoded_with;
-                val = val_without;
+                if(opt_type==treedec::app::MINIMIZING){
+                    parents_choice = encoded_without;
+                    val = val_without;
+                }
+                else{
+                    parents_choice = encoded_with;
+                    solution.insert(new_vertex);
+                    val = val_with;
+                }
             }
         }
     }
@@ -609,14 +624,14 @@ void top_down_computation2(T_t &T,
         auto child1 = *(adjIt++);
         auto child2 = *adjIt;
 
-        top_down_computation2(T, child1, iRes, iRes.get(child1, parents_choice), solution, parents_choice, minimizing);
-        top_down_computation2(T, child2, iRes, iRes.get(child2, parents_choice), solution, parents_choice, minimizing);
+        top_down_computation2(T, child1, iRes, iRes.get(child1, parents_choice), solution, parents_choice, opt_type);
+        top_down_computation2(T, child2, iRes, iRes.get(child2, parents_choice), solution, parents_choice, opt_type);
     }
     else{
         typename boost::graph_traits<T_t>::vertex_descriptor child =
                                *(boost::adjacent_vertices(cur, T).first);
 
-        top_down_computation2(T, child, iRes, val, solution, parents_choice, minimizing);
+        top_down_computation2(T, child, iRes, val, solution, parents_choice, opt_type);
     }
 }
 

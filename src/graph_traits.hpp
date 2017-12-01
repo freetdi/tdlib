@@ -362,7 +362,7 @@ namespace bagstuff {
 	template<class G>
 	struct treebagpmap : public put_get_helper<typename gtob<G>::type, treebagpmap<G> > {
 		typedef typename gtob<G>::type B;
-		treebagpmap(G& g) : _g(g){ untested();
+		treebagpmap(G& g) : _g(g){
 		}
 		B & operator[](unsigned v) const{
 			auto& g=const_cast<G&>(_g); // huh?
