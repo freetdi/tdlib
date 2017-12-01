@@ -43,7 +43,6 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, t
 #include "nice_decomposition.hpp"
 #include "applications/clique.hpp"
 #include "applications/independent_set.hpp"
-#include "applications/independent_set2.hpp"
 #include "applications/vertex_cover.hpp"
 #include "applications/dominating_set.hpp"
 #include "applications/coloring.hpp"
@@ -854,49 +853,9 @@ void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::v
     }
 }
 
-
-void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                   std::vector<unsigned int> &IS, unsigned graphtype)
-{
-    TD_tree_dec_t T;
-    make_tdlib_decomp(T, V_T, E_T);
-
-    TD_tree_dec_directed_t T_;
-    treedec::make_rooted(T, T_);
-
-    treedec::nice::I_nicify<TD_tree_dec_directed_t> N(T_, false);
-    N.do_it();
-//    treedec::nice::nicify(T_);
-
-    std::set<unsigned int> result;
-
-    if(graphtype == 0){
-        TD_graph_t G;
-        make_tdlib_graph(G, V_G, E_G);
-
-        treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
-    }
-    else if(graphtype == 1){
-        TD_graph_vec_t G;
-        make_tdlib_graph(G, V_G, E_G);
-
-        treedec::app::max_independent_set_with_treedecomposition(G, T_, result);
-    }
-    else{
-        assert(false);
-    }
-
-    IS.resize(result.size());
-    unsigned int i = 0;
-    for(std::set<unsigned int>::iterator sIt = result.begin(); sIt != result.end(); sIt++){
-        IS[i++] = *sIt;
-    }
-}
-
-unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                   std::vector<unsigned int> &IS, unsigned graphtype)
+                                                   std::vector<unsigned int> &IS, bool certificate, unsigned graphtype)
 {
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
@@ -915,13 +874,13 @@ unsigned gc_max_independent_set_with_treedecomposition2(std::vector<unsigned int
         TD_graph_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        size = treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
+        size = treedec::app::max_independent_set_with_treedecomposition(G, T_, result, certificate);
     }
     else if(graphtype == 1){
         TD_graph_vec_t G;
         make_tdlib_graph(G, V_G, E_G);
 
-        size = treedec::app::max_independent_set_with_treedecomposition2(G, T_, result);
+        size = treedec::app::max_independent_set_with_treedecomposition(G, T_, result, certificate);
     }
     else{
         assert(false);

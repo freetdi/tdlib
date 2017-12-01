@@ -1058,25 +1058,25 @@ def max_clique_with_treedecomposition(G, T):
 
     return py_C
 
-
-def max_independent_set_with_treedecomposition(G, T):
+def max_independent_set_with_treedecomposition(G, T, certificate=True):
     """
     Computes a maximum sized independent set with help of a tree decomposition.
 
     INPUTS:
 
     - G : input graph
-
     - T : a treedecomposition of G
+    - certificate: computed the IS if enabled (default=True)
 
     OUTPUT:
 
+    - s:     size of maximum sized independent set in G
     - IS:    a maximum sized independent set in G
 
     EXAMPLES:
 
         T, w = tdlib.seperator_algorithm(G)
-        IS = tdlib.max_independent_set_with_treedecomposition(V, T)
+        s, IS = tdlib.max_independent_set_with_treedecomposition(V, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, IS_
@@ -1091,50 +1091,7 @@ def max_independent_set_with_treedecomposition(G, T):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_, graphtype);
-
-    py_IS = []
-    cdef i;
-    for i in range(0, len(IS_)):
-        pyISi = IS_[i]
-        py_IS.append(pyISi)
-
-    return py_IS
-
-
-def max_independent_set_with_treedecomposition2(G, T):
-    """
-    Computes a maximum sized independent set with help of a tree decomposition.
-
-    INPUTS:
-
-    - G : input graph
-
-    - T : a treedecomposition of G
-
-    OUTPUT:
-
-    - IS:    a maximum sized independent set in G
-
-    EXAMPLES:
-
-        T, w = tdlib.seperator_algorithm(G)
-        IS = tdlib.max_independent_set_with_treedecomposition(V, T)
-    """
-
-    cdef vector[unsigned int] V_G, E_G, E_T, IS_
-    cdef vector[vector[int]] V_T
-
-    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
-    inv_labels_dict = inverse_labels_dict(labels_map)
-    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
-
-    if(rtn is False):
-        return
-
-    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
-
-    cdef unsigned size = gc_max_independent_set_with_treedecomposition2(V_G, E_G, V_T, E_T, IS_, graphtype);
+    cdef unsigned size = gc_max_independent_set_with_treedecomposition(V_G, E_G, V_T, E_T, IS_, certificate, graphtype);
 
     py_IS = []
     cdef i;
@@ -1152,17 +1109,18 @@ def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
     INPUTS:
 
     - G : input graph
-
     - T : a treedecomposition of G
+    - certificate: computed the IS if enabled (default=True)
 
     OUTPUT:
 
+    - s:     size of maximum sized independent set in G
     - VC:    a minimal vertex cover in G
 
     EXAMPLES:
 
         T, w = tdlib.seperator_algorithm(G)
-        VC = tdlib.min_vertex_cover_with_treedecomposition(G, T)
+        s, VC = tdlib.min_vertex_cover_with_treedecomposition(G, T)
     """
 
     cdef vector[unsigned int] V_G, E_G, E_T, VC_

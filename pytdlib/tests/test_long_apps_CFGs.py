@@ -32,7 +32,7 @@ class TestTdLib_packages(unittest.TestCase):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             base.print_graph_name(PREFIX, i)
             T, w = tdlib.minDegree_decomp(G)
-            S = tdlib.max_independent_set_with_treedecomposition2(G, T)
+            S = tdlib.max_independent_set_with_treedecomposition(G, T)
 
     """
     def test_min_vertex_cover(self):

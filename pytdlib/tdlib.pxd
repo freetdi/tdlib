@@ -56,10 +56,6 @@ cdef extern from "python_tdlib.hpp":
                                vector[unsigned int] &elim_ordering, unsigned graphtype)
     void gc_fillIn_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                             vector[unsigned int] &elim_ordering, unsigned graphtype)
-    #int gc_random_branch_and_bound(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                        vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb, unsigned graphtype)
-    #int gc_random_elimination_orderings(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-    #                                    vector[vector[int]] &V_T, vector[unsigned int] &E_T, int lb, unsigned graphtype)
 
 ##############################################################
 ############ POSTPROCESSING ##################################
@@ -77,12 +73,9 @@ cdef extern from "python_tdlib.hpp":
     void gc_max_clique_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                               vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                               vector[unsigned int] &C, unsigned graphtype)
-    void gc_max_independent_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+    unsigned gc_max_independent_set_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                        vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-                                                       vector[unsigned int] &IS, unsigned graphtype)
-    unsigned gc_max_independent_set_with_treedecomposition2(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
-                                                       vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-                                                       vector[unsigned int] &IS, unsigned graphtype)
+                                                       vector[unsigned int] &IS, bool certificate, unsigned graphtype)
     unsigned gc_min_vertex_cover_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
                                                     vector[unsigned int] &VC, bool certificate, unsigned graphtype)
