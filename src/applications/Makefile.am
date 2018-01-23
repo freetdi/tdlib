@@ -4,7 +4,6 @@ pkgincludeapps_HEADERS = \
 	applications.hpp \
 	clique.hpp \
 	independent_set.hpp \
-	independent_set2.hpp \
 	vertex_cover.hpp \
 	dominating_set.hpp \
 	coloring.hpp
