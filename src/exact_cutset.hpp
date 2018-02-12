@@ -1071,7 +1071,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 ///// =============  LEAFTRICK =========
         if(bag_index && source_bag.size()==1){
             auto pos=get_pos(*parent_it, results);
-            auto const& parentB=bag(pos, T);
+            auto const& parentB=boost::get(bag_t(), T, pos);
 
             // mark parent bag visited.
             for( auto jj : parentB){

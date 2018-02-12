@@ -114,7 +114,8 @@ void top_down_computation(T_t &T,
                                       std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() == 0){
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
+                    auto const& b=boost::get(bag_t(), T, cur);
+                    std::set_difference(b.begin(), b.end(),
                                         it->first.begin(), it->first.end(),
                                         std::inserter(S_comp, S_comp.begin()));
                     S.insert(it->first.begin(), it->first.end());
@@ -160,7 +161,8 @@ void top_down_computation(T_t &T,
                     typename treedec_traits<T_t>::bag_type must_take = it->first;
                     S.insert(it->first.begin(), it->first.end());
 
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
+                    auto const& b=boost::get(bag_t(), T, cur);
+                    std::set_difference(b.begin(), b.end(),
                                         it->first.begin(), it->first.end(),
                                         std::inserter(S_comp, S_comp.begin()));
 

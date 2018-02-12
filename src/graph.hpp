@@ -460,8 +460,9 @@ public:
         typedef typename boost::graph_traits<T_t>::adjacency_iterator bag_iterator;
         bag_iterator nIt, nEnd;
         boost::tie(nIt, nEnd) = boost::adjacent_vertices(_t, _T);
-        for(; nIt != nEnd; nIt++){
-            BOOST_AUTO(const& ibag, bag(*nIt, _T));
+        for(; nIt!=nEnd; ++nIt){
+            //auto const& ibag=boost::get(bag_t(), _T, *nIt);
+            auto const& ibag=bag(*nIt, _T); // BUG
 
             // BUG, does not work on vectors.
             if(ibag.find(vd1)==ibag.end()){

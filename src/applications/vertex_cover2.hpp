@@ -222,7 +222,8 @@ void top_down_computation2(T_t &T,
                                       std::inserter(intersection, intersection.begin()));
 
                 if(intersection.size() == 0){
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
+                    auto const& b=boost::get(bag_t(), T, cur);
+                    std::set_difference(b.begin(), b.end(),
                                         decoded_set.begin(), decoded_set.end(),
                                         std::inserter(S_comp, S_comp.begin()));
                     S.insert(decoded_set.begin(), decoded_set.end());
@@ -273,7 +274,8 @@ void top_down_computation2(T_t &T,
                     typename treedec_traits<T_t>::bag_type must_take = decoded_set;
                     S.insert(decoded_set.begin(), decoded_set.end());
 
-                    std::set_difference(bag(cur, T).begin(), bag(cur, T).end(),
+                    auto const& b=boost::get(bag_t(), T, cur);
+                    std::set_difference(b.begin(), b.end(),
                                         decoded_set.begin(), decoded_set.end(),
                                         std::inserter(S_comp, S_comp.begin()));
 
@@ -466,9 +468,10 @@ unsigned int bottom_up_computation_vertex_cover2(G_t &G, T_t &T,
             typename boost::graph_traits<T_t>::vertex_descriptor child2 =
                                      *(++boost::adjacent_vertices(cur, T).first);
 
-            BOOST_AUTO(subset_iters_it, make_subsets_range(bag(cur, T).begin(), bag(cur, T).end(), 0, bag(cur, T).size()).first);
+            auto const& b=boost::get(bag_t(), T, cur);
+            auto subset_iters_it=make_subsets_range(b.begin(), b.end(), 0, b.size()).first;
 
-            for(; subset_iters_it != bag(cur, T).end(); ++subset_iters_it){
+            for(; subset_iters_it != b.end(); ++subset_iters_it){
                 typename treedec_traits<T_t>::bag_type subset;
                 make_set(subset_iters_it, subset);
 

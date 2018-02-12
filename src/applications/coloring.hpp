@@ -105,7 +105,8 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
 
         if(node_type == treedec::nice::LEAF){
             //Store all k colorings.
-            unsigned int leaf = *(bag(cur, T).begin());
+            auto const& b=boost::get(bag_t(), T, cur);
+            unsigned int leaf = *(b.begin());
             unsigned int pos = TREEDEC_GET_POS(leaf, G);
 
             std::vector<int> coloring(boost::num_vertices(G), -1);

@@ -79,7 +79,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
 
         if(node_type == treedec::nice::LEAF){
             results[cur][typename treedec_traits<T_t>::bag_type()] = 0;
-            results[cur][bag(cur, T)] = 1;
+            auto const& b=boost::get(bag_t(), T, cur);
+            results[cur][b] = 1;
         }
         else if(node_type == treedec::nice::INTRODUCE){
             typename boost::graph_traits<T_t>::vertex_descriptor child =

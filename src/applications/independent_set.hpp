@@ -58,7 +58,7 @@ unsigned int bottom_up_computation_independent_set(G_t &G, T_t &T,
         if(node_type == treedec::nice::LEAF){
             //Store both possibilities (the empty set and the set containing one vertex).
             results[cur][typename treedec_traits<T_t>::bag_type()] = 0;
-            results[cur][bag(cur, T)] = 1;
+            results[cur][boost::get(bag_t(), T, cur)] = 1;
         }
         else if(node_type == treedec::nice::INTRODUCE){
             //For all results S of the child: Store S extended by the introduced vertex with value

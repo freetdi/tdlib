@@ -605,7 +605,8 @@ void treedec_to_ordering(T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     typename boost::graph_traits<T_t>::vertex_descriptor leaf, parent;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        if(boost::out_degree(*tIt, T) <= 1 && !bag(*tIt, T).empty()){
+        auto const& b=boost::get(bag_t(), T, *tIt);
+        if(boost::out_degree(*tIt, T) <= 1 && !b.empty()){
             leaf = *tIt;
             leaf_found = true;
             break;
@@ -620,21 +621,16 @@ void treedec_to_ordering(T_t &T,
         typename treedec_traits<T_t>::bag_type difference;
 
         if(boost::out_degree(leaf, T) == 1){
-            if(!std::includes(bag(parent, T).begin(),
-                              bag(parent, T).end(),
-                              bag(leaf, T).begin(),
-                              bag(leaf, T).end()))
-            {
-                std::set_difference(bag(leaf, T).begin(),
-                                    bag(leaf, T).end(),
-                                    bag(parent, T).begin(),
-                                    bag(parent, T).end(),
+            auto const& pb=boost::get(bag_t(), T, parent);
+            auto const& lb=boost::get(bag_t(), T, leaf);
+            if(!std::includes(pb.begin(), pb.end(), lb.begin(), lb.end())) {
+                std::set_difference(lb.begin(), lb.end(), pb.begin(), pb.end(),
                                     std::inserter(difference, difference.begin()));
             }
             boost::clear_vertex(leaf, T);
         }
         else{
-            difference = MOVE(bag(leaf, T));
+            difference = MOVE(boost::get(bag_t(), T, leaf));
         }
 
         for(typename treedec_traits<T_t>::bag_type::iterator sIt = difference.begin();

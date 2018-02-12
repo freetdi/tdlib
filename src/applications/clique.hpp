@@ -68,16 +68,17 @@ unsigned int max_clique_with_treedecomposition(G_t &G, T_t &T,
     typename boost::graph_traits<T_t>::vertex_iterator vIt, vEnd;
     for(boost::tie(vIt, vEnd) = boost::vertices(T); vIt != vEnd; vIt++){
         //We wouldn't find a larger clique.
-        if(bag(*vIt, T).size() <= max){ continue; }
+        auto const& b=boost::get(bag_t(), T, *vIt);
+        if(b.size() <= max){ continue; }
 
         //Search for a clique of size greater than 'size' by inspecting all subsets
         //of size exactly 'size' for size = max+1,max+2,..
-        for(unsigned int size = max+1; size <= bag(*vIt, T).size(); size++){
-            BOOST_AUTO(P, make_subsets_range(bag(*vIt, T).begin(), bag(*vIt, T).end(), size, size));
+        for(unsigned int size = max+1; size <= b.size(); ++size){
+            auto P=make_subsets_range(b.begin(), b.end(), size, size);
             BOOST_AUTO(I, P.first);
             bool changed = false;
 
-            for(; I != bag(*vIt, T).end(); ++I){
+            for(; I!=b.end(); ++I){
                 if(treedec::app::detail::is_clique(G, (*I).first, (*I).second)){
                     max = size;
 

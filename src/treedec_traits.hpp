@@ -53,6 +53,7 @@ struct tmpbaghack<bag_t, T_t, V>{
 };
 } //detail
 
+#if 1 // BUG. one call left in graph.hpp
 template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type const& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
@@ -62,6 +63,7 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
+#endif
 
 template<class V, class G>
 size_t bag_size(V const & v, G const& g)
