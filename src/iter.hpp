@@ -1345,7 +1345,7 @@ public: // ops
 //         assert(_i!=_e); why not?!
          if(_u==0){
             _t.back()=_e;
-         }else{untested();
+         }else{
          }
       }else if(_t.size()<=_u){
          BOOST_AUTO(back, _t.back());
@@ -1353,7 +1353,7 @@ public: // ops
          if(back!=_e){
             if(_t.size()==_u){
                ++_t.back();
-            }else{ untested();
+            }else{
                _t.push_back(back);
             }
          }else if(_t.back()==_e){ untested();
@@ -1369,11 +1369,11 @@ public: // ops
                  _t[0]=_e;
              }else{
              }
-         }else{ untested();
+         }else{
             _t.pop_back();
             BOOST_AUTO(back2, _t.back());
             ++back2;
-            if(back2!=_e){ untested();
+            if(back2!=_e){
                ++_t.back();
             }else{ unreachable();
             }

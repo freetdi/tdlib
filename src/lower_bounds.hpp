@@ -1070,7 +1070,7 @@ public:
             CFG_t::improvement_algo(H, lb+1);
 
             int new_lb = CFG_t::lb_algo(H);
-            if(new_lb > lb){ untested();
+            if(new_lb > lb){
                 lb++;
             }else{
                 break;
@@ -1209,7 +1209,7 @@ public:
 
             while(boost::num_edges(H) > 0){
                 new_lb = CFG_t::lb_algo(H);
-                if(new_lb > lb){ untested();
+                if(new_lb > lb){
                     break;
                 }else{
                 }
@@ -1221,7 +1221,7 @@ public:
 
                 CFG_t::improvement_algo(H, lb+1);
             }
-            if(new_lb > lb){ untested();
+            if(new_lb > lb){
                 lb++;
             }
             else{

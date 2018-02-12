@@ -302,7 +302,7 @@ public:
 			incomplete();
 			// retrying?!
 			assert(x=_bag_size+1);
-			assert(!solution);
+			assert(!_solution);
 			//	retry_decompose(x);
 		}else{
 		}
@@ -473,7 +473,7 @@ private: // blockstack
 	BLOCK* _top_block;
 	BLOCK* lastblock;
 	hashMap hashTable;
-	BLOCK const* solution;
+	BLOCK const* _solution;
 	BLOCK _emptyblock;
 	BLOCK& top_block(){
 		assert(_blockmem);
@@ -590,7 +590,8 @@ exact_ta<EXTA_a>::exact_ta(oG const& g, M const& m)
       _bag_size(0),
 		_delta(boost::num_vertices(g)),
       _blockmem(NULL),
-      _top_block(NULL)
+      _top_block(NULL),
+		_solution(NULL)
 {
 
 	auto nv=boost::num_vertices(g);
@@ -874,11 +875,13 @@ void exact_ta<EXTA_a>::registerBlock(N const& component, N& onb, D const& delt)
 		 trace1("SOL", component);
 		 trace1("SOL      ", onb);
 		 //trace1("SOL    ", delta);
-      if(solution){
+      if(_solution){
+			// where does it come from?
 			incomplete();
+		}else{
 		}
-      solution = &top_block();
-		trace1("found solution", solution->component);
+      _solution = &top_block();
+		trace1("found solution", _solution->component);
     }else{
     }
 
@@ -904,13 +907,13 @@ void exact_ta<EXTA_a>::process(BLOCK *b)
 	tassert(equals(b->neighbours(), make_open_neigh(b->component)));
 //  trace1("PROC", b->component);
   tassert(b);
-  tassert(!solution);
+  tassert(!_solution);
   assert(b->neighbours()==b->neighbours());
   for(auto const&v : b->neighbours()) {
-	  assert(!solution);
+	  assert(!_solution);
 
 	 // trie[v].insert(b);
-	  if(solution){ untested();
+	  if(_solution){ untested();
 		  break;
 	  }
 
@@ -935,7 +938,7 @@ void exact_ta<EXTA_a>::process(BLOCK *b)
     /// hmm c is already sat
     bool x=resaturate(c, b->neighbours(), v, nn, _delta);
 	 assert(!x || is_saturated(c).first);
-	 tassert(!solution);
+	 tassert(!_solution);
 
     // pass parent? here "b".
     if (x){
@@ -943,12 +946,12 @@ void exact_ta<EXTA_a>::process(BLOCK *b)
 		// delta: the verts added by saruration.
       tassert(cbset::size(nn) + _delta.size() <= _bag_size);
       registerBlock(c, nn, _delta);
-		if(solution){ untested();
+		if(_solution){ untested();
 			break;
 		}else{
 		}
     }else{
-		 tassert(!solution);
+		 tassert(!_solution);
 	 }
 
     tassert(is_saturated(b->component).first);
@@ -958,7 +961,7 @@ void exact_ta<EXTA_a>::process(BLOCK *b)
 	 // assert(*b==*b);
 	 extendByNew(_trie[v].begin() /* ->right */, v, *b);
 
-    if(solution){
+    if(_solution){
       return;
     }else{
 	 }
@@ -1002,7 +1005,7 @@ inline void exact_ta<EXTA_a>::q_base_set(vertex_t v)
 	if (cbset::size(onb) + _delta.size() > _bag_size) { untested();
 	}else{
 		registerBlock(c, onb, _delta);
-		if(solution){ untested();
+		if(_solution){ untested();
 			// BUG
 			// sometimes looking for tw=5 finds a td of width 4. why?!
 			return;
@@ -1015,7 +1018,7 @@ EXTA_t
 inline void exact_ta<EXTA_a>::q_base_sets()
 {
 //	for ( vertices... )
-	for (unsigned v=0; v<n() && !solution; v++) {
+	for (unsigned v=0; v<n() && !_solution; v++) {
 		if (boost::out_degree(v, _g) < _bag_size) {
 			q_base_set(v);
 		}else{
@@ -1028,36 +1031,29 @@ inline bool exact_ta<EXTA_a>::try_decompose(unsigned bs)
 {
 	if(n()>L+1){ untested();
 		std::cerr<<"too big: " << n() << "(" << L+1 << ")\n";
-		unreachable();
-		exit(25);
+		throw exception_invalid_precondition();
 	}else{
 	}
 
 	assert(_blockmem);
 	if(_bag_size+1==bs){
-		// reuse.
-		// fscs are still what they are.
 		clear_tries();
 	}else{
 		clear();
 	}
-//		clear(); // !
 	_bag_size = bs;
-
-	// trace1("TRY", _bag_size);
-	// tassert(_top_block==_blockmem); no. subsequent tries
 
 	fprintf(stderr, "try bagsize = %d\n", _bag_size);
 
 	q_base_sets();
 
 	BLOCK* bb=_blockmem;
-	while(bb!=&top_block() && !solution){
+	while(bb!=&top_block() && !_solution){
 		// try to extend newly discovered blocks.
 		process(bb);
 		bb = bb->next();
 	}
-	return solution;
+	return _solution;
 }
 /*--------------------------------------------------------------------------*/
 EXTA_t
@@ -1081,14 +1077,14 @@ EXTA_t
 inline void exact_ta<EXTA_a>::do_it(unsigned bs)
 {
 	assert(bs>1);
-	solution = NULL;
-	while (!solution) {
+	_solution = NULL;
+	while (!_solution) {
 		try_decompose(bs);
-		if(!solution){
+		if(!_solution){
 			++bs;
 		}
 	}
-	assert(solution);
+	assert(_solution);
 }
 /*--------------------------------------------------------------------------*/
 #include <boost/graph/graph_traits.hpp>
@@ -1098,7 +1094,7 @@ EXTA_t
 template<class TREEDEC_t>
 inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
 {
-  auto component=solution->component;
+  auto component=_solution->component;
   trace2("TDTDTDTD", component, cbset::size(component));
   //boost::clear(td);
   assert(boost::num_vertices(td)==0);
@@ -1110,11 +1106,11 @@ inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
     auto& b=boost::get(bag_t(), td, k);
 	 T s=cbset::diff(all, component);
     treedec::merge(b, s);
-    unsigned j=make_td(solution, &td);
+    unsigned j=make_td(_solution, &td);
     boost::add_edge(k, j, td);
   }else{ untested();
     // all in one...
-    make_td(solution, &td);
+    make_td(_solution, &td);
   }
   std::cerr << "make_td nvt " << boost::num_vertices(td) << "\n";
   assert(boost::num_edges(td)+1==boost::num_vertices(td));
@@ -1289,7 +1285,7 @@ inline void exact_ta<EXTA_a>::extendByNew(
 #else
 		try_combine_new(y.first, v, c, neighb);
 #endif
-		if(solution){
+		if(_solution){
 		  	break;
 		}
 	}
@@ -1317,12 +1313,12 @@ inline void exact_ta<EXTA_a>::try_extend_by_vertex(
 	bool x=exact_ta<EXTA_a>::resaturate(c2, c2onb, v, nn, _delta, comm);
 	if(x){
 		registerBlock(c2, nn, _delta);
-		if (solution) {
+		if (_solution) {
 			return;
 		}
 		tassert(size(c2) == size(uc) + _delta.size());
 	}else{
-		tassert(!solution);
+		tassert(!_solution);
 	}
 }
 /*--------------------------------------------------------------------------*/
@@ -1343,7 +1339,7 @@ inline void exact_ta<EXTA_a>::try_combine_new(
 
 	T un = cbset::union_(neighb, node->block->neighbours());
 	assert(un==un);
-	if(solution){
+	if(_solution){
 		unreachable();
 	}
 
@@ -1412,7 +1408,7 @@ inline void exact_ta<EXTA_a>::try_extend_union(
 		// hmm v is in the neighborhood in between
 		// if others, w, are in the saturation, then sat({v}+uc) is computed twice.
 		// also in in extendby(... w )
-		if(solution){
+		if(_solution){
 			break;
 		}
 	}

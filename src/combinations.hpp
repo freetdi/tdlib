@@ -441,7 +441,7 @@ public: // algo interface
             trace1("done PP in PPFITM", boost::num_edges(_g));
 #endif
 
-        for(auto const& x : bags){ untested();
+        for(auto const& x : bags){
             auto& B=boost::get<1>(x);
             trace1("B", B.size());
         }

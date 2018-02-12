@@ -57,7 +57,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 
 	// find a leaf in tgt (hack)
 	auto back=boost::vertices(tgt).first + (boost::num_vertices(tgt) - 1);
-	if(boost::out_degree(*back, tgt)){ untested();
+	if(boost::out_degree(*back, tgt)){
 		back = boost::vertices(tgt).first;
 	}else{
 	}
@@ -71,7 +71,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 #endif
 	typedef typename boost::graph_traits<T_t>::vertex_descriptor treenode_descriptor;
    if(boost::is_directed(src)){ itested();
-		if(boost::is_directed(tgt)){ untested();
+		if(boost::is_directed(tgt)){
 		}else{
 		}
 	}else{ itested();
@@ -169,7 +169,7 @@ void append_decomposition(T_t &tgt, S_t const&& src, G_t const& /*GR*/, M_t cons
 				// (currently, the root is either front or back in all outputs...)
 				if(boost::out_degree(tmap.back(), tgt)){
 					boost::add_edge(*back, tmap.back(), tgt);
-				}else{ untested();
+				}else{
 					boost::add_edge(*back, tmap.front(), tgt);
 				}
         }else{ untested();

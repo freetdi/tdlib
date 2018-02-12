@@ -100,7 +100,7 @@ public:
         try_it(_t, lb_bs);
     }
     template<class T>
-    void get_tree_decomposition(T& t) const{ untested();
+    void get_tree_decomposition(T& t) const{
         boost::copy_graph(_t, t);
     }
     template<class T>
