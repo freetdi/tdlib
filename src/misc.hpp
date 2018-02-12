@@ -589,7 +589,7 @@ void make_rooted(T_undir_t &T, T_dir_t &T_,
 {
     for(unsigned int i = 0; i < boost::num_vertices(T); i++){
         typename boost::graph_traits<T_undir_t>::vertex_descriptor new_vertex = boost::add_vertex(T_);
-        bag(new_vertex, T_) = bag(i, T);
+        boost::get(bag_t(), T_, new_vertex) = boost::get(bag_t(), T, i);
     }
 
     std::vector<BOOL> visited(boost::num_vertices(T), false);

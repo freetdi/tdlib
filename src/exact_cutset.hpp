@@ -983,7 +983,9 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 
     if(boost::num_vertices(_g) == 1){
         vertex_descriptor_T t=boost::add_vertex(T);
-        insert(bag(t, T), *vIt);
+        auto& b=boost::get(bag_t(), T, t);
+
+        insert(b, *vIt);
         if(bagsize <= 1){
             return true;
         }
@@ -1064,7 +1066,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
             assert(!bag_index);
             // root...
         }
-        auto& target_bag=bag(get_pos(*ii, results), T);
+        auto& target_bag=boost::get(bag_t(), T, get_pos(*ii, results));
 
 ///// =============  LEAFTRICK =========
         if(bag_index && source_bag.size()==1){

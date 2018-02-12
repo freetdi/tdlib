@@ -91,7 +91,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
             for(typename std::map<typename treedec_traits<T_t>::bag_type, int>::iterator it =
                          results[child].begin(); it != results[child].end(); it++)
             {
-                if(is_vertex_cover(G, bag(cur, T), it->first)){
+                auto& b=boost::get(bag_t(), T, cur);
+                if(is_vertex_cover(G, b, it->first)){
                     results[cur][it->first] = results[child][it->first];
                 }
                 else{
@@ -109,7 +110,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
                     results[cur][tmp] = results[child][it->first] + 1;
                 }
                 else{
-                    if(is_vertex_cover(G, bag(cur, T), tmp)){
+                    auto& b=boost::get(bag_t(), T, cur);
+                    if(is_vertex_cover(G, b, tmp)){
                         results[cur][tmp] = tmp.size();
                     }
                     else{
@@ -126,7 +128,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
                           treedec::nice::get_forgotten_vertex(cur, T);
 
             std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
+            auto& b=boost::get(bag_t(), T, cur);
+            treedec::powerset(b, subs);
 
             for(unsigned int i = 0; i < subs.size(); i++){
                 typename treedec_traits<T_t>::bag_type tmp = subs[i];
@@ -158,7 +161,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
                                      *(++boost::adjacent_vertices(cur, T).first);
 
             std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
+            auto& b=boost::get(bag_t(), T, cur);
+            treedec::powerset(b, subs);
 
             for(unsigned int i = 0; i < subs.size(); i++){
                 if(results[child1][subs[i]] < 0 || results[child2][subs[i]] < 0){

@@ -643,7 +643,8 @@ void treedec_to_ordering(T_t &T,
             O.push_back(*sIt);
         }
 
-        bag(leaf, T).clear();
+        auto& b=boost::get(bag_t(), T, leaf);
+        b.clear();
 
         impl::treedec_to_ordering<G_t, T_t>(T, O);
     }
@@ -661,9 +662,8 @@ void treedec_to_ordering(T_t &T,
     else if(boost::num_vertices(T) == 1){
         typename boost::graph_traits<T_t>::vertex_descriptor t =
                                                    *(boost::vertices(T).first);
-        for(typename treedec_traits<T_t>::bag_type::iterator sIt =
-                            bag(t, T).begin(); sIt != bag(t, T).end(); sIt++)
-        {
+        auto& b=boost::get(bag_t(), T, t);
+        for(auto sIt=b.begin(); sIt != b.end(); ++sIt) {
             O.push_back(*sIt);
         }
         return;

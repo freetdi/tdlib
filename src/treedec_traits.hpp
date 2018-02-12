@@ -54,16 +54,6 @@ struct tmpbaghack<bag_t, T_t, V>{
 } //detail
 
 template<typename T_t>
-inline typename treedec_traits<T_t>::bag_type& bag(
-        const typename boost::graph_traits<T_t>::vertex_descriptor& v,
-        T_t& T)
-{
-    incomplete();
-    typedef typename T_t::vertex_property_type b; //>::bag_type b;
-    return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
-}
-
-template<typename T_t>
 inline typename treedec_traits<T_t>::bag_type const& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t const& T)

@@ -181,7 +181,9 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
             typename boost::graph_traits<T_t>::vertex_descriptor child2 =
                                          *(++boost::adjacent_vertices(cur, T).first);
 
-            treedec::app::detail::colorings_intersection<G_t, T_t>(G, results[child1], results[child2], bag(cur, T), results[cur]);
+            auto& b=boost::get(bag_t(), T, cur);
+            treedec::app::detail::colorings_intersection<G_t, T_t>(
+                    G, results[child1], results[child2], b, results[cur]);
 
             //No coloring possible with k colors.
             if(results[cur].size() == 0){

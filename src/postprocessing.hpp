@@ -215,7 +215,7 @@ public:
             typename treedec_traits<T_t>::bag_type B;
             treedec::map_descriptors_to_bags<G_t>(S, B);
             typename treedec_traits<T_t>::bag_type old_bag = bag(refinement_vertex, _t);
-            bag(refinement_vertex, _t) = MOVE(B);
+            boost::get(bag_t(), _t, refinement_vertex) = MOVE(B);
 
             //Store the connected components of H[V(H)\S] in 'components'.
             typedef typename boost::graph_traits<immutable_type>::vertex_descriptor HI_vertex_descriptor;
@@ -255,7 +255,7 @@ public:
                 newN[i] = boost::add_vertex(_t);
                 typename treedec_traits<T_t>::bag_type uB;
                 treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
-                bag(newN[i], _t) = MOVE(uB);
+                boost::get(bag_t(), _t, newN[i]) = MOVE(uB);
 
                 assert(!boost::edge(refinement_vertex, newN[i], _t).second);
                 assert(!boost::edge(newN[i], refinement_vertex, _t).second);

@@ -106,7 +106,8 @@ unsigned int bottom_up_computation_independent_set(G_t &G, T_t &T,
                                 treedec::nice::get_forgotten_vertex(cur, T);
 
             std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
+            auto& b=boost::get(bag_t(), T, cur);
+            treedec::powerset(b, subs);
 
             for(unsigned int i = 0; i < subs.size(); i++){
                 typename treedec_traits<T_t>::bag_type tmp = subs[i];
@@ -135,7 +136,8 @@ unsigned int bottom_up_computation_independent_set(G_t &G, T_t &T,
                                      *(++boost::adjacent_vertices(cur, T).first);
 
             std::vector<typename treedec_traits<T_t>::bag_type> subs;
-            treedec::powerset(bag(cur, T), subs);
+            auto& b=boost::get(bag_t(), T, cur);
+            treedec::powerset(b, subs);
 
             for(unsigned int i = 0; i < subs.size(); i++){
                 if(results[child1][subs[i]] < 0 || results[child2][subs[i]] < 0){
