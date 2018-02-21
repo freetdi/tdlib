@@ -1198,4 +1198,20 @@ void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, st
     treedec::generic_elimination_search_p17_jumper(G, max_nodes, max_orderings);
 }
 
+
+/* weight stuff */
+
+unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype){
+    TD_graph_t G;
+    make_tdlib_graph(G, V_G, E_G);
+
+    TD_tree_dec_t T;
+    make_tdlib_decomp(T, V_T, E_T);
+
+    TD_tree_dec_directed_t N;
+
+    return treedec::nice::weight_try_roots(T, N);
+}
+
 // vim:ts=8:sw=4:et

@@ -133,3 +133,9 @@ void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<
 void gc_generic_elimination_search_p17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings);
 void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings);
 
+
+/* weight stuff */
+
+unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype);
+

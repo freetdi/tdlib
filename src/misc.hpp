@@ -607,6 +607,13 @@ void make_rooted(T_undir_t &T, T_dir_t &T_)
     detail::make_rooted(T, T_, t);
 }
 
+template <typename T_undir_t, typename T_dir_t>
+void make_rooted(T_undir_t &T, T_dir_t &T_, typename boost::graph_traits<T_undir_t>::vertex_descriptor t)
+{
+    detail::make_rooted(T, T_, t);
+}
+
+
 //Glues a single bag with the current tree decomposition T according to subset relation.
 //used for preprocessing.
 // BUG: this is inefficient. there's already a better implementation

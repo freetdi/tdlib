@@ -1547,3 +1547,35 @@ def generic_elimination_search_p17_jumper(G, max_nodes, max_orderings):
 
     gc_generic_elimination_search_p17_jumper(V_G, E_G, graphtype, max_nodes_c, max_orderings_c)
 
+
+##############################################################
+############ WEIGHT STUFF ####################################
+
+
+def weight_stats(G, T):
+    """
+    Computes weight statistics.
+
+    INPUTS:
+
+    - G : input graph
+
+    - T : a treedecomposition of G
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+    inv_labels_dict = inverse_labels_dict(labels_map)
+    rtn = cython_make_tdlib_decomp(T.vertices(), T.edges(), V_T, E_T, inv_labels_dict)
+
+    if(rtn is False):
+        return
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    cdef unsigned diff = gc_weight_stats(V_G, E_G, V_T, E_T, graphtype)
+
+
+    return diff
