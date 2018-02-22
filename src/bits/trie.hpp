@@ -328,12 +328,20 @@ protected:
 
 public:
 	TRIE(unsigned depth, Alloc const& alloc=Alloc())
-		: _allocator(alloc), _depth(depth), _size(0) {
+		: _allocator(alloc),
+		  _root(NULL),
+		  _depth(depth),
+	     _size(0)
+	{
 			incomplete();
 		// _root = new_node(-1u);
 	}
 	TRIE(Alloc const& alloc=Alloc())
-		: _allocator(alloc), _size(0) {
+		: _allocator(alloc),
+		  _root(NULL),
+		  _depth(0),
+	     _size(0)
+	{
 			incomplete();
 		// _root = new_node(-1u);
 	}
@@ -372,7 +380,6 @@ template<class V, class B, class Alloc>
 inline typename TRIE<V, B, Alloc>::node_t*
 TRIE<V, B, Alloc>::new_node()
 {
-  
   Alloc a;
   node_t* newnode = (node_t*) const_cast<Alloc&>(_allocator).allocate(sizeof(node_t));
   lassert(newnode);
@@ -381,14 +388,13 @@ TRIE<V, B, Alloc>::new_node()
   newnode->right = NULL;
   newnode->block = NULL;
 
-  __builtin_prefetch (newnode+1,1);
+  __builtin_prefetch (newnode+1, 1);
   return newnode;
 }
 template<class V, class B, class Alloc>
 inline typename TRIE<V, B, Alloc>::node_t*
 TRIE<V, B, Alloc>::new_node(V v, node_t* left, node_t* right)
 {
-  
   Alloc a;
   node_t* newnode = new_node();
   lassert(newnode);
@@ -432,25 +438,13 @@ inline B& TRIE<T, B, Alloc>::operator[](const T& seq)
 				p = p->left; // not in component
 				lassert(p->right);
 			}else{
-#if 0
-				par = p;
-				p->left = new_node(w, NULL, new_node(-1u, NULL, NULL));
-				p = p->left;
-				par = p;
-				p = p->right;
-#else
 				par = p;
 				p->left = new_node(-1u, NULL, NULL);
 				p = p->left;
-#endif
-
 			}
 		}
-#if 0
-		assert(p->right);
-#else
+
 		if(!p->right){
-			// newly introduced?
  			lassert(p->v==-1u);
 			p->v = w;
 			par = p;
@@ -459,7 +453,6 @@ inline B& TRIE<T, B, Alloc>::operator[](const T& seq)
 			p->right = new_node(-1u, NULL, NULL);
 			p = p->right;
 		}else
-#endif
 
 		if(p->v == w){
 			//trace2("gotit", w, p->v);

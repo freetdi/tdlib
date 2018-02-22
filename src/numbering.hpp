@@ -76,8 +76,8 @@ public:
 		// HACK. cleanup later. NUMBERING_2?
 #ifndef NDEBUG
 		auto id=get(_idmap, v);
-#endif
 		assert(_data[id]);
+#endif
 		return -1 - _data[get(_idmap, v)];
 	}
 private:

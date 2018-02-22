@@ -160,12 +160,13 @@ public:
 
             for(boost::tie(tIt, tEnd) = boost::vertices(_t); tIt!=tEnd; ++tIt){
                 callback(0);
-                if(bag(*tIt, _t).size() == bagsize){
+                auto const& b=boost::get(bag_t(), _t, *tIt);
+                if(b.size() == bagsize){
                     disabled_.resize(0);
                     vdMap_.resize(0);
 
-                    /* draft:: */ is_in_neighbour_bd<vertex_descriptor, T_t> cb(_t, *tIt);
-                    BOOST_AUTO(mybag, bag(*tIt, _t));
+                    /* draft::?? */ is_in_neighbour_bd<vertex_descriptor, T_t> cb(_t, *tIt);
+                    auto mybag=b;
                     HI = &treedec::draft::immutable_clone(_g, H, mybag.begin(), mybag.end(), mybag.size(), &vdMap_, &cb);
                     status = is_improvement_bag<immutable_type, std::vector<imm_vertex_descriptor>, long unsigned>
                                                                                   (*HI, disabled_, X, Y, cb.a, cb.b);
@@ -214,8 +215,8 @@ public:
             //the bag of 'refinement_vertex' with this bag.
             typename treedec_traits<T_t>::bag_type B;
             treedec::map_descriptors_to_bags<G_t>(S, B);
-            typename treedec_traits<T_t>::bag_type old_bag = bag(refinement_vertex, _t);
-            bag(refinement_vertex, _t) = MOVE(B);
+            auto old_bag = boost::get(bag_t(), _t, refinement_vertex);
+            boost::get(bag_t(), _t, refinement_vertex) = MOVE(B);
 
             //Store the connected components of H[V(H)\S] in 'components'.
             typedef typename boost::graph_traits<immutable_type>::vertex_descriptor HI_vertex_descriptor;
@@ -255,7 +256,7 @@ public:
                 newN[i] = boost::add_vertex(_t);
                 typename treedec_traits<T_t>::bag_type uB;
                 treedec::map_descriptors_to_bags<G_t>(union_S_W_i[i], uB);
-                bag(newN[i], _t) = MOVE(uB);
+                boost::get(bag_t(), _t, newN[i]) = MOVE(uB);
 
                 assert(!boost::edge(refinement_vertex, newN[i], _t).second);
                 assert(!boost::edge(newN[i], refinement_vertex, _t).second);
@@ -272,13 +273,14 @@ public:
             //with exactly one new neighbour of 'refinement_vertex'.
             for(unsigned int i = 0; i <  oldN.size(); i++){
                 intersection.clear();
+                auto const& b=boost::get(bag_t(), _t, oldN[i]);
                 std::set_intersection(old_bag.begin(), old_bag.end(),
-                                      bag(oldN[i], _t).begin(),
-                                      bag(oldN[i], _t).end(),
+                                      b.begin(), b.end(),
                                       std::inserter(intersection, intersection.begin()));
 
                 for(unsigned int j = 0; j < newN.size(); j++){
-                    if(std::includes(bag(newN[j], _t).begin(), bag(newN[j], _t).end(),
+                    auto const& b=boost::get(bag_t(), _t, newN[j]);
+                    if(std::includes(b.begin(), b.end(),
                                      intersection.begin(), intersection.end()))
                     {
                         boost::add_edge(newN[j], oldN[i], _t);

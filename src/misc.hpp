@@ -615,7 +615,7 @@ void make_rooted(T_undir_t &T, T_dir_t &T_,
 {
     for(unsigned int i = 0; i < boost::num_vertices(T); i++){
         typename boost::graph_traits<T_undir_t>::vertex_descriptor new_vertex = boost::add_vertex(T_);
-        bag(new_vertex, T_) = bag(i, T);
+        boost::get(bag_t(), T_, new_vertex) = boost::get(bag_t(), T, i);
     }
 
     std::vector<BOOL> visited(boost::num_vertices(T), false);
@@ -632,6 +632,13 @@ void make_rooted(T_undir_t &T, T_dir_t &T_)
 
     detail::make_rooted(T, T_, t);
 }
+
+template <typename T_undir_t, typename T_dir_t>
+void make_rooted(T_undir_t &T, T_dir_t &T_, typename boost::graph_traits<T_undir_t>::vertex_descriptor t)
+{
+    detail::make_rooted(T, T_, t);
+}
+
 
 //Glues a single bag with the current tree decomposition T according to subset relation.
 //used for preprocessing.

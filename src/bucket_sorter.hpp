@@ -58,21 +58,19 @@ namespace boost {
       trace1("rm", head[bucket[x] ]);
       trace2("rm", prev[i], next[i]);
 #endif
-      const size_type& next_node = next[i];
-      const size_type& prev_node = prev[i];
+      auto next_node = next[i];
+      auto prev_node = prev[i];
       assert(prev_node!=i);
-    
-      //check if i is the end of the bucket list 
+
+      //check if i is the end of the bucket list
       if ( next_node != invalid_value() ){
         assert(next_node != prev_node);
-        prev[next_node] = prev_node; 
+        prev[next_node] = prev_node;
       }
       //check if i is the begin of the bucket list
       if( prev_node == invalid_value() ){
         unreachable();
         // double remove?
-      }else if(prev_node>=size()){
-        next[prev_node] = next_node;
       }else{
         next[prev_node] = next_node;
       }
@@ -92,11 +90,15 @@ namespace boost {
       trace1("rmd", b.top());
       trace2("rmd", prev[i], next[i]);
 #endif
-      next[i]=invalid_value(); // BUG, why needed?
+      // BUG? , (why) is this needed?
+      next[i] = invalid_value();
+
 #ifndef NDEBUG
-      prev[i]=invalid_value();
+      // indicate that this element is not listed in a bucket.
+      // genenerally, the user needs to keep track, not us.
+      prev[i] = invalid_value();
 #endif
-    }
+    } // remove
 
     void push_back(const value_type& x) { untested();
       assert(x<next.size());
@@ -105,6 +107,8 @@ namespace boost {
     }
 
     void push(const value_type& x) {
+      // dont know how to do this right now, but i mean it.
+      // assert( !is_in_bucket(x) );
       assert(x<next.size());
       id_to_value[get(id, x)] = x;
       (*this)[bucket[x]].push(x);
@@ -132,7 +136,9 @@ namespace boost {
 #endif
 
     void update(const value_type& x) {
-      remove(x); // can kill head.
+      // dont know how to do this right now, but i mean it.
+      // assert( is_in_bucket(x) );
+      remove(x);
       (*this)[bucket[x]].push(x);
     }
 

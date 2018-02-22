@@ -164,7 +164,7 @@ public: // construct
             auto n=*p.first;
             auto deg=boost::out_degree(n, g);
 
-            if(deg==0){ untested();
+            if(deg==0){
 //            }else if(deg==1){ untested();
             }else{
                 size_t missing_edges=-1;

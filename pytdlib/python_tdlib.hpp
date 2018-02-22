@@ -58,7 +58,6 @@ int gc_minDegree_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> 
 int gc_boost_minDegree_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                          std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype);
 
-
 int gc_fillIn_decomp(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                       std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype);
 
@@ -67,6 +66,9 @@ void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned in
 
 void gc_fillIn_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                         std::vector<unsigned int> &elim_ordering, unsigned graphtype);
+
+int gc_Thorup(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
+                         std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype);
 
 
 /* POSTPROCESSING */
@@ -128,4 +130,10 @@ void gc_generic_elimination_search3(std::vector<unsigned int> &V_G, std::vector<
 
 void gc_generic_elimination_search_p17(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings);
 void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G, unsigned graphtype, unsigned max_nodes, unsigned max_orderings);
+
+
+/* weight stuff */
+
+unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype, bool verbose);
 

@@ -72,10 +72,10 @@ int main(int argc, char** argv)
 	if(argc>2){
 		rng.seed(atoi(argv[2]));
 	}
-	bool print=false;
-	if(argc>3){
-		print = true;
-	}
+	// bool print=false;
+	// if(argc>3){
+	// 	print = true;
+	// }
 
 	typedef sg_dvv G;
 	sg_dvv g(size);
@@ -185,7 +185,7 @@ int main(int argc, char** argv)
 #endif
 		);
 	typename treedec::graph_traits<G>::treedec_type t;
-	g=h; // restore
+	g = h; // restore
 	treedec::check(g);
 	assert(boost::num_edges(g)==boost::num_edges(h));
 
@@ -198,23 +198,23 @@ int main(int argc, char** argv)
 	}
 
 	int status = 0;
-#ifdef CHECK_INEFFICIENT_VARIANT
-	treedec::ordering_to_treedec(g, o, t ); // can kill g!
-   h=g; // restore
+	if(0){ // inefficient
+		treedec::ordering_to_treedec(g, o, t ); // can kill g!
+		h=g; // restore
 
-	status = treedec::check_treedec(g,t);
-	std::cout << "bagsize " << treedec::get_bagsize(t) << " status " << status <<"\n";
-	std::cout << "same as bagsize! " << w <<"\n";
-	assert(w == treedec::get_bagsize(t)); /// checks if BMD works!
-#endif
+		status = treedec::check_treedec(g,t);
+		std::cout << "bagsize " << treedec::get_bagsize(t) << " status " << status <<"\n";
+		std::cout << "same as bagsize! " << w <<"\n";
+		assert(w == treedec::get_bagsize(t)); /// checks if BMD works!
+	}
 
 	std::vector<unsigned>& ou=reinterpret_cast<std::vector<unsigned>&>(o);
 	treedec::draft::vec_ordering_to_tree(g, ou, t );
 	assert(boost::num_edges(t)+1==boost::num_vertices(t));
 	assert(boost::num_edges(t)+1==boost::num_vertices(g));
 
+#if 0 // later.
 	incomplete(); // need printer header
-#if 0
 	if(print){
 		auto P = treedec::draft::grtdprinter<G>(std::cout, g, "test");
 		treedec::draft::vec_ordering_to_tree(g, ou, P );
@@ -222,18 +222,18 @@ int main(int argc, char** argv)
 #endif
 
 
-	// does not work on vectors...
-	// status=treedec::check_treedec(g,t);
+	// does not work on vectors. (?!)
+	status = treedec::check_treedec(g, t);
 
-	if (!status) std::cout << "treedec is valid!!\n";
+	if (!status){
+		std::cout << "treedec is valid!!\n";
+	}else{
+		incomplete();
+		std::cout << "something is wrong\n";
+	}
 	std::cout << "bagsize " << treedec::get_bagsize(t) << " status " << status <<"\n";
 	std::cout << "boost_minDegree_ordering said " << w << "\n";
 
-	incomplete();
-//	assert(!status);
-
-	if(w != treedec::get_bagsize(t)){
-	}
 	assert(w == treedec::get_bagsize(t));
 
 #endif // HAVE_GALA

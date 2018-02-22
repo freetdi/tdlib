@@ -20,6 +20,8 @@
 #ifndef TREEDEC_INDUCED_SUBGRAPH_HPP
 #define TREEDEC_INDUCED_SUBGRAPH_HPP
 
+#include <boost/iterator/filter_iterator.hpp>
+
 // graph const&+member_pred const&=induced subgraph.
 //
 // this is just used for vertex iteration right now.

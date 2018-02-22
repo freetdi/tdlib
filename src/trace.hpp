@@ -1,17 +1,8 @@
 #include <iostream>
 
 #ifndef incomplete
-#ifdef TRACE_INCOMPLETE
 #define incomplete() \
 	std::cout << "incomplete " << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"
-#else
-#define incomplete()
-#endif
-#endif
-
-#ifndef unreachable
-#define unreachable() \
-	std::cerr << "unreachable " << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"
 #endif
 
 #ifndef unreachable

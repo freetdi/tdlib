@@ -1,5 +1,5 @@
 // Lukas Larisch, 2014 - 2017
-// Felix Salfelder 2016 - 2017
+// Felix Salfelder 2016 - 2018
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -60,6 +60,10 @@
 #include "numbering.hpp"
 #include "copy.hpp"
 #include "config_traits.hpp"
+
+#include "generic_elimination_search_overlay.hpp"
+#include "induced_subgraph.hpp"
+
 #include "graph.hpp"
 #include "misc.hpp"
 #include "overlay.hpp"
@@ -752,7 +756,8 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
                 std::begin(comp_range), std::end(comp_range), compsize,
                 &vdMap);
 
-        assert_connected(G_);
+//        not defined here.
+//        assert_connected(G_);
 
         // T_t T_; // doesn't work (probably should?)
         boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> T_;

@@ -371,7 +371,7 @@ public: // implementation
         // bug: idmap!
         auto degc=baseclass::_degreemap[c];
 
-        assert(fill_c<=degc*(degc-1));
+        assert(fill_c<=long(degc*(degc-1)));
 
         baseclass::_numbering.put(c);
         baseclass::_numbering.increment();
