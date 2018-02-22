@@ -52,6 +52,8 @@ cdef extern from "python_tdlib.hpp":
                                vector[vector[int]] &V_T, vector[unsigned int] &E_T, unsigned graphtype)
     void gc_fillIn_decomp(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                             vector[vector[int]] &V_T, vector[unsigned int] &E_T, unsigned graphtype)
+    void gc_Thorup(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
+                            vector[vector[int]] &V_T, vector[unsigned int] &E_T, unsigned graphtype)
     void gc_minDegree_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                vector[unsigned int] &elim_ordering, unsigned graphtype)
     void gc_fillIn_ordering(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
@@ -124,5 +126,5 @@ cdef extern from "python_tdlib.hpp":
 
     unsigned gc_weight_stats(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                        vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-                                                       unsigned graphtype)
+                                                       unsigned graphtype, bool verbose)
 

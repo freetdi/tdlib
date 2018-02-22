@@ -395,7 +395,7 @@ unsigned min(unsigned a, unsigned b){
     return (a <= b)? a : b;
 }
 
-
+/*
 //some measurement for storage consumption
 template <class T_t>
 unsigned get_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor root){
@@ -411,12 +411,27 @@ unsigned get_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor
             return -1;
     }
 }
+*/
+
+//some measurement for storage consumption
+template <class T_t>
+unsigned get_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor root){
+    switch (boost::out_degree(root, T)){
+        case 0:
+            return 0;
+        case 1:
+            return get_weight(T, *(boost::adjacent_vertices(root, T).first));
+        case 2:
+            unsigned l = get_weight(T, *(boost::adjacent_vertices(root, T).first));
+            unsigned r = get_weight(T, *(++boost::adjacent_vertices(root, T).first));
+            return (l == r)? l+1 : (l > r)? l : r;
+    }
+}
 
 template <class T_t, class N_t>
-unsigned weight_try_roots(T_t &T, N_t &N){
+unsigned weight_try_roots(T_t &T, N_t &N, bool verbose=false){
     unsigned min = -1;
     unsigned max = 0;
-    //double avg = 0.0;
 
     typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
     for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
@@ -426,22 +441,22 @@ unsigned weight_try_roots(T_t &T, N_t &N){
 
         unsigned w = get_weight(N, *tIt);
 
+        //std::cout << boost::out_degree(*tIt, N) << std::endl;
+
         min = (min < w)? min : w;
         max = (w >= max)? w : max;
-        //avg += w;
 
         //std::cout << "weight " << w << std::endl;
     }
-    //avg /= boost::num_vertices(T);
 
-    unsigned diff = max - min;
+    if(verbose){
+        unsigned diff = max - min;
+        std::cout << "min " << min << " # ";
+        std::cout << "max " << max << " # ";
+        std::cout << "diff " << diff << std::endl;
+    }
 
-    std::cout << "min " << min << " # ";
-    std::cout << "max " << min << " # ";
-    //std::cout << "avg " << avg << " # ";
-    std::cout << "diff " << diff << std::endl;
-
-    return diff;
+    return min;
 }
 
 

@@ -820,6 +820,42 @@ def fillIn_decomp(G):
     return T, get_width(T)
 
 
+def Thorup(G):
+    """
+    Computes a tree decomposition of a given graph based on Thorup's algorithm.
+     INPUTS:
+
+    INPUTS:
+
+    - G : input graph
+
+    OUTPUTS:
+
+    - T : treedecomposition of G
+
+    - width : the width of T
+
+    EXAMPLES:
+
+        T, width = tdlib.Thorup(G)
+    """
+
+    cdef vector[unsigned int] V_G, E_G, E_T
+    cdef vector[vector[int]] V_T
+
+    labels_map = cython_make_tdlib_graph(G.vertices(), G.edges(), V_G, E_G)
+
+    cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+
+    gc_Thorup(V_G, E_G, V_T, E_T, graphtype);
+
+    V_T_ = apply_labeling(V_T, labels_map)
+
+    T = Decomp(V_T_, E_T)
+
+    return T, get_width(T)
+
+
 def minDegree_ordering(G):
     """
     Computes an elimination ordering of a given graph based on the minDegree
@@ -1552,7 +1588,7 @@ def generic_elimination_search_p17_jumper(G, max_nodes, max_orderings):
 ############ WEIGHT STUFF ####################################
 
 
-def weight_stats(G, T):
+def weight_stats(G, T, verbose=False):
     """
     Computes weight statistics.
 
@@ -1574,8 +1610,9 @@ def weight_stats(G, T):
         return
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
+    cdef bool verb = verbose
 
-    cdef unsigned diff = gc_weight_stats(V_G, E_G, V_T, E_T, graphtype)
+    cdef unsigned diff = gc_weight_stats(V_G, E_G, V_T, E_T, graphtype, verb)
 
 
     return diff

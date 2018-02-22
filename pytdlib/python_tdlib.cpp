@@ -48,15 +48,14 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, t
 #include "applications/dominating_set.hpp"
 #include "applications/coloring.hpp"
 #include "misc.hpp"
+#include "thorup.hpp"
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
 #endif
 
 
-
 #include "convenience.hpp"
-
 
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> TD_graph_t; //type 0
@@ -83,7 +82,7 @@ void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned
     if(E.size() != 0){
         for(unsigned int j = 0; j < E.size()-1; j++){
             boost::add_edge(idxMap[E[j]], idxMap[E[j+1]], G);
-            if(directed){
+            if(!directed){
                 boost::add_edge(idxMap[E[j+1]], idxMap[E[j]], G);
             }
             j++;
@@ -694,6 +693,63 @@ int gc_fillIn_decomp(std::vector<unsigned int> &V_G, std::vector<unsigned int> &
 }
 
 
+
+typedef bool cfg_alive_t;
+typedef bool cfg_dying_t;
+
+struct cfg_node
+{
+  // iCode *ic; // bnot relevant
+  // operand_map_t operands;
+  cfg_alive_t alive;
+  cfg_dying_t dying;
+};
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, cfg_node> cfg_t;
+
+
+
+int gc_Thorup(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+                      std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype)
+{
+    TD_tree_dec_t T;
+
+    if(graphtype == 0){
+        //TD_graph_t G;
+        cfg_t G;
+
+        make_tdlib_graph(G, V_G, E_G, true); //directed
+
+        typedef treedec::he::thorup<cfg_t> thorup;
+        //typedef treedec::he::thorup<TD_graph_t> thorup;
+	thorup Tp(G);
+	Tp.do_it();
+	Tp.get_tree_decomposition(T);
+    }
+    else if(graphtype == 1){
+        //TD_graph_vec_t G;
+        cfg_t G;
+
+        make_tdlib_graph(G, V_G, E_G, true); //directed
+
+        typedef treedec::he::thorup<cfg_t> thorup;
+        //typedef treedec::he::thorup<TD_graph_t> thorup;
+	thorup Tp(G);
+	Tp.do_it();
+	Tp.get_tree_decomposition(T);
+    }
+    else{
+        assert(false);
+        return -66;
+    }
+
+    treedec::make_small(T);
+    make_python_decomp(T, V_T, E_T);
+
+    return treedec::get_width(T);
+}
+
+
 void gc_minDegree_ordering(std::vector<unsigned int> &V, std::vector<unsigned int> &E,
                            std::vector<unsigned int> &elim_ordering, unsigned graphtype)
 {
@@ -1202,7 +1258,7 @@ void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, st
 /* weight stuff */
 
 unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype){
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype, bool verbose){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
@@ -1211,7 +1267,7 @@ unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned in
 
     TD_tree_dec_directed_t N;
 
-    return treedec::nice::weight_try_roots(T, N);
+    return treedec::nice::weight_try_roots(T, N, verbose);
 }
 
 // vim:ts=8:sw=4:et
