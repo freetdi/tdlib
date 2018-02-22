@@ -71,7 +71,7 @@ bool is_vertex_cover2(G_t &G,
 //TODO: marker?
 template <typename G_t>
 bool is_valid_extension(G_t &G,
-    typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &bag,
+    const typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &bag,
     const typename treedec_traits<typename treedec_chooser<G_t>::type>::bag_type &old_VC,
     typename boost::graph_traits<G_t>::vertex_descriptor new_vertex)
 {
@@ -131,7 +131,9 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
                 iRes.decode(child, old_encoded, decoded_set);
                 unsigned new_encoded = iRes.encode(cur, decoded_set);
 
-                if(is_valid_extension(G, &bag(cur, T), decoded_set, new_vertex)){
+                auto &b = bag(cur, T);
+
+                if(is_valid_extension(G, b, decoded_set, new_vertex)){
                     iRes.add(cur, new_encoded, iRes.get(child, old_encoded));
                 }
                 else{
@@ -151,7 +153,6 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
                 if(it->second != -1){
                     iRes.add(cur, new_encoded, it->second + 1);
                 }
-
                 else{ //TODO: is this really correct?!
 /*
                     typename treedec_traits<T_t>::bag_type new_set;

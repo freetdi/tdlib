@@ -118,8 +118,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
         treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
         if(node_type == treedec::nice::LEAF){
-            auto const& b=boost::get(bag_t(), T, cur);
-            auto leaf=*(b.begin());
+            auto leaf=*(bag(cur, T).begin());
             auto pos=boost::get(boost::vertex_index, G, leaf);
 
             std::vector<int> result(boost::num_vertices(G), -1);
@@ -247,8 +246,9 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                                          *(++boost::adjacent_vertices(cur, T).first);
 
             std::set<unsigned int> M;
-            auto const& b=boost::get(bag_t(), T, cur);
-            for(auto bIt=b.begin(); bIt!=b.end(); ++bIt) {
+            for(typename treedec_traits<T_t>::bag_type::iterator bIt =
+                        bag(cur, T).begin(); bIt != bag(cur, T).end(); bIt++)
+            {
                 unsigned int pos = TREEDEC_GET_POS(*bIt, G);
                 M.insert(pos);
             }

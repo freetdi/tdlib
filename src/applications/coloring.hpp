@@ -62,7 +62,7 @@ bool is_valid_extended_coloring(G_t &G, typename boost::graph_traits<G_t>::verte
 template <typename G_t, typename T_t>
 void colorings_intersection(G_t &G, std::vector<std::vector<int> > &results_left,
                             std::vector<std::vector<int> > &results_right,
-                            typename treedec_traits<T_t>::bag_type &bag,
+                            const typename treedec_traits<T_t>::bag_type &bag,
                             std::vector<std::vector<int> > &intersection)
 {
     for(unsigned int i = 0; i < results_left.size(); i++){
@@ -105,8 +105,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
 
         if(node_type == treedec::nice::LEAF){
             //Store all k colorings.
-            auto const& b=boost::get(bag_t(), T, cur);
-            unsigned int leaf = *(b.begin());
+            unsigned int leaf = *(bag(cur, T).begin());
             unsigned int pos = TREEDEC_GET_POS(leaf, G);
 
             std::vector<int> coloring(boost::num_vertices(G), -1);
@@ -182,9 +181,7 @@ bool bottom_up_computation_min_coloring(G_t &G, T_t &T, unsigned int k,
             typename boost::graph_traits<T_t>::vertex_descriptor child2 =
                                          *(++boost::adjacent_vertices(cur, T).first);
 
-            auto& b=boost::get(bag_t(), T, cur);
-            treedec::app::detail::colorings_intersection<G_t, T_t>(
-                    G, results[child1], results[child2], b, results[cur]);
+            treedec::app::detail::colorings_intersection<G_t, T_t>(G, results[child1], results[child2], bag(cur, T), results[cur]);
 
             //No coloring possible with k colors.
             if(results[cur].size() == 0){
