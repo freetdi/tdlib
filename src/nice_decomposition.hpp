@@ -390,11 +390,6 @@ private:
     bool _cleanup;
 }; // nicify
 
-
-unsigned min(unsigned a, unsigned b){
-    return (a <= b)? a : b;
-}
-
 /*
 //some measurement for storage consumption
 template <class T_t>
