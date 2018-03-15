@@ -225,8 +225,8 @@ public: // queueing
         _degs.push(v);
     }
     void update(const vertex_descriptor& v)
-    {
-        _vals[v]=_degree[v]; // BUG. use the same array!!
+    { untested();
+        _vals[v] = _degree[v]; // BUG. use the same array!!
         trace2("update", v, _vals[v]);
         _degs.update(v);
     }
@@ -237,16 +237,13 @@ public: // queueing
     }
 #endif
 
-    void update_queued()
-    {
-
+    void update_queued() {
         while(!_q.empty()){
             reg(_q.top());
             _q.pop();
         }
     }
-    void flush() const
-    {
+    void flush() const {
     }
 
 public: // picking
