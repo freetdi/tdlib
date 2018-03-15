@@ -96,6 +96,12 @@ void merge(C& c, B b, E e)
     detail::container_modify<C>::merge(c, b, e);
 }
 
+template<class C>
+void sort(C& c)
+{
+    detail::container_modify<C>::sort(c);
+}
+
 template<class C, class E>
 bool contains(C const& c, E e)
 {

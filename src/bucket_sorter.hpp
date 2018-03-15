@@ -66,6 +66,7 @@ namespace boost {
       if ( next_node != invalid_value() ){
         assert(next_node != prev_node);
         prev[next_node] = prev_node;
+      }else{
       }
       //check if i is the begin of the bucket list
       if( prev_node == invalid_value() ){
@@ -76,6 +77,7 @@ namespace boost {
       }
       if(next_node == prev_node){
         // double remove?
+      }else{
       }
 
       assert(head[bucket[x]]!=x);
