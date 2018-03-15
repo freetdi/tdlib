@@ -373,7 +373,7 @@ public:
     int get_treewidth() {
         return int(_lb_bs)-1;
     }
-    void isolate(vertex_descriptor v){ untested();
+    void isolate(vertex_descriptor v){
         unsigned deg = _degree[v];
         _num_edges -= deg;
 
@@ -428,7 +428,7 @@ public:
             _dormant.unmark(n);
             // wake up!
             _degs.reg(n);
-        }else{ untested();
+        }else{
             assert(_degs.is_reg(n));
             // back/front?
             //
@@ -485,7 +485,7 @@ public:
                 assert(*Is.first != *Ii);
                 if(!_marker.is_marked(*Ii)){ untested();
                     // not a neighbour.
-                }else{ untested();
+                }else{
                     // need to avoid is_edge here..
                     assert(boost::edge(*Is.first, *Ii, _g).second
                             == boost::edge(*Ii, *Is.first, _g).second);
@@ -859,7 +859,7 @@ bool preprocessing<G_t, CFG>::check_twins_3(
             // a=x
             // =xx
             ++Ib;
-            if(*Ib == a){ untested();
+            if(*Ib == a){
                 ++Ia;
                 ++Ib;
                 ret = *Ia==*Ib;

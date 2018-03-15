@@ -145,7 +145,7 @@ namespace detail{//
             }
           }
         }
-        static void sort(C& c) { untested();
+        static void sort(C& c) {
             std::sort(c.begin(), c.end());
         }
     };
@@ -179,7 +179,7 @@ namespace detail{//
             insert(c, *b);
           }
         }
-        static void sort(C&) { untested();
+        static void sort(C&) {
         }
     }; // container_mod<set>
 } // detail

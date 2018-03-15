@@ -225,7 +225,7 @@ public: // queueing
         _degs.push(v);
     }
     void update(const vertex_descriptor& v)
-    { untested();
+    {
         _vals[v] = _degree[v]; // BUG. use the same array!!
         trace2("update", v, _vals[v]);
         _degs.update(v);
