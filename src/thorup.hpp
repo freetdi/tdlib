@@ -26,7 +26,7 @@
 // property, e.g.:
 //
 // struct tree_dec_node
-// {
+// { untested();
 //  std::set<unsigned int> bag;
 // };
 // typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
@@ -85,8 +85,7 @@ namespace treedec{
 
 namespace pkk_thorup{
 
-struct forget_properties
-{
+struct forget_properties {
   template<class T1, class T2>
   void operator()(const T1&, const T2&) const
   {
@@ -169,7 +168,7 @@ void thorup_E(std::multimap<unsigned, unsigned> &M, I_t const& I)
 		}else{
 		}
 
-      while (s.top().second <= i) {
+      while (s.top().second <= i) { untested();
 			M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
 			s.pop();
 		}
@@ -253,7 +252,7 @@ find_bag(const std::set<unsigned int> &X, const T_t &T)
   }
 
   if (t_found == t_end) // Todo: Better error handling (throw exception?)
-    {
+    { untested();
       std::cerr << "find_bag() failed.\n";
       std::cerr.flush();
     }
@@ -324,8 +323,8 @@ void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_
 template <class T_t, class G_t>
 void tree_decomposition_from_elimination_ordering(T_t &T, const std::vector<unsigned int>& l, const G_t &G)
 {
-  auto v = l.rbegin();
-  auto v_end = l.rend();
+  auto v=l.rbegin();
+  auto v_end=l.rend();
 
   // Todo: Implement a graph adaptor for boost that allows to treat directed
   // graphs as undirected graphs.
@@ -339,7 +338,7 @@ void tree_decomposition_from_elimination_ordering(T_t &T, const std::vector<unsi
 
 template <class T_t, class G_t>
 void thorup_tree_decomposition(T_t &tree_decomposition, const G_t &cfg)
-{
+{ untested();
 	std::list<unsigned int> elimination_ordering;
 
 	thorup_elimination_ordering(elimination_ordering, cfg);
@@ -383,18 +382,17 @@ public:
 	decomp_type const& get_tree_decomposition() const{
 		return _t;
 	}
-	size_t get_bagsize() const{
+	size_t get_bagsize() const{ untested();
 		return treedec::get_bagsize(_t);
 	}
-	std::list<unsigned> const&  get_elimord() const{
-		return _o;
+	std::shared_ptr<const std::vector<unsigned> > get_elimord() const{
+		return std::make_shared<const std::vector<unsigned> > (_o);
 	}
 private:
 	G const& _g;
 	std::vector<unsigned> _o;
 	decomp_type _t;
 };
-
 namespace he {
     template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
     using thorup=treedec::thorup<x, C>;
