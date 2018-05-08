@@ -26,7 +26,7 @@
 // property, e.g.:
 //
 // struct tree_dec_node
-// {
+// { untested();
 //  std::set<unsigned int> bag;
 // };
 // typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_node> tree_dec_t;
@@ -85,11 +85,10 @@ namespace treedec{
 
 namespace pkk_thorup{
 
-struct forget_properties
-{
+struct forget_properties {
   template<class T1, class T2>
   void operator()(const T1&, const T2&) const
-  {
+  { untested();
   }
 };
 
@@ -99,14 +98,14 @@ template <class l_t>
 void thorup_D(l_t &l, const std::multimap<unsigned, unsigned> &MJ,
 		const std::multimap<unsigned, unsigned> &MS,
 		const unsigned n)
-{
+{ untested();
   std::map<unsigned int, unsigned int> m;
 
   l.clear();
 
   unsigned int i = 0;
   for (unsigned int j = n; j > 0;)
-    {
+    { untested();
       j--;
       if (m.find(j) == m.end())
         m[j] = i++;
@@ -126,11 +125,11 @@ void thorup_D(l_t &l, const std::multimap<unsigned, unsigned> &MJ,
 
   std::map<unsigned int, unsigned int>::iterator mi;
 
-  for (mi = m.begin(); mi != m.end(); ++mi){
+  for (mi = m.begin(); mi != m.end(); ++mi){ untested();
     v[mi->second] = mi->first;
   }
 
-  for (i = 0; i < n; i++){
+  for (i = 0; i < n; i++){ untested();
     l.push_back(v[i]);
   }
 }
@@ -140,7 +139,7 @@ void thorup_D(l_t &l, const std::multimap<unsigned, unsigned> &MJ,
 // could be reduced to O(|I|).
 template <class I_t>
 void thorup_E(std::multimap<unsigned, unsigned> &M, I_t const& I)
-{
+{ untested();
   typedef typename boost::graph_traits<I_t>::adjacency_iterator adjacency_iter_t;
   typedef typename boost::property_map<I_t, boost::vertex_index_t>::type index_map;
   index_map index = boost::get(boost::vertex_index, I);
@@ -152,30 +151,30 @@ void thorup_E(std::multimap<unsigned, unsigned> &M, I_t const& I)
   s.push(std::pair<int, unsigned int>(-1, boost::num_vertices(I)));
 
   for (unsigned int i = 0; i < boost::num_vertices(I); i++)
-    {
+    { untested();
       unsigned int j = i;
       adjacency_iter_t j_curr, j_end;
 
       for (boost::tie(j_curr, j_end)=boost::adjacent_vertices(i, I);
-			  	j_curr != j_end; ++j_curr){
-        if (index[*j_curr] > j){
+			  	j_curr != j_end; ++j_curr){ untested();
+        if (index[*j_curr] > j){ untested();
           j = index[*j_curr];
-		  }else{
+		  }else{ untested();
 		  }
 		}
 
-      if (j == i){
+      if (j == i){ untested();
         continue;
-		}else{
+		}else{ untested();
 		}
 
-      while (s.top().second <= i) {
+      while (s.top().second <= i) { untested();
 			M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
 			s.pop();
 		}
 
       unsigned int i2 = i;
-		while (j >= s.top().second && s.top().second > i2) {
+		while (j >= s.top().second && s.top().second > i2) { untested();
 			i2 = s.top().first;
 			s.pop();
 		}
@@ -184,7 +183,7 @@ void thorup_E(std::multimap<unsigned, unsigned> &M, I_t const& I)
     }
     
     // Thorup forgot this in his paper. Without it, some maximal chains are omitted.
-    while(s.size() > 1) {
+    while(s.size() > 1) { untested();
         M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
         s.pop();
     }
@@ -199,7 +198,7 @@ void thorup_E(std::multimap<unsigned, unsigned> &M, I_t const& I)
 // it seems that G is expected to be oriented. otherwise result is worse
 template <class l_t, class G_t>
 void thorup_elimination_ordering(l_t &l, const G_t &G)
-{
+{ untested();
   // Remove edges to immediately following instruction. By "each statement can
   // have at most one jump" in the last paragraph of Appendix A it is clear
   // that Thorup does not consider the implicit next-instruction-edges as
@@ -207,7 +206,7 @@ void thorup_elimination_ordering(l_t &l, const G_t &G)
   boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> J;
   boost::copy_graph(G, J, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
   auto N=boost::num_vertices(J);
-  for (unsigned int i = 1; i < N; i++){
+  for (unsigned int i = 1; i < N; i++){ untested();
     remove_edge(i-1, i, J);
   }
 
@@ -231,29 +230,29 @@ void thorup_elimination_ordering(l_t &l, const G_t &G)
 template <class T_t>
 typename boost::graph_traits<T_t>::vertex_iterator
 find_bag(const std::set<unsigned int> &X, const T_t &T)
-{
+{ untested();
   typedef typename boost::graph_traits<T_t>::vertex_iterator T_vertex_iter_t;
   typedef typename std::set<unsigned int>::const_iterator vertex_index_iter_t;
 
   T_vertex_iter_t t, t_end, t_found;
   vertex_index_iter_t v;
 
-  for (boost::tie(t, t_end) = vertices(T), t_found = t_end; t != t_end; ++t) {
-	  for (v = X.begin(); v != X.end(); ++v){
+  for (boost::tie(t, t_end) = vertices(T), t_found = t_end; t != t_end; ++t) { untested();
+	  for (v = X.begin(); v != X.end(); ++v){ untested();
 		  auto const& b=boost::get(treedec::bag_t(), T, *t);
-		  if (b.find(*v) == b.end()){
+		  if (b.find(*v) == b.end()){ untested();
 			  break;
-		  }else{
+		  }else{ untested();
 		  }
 	  }
 
-	  if (v == X.end()){
+	  if (v == X.end()){ untested();
 		  t_found = t;
 	  }
   }
 
   if (t_found == t_end) // Todo: Better error handling (throw exception?)
-    {
+    { untested();
       std::cerr << "find_bag() failed.\n";
       std::cerr.flush();
     }
@@ -264,13 +263,13 @@ find_bag(const std::set<unsigned int> &X, const T_t &T)
 // Add edges to make the vertices in X a clique in G.
 template <class G_t>
 void make_clique(const std::set<unsigned int> &X , G_t &G)
-{
+{ untested();
   std::set<unsigned int>::const_iterator n1, n2;
-  for (n1 = X.begin(); n1 != X.end(); n1++){
-    for (n2 = n1, ++n2; n2 != X.end(); ++n2){
-      if(!boost::edge(*n1, *n2, G).second){
+  for (n1 = X.begin(); n1 != X.end(); n1++){ untested();
+    for (n2 = n1, ++n2; n2 != X.end(); ++n2){ untested();
+      if(!boost::edge(*n1, *n2, G).second){ untested();
 			boost::add_edge(*n1, *n2, G);
-		}else{
+		}else{ untested();
 		}
 	 }
   }
@@ -278,10 +277,10 @@ void make_clique(const std::set<unsigned int> &X , G_t &G)
 
 template <class T_t, class v_t, class G_t>
 void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_t &G, std::vector<bool> &active)
-{
+{ untested();
   // Base case: Empty graph. Create an empty bag.
   if (v == v_end)
-    {
+    { untested();
       boost::add_vertex(T);
       return;
     }
@@ -323,9 +322,9 @@ void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_
 // FIXME. not here?
 template <class T_t, class G_t>
 void tree_decomposition_from_elimination_ordering(T_t &T, const std::vector<unsigned int>& l, const G_t &G)
-{
-  auto v = l.rbegin();
-  auto v_end = l.rend();
+{ untested();
+  auto v=l.rbegin();
+  auto v_end=l.rend();
 
   // Todo: Implement a graph adaptor for boost that allows to treat directed
   // graphs as undirected graphs.
@@ -339,7 +338,7 @@ void tree_decomposition_from_elimination_ordering(T_t &T, const std::vector<unsi
 
 template <class T_t, class G_t>
 void thorup_tree_decomposition(T_t &tree_decomposition, const G_t &cfg)
-{
+{ untested();
 	std::list<unsigned int> elimination_ordering;
 
 	thorup_elimination_ordering(elimination_ordering, cfg);
@@ -357,10 +356,10 @@ public: // types
 			  boost::property<treedec::bag_t, std::set<unsigned> > > decomp_type;
 public:
 	thorup(G const& g)
-		: algo1("thorup"), _g(g){
+		: algo1("thorup"), _g(g){ untested();
 	}
 
-	void do_it(){
+	void do_it(){ untested();
 		pkk_thorup::thorup_elimination_ordering(_o, _g);
 
 		// check: do we have better algorithms?
@@ -377,24 +376,23 @@ public:
 	}
 
 	template<class T>
-	void get_tree_decomposition(T& t) const{
+	void get_tree_decomposition(T& t) const{ untested();
 		boost::copy_graph(_t, t);
 	}
-	decomp_type const& get_tree_decomposition() const{
+	decomp_type const& get_tree_decomposition() const{ untested();
 		return _t;
 	}
-	size_t get_bagsize() const{
+	size_t get_bagsize() const{ untested();
 		return treedec::get_bagsize(_t);
 	}
-	std::list<unsigned> const&  get_elimord() const{
-		return _o;
+	std::shared_ptr<const std::vector<unsigned> > get_elimord() const{ untested();
+		return std::make_shared<const std::vector<unsigned> > (_o);
 	}
 private:
 	G const& _g;
 	std::vector<unsigned> _o;
 	decomp_type _t;
 };
-
 namespace he {
     template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
     using thorup=treedec::thorup<x, C>;
