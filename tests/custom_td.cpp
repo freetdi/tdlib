@@ -177,7 +177,7 @@ int main(int, char**)
 		auto X=B.get_tree_decomposition();
 		std::cout << "elimord\n";
 		unsigned sy=0;
-		for(auto y:*Y){ untested();
+		for(auto y:*Y){
 			sy+=y;
 			std::cout << y << "\n";
 		}
