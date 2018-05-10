@@ -7,7 +7,7 @@ if(len(sys.argv)<2 or sys.argv[1]!="long"):
     sys.exit(77)
 
 from graphs import *
-import CFGs
+import NewCFGs
 
 #don't confuse python unittest
 sys.argv=sys.argv[:1]
@@ -16,7 +16,7 @@ PREFIX = "NewCFGs"
 COUNT = 5961
 
 class TestTdLib_packages(unittest.TestCase):
-    #TODO: validation (is_clique, is_IS, is_VC,..) in tdlib?
+    """
     def test_max_clique(self):
         print("---maxClique--")
         for i in range(0, COUNT+1):
@@ -32,7 +32,7 @@ class TestTdLib_packages(unittest.TestCase):
             base.print_graph_name(PREFIX, i)
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.max_independent_set_with_treedecomposition(G, T)
-
+    """
     def test_min_vertex_cover(self):
         print("---minVertexCover--")
         for i in range(0, COUNT+1):
@@ -40,7 +40,8 @@ class TestTdLib_packages(unittest.TestCase):
             base.print_graph_name(PREFIX, i)
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
-
+            print(str(S))
+    """
     def test_min_dominating_set(self):
         print("---minDominatingSet--")
         for i in range(0, COUNT+1):
@@ -62,6 +63,7 @@ class TestTdLib_packages(unittest.TestCase):
             base.print_graph_name(PREFIX, i)
             T, w = tdlib.minDegree_decomp(G)
             S = tdlib.min_coloring_with_treedecomposition(G, T)
+    """
 
 if __name__ == '__main__':
     unittest.main()

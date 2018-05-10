@@ -90,11 +90,13 @@ template <typename T_t>
 typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
 {
     typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
+
+    //need assert here
+
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
     std::vector<BOOL> visited(boost::num_vertices(T), false);
 
-    for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end;
-        boost::tie(e, e_end)=boost::in_edges(t, T)){
+    for(boost::tie(e, e_end)=boost::in_edges(t, T); e!=e_end; ++e){ //wtf?! see diff
         if(!visited[boost::source(*e, T)]){
             t = boost::source(*e, T);
             visited[t] = true;
