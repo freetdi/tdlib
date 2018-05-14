@@ -421,6 +421,8 @@ unsigned get_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor
             unsigned r = get_weight(T, *(++boost::adjacent_vertices(root, T).first));
             return (l == r)? l+1 : (l > r)? l : r;
     }
+	 unreachable();
+	 return 0;
 }
 
 template <class T_t, class N_t>

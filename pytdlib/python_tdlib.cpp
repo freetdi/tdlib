@@ -68,7 +68,12 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_gra
 
 
 template <typename G_t>
-void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned int> &E, bool directed=false){
+void make_tdlib_graph(G_t &G,
+        std::vector<unsigned int> const&V,
+        std::vector<unsigned int> const&E,
+        bool directed=false){
+    (void)directed; // not really sure, what this is supposed to do.
+                    // G is directed. or it is not.
     unsigned int max = 0;
     for(unsigned int i = 0; i < V.size(); i++){
         max = (V[i]>max)? V[i] : max;
@@ -81,13 +86,7 @@ void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned
 
     if(E.size() != 0){
         for(unsigned int j = 0; j < E.size()-1; j++){
-            boost::add_edge(idxMap[E[j]], idxMap[E[j+1]], G);
-            if(directed){ untested();
-                // graph is directed. need both edges
-                boost::add_edge(idxMap[E[j+1]], idxMap[E[j]], G);
-            }else{
-                // not directed. add_edge has already done both.
-            }
+            treedec::add_edge(idxMap[E[j]], idxMap[E[j+1]], G);
             j++;
         }
     }
@@ -1261,7 +1260,7 @@ void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, st
 /* weight stuff */
 
 unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype, bool verbose){
+                                  std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned /* graphtype */, bool verbose){
     TD_graph_t G;
     make_tdlib_graph(G, V_G, E_G);
 
