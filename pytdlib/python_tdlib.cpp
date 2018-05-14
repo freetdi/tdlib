@@ -82,8 +82,11 @@ void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned
     if(E.size() != 0){
         for(unsigned int j = 0; j < E.size()-1; j++){
             boost::add_edge(idxMap[E[j]], idxMap[E[j+1]], G);
-            if(!directed){
+            if(directed){ untested();
+                // graph is directed. need both edges
                 boost::add_edge(idxMap[E[j+1]], idxMap[E[j]], G);
+            }else{
+                // not directed. add_edge has already done both.
             }
             j++;
         }
