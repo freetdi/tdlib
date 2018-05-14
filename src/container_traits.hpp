@@ -23,6 +23,7 @@
 #include <vector>
 #include <assert.h>
 #include <set>
+#include <algorithm> // sort
 #include "trace.hpp"
 
 namespace treedec{//
@@ -108,6 +109,9 @@ namespace detail{//
         static void insert(C& c, E e) { untested();
           c.insert(e);
         }
+        // sort. no-op for some containers
+        static void insert(C& c) { untested();
+        }
     };
     template<class C>
     struct container_modify<C,
@@ -141,6 +145,9 @@ namespace detail{//
             }
           }
         }
+        static void sort(C& c) {
+            std::sort(c.begin(), c.end());
+        }
     };
     template<class C>
     struct container_modify<C,
@@ -172,7 +179,9 @@ namespace detail{//
             insert(c, *b);
           }
         }
-    };
+        static void sort(C&) {
+        }
+    }; // container_mod<set>
 } // detail
 
 } // namespace treedec

@@ -93,7 +93,7 @@ namespace boost{\
     inline \
     typename property_map< T, vertex_all_t>::type\
     get(vertex_all_t, T& g) \
-    { untested(); \
+    {\
         typedef typename property_map< T, vertex_all_t>::type\
           pmap_type;\
         return pmap_type(g);\
@@ -102,7 +102,7 @@ namespace boost{\
     inline \
     bagstuff::const_treebagpmap<T>\
     get(vertex_all_t, T const& g) \
-    { untested(); \
+    {\
         typedef typename property_map< T, vertex_all_t>::const_type\
             pmap_type;\
         return pmap_type(g);\
@@ -112,7 +112,7 @@ namespace boost{\
     inline void\
     put(put_get_helper<bagstuff::gtob<T>::type,\
             bagstuff::treebagpmap<T> >& pa, U k, treedec::bag_t const& v)\
-    { untested();\
+    { untested1("....");\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
@@ -126,7 +126,7 @@ namespace boost{\
     put(const put_get_helper<bagstuff::gtob<T>::type,\
           bagstuff::treebagpmap<T> >& pa, U k,\
           const property<treedec::bag_t, std::set<unsigned> >& v)\
-    { untested(); \
+    {\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
@@ -140,7 +140,7 @@ namespace boost{\
     put(const put_get_helper<bagstuff::gtob<T>::type,\
         bagstuff::treebagpmap<T> >& pa, U k,\
         const property<treedec::bag_t, std::vector<unsigned> >& v)\
-    { untested(); \
+    {\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\

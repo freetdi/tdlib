@@ -25,8 +25,11 @@
 #include <iostream>
 #define untested() \
 	std::cerr << "@@# untested \n@@@:" << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"
+#define untested1(x) \
+	std::cerr << "@@# untested \n###:" << x << "\n";
 #else
 #define untested()
+#define untested1(x)
 #endif
 #define USE(x) (1)?(void)(0):(void)(x)
 

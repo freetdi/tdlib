@@ -170,10 +170,18 @@ int main(int, char**)
 		typedef boost::adjacency_list<boost::vecS, boost::vecS,
 				  boost::bidirectionalS > G;
 		typedef treedec::thorup<G> alg_B;
-		G h;
+		G h(2);
 		alg_B B(h);
 		B.do_it();
+		auto Y=B.get_elimord();
 		auto X=B.get_tree_decomposition();
+		std::cout << "elimord\n";
+		unsigned sy=0;
+		for(auto y:*Y){
+			sy+=y;
+			std::cout << y << "\n";
+		}
+		assert(sy==1);
 		boost::copy_graph(X, st);
 
 		B.get_tree_decomposition(st);

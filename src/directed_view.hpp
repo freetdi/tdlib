@@ -346,7 +346,6 @@ template<class G>
 typename graph_traits<G>::edges_size_type
 num_edges(treedec::draft::directed_view<G> const& g)
 {
-	untested();
 	return num_edges(*g);
 }
 

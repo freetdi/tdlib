@@ -35,6 +35,7 @@ check_PROGRAMS = \
 	bmd \
 	directed_view \
 	bag \
+	bug_19 \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
 	bucket_sorter_2u \
@@ -82,7 +83,7 @@ AM_CXXFLAGS = -O0 -g
 treedec:
 	-ln -sf $(top_srcdir)/src treedec
 
-EXTRA_DIST = g.h sdcc_.cpp
+EXTRA_DIST = g.h sdcc_.cpp g_19.h
 # 	svbs_random.h
 
 ${TESTS:%=%.log}: .P
