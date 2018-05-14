@@ -75,12 +75,12 @@ static std::atomic<unsigned> global_result;
 bool trace=false;
 
 #include <boost/graph/graph_traits.hpp>
-#include <tdlib/graph_traits.hpp>
+#include <treedec/graph_traits.hpp>
 
 //
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
-#include <tdlib/directed_view.hpp>
+#include <treedec/directed_view.hpp>
 #ifdef USE_RANDOM_MD
 #include <gala/examples/ssg_random.h>
 #endif
@@ -100,9 +100,9 @@ bool trace=false;
 
 #include "timer.h"
 
-#include <tdlib/printer.hpp>
-#include <tdlib/combinations.hpp>
-#include <tdlib/elimination_orderings.hpp>
+#include <treedec/printer.hpp>
+#include <treedec/combinations.hpp>
+#include <treedec/elimination_orderings.hpp>
 #include <boost/graph/copy.hpp>
 
 // undirected simple loopless graph
@@ -131,7 +131,6 @@ unsigned TWTHREAD_BASE::_running;
 
 #include "grparse.h"
 
-// bug, still tdlib
 
 ////// why is this necessary? //////
 using boost::out_edges;

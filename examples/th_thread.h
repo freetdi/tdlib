@@ -1,7 +1,7 @@
 #ifndef THTHREAD_H
 #define THTHREAD_H
 
-#include <tdlib/thorup.hpp>
+#include <treedec/thorup.hpp>
 
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class TH_THREAD : public TWTHREAD<G, cfgt> {
