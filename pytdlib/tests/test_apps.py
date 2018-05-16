@@ -3,6 +3,7 @@ import sys
 import tdlib
 import unittest
 import random
+import printer
 
 from graphs import *
 
@@ -10,6 +11,7 @@ from graphs import *
 sys.argv=sys.argv[:1]
 
 class TestTdLib_app(unittest.TestCase):
+    """
     def test_max_clique_with_treedecomposition_0a(self):
         V, E = cornercases[0]
         G = Graph(V, E)
@@ -125,13 +127,17 @@ class TestTdLib_app(unittest.TestCase):
         self.assertEqual(s, 1)
         self.assertEqual(len(S), s)
 
+    """
     def test_max_independent_set_with_treedecomposition_1(self):
         G = Graph(V_P6, E_P6)
         T, w = tdlib.PP_FI_TM(G)
+        printer.dump_treedecomposition_as_dot(T, "error_td.dot")
+        printer.dump_graph_as_dot(T, "error_graph.dot")
         s, S = tdlib.max_independent_set_with_treedecomposition(G, T)
         self.assertEqual(s, 3)
         self.assertEqual(len(S), s)
 
+    """
     def test_max_independent_set_with_treedecomposition_2(self):
         G = Graph(V_K5, E_K5)
         T, w = tdlib.PP_MD(G)
@@ -182,6 +188,7 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_FI_TM(G)
                 s, S = tdlib.max_independent_set_with_treedecomposition(G, T)
                 self.assertEqual(len(S), s)
+
 
     def test_min_vertex_cover_with_treedecomposition_0a(self):
         V, E = cornercases[0]
@@ -453,6 +460,7 @@ class TestTdLib_app(unittest.TestCase):
                 T, w = tdlib.PP_MD(G)
                 s, S = tdlib.min_coloring_with_treedecomposition(G, T)
                 self.assertEqual(len(S), s)
+    """ 	
 
 if __name__ == '__main__':
     unittest.main()
