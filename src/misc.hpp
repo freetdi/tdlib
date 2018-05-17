@@ -256,7 +256,7 @@ int check_treedec(G_t const& G, T_t const& T)
     if(!is_tree(T)){
 #ifndef NDEBUG
         std::cerr << "[is_valid_treedecomposition]: treedecomposition is not a tree" << std::endl;
-        dump_td(T, "validation_error_td.dot");
+        //dump_td(T, "validation_error_td.dot");
 #endif
         return -1;
     }

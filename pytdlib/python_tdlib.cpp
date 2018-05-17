@@ -1254,7 +1254,7 @@ unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned in
 
     treedec::nice::min_weight_traversal_caller(M, S);
 
-    dump_td(M, "weight_stuff.dot");
+    //dump_td(M, "weight_stuff.dot");
 
     return treedec::nice::weight_try_roots(T, N, verbose);
 }
