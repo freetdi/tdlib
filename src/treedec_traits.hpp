@@ -116,7 +116,7 @@ namespace boost{\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
-        for(auto const& i : v.BAG){ untested();\
+        for(auto const& i : v.BAG){ untested1(".");\
             treedec::push(b, i);\
         }\
     }\
@@ -130,7 +130,7 @@ namespace boost{\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
-        for(auto const& i : v.m_value){ untested();\
+        for(auto const& i : v.m_value){\
             treedec::push(b, i);\
         }\
     }\
@@ -144,7 +144,7 @@ namespace boost{\
         auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
-        for(auto const& i : v.m_value){ untested();\
+        for(auto const& i : v.m_value){ untested1("...");\
             treedec::push(b, i);\
         }\
     }\
@@ -171,7 +171,7 @@ namespace boost{\
 \
     inline bagstuff::treebagpmap<T> \
     get(treedec::bag_t, T & t)\
-    { untested(); \
+    { untested1("..,"); \
         return bagstuff::treebagpmap<T>(t);\
     }\
 \
