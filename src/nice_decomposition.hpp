@@ -514,21 +514,9 @@ template <typename T_t>
 void min_weight_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
     typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
 
-    std::cout << "find root in min weight traversal" << std::endl;
-    print_set(BAG_(root, T));
-
     std::vector<unsigned> w(boost::num_vertices(T));
     compute_weight(T, root, w);
-
-    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
-    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
-        print_set(BAG_(*tIt, T), false);
-        std::cout << ": " << w[*tIt] << std::endl;
-    }
-
     detail::min_weight_traversal(T, S, root, w);
-
-    std::cout << "#S vs #V: " << S.size() << " " << boost::num_vertices(T) << std::endl;
 
 }
 

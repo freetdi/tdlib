@@ -39,8 +39,7 @@ class TestTdLib_packages(unittest.TestCase):
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             base.print_graph_name(PREFIX, i)
             T, w = tdlib.minDegree_decomp(G)
-            S = tdlib.min_vertex_cover_with_treedecomposition(G, T)
-            print(str(S))
+            S = tdlib.min_vertex_cover_with_treedecomposition(G, T, True, True)
     """
     def test_min_dominating_set(self):
         print("---minDominatingSet--")

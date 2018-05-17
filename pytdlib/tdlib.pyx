@@ -1139,7 +1139,7 @@ def max_independent_set_with_treedecomposition(G, T, certificate=True):
     return size, py_IS
 
 
-def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
+def min_vertex_cover_with_treedecomposition(G, T, certificate=True, cache_traversal=False):
     """
     Computes a minimum vertex cover with help of a tree decomposition.
 
@@ -1172,7 +1172,7 @@ def min_vertex_cover_with_treedecomposition(G, T, certificate=True):
 
     cdef unsigned graphtype = graphtype_to_uint(G.graphtype())
 
-    cdef unsigned size = gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, certificate, graphtype);
+    cdef unsigned size = gc_min_vertex_cover_with_treedecomposition(V_G, E_G, V_T, E_T, VC_, certificate, cache_traversal, graphtype);
 
     py_VC = []
     cdef i;

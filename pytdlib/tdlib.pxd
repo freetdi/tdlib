@@ -100,7 +100,7 @@ cdef extern from "python_tdlib.hpp":
 
     unsigned gc_min_vertex_cover_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,
-                                                    vector[unsigned int] &VC, bool certificate, unsigned graphtype)
+                                                    vector[unsigned int] &VC, bool certificate, bool cache_traversal, unsigned graphtype)
 
     unsigned gc_min_coloring_with_treedecomposition(vector[unsigned int] &V_G, vector[unsigned int] &E_G,
                                                     vector[vector[int]] &V_T, vector[unsigned int] &E_T,

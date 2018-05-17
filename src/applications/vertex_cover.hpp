@@ -98,11 +98,17 @@ bool is_valid_extension(G_t &G,
 
 template <typename G_t, typename T_t>
 unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
-         treedec::app::detail::Intermediate_Results<T_t> &iRes)
+         treedec::app::detail::Intermediate_Results<T_t> &iRes, bool use_cache_weight_traversal=false)
 {
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
-    treedec::nice::postorder_traversal(T, S);
-    //treedec::nice::min_weight_traversal(T, S);
+
+    if(use_cache_weight_traversal){
+        treedec::nice::min_weight_traversal(T, S);
+    }
+    else{
+        treedec::nice::postorder_traversal(T, S);
+    }
+
     typename boost::graph_traits<T_t>::vertex_descriptor cur;
 
     while(!S.empty()){
@@ -236,7 +242,7 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
 
 template <typename G_t, typename T_t>
 unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
-              typename treedec_traits<T_t>::bag_type &global_result, bool certificate=true)
+              typename treedec_traits<T_t>::bag_type &global_result, bool certificate=true, bool use_cache_weight_traversal=false)
 {
 
     assert(treedec::is_undirected_type(G));
@@ -248,7 +254,7 @@ unsigned int min_vertex_cover_with_treedecomposition(G_t &G, T_t &T,
 
     treedec::app::detail::Intermediate_Results<T_t> iRes(T);
 
-    unsigned int min = treedec::app::detail::bottom_up_computation_vertex_cover(G, T, iRes);
+    unsigned int min = treedec::app::detail::bottom_up_computation_vertex_cover(G, T, iRes, use_cache_weight_traversal);
 
     if(certificate && min > 0){
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
