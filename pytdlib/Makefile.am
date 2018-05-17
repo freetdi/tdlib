@@ -27,7 +27,8 @@ EXTRA_DIST = \
 	Decomp.py \
 	python_tdlib.hpp \
 	tdlib.pxd \
-	tdlib.pyx
+	tdlib.pyx \
+	printer.py
 
 uninstall-hook:
 	-rmdir ${DESTDIR}/${instdir}
