@@ -50,7 +50,6 @@ script:
   - "./configure --enable-debug
                 CXXFLAGS=-std=c++11"
   - make check
-  - cat examples/*.log
 
   # redo with gala
   - LD_LIBRARY_PATH_OLD="$LD_LIBRARY_PATH"
@@ -84,7 +83,6 @@ script:
                     CPPFLAGS=-I${HOME}/GP/include\\ -I$BOOST_HOME
                     LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
        make check
-       cat examples/*.log
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
   - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
