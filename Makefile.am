@@ -28,7 +28,7 @@ if USE_PYTHON
 pytdlib = pytdlib
 endif
 
-SUBDIRS = $(pytdlib) src
+SUBDIRS = tests examples $(pytdlib) src
 
 
 EXTRA_DIST = cython.am
