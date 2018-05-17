@@ -64,6 +64,9 @@ script:
       export BOOST_HOME=`pwd`
       ./bootstrap.sh
       ./b2 --with-system --with-graph --with-thread --with-regex
+      echo LOCAL_INSTALL ${LOCAL_INSTALL}
+      LOCAL_INSTALL=${BOOST_HOME}/stage
+      echo LOCAL_INSTALL ${LOCAL_INSTALL}
       export BOOST_PARAM="--with-boost=$LOCAL_INSTALL"
       popd
       export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
@@ -75,13 +78,12 @@ script:
   - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
   - ( cd gala_src; ./configure )
   - make -C gala_src install DESTDIR=${HOME} prefix=GP
+  - echo $TRAVIS_OS_NAME $CXX
   - popd
   - |-
-    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "g++" ]; then
-       "./configure --enable-debug CXXFLAGS=-std=c++11
-                    CXXFLAGS=-std=c++11
-                    CPPFLAGS=-I${HOME}/GP/include\\ -I$BOOST_HOME
-                    LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
+    if [ "$TRAVIS_OS_NAME" = "linux" -a ${CXX:0:3} = "g++" ]; then
+       echo doing linux and gcc
+       ./configure --enable-debug CXXFLAGS=-std=c++11 CXXFLAGS=-std=c++11 CPPFLAGS=-I${HOME}/GP/include\ -I$BOOST_HOME LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex
        make check
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
