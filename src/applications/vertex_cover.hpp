@@ -101,8 +101,8 @@ unsigned int bottom_up_computation_vertex_cover(G_t &G, T_t &T,
          treedec::app::detail::Intermediate_Results<T_t> &iRes)
 {
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S;
-    //treedec::nice::postorder_traversal(T, S);
-    treedec::nice::min_weight_traversal(T, S);
+    treedec::nice::postorder_traversal(T, S);
+    //treedec::nice::min_weight_traversal(T, S);
     typename boost::graph_traits<T_t>::vertex_descriptor cur;
 
     while(!S.empty()){

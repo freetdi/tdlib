@@ -1,4 +1,4 @@
-// Lukas Larisch, 2014 - 2016
+// Lukas Larisch, 2014 - 2018
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -449,100 +449,99 @@ unsigned get_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor
 
 //some measurement for storage consumption
 template <class T_t>
-unsigned compute_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor root, std::vector<unsigned> &w, unsigned &q){
+unsigned compute_weight(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor root, std::vector<unsigned> &w){
     unsigned c = 0;
     switch (boost::out_degree(root, T)){
         case 0:
-            c = 0;
             break;
         case 1:
-            c = compute_weight(T, *(boost::adjacent_vertices(root, T).first), w, q);
+            c = compute_weight(T, *(boost::adjacent_vertices(root, T).first), w);
             break;
         case 2:
-            unsigned l = compute_weight(T, *(boost::adjacent_vertices(root, T).first), w, q);
-            unsigned r = compute_weight(T, *(++boost::adjacent_vertices(root, T).first), w, q);
+            unsigned l = compute_weight(T, *(boost::adjacent_vertices(root, T).first), w);
+            unsigned r = compute_weight(T, *(++boost::adjacent_vertices(root, T).first), w);
             c = (l == r)? l+1 : (l > r)? l : r;
             break;
     }
-    w[root] = c; 
-    q++;
+    w[root] = c;
     return c;
 }
 
 namespace detail{
 
 template <typename T_t>
-void min_weight_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S, typename boost::graph_traits<T_t>::vertex_descriptor root, std::vector<unsigned> &w, unsigned &q, unsigned &p){    
-    p++;
-
-    if(boost::out_degree(root, T) > 2){
-        std::cout << "kotz" << std::endl;
-    }
-
-    bool x = false;
-    bool y = false;
-    bool z = false;
-
+void min_weight_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S, typename boost::graph_traits<T_t>::vertex_descriptor root, std::vector<unsigned> &w){    
     switch (boost::out_degree(root, T)){
         case 0:
-            x = true;
+            S.push(root);
             break;
         case 1:
-            y = true;
-            detail::min_weight_traversal(T, S, *(boost::adjacent_vertices(root, T).first), w, q, p);
+            S.push(root);
+            detail::min_weight_traversal(T, S, *(boost::adjacent_vertices(root, T).first), w);
             break;
         case 2:
-            z = true;
             auto a = w[*(boost::adjacent_vertices(root, T).first)];
             auto b = w[*(++boost::adjacent_vertices(root, T).first)];
 
+            S.push(root);
+
             if(a < b){
-                detail::min_weight_traversal(T, S, *(boost::adjacent_vertices(root, T).first), w, q, p);
+                detail::min_weight_traversal(T, S, *(boost::adjacent_vertices(root, T).first), w);
+                detail::min_weight_traversal(T, S, *(++boost::adjacent_vertices(root, T).first), w);
             }
             else{
-                detail::min_weight_traversal(T, S, *(++boost::adjacent_vertices(root, T).first), w, q, p);
+                detail::min_weight_traversal(T, S, *(++boost::adjacent_vertices(root, T).first), w);
+                detail::min_weight_traversal(T, S, *(boost::adjacent_vertices(root, T).first), w);
             }
             break;
     }
-
-    if(!x && !y && !z){
-        std::cout << "what the fuck?!" << std::endl;
-    }
-
-    q++;
-    S.push(w[root]);
 }
 
 } //detail
+
+
+template <typename T>
+void print_set(std::set<T> &S, bool newline=true){
+    for(auto sIt = S.begin(); sIt != S.end(); sIt++){
+        std::cout << *sIt << " ";
+    }
+    if(newline){
+        std::cout << std::endl;
+    } 
+}
 
 template <typename T_t>
 void min_weight_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
     typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
 
+    std::cout << "find root in min weight traversal" << std::endl;
+    print_set(BAG_(root, T));
+
     std::vector<unsigned> w(boost::num_vertices(T));
-    unsigned q = 0;
-    compute_weight(T, root, w, q);
-    if(q != w.size()){
-        std::cout << "shit?!" << std::endl;
+    compute_weight(T, root, w);
+
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+        print_set(BAG_(*tIt, T), false);
+        std::cout << ": " << w[*tIt] << std::endl;
     }
 
+    detail::min_weight_traversal(T, S, root, w);
 
-    unsigned s = 0;
-    unsigned p = 0;
-    detail::min_weight_traversal(T, S, root, w, s, p);
-
-    if(s != w.size()){
-        std::cout << "shit222222222222222?!" << std::endl;
-    }    
-
-
-    if(p != w.size()){
-        std::cout << "shit33333333333333!" << std::endl;
-    }    
-
-    std::cout << S.size() << " " << boost::num_vertices(T) << std::endl;
+    std::cout << "#S vs #V: " << S.size() << " " << boost::num_vertices(T) << std::endl;
 
 }
+
+template <typename T_t>
+void min_weight_traversal_caller(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S){
+    min_weight_traversal(T, S);
+
+    while(!S.empty()){
+        print_set(BAG_(S.top(), T));
+        S.pop();
+    }
+}
+
 
 template <class T_t, class N_t>
 unsigned weight_try_roots(T_t &T, N_t &N, bool verbose=false){
@@ -566,8 +565,7 @@ unsigned weight_try_roots(T_t &T, N_t &N, bool verbose=false){
 
         std::vector<unsigned> weight;
         weight.resize(boost::num_vertices(N));
-        unsigned t = 0;
-        compute_weight(N, *tIt, weight, t);
+        compute_weight(N, *tIt, weight);
         if(weight[*tIt] != w){
             std::cerr << "error in compute_weight!";
         }

@@ -65,7 +65,6 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> TD_gra
 
 #include "python_tdlib.hpp"
 
-
 template <typename G_t>
 void make_tdlib_graph(G_t &G, std::vector<unsigned int> &V, std::vector<unsigned int> &E, bool directed=false){
     unsigned int max = 0;
@@ -1235,6 +1234,8 @@ void gc_generic_elimination_search_p17_jumper(std::vector<unsigned int> &V_G, st
 
 /* weight stuff */
 
+
+
 unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T, unsigned graphtype, bool verbose){
     TD_graph_t G;
@@ -1243,7 +1244,17 @@ unsigned gc_weight_stats(std::vector<unsigned int> &V_G, std::vector<unsigned in
     TD_tree_dec_t T;
     make_tdlib_decomp(T, V_T, E_T);
 
-    TD_tree_dec_directed_t N;
+    TD_tree_dec_directed_t N, M;
+
+    treedec::make_rooted(T, M);
+
+    treedec::nice::nicify(M);
+
+    std::stack<boost::graph_traits<TD_tree_dec_directed_t>::vertex_descriptor> S;
+
+    treedec::nice::min_weight_traversal_caller(M, S);
+
+    dump_td(M, "weight_stuff.dot");
 
     return treedec::nice::weight_try_roots(T, N, verbose);
 }
