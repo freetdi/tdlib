@@ -33,7 +33,8 @@ install:
   - sudo pip install cython
 
 script:
-  - GALA_COMMIT=93f5c2e11d7075
+  # TODO: point to release instead.
+  - GALA_COMMIT=249b946e78696bcf4e5e0f
 
   - uname -a
   - g++ --version
