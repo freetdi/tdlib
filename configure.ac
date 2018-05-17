@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([treedec], [0.8.8], [larisch.larisch@kaust.edu.sa,felix@salfelder.org])
+AC_INIT([treedec], [0.9.0], [larisch.larisch@kaust.edu.sa,felix@salfelder.org])
 AC_CONFIG_SRCDIR([src/graph_traits.hpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -148,15 +148,15 @@ else
 fi
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([examples/Makefile])
-AC_CONFIG_FILES([examples/gr/Makefile])
+#AC_CONFIG_FILES([examples/Makefile])
+#AC_CONFIG_FILES([examples/gr/Makefile])
 AC_CONFIG_FILES([pytdlib/Makefile])
 AC_CONFIG_FILES([pytdlib/tests/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bits/Makefile])
 AC_CONFIG_FILES([src/applications/Makefile])
 AC_CONFIG_FILES([src/impl/Makefile])
-AC_CONFIG_FILES([tests/Makefile])
+#AC_CONFIG_FILES([tests/Makefile])
 
 AC_OUTPUT
 

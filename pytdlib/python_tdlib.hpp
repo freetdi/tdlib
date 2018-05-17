@@ -83,29 +83,25 @@ void gc_minimalChordal(std::vector<unsigned int> &V, std::vector<unsigned int> &
 
 /* APPLICATIONS */
 
-void gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_max_clique_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                           std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                          std::vector<unsigned int> &C, unsigned graphtype);
+                                          std::vector<unsigned int> &C, bool certificate, unsigned graphtype);
 
-void gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_max_independent_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                    std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                   std::vector<unsigned int> &IS, unsigned graphtype);
+                                                   std::vector<unsigned int> &IS, bool certificate, unsigned graphtype);
 
-void gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_min_vertex_cover_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                 std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                std::vector<unsigned int> &VC, unsigned graphtype);
+                                                std::vector<unsigned int> &VC, bool certificate, bool cache_traversal, unsigned graphtype);
 
-unsigned gc_min_vertex_cover_with_treedecomposition2(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
-                                                std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                std::vector<unsigned int> &VC, bool certificate, unsigned graphtype);
-
-void gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_min_dominating_set_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                                   std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                                  std::vector<unsigned int> &DS, unsigned graphtype);
+                                                  std::vector<unsigned int> &DS, bool certificate, unsigned graphtype);
 
-void gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
+unsigned gc_min_coloring_with_treedecomposition(std::vector<unsigned int> &V_G, std::vector<unsigned int> &E_G,
                                             std::vector<std::vector<int> > &V_T, std::vector<unsigned int> &E_T,
-                                            std::vector<std::vector<int> > &col, unsigned graphtype);
+                                            std::vector<std::vector<int> > &col, bool certificate, unsigned graphtype);
 
 
 /* MISC */

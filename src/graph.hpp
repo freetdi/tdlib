@@ -673,16 +673,49 @@ void saturate(S& s, G const& g)
 
 
 /* checks for preconditions prior to running an algorithm */
+template <typename G_t>
+bool is_undirected_type(G_t &G){
+    (void)G;
+
+    G_t H;
+
+    auto v = boost::add_vertex(H);
+    auto w = boost::add_vertex(H);
+    boost::add_edge(v, w, H);
+
+    return boost::edge(w, v, H).second;
+}
+
+template <typename G_t>
+//works with vertex container=vec
+bool is_edge_set_type(G_t &G){
+    (void)G;
+
+    G_t H;
+    auto u = boost::add_vertex(H);
+    auto v = boost::add_vertex(H);
+    auto w = boost::add_vertex(H);
+
+    boost::add_edge(u, w, H);
+    boost::add_edge(u, v, H);
+
+    typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
+    boost::tie(nIt, nEnd) = boost::adjacent_vertices(u, H);
+
+    auto x = *nIt;
+    nIt++;
+    auto y = *nIt;
+
+    return x < y;
+}
 
 //checks if G has no self-loops
 template <typename G_t>
-bool no_loops(G_t const &G)
-{ untested();
+bool no_loops(G_t const &G){
     auto p=boost::vertices(G);
-    for(; p.first!=p.second; ++p.first){ untested();
-        if(boost::edge(*p.first, *p.first, G).second){ untested();
+    for(; p.first!=p.second; ++p.first){
+        if(boost::edge(*p.first, *p.first, G).second){
             return false;
-        }else{ untested();
         }
     }
     return true;
@@ -691,14 +724,13 @@ bool no_loops(G_t const &G)
 //checks if G has no duplicated edges
 //TODO: dont use sets but markers (see one neighbour more than once -> return false)
 template <typename G_t>
-bool no_duplicate_edges(G_t const &G)
-{ untested();
+bool no_duplicate_edges(G_t const &G){
     auto p=boost::vertices(G);
-    for(; p.first!=p.second; ++p.first){ untested();
+    for(; p.first!=p.second; ++p.first){ 
         typename std::set<typename boost::graph_traits<G_t>::vertex_descriptor> S;
         typename boost::graph_traits<G_t>::adjacency_iterator nIt, nEnd;
-        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*p.first, G); nIt != nEnd; nIt++){ untested();
-            if(S.find(*nIt) != S.end()){ untested();
+        for(boost::tie(nIt, nEnd) = boost::adjacent_vertices(*p.first, G); nIt != nEnd; nIt++){
+            if(S.find(*nIt) != S.end()){
                 return false;
             }
             S.insert(*nIt);
@@ -709,15 +741,13 @@ bool no_duplicate_edges(G_t const &G)
 
 //checks if G is symmetric (v -> w => w -> v)
 template <typename G_t>
-bool is_symmetric(G_t const &G)
-{ untested();
+bool is_symmetric(G_t const &G){
     auto p=boost::vertices(G);
-    for(; p.first!=p.second; ++p.first){ untested();
+    for(; p.first!=p.second; ++p.first){
         auto q=boost::adjacent_vertices(*p.first, G);
-        for(; q.first!=q.second; ++q.first){ untested();
-            if(!boost::edge(*q.first, *p.first, G).second){ untested();
+        for(; q.first!=q.second; ++q.first){
+            if(!boost::edge(*q.first, *p.first, G).second){
                 return false;
-            }else{ untested();
             }
         }
     }
@@ -726,46 +756,43 @@ bool is_symmetric(G_t const &G)
 
 //this means the edge set, not the boost-type
 template <typename G_t>
-bool is_undirected(G_t const &G)
-{ untested();
+bool is_undirected(G_t const &G){
     return is_symmetric(G);
 }
 
 //checks if G is antisymmetric (v -> w => !(w -> v))
 template <typename G_t>
-bool is_antisymmetric(G_t const &G)
-{ untested();
+bool is_antisymmetric(G_t const &G){
     auto p=boost::vertices(G);
-    for(; p.first!=p.second; ++p.first){ untested();
+    for(; p.first!=p.second; ++p.first){
         auto q=boost::adjacent_vertices(*p.first, G);
-        for(; q.first!=q.second; ++q.first){ untested();
-            if(boost::edge(*q.first, *p.first, G).second){ untested();
+        for(; q.first!=q.second; ++q.first){
+            if(boost::edge(*q.first, *p.first, G).second){
                 return false;
-            }else{ untested();
             }
         }
     }
     return true;
 }
 
-#if 0
 //checks if G is connected
 template <typename G_t>
-bool is_connected(G_t const &G){ untested();
+bool is_connected_undirected(G_t const &G){
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
     get_components(G, components);
 
     return components.size() == 1;
 }
 
+/*
 //checks if G is a tree
 //TODO: #edges on directed symmetric graphs is twice the number on undirected graphs..
 //TODO: additionally needs no_duplicate edges for directed graphs
 template <typename G_t>
-bool is_tree(G_t const &G){ untested();
+bool is_tree(G_t const &G){
     return is_connected(G) && boost::num_edges(G)+1 == boost::num_vertices(G);
 }
-#endif
+*/
 
 //checks if O is a permutation of V(G)
 //TODO: use vec<bool>
@@ -789,4 +816,5 @@ bool is_vertex_permutation(O_t const &O, G const &g)
 } // treedec
 
 #endif // guard
+
 // vim:ts=8:sw=4:et

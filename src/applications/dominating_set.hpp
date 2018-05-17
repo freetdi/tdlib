@@ -118,8 +118,7 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
         treedec::nice::enum_node_type node_type = treedec::nice::get_type(cur, T);
 
         if(node_type == treedec::nice::LEAF){
-            auto const& b=boost::get(bag_t(), T, cur);
-            auto leaf=*(b.begin());
+            auto leaf=*(bag(cur, T).begin());
             auto pos=boost::get(boost::vertex_index, G, leaf);
 
             std::vector<int> result(boost::num_vertices(G), -1);
@@ -247,8 +246,9 @@ unsigned int bottom_up_computation_dominating_set(G_t &G, T_t &T,
                                          *(++boost::adjacent_vertices(cur, T).first);
 
             std::set<unsigned int> M;
-            auto const& b=boost::get(bag_t(), T, cur);
-            for(auto bIt=b.begin(); bIt!=b.end(); ++bIt) {
+            for(typename treedec_traits<T_t>::bag_type::iterator bIt =
+                        bag(cur, T).begin(); bIt != bag(cur, T).end(); bIt++)
+            {
                 unsigned int pos = TREEDEC_GET_POS(*bIt, G);
                 M.insert(pos);
             }
@@ -389,7 +389,7 @@ void top_down_computation_min_dominating_set(G_t &G, T_t &T,
 
 template <typename G_t, typename T_t>
 unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
-                  typename treedec_traits<T_t>::bag_type &global_result)
+                  typename treedec_traits<T_t>::bag_type &global_result, bool certificate=true)
 {
     if(boost::num_vertices(G) == 0){
         return 0;
@@ -406,14 +406,14 @@ unsigned int min_dominating_set_with_treedecomposition(G_t &G, T_t &T,
 
     unsigned int min = treedec::app::detail::bottom_up_computation_dominating_set(G, T, results, inv_map);
 
-    if(min > 0){
+    if(certificate && min > 0){
         std::vector<int> domset(boost::num_vertices(G), -1);
         typename boost::graph_traits<T_t>::vertex_descriptor root = find_root(T);
         std::vector<int> have_to_take(boost::num_vertices(G), -1);
         treedec::app::detail::top_down_computation_min_dominating_set(G, T, root, results, global_result, have_to_take);
     }
 
-    // assert(treedec::validation::is_valid_dominating_set(G, result));
+    assert(certificate && treedec::validation::is_valid_dominating_set(G, global_result));
 
     return (unsigned int) min;
 }

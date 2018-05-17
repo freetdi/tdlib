@@ -54,12 +54,39 @@
 
 #ifndef NDEBUG
 #include <iostream>
+#include <fstream>
 #endif
 
 // cleanup later
 #define BAG_(x, y) boost::get(bag_t(), y, x)
 
+
 namespace treedec{
+
+
+/*
+template <typename T_t>
+void dump_td(T_t &T, std::string fname){
+    std::ofstream fout(fname);
+    fout << "digraph G{" << std::endl;
+    typename boost::graph_traits<T_t>::vertex_iterator tIt, tEnd;
+    for(boost::tie(tIt, tEnd) = boost::vertices(T); tIt != tEnd; tIt++){
+        fout << *tIt << " [label=\"";
+        for(auto sIt = BAG_(*tIt, T).begin(); sIt != BAG_(*tIt, T).end(); sIt++){
+            fout << *sIt << ",";
+        }
+        fout << "\"];" << std::endl;
+    }
+
+    typename boost::graph_traits<T_t>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(T); eIt != eEnd; eIt++){
+        fout << boost::source(*eIt, T) << " -> " << boost::target(*eIt, T) << ";" << std::endl; 
+    }
+    fout << "}" << std::endl;
+}
+
+*/
+
 
 // TODO: deduplicate (see sethack.h)
 // be careful: will fail on unordered sets without warning.
@@ -82,6 +109,34 @@ inline bool set_intersect(const S& s, const T& t)
     }
     return false;
 }
+
+// Find a root of an acyclic graph T
+// Complexity: Linear in the number of vertices of T.
+// Also works with undirected graphs
+template <typename T_t>
+typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
+{
+    typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
+
+    typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
+    boost::tie(e, e_end)=boost::in_edges(t, T);
+    std::vector<BOOL> visited(boost::num_vertices(T), false);
+    visited[t] = true;
+
+    for(; e!=e_end; boost::tie(e, e_end)=boost::in_edges(t, T)){ //sic!
+        if(!visited[boost::source(*e, T)]){
+            t = boost::source(*e, T);
+            visited[t] = true;
+        }
+        else{
+            //T is undirected
+            return t;
+        }
+    }
+
+    return t;
+}
+
 
 template <typename T_t>
 void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S)
@@ -175,7 +230,8 @@ bool is_tree(G_t const& G){
     //root itself is not contained in components[0].
     return (components[0].size()+1 == boost::num_vertices(G));
 }
-#endif
+#endif 
+
 
 
 /* Check if a tree decomposition is valid with respect to G.
@@ -200,6 +256,7 @@ int check_treedec(G_t const& G, T_t const& T)
     if(!is_tree(T)){
 #ifndef NDEBUG
         std::cerr << "[is_valid_treedecomposition]: treedecomposition is not a tree" << std::endl;
+        //dump_td(T, "validation_error_td.dot");
 #endif
         return -1;
     }
@@ -559,7 +616,6 @@ void thicken(T_t &T){
     }
 }
 
-// legacy. does not make anything.
 template <typename T_t>
 void make_thick(T_t &T){ untested();
 	return thicken(T);
@@ -616,8 +672,6 @@ void make_rooted(T_undir_t &T, T_dir_t &T_, typename boost::graph_traits<T_undir
 
 //Glues a single bag with the current tree decomposition T according to subset relation.
 //used for preprocessing.
-// BUG: this is inefficient. there's already a better implementation
-// (where?)
 template<typename T_t, class B>
 void glue_bag( B &b,
         typename treedec_traits<T_t>::vd_type elim_vertex,
@@ -632,7 +686,7 @@ void glue_bag( B &b,
                          boost::get(bag_t(), T, *vIt).end(),
                          b.begin(), b.end()))
         {
-            // BUG, inefficient for vectors.
+            // inefficient for vectors.
             if(!contains(BAG_(*vIt, T), elim_vertex)){
                 push(b, elim_vertex);
                 t_vertex_descriptor t_dec_node=boost::add_vertex(T);
@@ -641,10 +695,8 @@ void glue_bag( B &b,
     std::cout << "glue edg2" << *vIt << " " <<  t_dec_node << "\n";
 #endif
                 boost::add_edge(*vIt, t_dec_node, T);
-            }else{ untested();
             }
             return;
-        }else{ itested();
         }
     }
 

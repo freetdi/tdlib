@@ -31,11 +31,11 @@ namespace detail{ //
 template<class B, class T, class V>
 struct tmpbaghack{ //
     static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v)
-    { incomplete();
+    { //incomplete();
         return t[v];
     }
     static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v) {
-        incomplete();
+        //incomplete();
         return t[v];
     }
 };
@@ -43,11 +43,11 @@ struct tmpbaghack{ //
 template<class T_t, class V>
 struct tmpbaghack<bag_t, T_t, V>{
     static typename treedec_traits<T_t>::bag_type& get_bag(T_t& t, V& v) {
-        incomplete();
+        //incomplete();
         return t[v].bag;
     }
     static typename treedec_traits<T_t>::bag_type const& get_bag(T_t const& t, V const& v) {
-        incomplete();
+        //incomplete();
         return t[v].bag;
     }
 };
@@ -59,7 +59,7 @@ inline typename treedec_traits<T_t>::bag_type const& bag(
         const typename boost::graph_traits<T_t>::vertex_descriptor& v,
         T_t const& T)
 {
-    incomplete();
+    //incomplete();
     typedef typename T_t::vertex_property_type b; //>::bag_type b;
     return detail::tmpbaghack<b,T_t,const typename boost::graph_traits<T_t>::vertex_descriptor&>::get_bag(T, v);
 }
@@ -93,7 +93,7 @@ namespace boost{\
     inline \
     typename property_map< T, vertex_all_t>::type\
     get(vertex_all_t, T& g) \
-    {\
+    { \
         typedef typename property_map< T, vertex_all_t>::type\
           pmap_type;\
         return pmap_type(g);\
@@ -102,7 +102,7 @@ namespace boost{\
     inline \
     bagstuff::const_treebagpmap<T>\
     get(vertex_all_t, T const& g) \
-    {\
+    { \
         typedef typename property_map< T, vertex_all_t>::const_type\
             pmap_type;\
         return pmap_type(g);\

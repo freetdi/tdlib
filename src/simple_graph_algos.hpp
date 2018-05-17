@@ -86,7 +86,7 @@ void induced_subgraph_omit_edges(G_t &H, const G_t &G,
 
 //TODO: prototype in graph.hpp
 template <typename H_t, typename G_t, class S_t, class M_t>
-void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
+void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap, M_t* vdMap2=NULL)
 {
     assert(boost::num_vertices(H)==0);
     typedef typename boost::graph_traits<G_t>::vertex_descriptor G_vertex_descriptor;
@@ -95,6 +95,9 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
     std::vector<BOOL> disabled(boost::num_vertices(G), true);
     if(vdMap){
         vdMap->resize(X.size());
+    }
+    if(vdMap2){
+        vdMap2->resize(boost::num_vertices(G));
     }
     H = MOVE(G_t(X.size()));
     H_vertex_iterator h=boost::vertices(H).first;
@@ -108,8 +111,14 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 
        if(vdMap){
            (*vdMap)[pos2] = *sIt;
+       }
+       if(vdMap2){
+           (*vdMap2)[*sIt] = pos2;
+       }
+       if(vdMap || vdMap2){
            ++pos2;
        }
+
     }
     assert(h==boost::vertices(H).second);
 
@@ -126,41 +135,15 @@ void copy_induced_subgraph(H_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 // paste subgraph of G induced by X into H.
 // store map V(H) -> X \subset V(G) in vdMap.
 //
-// TODO: misleading name. paste_induced_subgraph?
+// TODO: misleading name. paste_induced_subgraph
 template <typename G_t, class S_t, class M_t>
 void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t* vdMap)
 {
-    typedef typename boost::graph_traits<G_t>::vertex_descriptor vertex_descriptor;
     if(boost::num_vertices(H)==0){
         return copy_induced_subgraph(H, G, X, vdMap);
     }
     else{
         throw exception_invalid_precondition();
-    }
-    std::vector<vertex_descriptor> internal_map(boost::num_vertices(G));
-    std::vector<BOOL> disabled(boost::num_vertices(G), true);
-    if(vdMap){
-        vdMap->resize(X.size());
-    }
-
-    for(typename S_t::const_iterator sIt=X.begin(); sIt!=X.end(); ++sIt){
-       unsigned int pos1 = get_pos(*sIt, G);
-       internal_map[pos1] = boost::add_vertex(H);
-       disabled[pos1] = false;
-
-       if(vdMap){
-           unsigned int pos2 = get_pos(internal_map[pos1], H);
-           (*vdMap)[pos2] = *sIt;
-       }
-    }
-
-    typename boost::graph_traits<G_t>::edge_iterator eIt, eEnd;
-    for(boost::tie(eIt, eEnd) = boost::edges(G); eIt!=eEnd; ++eIt){
-        unsigned int spos=get_pos(boost::source(*eIt, G), G);
-        unsigned int dpos=get_pos(boost::target(*eIt, G), G);
-        if(!disabled[spos] && !disabled[dpos]){
-            boost::add_edge(internal_map[spos], internal_map[dpos], H);
-        }
     }
 }
 
@@ -174,7 +157,7 @@ void induced_subgraph(G_t &H, G_t const &G, S_t const& X, M_t& vdMap)
 template <typename G_t, class S_t, class M_t>
 void induced_subgraph(G_t &H, G_t const &G, S_t const& X)
 {
-    return induced_subgraph(H, G, X, NULL);
+    induced_subgraph(H, G, X, NULL);
 }
 
 // TODO: different containers?
@@ -288,7 +271,7 @@ void get_components(G_t const& G,
     }
 }
 
-// find a neighbour x of v with the least common neighbours
+// find a neighbour x of v with least common neighbours
 template <typename G_t, class M>
 inline typename boost::graph_traits<G_t>::vertex_descriptor
    get_least_common_vertex(const typename boost::graph_traits<G_t>::vertex_descriptor v,

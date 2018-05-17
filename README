@@ -1,9 +1,9 @@
 treedec provides tree decomposition algorithms
 
-A tree decomposition of a simple loopless graph G is a tree T with bags at its
+A tree decomposition of a simple, loopless, undirected graph G is a tree T with bags at its
 nodes containing vertices from G. The usual conditions apply. By convention,
 a tree is an acyclic graph with exactly one connected component. The bagsize
-of T is the size of the biggest bag, which is a more natural notion for the
+of T is the size of the biggest bag, which is a notion for the
 (width of T)+1.
 
 there is work in progress, so this description should be understood as
@@ -35,11 +35,11 @@ which is meant to work with treedecomposition types (see below).
 in namespace treedec we currently have (needs verification)
 
 prep::*        // preprocessing
-he::fill_in    // fill_in heuristic
-he::min_degree // fill_in heuristic
+he::fill_in    // fillIn heuristic
+he::min_degree // minDegree heuristic
 he::thorup     // thorups heuristic
 ex::ta         // tamakis algorithm
-ex::cutset     // tamakis algorithm
+ex::cutset     // exact algorithm
 comb::PP_FI    // preprocessing + fill_in
 comb::PP_FI_TM // preprocessing + fill_in + triangulation
 comb::ex17     // PACE 17 exact (pp + tamaki)
@@ -47,14 +47,9 @@ comb::ex17     // PACE 17 exact (pp + tamaki)
 == graph types ==
 
 A graph is expected to be a model of AdjacencyGraph, but without self loops
-and without parallel edges. Graphs that model BidirectionalGraph must not
-contain more than one edge for any two vertices, as accessed through
-boost::edges. Other graphs need to contain an edge (u,v) for each edge (v,u).
-
-(this sounds complicated, but actually we just make sure that we can reach
-neighbours with reasonable effort).
-
-(TODO: really implement it that way.)
+and without parallel edges. It needs to be undirected.
+Some algorithms support graphs that model BidirectionalGraph. These graphs
+must not contain more than one edge for any two vertices, as accessed through boost::edges. 
 
 == configuration objects ==
 
@@ -67,17 +62,22 @@ you don't care.
 
 == tree decompositions ==
 
-a tree decomposition is a graph in the above sense with a vertex property of
-access type treedec::bag_t. the edges in a bidirectional graph container are
-oriented away from a root vertex. this root vertex should/will/might be
-accessible e.g. using a property tag such as treedec::root_t (or similar).
+a tree decomposition is a undirected graph in the above sense with a vertex property of
+access type treedec::bag_t. Sometimes, bidirectional graphs also work. Then, the edges
+of the tree decomposition must be oriented away from a root vertex. 
 
-a possible model is
+the expected models are
 
 #include <treedec/treedec_traits.hpp>
 typedef std::vector<vertex_descriptor> bag_container_type;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::property<treedec::bag_t, bag_container_type> > T;
+
+or
+
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
+        boost::property<treedec::bag_t, bag_container_type> > T;
+
 
 where vertex_descriptor must be compatible with the graph to be decomposed.
 
@@ -85,7 +85,7 @@ it is possible to use custom tree decomposition types, such as with bundled
 properties. if you have a graph
 
 struct mybundle{
-   std::set<unsigned> bag; // BUG. must be "bag" right now.
+   std::set<unsigned> bag; // must be "bag" right now.
    [..]
 };
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,

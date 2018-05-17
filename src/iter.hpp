@@ -1317,7 +1317,7 @@ public: // ops
          return false;
       }else if(_t.size()){
          return *_t.begin() == other;
-      }else{ untested();
+      }else{
          return false;
       }
    }
@@ -1345,7 +1345,6 @@ public: // ops
 //         assert(_i!=_e); why not?!
          if(_u==0){
             _t.back()=_e;
-         }else{
          }
       }else if(_t.size()<=_u){
          BOOST_AUTO(back, _t.back());
@@ -1367,7 +1366,6 @@ public: // ops
              carry(back2);
              if(_t.size()<_l){
                  _t[0]=_e;
-             }else{
              }
          }else{
             _t.pop_back();
@@ -1380,7 +1378,6 @@ public: // ops
          }
       }else if(_t.back() != _e){ untested();
          incomplete();
-      }else{ untested();
       }
 
       assert(_t.size()<=_u || _u==0);

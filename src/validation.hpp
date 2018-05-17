@@ -1,4 +1,4 @@
-// Lukas Larisch, 2014 - 2016
+// Lukas Larisch, 2014 - 2017
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -18,6 +18,8 @@
 
 #ifndef TREEDEC_VALIDATION_HPP
 #define TREEDEC_VALIDATION_HPP
+
+#define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
 
 namespace treedec{
 
@@ -117,5 +119,7 @@ bool is_valid_coloring(G_t &G, std::vector<typename treedec::treedec_traits<type
 } //namespace validation
 
 } //namespace treedec
+
+#undef get_pos
 
 #endif //ifdef TREEDEC_VALIDATION_HPP
