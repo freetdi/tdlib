@@ -13,7 +13,7 @@ class TestTdLib(unittest.TestCase):
         G = Graph(V_RandomGNM_250_1000, E_RandomGNM_250_1000)
         T, w = tdlib.boost_minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 157)
+        self.assertEqual(w, 110)
 
     def test_boost_minDegree_decomp_decomp_0(self):
         for V, E in cornercases:
@@ -43,19 +43,19 @@ class TestTdLib(unittest.TestCase):
         G = Graph(V_Wagner, E_Wagner)
         T, w = tdlib.boost_minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 5)
+        self.assertEqual(w, 4)
 
     def test_boost_minDegree_decomp_6(self):
         G = Graph(V_Pappus, E_Pappus)
         T, w = tdlib.boost_minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 7)
+        self.assertEqual(w, 6)
 
     def test_boost_minDegree_decomp_7(self):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
         T, w = tdlib.boost_minDegree_decomp(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-        self.assertEqual(w, 7)
+        self.assertEqual(w, 5)
 
     def test_boost_minDegree_decomp_8(self):
         for i in range(0, 10):
