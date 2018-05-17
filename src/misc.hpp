@@ -64,7 +64,7 @@
 namespace treedec{
 
 
-
+/*
 template <typename T_t>
 void dump_td(T_t &T, std::string fname){
     std::ofstream fout(fname);
@@ -83,7 +83,9 @@ void dump_td(T_t &T, std::string fname){
         fout << boost::source(*eIt, T) << " -> " << boost::target(*eIt, T) << ";" << std::endl; 
     }
     fout << "}" << std::endl;
-}  
+}
+
+*/
 
 
 // TODO: deduplicate (see sethack.h)
