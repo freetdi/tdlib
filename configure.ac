@@ -101,6 +101,10 @@ AC_LANG_PUSH([C++])
 # unconditional c++11
 CXXFLAGS="$CXXFLAGS -std=c++11"
 
+AC_CHECK_HEADERS([boost/tuple/tuple.hpp], [],
+                 AC_MSG_ERROR([could not find a boost header])
+)
+
 have_gala=no
 
 AC_ARG_WITH([gala], AS_HELP_STRING([--without-gala], [Disable gala]))
