@@ -276,10 +276,10 @@ public:
 public:
     bmdo(G_t &G, std::vector<int> &O)
       : _g(G), _o(O)
-    { untested();
+    {
         untested();
     }
-    vertices_size_type bagsize() const{ untested();
+    vertices_size_type bagsize() const{
         return _bs;
     }
     void do_it();
@@ -291,7 +291,7 @@ private:
 
 template<class G_t>
 void bmdo<G_t>::do_it()
-{ untested();
+{
     vertices_size_type n=boost::num_vertices(_g);
     edges_size_type e=boost::num_edges(_g);
 

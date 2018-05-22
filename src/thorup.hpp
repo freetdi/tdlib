@@ -382,7 +382,7 @@ public:
 	decomp_type const& get_tree_decomposition() const{
 		return _t;
 	}
-	size_t get_bagsize() const{ untested();
+	size_t get_bagsize() const{
 		return treedec::get_bagsize(_t);
 	}
 	std::shared_ptr<const std::vector<unsigned> > get_elimord() const{

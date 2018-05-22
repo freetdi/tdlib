@@ -547,7 +547,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_PP
     if(!(mask & ( 1 << nPP ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPP, new PP_THREAD<uG16, grtd_algo_config>(g16, "PP_16"));
     }else{ untested();
         reg_thread(threads, nPP, new PP_THREAD<uG32, grtd_algo_config>(g32, "PP_32"));
@@ -556,7 +556,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FIPPTM
     if(!(mask & ( 1 << nPPFITM ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG16, grtd_algo_config>(g16, "FIPPTM_16"));
     }else{ untested();
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG32, grtd_algo_config>(g32, "FIPPTM_32"));
@@ -583,7 +583,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_PPMD
     if(!(mask & ( 1 << nPPMD ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG16, grtd_algo_config>(g16, "PPMD_16"));
     }else{ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG32, grtd_algo_config>(g32, "PPMD_32"));

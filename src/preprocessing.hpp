@@ -268,7 +268,7 @@ public:
         _lb_bs = l+1;
     }
     void do_it();
-    size_t get_bagsize() const{ untested();
+    size_t get_bagsize() const{
         return _lb_bs;
     }
     template<class BAG_t>
