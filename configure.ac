@@ -170,6 +170,7 @@ AC_MSG_RESULT([
    prefix:     $prefix
    python:     $python
    gala:       $have_gala
+   CXX:        $CXX
    CPPFLAGS:   $CPPFLAGS
    CXXFLAGS:   $CXXFLAGS
 ])
