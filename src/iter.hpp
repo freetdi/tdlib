@@ -33,7 +33,6 @@
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp> // adjacent_vertices
-#include <tr1/utility> // pair
 
 #include "graph.hpp"
 
