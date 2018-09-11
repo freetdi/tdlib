@@ -74,42 +74,42 @@ class TestTdLib_misc(unittest.TestCase):
         for V, E in cornercases:
             G = Graph(V, E)
             T, w = tdlib.trivial_decomposition(G)
-            self.assertEqual(T.vertices(), [V])
+            self.assertEqual(T.vertices(), [list(V)])
 
     def test_trivial_decomposition_1(self):
         G = Graph(V_P6, E_P6)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_P6])
+        self.assertEqual(T.vertices(), [list(V_P6)])
 
     def test_trivial_decomposition_2(self):
         G = Graph(V_K5, E_K5)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_K5])
+        self.assertEqual(T.vertices(), [list(V_K5)])
 
     def test_trivial_decomposition_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_Petersen])
+        self.assertEqual(T.vertices(), [list(V_Petersen)])
 
     def test_trivial_decomposition_4(self):
         G = Graph(V_Petersen_double, E_Petersen_double)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_Petersen_double])
+        self.assertEqual(T.vertices(), [list(V_Petersen_double)])
 
     def test_trivial_decomposition_5(self):
         G = Graph(V_Wagner, E_Wagner)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_Wagner])
+        self.assertEqual(T.vertices(), [list(V_Wagner)])
 
     def test_trivial_decomposition_6(self):
         G = Graph(V_Pappus, E_Pappus)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_Pappus])
+        self.assertEqual(T.vertices(), [list(V_Pappus)])
 
     def test_trivial_decomposition_7(self):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
         T, w = tdlib.trivial_decomposition(G)
-        self.assertEqual(T.vertices(), [V_Grid_5_5])
+        self.assertEqual(T.vertices(), [list(V_Grid_5_5)])
 
     def test_trivial_decomposition_8(self):
         for i in range(0, 10):

@@ -25,7 +25,7 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_boost_MD(self):
-	print("---boost_MD---")
+        print("---boost_MD---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -33,7 +33,7 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_FI(self):
-	print("---FI---")
+        print("---FI---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -41,7 +41,7 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP(self):
-	print("---PP---")
+        print("---PP---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -50,15 +50,15 @@ class TestTdLib_packages(unittest.TestCase):
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_MD(self):
-	print("---PP_MD---")
+        print("---PP_MD---")
         for i in range(0, COUNT+1):
-	    base.print_graph_name(PREFIX, i)
+            base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
             T, w = tdlib.PP_MD(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_FI(self):
-	print("---PP_FI---")
+        print("---PP_FI---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -66,7 +66,7 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_PP_FI_TM(self):
-	print("---PP_FI_TM---")
+        print("---PP_FI_TM---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -74,7 +74,7 @@ class TestTdLib_packages(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_MSVS_trivial(self):
-	print("---MSVS_trivial---")
+        print("---MSVS_trivial---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
@@ -84,7 +84,7 @@ class TestTdLib_packages(unittest.TestCase):
 
     """
     def test_seperator_algorithm(self):
-	print("---seperator_algorithm---")
+        print("---seperator_algorithm---")
         for i in range(0, COUNT+1):
             if base.skip(PREFIX, i, lambda x,y: x > 100 or y > 300):
                 continue
@@ -95,7 +95,7 @@ class TestTdLib_packages(unittest.TestCase):
     """
 
     def test_conversion(self):
-	print("---conversion---")
+        print("---conversion---")
         for i in range(0, COUNT+1):
             base.print_graph_name(PREFIX, i)
             G = Graph(eval(PREFIX+".V_"+str(i)), eval(PREFIX+".E_"+str(i)))
