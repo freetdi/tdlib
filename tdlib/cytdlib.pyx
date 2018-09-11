@@ -149,8 +149,8 @@ AUTHOR: Lukas Larisch (now): Initial version
 
 from libcpp.vector cimport vector
 
-from Graph import Graph
-from Decomp import Decomp
+from .Graph import Graph
+from .Decomp import Decomp
 
 
 ##############################################################
