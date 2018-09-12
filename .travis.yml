@@ -9,7 +9,8 @@ compiler:
   - clang
 
 python:
-  - "2.7"
+  - "3.6"
+
 virtualenv:
   system_site_packages: true
 
@@ -26,6 +27,7 @@ addons:
       - libboost-thread1.55-dev
       - libboost-graph1.55-dev
       - stx-btree-dev
+      - python3-dev
 
 install:
 
@@ -34,7 +36,8 @@ install:
 
 script:
   # TODO: point to release instead.
-  - GALA_COMMIT=249b946e78696bcf4e5e0f
+  - GALA_COMMIT=6c6a6f2b3d2f92
+  - PYTHON=python3
 
   - uname -a
   - g++ --version
@@ -43,13 +46,13 @@ script:
   - autoconf --version
   - automake --version
   - python --version
+  - $PYTHON --version
   - pwd
   - ls -la
 
   # run all checks
   - ./bootstrap
-  - "./configure --enable-debug
-                CXXFLAGS=-std=c++11"
+  - "./configure --enable-debug CXXFLAGS=-std=c++11\ --with-python=$PYTHON"
   - make check
 
   # redo with gala
@@ -88,4 +91,4 @@ script:
        make check
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
-  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
+  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS="-std=c++11 --with-python=$PYTHON"
