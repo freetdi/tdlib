@@ -19,7 +19,7 @@ CLEANFILES += cytdlib.cpp
 clean-local:
 	rm -rf __pycache__
 
-.PHONY: clean-extra
+.PHONY: clean-extra symlinks
 
 AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
               -fno-strict-aliasing -g -fwrapv -O2 -Wall \
@@ -29,13 +29,16 @@ longcheck: all-am
 	$(MAKE) -C tests $@
 
 if VPATH_BUILD
-all-local:
+SYMLINKS = symlinks
+endif
+all-local: $(SYMLINKS)
+
+symlinks:
 	ln -sf $(srcdir)/graphs.py
 	ln -sf $(srcdir)/Graph.py
 	ln -sf $(srcdir)/Decomp.py
 	ln -sf $(srcdir)/printer.py
 	ln -sf $(srcdir)/__init__.py
-endif
 
 AM_CPPFLAGS = @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -omit-version
