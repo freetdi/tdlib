@@ -4,16 +4,16 @@
 typedef int var_t;
 typedef std::set<unsigned int> sdcc_bagtype;
 struct tree_dec_node {
-//  typedef boost::vertex_property_tag kind; // do we need it?
+	//  typedef boost::vertex_property_tag kind; // do we need it?
 	sdcc_bagtype bag;
-  std::set<var_t> alive;
-  unsigned weight;
+	std::set<var_t> alive;
+	unsigned weight;
 };
 struct tree_dec_node2 {
-//  typedef boost::vertex_property_tag kind; // do we need it?
+	//  typedef boost::vertex_property_tag kind; // do we need it?
 	std::vector<unsigned> bag;
-  std::set<var_t> alive;
-  unsigned weight;
+	std::set<var_t> alive;
+	unsigned weight;
 };
 
 #include <treedec/treedec_traits.hpp>
@@ -194,4 +194,6 @@ int main(int, char**)
 //	boost::copy_graph(cbt, vt); not yet
 	boost::copy_graph(cbt, st);
 
+	assert(treedec::get_width(vt)==2);
+	assert(treedec::get_width(cpt)==2);
 }

@@ -353,12 +353,13 @@ namespace bagstuff {
 		typedef typename gtob<G>::type B;
 		const_treebagpmap(G const& g) : _g(g){}
 
-		std::set<unsigned>& operator[](unsigned v) const{
+		B& operator[](unsigned v) const{
 			auto& g=const_cast<G&>(_g); // huh?
 			return g[v].bag;
 		}
 		G const&_g;
 	};
+
 	template<class G>
 	struct treebagpmap : public put_get_helper<typename gtob<G>::type, treebagpmap<G> > {
 		typedef typename gtob<G>::type B;
