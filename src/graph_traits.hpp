@@ -378,26 +378,6 @@ namespace bagstuff {
 
 } // bagstuff
 
-
-	template<class C, class T>
-	struct bag_sfinae { typedef T type; };
-
-	template<class G>
-	struct property_map<G,
-		typename bag_sfinae<
-			decltype( boost::vertex_bundle_type<G>::type::bag ),
-		   typename std::enable_if<
-			   1||std::is_same< typename boost::vertex_bundle_type<G>::type,
-			                  treedec::bag_t>::value, vertex_all_t
-							>::type
-		 >::type
-		 >
-	{ //
-		typedef bagstuff::treebagpmap<G>  type;
-		typedef bagstuff::const_treebagpmap<G> const_type;
-	};
-
-
 } // boost
 
 #endif

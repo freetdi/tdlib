@@ -90,6 +90,13 @@ size_t bag_size(V const & v, G const& g)
 #define TREEDEC_TREEDEC_BAG_TRAITS(T, BAG)\
 namespace boost{\
 \
+    template<> \
+    struct property_map<T, vertex_all_t> \
+    { \
+        typedef bagstuff::treebagpmap<T>  type; \
+        typedef bagstuff::const_treebagpmap<T> const_type; \
+    }; \
+\
     inline \
     typename property_map< T, vertex_all_t>::type\
     get(vertex_all_t, T& g) \
@@ -145,6 +152,20 @@ namespace boost{\
         auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
         b.clear();\
         for(auto const& i : v.m_value){ untested1("...");\
+            treedec::push(b, i);\
+        }\
+    }\
+\
+    template<class U> \
+    inline void\
+    put(const put_get_helper<bagstuff::gtob<T>::type,\
+        bagstuff::treebagpmap<T> >& pa, U k,\
+        T::vertex_property_type v)\
+    {\
+        auto& PA=static_cast<bagstuff::treebagpmap<T>  const&>(pa);\
+        auto& b=const_cast<bagstuff::treebagpmap<T> &>(PA)[k];\
+        b.clear();\
+        for(auto const& i : v. BAG){ untested1("...");\
             treedec::push(b, i);\
         }\
     }\
