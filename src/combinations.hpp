@@ -485,6 +485,7 @@ public: // algo interface
                 }else{
                 }
             }
+            new_elim_ordering_.resize(c);
 
             assert(is_vertex_permutation(new_elim_ordering, H));
 
