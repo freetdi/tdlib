@@ -1,4 +1,6 @@
 # some rules levitating the cython build
+# Author: (c) Felix Salfelder 2012-1017
+# License: GPLv3+
 
 AM_V_CYT = $(am__v_CYT_$(V))
 am__v_CYT_ = $(am__v_CYT_$(AM_DEFAULT_VERBOSITY))
