@@ -43,7 +43,7 @@ inline IG_t const& immutable_clone(
 //    typedef typename graph_traits<G_t>::immutable_type immutable_type;
     typedef typename boost::graph_traits<IG_t>::vertex_descriptor vertex_descriptor_ig;
 
-    BOOST_AUTO(nv, boost::num_vertices(G));
+    auto nv=boost::num_vertices(G);
     ig = MOVE(IG_t(bag_nv));
 
     assert(bag_nv == boost::num_vertices(ig));
@@ -60,8 +60,8 @@ inline IG_t const& immutable_clone(
     // map vertex positions in G to vertices in ig
     std::vector<vertex_descriptor_ig> reverse_map(nv);
 
-    BOOST_AUTO(bi, bbegin);
-    BOOST_AUTO(be, bend);
+    auto bi=bbegin;
+    auto be=bend;
     unsigned i=0;
     for(; bi!=be; ++bi){
         // FIXME: pos, vertex_index?
@@ -88,7 +88,7 @@ inline IG_t const& immutable_clone(
                 boost::add_edge(reverse_map[s], reverse_map[t], ig);
             }
         }else{
-            BOOST_AUTO(vi, bi);
+            auto vi=bi;
             ++vi; // skip self loop
 
             for(; vi!=be; ++vi){
