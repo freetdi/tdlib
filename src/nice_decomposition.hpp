@@ -115,7 +115,7 @@ enum_node_type get_type(typename boost::graph_traits<T_t>::vertex_descriptor v, 
         return JOIN;
     }
     else if(boost::out_degree(v, T) == 1){
-        typename boost::graph_traits<T_t>::vertex_descriptor child = *(boost::adjacent_vertices(v, T).first);
+        auto child=*(boost::adjacent_vertices(v, T).first);
 
         if(BAG_(v, T).size() > BAG_(child, T).size()){
             return INTRODUCE;
@@ -242,7 +242,8 @@ void nicify_joins(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
 //Ensure that all nodes' bags are either a subset or a superset of their successors'.
 //Complexity: Linear in the number of vertices of T.
 template <class T_t>
-void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t, bool empty_leafs, bool cleanup){
+void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor
+                  t, bool empty_leafs, bool cleanup){
     typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
     typename boost::graph_traits<T_t>::vertex_descriptor c0, c1;
 
@@ -273,17 +274,19 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
     c0 = *c;
     nicify_diffs(T, c0, empty_leafs, cleanup);
 
-    if(cleanup){
+    if(!cleanup){
+    }else if (T[t].bag == T[c0].bag){ untested();
         // Redundant bags are isolated, and thus marked for later removal.
-        if (T[t].bag == T[c0].bag){
-            T[c0].bag.clear();
-            boost::remove_edge(t, c0, T);
-            typename boost::graph_traits<T_t>::adjacency_iterator c, c_end;
-            for(boost::tie(c, c_end) = adjacent_vertices(c0, T); c != c_end; ++c){
-                boost::add_edge(t, *c, T);
-                boost::remove_edge(c0, *c, T);
-            }
+        T[c0].bag.clear();
+
+        // TODO: use some sort of contract(c0, t);
+        boost::remove_edge(t, c0, T);
+        auto A=adjacent_vertices(c0, T);
+        for(; A.first!=A.second; ++A.first){ untested();
+            boost::add_edge(t, *A.first, T);
         }
+        clear_vertex(c0, T);
+    }else{
     }
 
     if(std::includes(BAG_(t, T).begin(), BAG_(t, T).end(),
@@ -575,5 +578,3 @@ unsigned weight_try_roots(T_t &T, N_t &N, bool verbose=false){
 #endif //TREEDEC_NICE_DECOMPOSITION_HPP
 
 // vim:ts=8:sw=4:et
-
-
