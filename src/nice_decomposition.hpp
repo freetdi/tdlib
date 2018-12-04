@@ -274,24 +274,18 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor
     c0 = *c;
     nicify_diffs(T, c0, empty_leafs, cleanup);
 
-    if(cleanup){
+    if(!cleanup){
+    }else if (T[t].bag == T[c0].bag){ untested();
         // Redundant bags are isolated, and thus marked for later removal.
-        if (T[t].bag == T[c0].bag){
-            T[c0].bag.clear();
-            boost::remove_edge(t, c0, T);
+        T[c0].bag.clear();
 
-            // TODO: use some sort of contract(c0, t);
-            auto A=adjacent_vertices(c0, T);
-            for(; A.first!=A.second; ++A.first){ untested();
-                boost::add_edge(t, *A.first, T);
-            }
-
-            // BUG: use some sort of isolate_vertex(c0).
-            auto B=adjacent_vertices(c0, T);
-            for(; B.first!=B.second; ++B.first){ untested();
-                boost::remove_edge(c0, *B.first, T);
-            }
+        // TODO: use some sort of contract(c0, t);
+        boost::remove_edge(t, c0, T);
+        auto A=adjacent_vertices(c0, T);
+        for(; A.first!=A.second; ++A.first){ untested();
+            boost::add_edge(t, *A.first, T);
         }
+        clear_vertex(c0, T);
     }else{
     }
 
