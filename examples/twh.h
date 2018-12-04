@@ -787,7 +787,7 @@ static void parseargs(int argc, char * const * argv)
             fformat = f_DOT;
         }else if(!strncmp("--he17", argv[i], 6)){ untested();
             mask_in |= (1<<nP17);
-        }else if(!strncmp("--ex17", argv[i], 6)){ untested();
+        }else if(!strncmp("--ex17", argv[i], 6)){
             mask_in |= (1<<nEX17);
         }else if(!strncmp("--thorup", argv[i], 8)){ untested();
             mask_in |= (1<<nTH);

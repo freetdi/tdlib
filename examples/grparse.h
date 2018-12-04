@@ -209,7 +209,7 @@ public:
 	template<class P>
 	void orient(P& p)
 	{
-		switch(_orient){ untested();
+		switch(_orient){
 			case oNONE:
 				break;
 			case oUPPER:
