@@ -93,6 +93,7 @@ $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile ${TD_VALIDATE}
 
 BUILT_SOURCES = treedec
 CLEANFILES = \
+	h.gr.td--* \
 	${BUILT_SOURCES} *~ \
    $(TWEXP_AMNAME).gcda \
 	$(GRTDP_AMNAME).gcda \
