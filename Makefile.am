@@ -25,7 +25,7 @@
 ACLOCAL_AMFLAGS = -Im4
 
 if USE_PYTHON
-pytdlib = pytdlib
+pytdlib = tdlib
 endif
 
 SUBDIRS = tests examples $(pytdlib) src

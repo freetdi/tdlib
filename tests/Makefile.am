@@ -35,9 +35,9 @@ check_PROGRAMS = \
 	bmd \
 	directed_view \
 	bag \
+	bug_19 \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
-	bucket_sorter_2u \
 	common_out_edges \
 	custom_td \
 	dead_simple \
@@ -52,10 +52,6 @@ check_PROGRAMS = \
 	sdcc_uu \
 	sdcc_bu \
 	vec2tree
-
-# these fail. known bug...
-XFAIL_TESTS = \
-	bucket_sorter_2u
 
 inline_SOURCES=sdcc_bb.cpp inline.cpp
 inline_CXXFLAGS=${AM_CXXFLAGS}
@@ -82,7 +78,9 @@ AM_CXXFLAGS = -O0 -g
 treedec:
 	-ln -sf $(top_srcdir)/src treedec
 
-EXTRA_DIST = g.h sdcc_.cpp
+EXTRA_DIST = \
+	bucket_sorter_2u.cpp \
+	g.h sdcc_.cpp g_19.h
 # 	svbs_random.h
 
 ${TESTS:%=%.log}: .P

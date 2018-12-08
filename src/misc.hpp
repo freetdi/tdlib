@@ -758,14 +758,16 @@ template<class B, typename T_t>
 void glue_bags(B& bags, T_t &T)
 {
     for(unsigned int i = bags.size(); i > 0; i--){
-        typename treedec_traits<T_t>::vd_type first = boost::get<0>(bags[i-1]);
-        auto& second=boost::get<1>(bags[i-1]);
+        auto base=boost::get<0>(bags[i-1]);
+        auto& bag=boost::get<1>(bags[i-1]);
 /*
         if(ignore_isolated_vertices && second.empty()){
             continue;
         }
 */
-        glue_bag(second, first, T);
+
+        sort(bag); // must be ordered
+        glue_bag(bag, base, T);
     }
 }
 

@@ -295,7 +295,7 @@ inline std::pair<unsigned, bool> TWTHREAD<TWTa>::commit_result(result_t x)
 	if(x>_result){
 		unreachable();
 	}
-	if(unsigned(global_result)<x){ untested();
+	if(unsigned(global_result)<x){
 		x = global_result;
 		is_better = false;
 	}else{

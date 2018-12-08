@@ -1,7 +1,6 @@
-tdlib is free software under the GPL. However, the version used varies on a per-file basis.
-
-See the comments in the individual source files for the exact license used.
+treedec is free software licensed under the General Public License (GPL). The
+license version varies on a per-file basis. See the respective note in the
+headers.
 
 Version 2 of the GPL can be found in the file GPL-2.
 Version 3 of the GPL can be found in the file GPL-3.
-

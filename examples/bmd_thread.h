@@ -27,7 +27,7 @@ public:
 	typedef cfgt<G> CFG;
     BMD_THREAD( G& g, const std::string& name="BMD", mag_t m=M64)
         : base(g, name, 0), _g(g), _mag(m)
-    { untested();
+    {
         base::go(); // ??
     }
 
@@ -39,7 +39,7 @@ public:
         base::print_results_order(o, _elimord);
     }
 
-    void run() { untested();
+    void run() {
 #ifdef HAVE_GALA_GRAPH_H
         // TODO: faster with "remove-only" stuffed vector-graph...
         sg_dvv16* pg16;

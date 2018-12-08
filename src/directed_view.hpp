@@ -398,7 +398,7 @@ template<class G, class P>
 void remove_out_edge_if(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		P p, treedec::draft::directed_view<G>& g)
-{ untested();
+{
 	return remove_out_edge_if(v, p, *g);
 }
 

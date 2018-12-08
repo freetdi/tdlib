@@ -268,7 +268,7 @@ public:
         _lb_bs = l+1;
     }
     void do_it();
-    size_t get_bagsize() const{ untested();
+    size_t get_bagsize() const{
         return _lb_bs;
     }
     template<class BAG_t>
@@ -383,6 +383,7 @@ public:
         }
         assert(deg == _degree[v]);
     }
+    // update neigh degrees. (v is gone.)
     void redegree(vertex_descriptor v, unsigned mark_needs_update=0)
     { // call degree.hpp redegree?
         (void)mark_needs_update;
@@ -393,9 +394,9 @@ public:
 
             if(!enable_dormant_nodes){
                 assert(!_dormant.is_marked(n));
-            }
-            else if(_dormant.is_marked(n)){
+            }else if(_dormant.is_marked(n)){ untested();
                 _dormant.unmark(n);
+            }else{ untested();
             }
             // hmm, which ones do really need update?
             // (later...)
@@ -412,8 +413,7 @@ public:
     void set_dormant(vertex_descriptor n){
         if(!enable_dormant_nodes){
             return;
-        }
-        else{untested();
+        }else{untested();
             assert(!_dormant.is_marked(n));
             _dormant.mark(n);
             _degs.unlink(n);
@@ -485,8 +485,7 @@ public:
                 assert(*Is.first != *Ii);
                 if(!_marker.is_marked(*Ii)){ untested();
                     // not a neighbour.
-                }
-                else{
+                }else{
                     // need to avoid is_edge here..
                     assert(boost::edge(*Is.first, *Ii, _g).second
                             == boost::edge(*Ii, *Is.first, _g).second);
@@ -514,7 +513,7 @@ private:
     }
     void unlink_1_neighbourhood(vertex_descriptor v){
         auto pp=adjacent_vertices(v);
-        for(; pp.first!=pp.second; ++pp.first){
+        for(; pp.first!=pp.second; ++pp.first){ untested();
             _degs.unlink(*pp.first);
         }
     }
@@ -860,10 +859,10 @@ bool preprocessing<G_t, CFG>::check_twins_3(
             // a=x
             // =xx
             ++Ib;
-            if(*Ib == a){ untested();
+            if(*Ib == a){
                 ++Ia;
                 ++Ib;
-                return Ia==Ib;
+                ret = *Ia==*Ib;
             }else{
                 ++Ia;
                 if(*Ia==*Ib){
@@ -999,8 +998,8 @@ bool preprocessing<G_t, CFG>::Buddy(
     if(check_twins_3(v, w)){
         assert(!is_numbered(v));
         assert(!is_numbered(w));
-        unlink_1_neighbourhood(v);
-        _degs.unlink(w, 3);
+        // unlink_1_neighbourhood(v); // _deg-unlinks v-neighs. redegree(v) below does that
+        // _degs.unlink(w, 3); addtoelims does that
 
         vd_type vd2 = w;
 
@@ -1296,10 +1295,10 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
         assert(deg_v);
         assert(_lb_tw>=0);
 
-        if(deg_v <= (vertices_size_type)_lb_tw){
+        if(deg_v <= (vertices_size_type)_lb_tw){ untested();
             vd_type vd = get_vd(_g, v);
 
-            unlink_1_neighbourhood(v, _g, _degs);
+            unlink_1_neighbourhood(v, _g, _degs); // BUG? redegree does that
             _degs.unlink(v);
 
             make_neigh_clique(v);
@@ -1307,12 +1306,10 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
             redegree(v);
 
             return true;
-        }
-        else if(vertices_size_type(_lb_tw) < deg_v-1u){
+        }else if(vertices_size_type(_lb_tw) < deg_v-1u){ untested();
             _lb_tw = deg_v-1;
             return true;
-        }
-        else{
+        }else{ untested();
             return false;
         }
     }

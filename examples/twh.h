@@ -75,12 +75,12 @@ static std::atomic<unsigned> global_result;
 bool trace=false;
 
 #include <boost/graph/graph_traits.hpp>
-#include <tdlib/graph_traits.hpp>
+#include <treedec/graph_traits.hpp>
 
 //
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost.h>
-#include <tdlib/directed_view.hpp>
+#include <treedec/directed_view.hpp>
 #ifdef USE_RANDOM_MD
 #include <gala/examples/ssg_random.h>
 #endif
@@ -100,9 +100,9 @@ bool trace=false;
 
 #include "timer.h"
 
-#include <tdlib/printer.hpp>
-#include <tdlib/combinations.hpp>
-#include <tdlib/elimination_orderings.hpp>
+#include <treedec/printer.hpp>
+#include <treedec/combinations.hpp>
+#include <treedec/elimination_orderings.hpp>
 #include <boost/graph/copy.hpp>
 
 // undirected simple loopless graph
@@ -131,7 +131,6 @@ unsigned TWTHREAD_BASE::_running;
 
 #include "grparse.h"
 
-// bug, still tdlib
 
 ////// why is this necessary? //////
 using boost::out_edges;
@@ -548,7 +547,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_PP
     if(!(mask & ( 1 << nPP ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPP, new PP_THREAD<uG16, grtd_algo_config>(g16, "PP_16"));
     }else{ untested();
         reg_thread(threads, nPP, new PP_THREAD<uG32, grtd_algo_config>(g32, "PP_32"));
@@ -557,7 +556,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FIPPTM
     if(!(mask & ( 1 << nPPFITM ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG16, grtd_algo_config>(g16, "FIPPTM_16"));
     }else{ untested();
         reg_thread(threads, nPPFITM, new PPFITM_THREAD<uG32, grtd_algo_config>(g32, "FIPPTM_32"));
@@ -584,7 +583,7 @@ void twh(P& p, mag_t m, unsigned mask)
 /*--------------------------------------------------------------------------*/
 #ifdef USE_PPMD
     if(!(mask & ( 1 << nPPMD ))) {
-    }else if( m < M16){ untested();
+    }else if( m < M16){
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG16, grtd_algo_config>(g16, "PPMD_16"));
     }else{ untested();
         reg_thread(threads, nPPMD, new PPMD_THREAD<uG32, grtd_algo_config>(g32, "PPMD_32"));
@@ -788,7 +787,7 @@ static void parseargs(int argc, char * const * argv)
             fformat = f_DOT;
         }else if(!strncmp("--he17", argv[i], 6)){ untested();
             mask_in |= (1<<nP17);
-        }else if(!strncmp("--ex17", argv[i], 6)){ untested();
+        }else if(!strncmp("--ex17", argv[i], 6)){
             mask_in |= (1<<nEX17);
         }else if(!strncmp("--thorup", argv[i], 8)){ untested();
             mask_in |= (1<<nTH);

@@ -9,7 +9,8 @@ compiler:
   - clang
 
 python:
-  - "2.7"
+  - "3.6"
+
 virtualenv:
   system_site_packages: true
 
@@ -26,6 +27,7 @@ addons:
       - libboost-thread1.55-dev
       - libboost-graph1.55-dev
       - stx-btree-dev
+      - python3-dev
 
 install:
 
@@ -33,7 +35,9 @@ install:
   - sudo pip install cython
 
 script:
-  - GALA_COMMIT=93f5c2e11d7075
+  # TODO: point to release instead.
+  - GALA_COMMIT=6c6a6f2b3d2f92
+  - PYTHON=python3
 
   - uname -a
   - g++ --version
@@ -42,13 +46,13 @@ script:
   - autoconf --version
   - automake --version
   - python --version
+  - $PYTHON --version
   - pwd
   - ls -la
 
   # run all checks
   - ./bootstrap
-  - "./configure --enable-debug
-                CXXFLAGS=-std=c++11"
+  - "./configure --enable-debug CXXFLAGS=-std=c++11\ --with-python=$PYTHON"
   - make check
 
   # redo with gala
@@ -64,6 +68,9 @@ script:
       export BOOST_HOME=`pwd`
       ./bootstrap.sh
       ./b2 --with-system --with-graph --with-thread --with-regex
+      echo LOCAL_INSTALL ${LOCAL_INSTALL}
+      LOCAL_INSTALL=${BOOST_HOME}/stage
+      echo LOCAL_INSTALL ${LOCAL_INSTALL}
       export BOOST_PARAM="--with-boost=$LOCAL_INSTALL"
       popd
       export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LOCAL_INSTALL/lib"
@@ -75,14 +82,13 @@ script:
   - ( cd gala_src; tar --strip-components=1 -zxf ../${GALA_COMMIT}.tar.gz )
   - ( cd gala_src; ./configure )
   - make -C gala_src install DESTDIR=${HOME} prefix=GP
+  - echo $TRAVIS_OS_NAME $CXX
   - popd
   - |-
-    if [ "$TRAVIS_OS_NAME" = "linux" -a $CXX = "g++" ]; then
-       "./configure --enable-debug CXXFLAGS=-std=c++11
-                    CXXFLAGS=-std=c++11
-                    CPPFLAGS=-I${HOME}/GP/include\\ -I$BOOST_HOME
-                    LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex"
+    if [ "$TRAVIS_OS_NAME" = "linux" -a ${CXX:0:3} = "g++" ]; then
+       echo doing linux and gcc
+       ./configure --enable-debug CXXFLAGS=-std=c++11 CXXFLAGS=-std=c++11 CPPFLAGS=-I${HOME}/GP/include\ -I$BOOST_HOME LDFLAGS=-L$BOOST_HOME/stage/lib LIBS=-lboost_regex
        make check
     fi
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH_OLD"
-  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS=-std=c++11
+  - make distcheck DISTCHECK_CONFIGURE_FLAGS=CXXFLAGS="-std=c++11 --with-python=$PYTHON"

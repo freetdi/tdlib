@@ -15,7 +15,7 @@ public:
     PP_THREAD( G const&g, const std::string& name )
         : base(g, name, 0), _work(g) // <= stored here
 			 , _PP(NULL)
-    { untested();
+    {
         _PP = new algo_type(_work);
         treedec::check(g);
         treedec::check(_work);
@@ -36,7 +36,7 @@ public:
 		  // _PP->get_tree_decomposition(P);
     }
 
-    void run() { untested();
+    void run() {
 		_PP->do_it();
 
 		  CFG::message(bLOG, "PP edges left %d\n", _PP->num_edges());

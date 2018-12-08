@@ -9,6 +9,11 @@ of T is the size of the biggest bag, which is a notion for the
 there is work in progress, so this description should be understood as
 normative. deviations from conventions stated here are considered bugs.
 
+== prerequisites ==
+
+- boost (tested with >=1.62)
+- a c++ compiler with reasonable c++ support
+
 == the interface ==
 
 a tree decomposition algorithm is a class template

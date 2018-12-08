@@ -38,6 +38,7 @@ BOOST_LIBS = -lboost_thread -lboost_system -lpthread
 PROFILE_GEN = -fprofile-generate
 PROFILE_FLAGS = -fprofile-use=.
 PROFILE_GRAPH = gr/h.gr
+TD_VALIDATE = ./td-validate
 
 COMMON_CXXFLAGS = -Os -march=native
 
@@ -78,19 +79,21 @@ $(GRTD_AMNAME).Tpo: $(GRTDP_AMNAME).gcda
 
 TIME=1
 
-$(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile
+$(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile ${TD_VALIDATE}
 	rm -f $@
-	@for i in --ex17 --fi --ppfi; do \
-		echo "./tdecomp-profile -m $$i < $< > $<.td$$i & p=\$$!; sleep $(TIME); kill -TERM \$$p;"; \
-		./tdecomp-profile -m $$i < $< > $<.i.td$$i & p=$$!; sleep $(TIME); kill -TERM $$p; \
+	@TD=$$(basename $<).td; \
+	for i in --ex17 --fi --ppfi; do \
+		echo "./tdecomp-profile $$i < $< > $$TD$$i & p=\$$!; sleep $(TIME); kill -TERM \$$p;"; \
+		./tdecomp-profile $$i < $< > $$TD.i$$i & p=$$!; sleep $(TIME); kill -TERM $$p; \
       wait $$p; \
-		grep -v incomplete $<.i.td$$i > $<.td$$i; \
-		rm $<.i.td$$i; \
-		td-validate $< $<.td$$i || : ; \
+		grep -v incomplete $$TD.i$$i > $$TD$$i; \
+		rm $$TD.i$$i; \
+		${TD_VALIDATE} $< $$TD$$i || : ; \
 	done
 
 BUILT_SOURCES = treedec
 CLEANFILES = \
+	h.gr.td--* \
 	${BUILT_SOURCES} *~ \
    $(TWEXP_AMNAME).gcda \
 	$(GRTDP_AMNAME).gcda \

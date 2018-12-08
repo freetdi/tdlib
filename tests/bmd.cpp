@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
 	std::vector<int> inverse_perm(n, 0);
 	std::vector<int> supernode_sizes(n, 1);
-	BOOST_AUTO(id, boost::get(boost::vertex_index, g));
+	auto id=boost::get(boost::vertex_index, g);
 	std::vector<int> degree(n, 0);
 	std::vector<int> io(n, 0);
 	std::vector<int> o(n, 0);

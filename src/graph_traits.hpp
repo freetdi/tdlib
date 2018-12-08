@@ -353,12 +353,13 @@ namespace bagstuff {
 		typedef typename gtob<G>::type B;
 		const_treebagpmap(G const& g) : _g(g){}
 
-		std::set<unsigned>& operator[](unsigned v) const{
+		B& operator[](unsigned v) const{
 			auto& g=const_cast<G&>(_g); // huh?
 			return g[v].bag;
 		}
 		G const&_g;
 	};
+
 	template<class G>
 	struct treebagpmap : public put_get_helper<typename gtob<G>::type, treebagpmap<G> > {
 		typedef typename gtob<G>::type B;
@@ -376,26 +377,6 @@ namespace bagstuff {
 	};
 
 } // bagstuff
-
-
-	template<class C, class T>
-	struct bag_sfinae { typedef T type; };
-
-	template<class G>
-	struct property_map<G,
-		typename bag_sfinae<
-			decltype( boost::vertex_bundle_type<G>::type::bag ),
-		   typename std::enable_if<
-			   1||std::is_same< typename boost::vertex_bundle_type<G>::type,
-			                  treedec::bag_t>::value, vertex_all_t
-							>::type
-		 >::type
-		 >
-	{ //
-		typedef bagstuff::treebagpmap<G>  type;
-		typedef bagstuff::const_treebagpmap<G> const_type;
-	};
-
 
 } // boost
 

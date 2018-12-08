@@ -149,8 +149,8 @@ AUTHOR: Lukas Larisch (now): Initial version
 
 from libcpp.vector cimport vector
 
-from Graph import Graph
-from Decomp import Decomp
+from .Graph import Graph
+from .Decomp import Decomp
 
 
 ##############################################################
@@ -159,6 +159,7 @@ from Decomp import Decomp
 #between the python graph encoding and TdLib graph encoding,
 #which is based on the BGL.
 
+# BUG: does not make a graph.
 cdef cython_make_tdlib_graph(pyV, pyE, vector[unsigned int] &V, vector[unsigned int] &E):
     labels_map = list()
     labels_dict_inv = dict()
@@ -1578,3 +1579,5 @@ def weight_stats(G, T, verbose=False):
 
 
     return diff
+
+# vim:ts=8:sw=4:et

@@ -36,8 +36,8 @@ LONG_TESTS = \
 	test_long_approx_Zoo.py \
 	test_long_apps_Zoo.py \
 	test_long_lb_Zoo.py \
-        test_long_generic_search_Dimacs.py \
-        test_long_generic_search_Networks.py
+	test_long_generic_search_Dimacs.py \
+	test_long_generic_search_Networks.py
 
 EXTRALONG_TESTS = \
 test_long_fi_Dimacs.py
@@ -45,6 +45,13 @@ test_long_fi_Dimacs.py
 # AM_PY_LOG_DRIVER_FLAGS=--short
 
 AM_PY_LOG_DRIVER_FLAGS=$(DEBUGFLAG)
+
+# pretend there is a "tdlib" module
+all-am: | tdlib
+
+tdlib:
+	$(LN_S) ../ tdlib
+
 
 longcheck:
 	$(MAKE) check TESTS="$(LONG_TESTS)" AM_PY_LOG_DRIVER_FLAGS+=--long
@@ -56,7 +63,7 @@ $(LONG_TESTS:%.py=%.log): AM_PY_LOG_DRIVER_FLAGS=
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 AM_TESTS_ENVIRONMENT = \
-    export PYTHONPATH='.:..:$(top_srcdir)/pytdlib';
+    export PYTHONPATH='.';
 
 EXTRA_DIST = \
 	$(TESTS) \

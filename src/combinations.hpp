@@ -58,7 +58,7 @@
 #include "misc.hpp"
 #include "util.hpp"
 #ifdef HAVE_GALA_GRAPH_H
-#include "exact_ta.hpp"
+# include "exact_ta.hpp" // needs gala/cbset.h
 #endif
 #include "treedec_copy.hpp"
 
@@ -485,6 +485,7 @@ public: // algo interface
                 }else{
                 }
             }
+            new_elim_ordering_.resize(c);
 
             assert(is_vertex_permutation(new_elim_ordering, H));
 

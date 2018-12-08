@@ -33,7 +33,6 @@
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp> // adjacent_vertices
-#include <tr1/utility> // pair
 
 #include "graph.hpp"
 
@@ -231,12 +230,12 @@ public: // types
             // trace1("cmp++ ", pos);
             assert(_cs._visited[pos]);
 
-            BOOST_AUTO(p, boost::adjacent_vertices(pre, _cs._g));
+            auto p=boost::adjacent_vertices(pre, _cs._g);
             _cs._stack.push_back(p);
 
             // DFS
             while(true){
-                BOOST_AUTO(& candi, _cs._stack.back());
+                auto& candi=_cs._stack.back();
                 if(candi.first==candi.second){
                     _cs._stack.pop_back();
 
@@ -317,7 +316,7 @@ public: // types
                 }else{
                 }
 
-                BOOST_AUTO(f, *p.first);
+                auto f=*p.first;
                 unsigned pos=boost::get(boost::vertex_index, _cs._g, f);
                 assert(pos<_cs._visited.size());
                 if(!_cs._visited[pos]){
@@ -483,12 +482,12 @@ public: // ops
     }
     std::pair<component_iter, component_iter> operator*()
     {
-        BOOST_AUTO(p, boost::get(boost::vertex_index, _g, *_range.first));
+        auto p=boost::get(boost::vertex_index, _g, *_range.first);
         (void)p;
         // trace2("op*", *_range.first,  _visited[p]);
         assert(_range.first==_range.second || !_visited[p]);
 
-        BOOST_AUTO(second, _range.first);
+        auto second=_range.first;
         if(_range.first!=_range.second){
             ++second;
         }else{
@@ -521,7 +520,7 @@ std::pair<detail::components_iter<G, VRP_, MASK>,
         )
 {
     (void) b;
-    BOOST_AUTO(p, boost::vertices(g));
+    auto p=boost::vertices(g);
     return std::make_pair(
         detail::components_iter<G, VRP_, MASK>(p, g, g, s),
         detail::components_iter<G, VRP_, MASK>(std::make_pair(p.second, p.second), g)); // FIXME
@@ -648,7 +647,7 @@ public: // ops
         if(_q.front().first!=_q.front().second){
         }else{ untested();
         }
-        BOOST_AUTO(vd, *front_range().first);
+        auto vd=*front_range().first;
         trace1("op*", vd);
         return vd;
     }
@@ -710,7 +709,7 @@ private:
                 trace1("been there", pos);
             }else{
                 set_visited(pos);
-                BOOST_AUTO(av, boost::adjacent_vertices(v, _g));
+                auto av=boost::adjacent_vertices(v, _g);
                 assert(av.first!=av.second);
                 maybe_push_back(av);
                 trace2("found new", pos, count_range(av));
@@ -940,7 +939,7 @@ public: // types
             if(_onion._q.front().first!=_onion._q.front().second){ untested();
             }else{ untested();
             }
-            BOOST_AUTO(vd, *front_range().first);
+            auto vd=*front_range().first;
             trace1("op*", vd);
             return vd;
         }
@@ -1001,7 +1000,7 @@ public: // types
                 if(visited(pos)){ untested();
                 }else{ untested();
                     visited(pos) = true;
-                    BOOST_AUTO(av, boost::adjacent_vertices(v, _onion._g));
+                    auto av=boost::adjacent_vertices(v, _onion._g);
                     assert(av.first!=av.second);
                     _onion.maybe_push_back(av);
                     assert(count_range(av)==boost::out_degree(v, _onion._g));
@@ -1347,7 +1346,7 @@ public: // ops
             _t.back()=_e;
          }
       }else if(_t.size()<=_u){
-         BOOST_AUTO(back, _t.back());
+         auto back=_t.back();
          ++back;
          if(back!=_e){
             if(_t.size()==_u){
@@ -1362,14 +1361,14 @@ public: // ops
          }else if(_t.size()==1){
             ++_t.back();
          }else if(_t.size()==_l){
-             BOOST_AUTO(back2, _t.back());
+             auto back2=_t.back();
              carry(back2);
              if(_t.size()<_l){
                  _t[0]=_e;
              }
          }else{
             _t.pop_back();
-            BOOST_AUTO(back2, _t.back());
+            auto back2=_t.back();
             ++back2;
             if(back2!=_e){
                ++_t.back();
@@ -1385,13 +1384,13 @@ public: // ops
    }
    void carry(T end)
    {
-       BOOST_AUTO(b, _t.back());
+       auto b=_t.back();
        ++b;
        if(_t.size() == 1){
            ++_t.back();
        }else if(_t.back() == end){
            _t.pop_back();
-           BOOST_AUTO(newend, _t.back());
+           auto newend=_t.back();
            ++newend;
            if(newend==end){
                newend=_t.back();
@@ -1416,7 +1415,7 @@ public: // ops
          if(!_t.size()){
             _t.push_back(_i);
          }else{
-            BOOST_AUTO(back, _t.back());
+            auto back=_t.back();
             if(back==_e){
                break;
             }else{
@@ -1614,7 +1613,7 @@ public: // ops
         A ii(_b);
         unsigned n=0;
         for(; ii!=_e; ++ii){
-            BOOST_AUTO(aend, boost::adjacent_vertices(*ii, _g).second);
+            auto aend=boost::adjacent_vertices(*ii, _g).second;
             found |= update(_a[n], aend, previous, _v);
             ++n;
         }

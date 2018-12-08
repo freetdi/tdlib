@@ -1270,7 +1270,9 @@ inline void exact_ta<EXTA_a>::extendByNew(
 		tassert(y.first->block);
 //		trace1("loop", y.first->block->component);
 
+#ifndef NDEBUG
 		auto const& iternode=y.first;
+#endif
 		tassert(cbset::contains(iternode->block->component, iternode.back()));
 
 		tassert(!cbset::contains(c, iternode.back()));

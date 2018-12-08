@@ -1,9 +1,9 @@
 //typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> bald_t;
 //
 //
-#include <tdlib/algo.hpp>
-#include <tdlib/exact_ta.hpp>
-#include <tdlib/tuple_td.hpp>
+#include <treedec/algo.hpp>
+#include <treedec/exact_ta.hpp>
+#include <treedec/tuple_td.hpp>
 #include <gala/boost_copy.h>
 
 //typedef cbset::BSET_DYNAMIC<K> BSET;

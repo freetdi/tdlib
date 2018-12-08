@@ -101,6 +101,10 @@ AC_LANG_PUSH([C++])
 # unconditional c++11
 CXXFLAGS="$CXXFLAGS -std=c++11"
 
+AC_CHECK_HEADERS([boost/tuple/tuple.hpp], [],
+                 AC_MSG_ERROR([could not find a boost header])
+)
+
 have_gala=no
 
 AC_ARG_WITH([gala], AS_HELP_STRING([--without-gala], [Disable gala]))
@@ -147,11 +151,13 @@ else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
 
+AM_CONDITIONAL([VPATH_BUILD], [test ! x$srcdir = "x."])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([examples/Makefile])
 AC_CONFIG_FILES([examples/gr/Makefile])
-AC_CONFIG_FILES([pytdlib/Makefile])
-AC_CONFIG_FILES([pytdlib/tests/Makefile])
+AC_CONFIG_FILES([tdlib/Makefile])
+AC_CONFIG_FILES([tdlib/tests/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bits/Makefile])
 AC_CONFIG_FILES([src/applications/Makefile])
@@ -166,6 +172,7 @@ AC_MSG_RESULT([
    prefix:     $prefix
    python:     $python
    gala:       $have_gala
+   CXX:        $CXX
    CPPFLAGS:   $CPPFLAGS
    CXXFLAGS:   $CXXFLAGS
 ])

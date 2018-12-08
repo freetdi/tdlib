@@ -4,16 +4,16 @@
 typedef int var_t;
 typedef std::set<unsigned int> sdcc_bagtype;
 struct tree_dec_node {
-//  typedef boost::vertex_property_tag kind; // do we need it?
+	//  typedef boost::vertex_property_tag kind; // do we need it?
 	sdcc_bagtype bag;
-  std::set<var_t> alive;
-  unsigned weight;
+	std::set<var_t> alive;
+	unsigned weight;
 };
 struct tree_dec_node2 {
-//  typedef boost::vertex_property_tag kind; // do we need it?
+	//  typedef boost::vertex_property_tag kind; // do we need it?
 	std::vector<unsigned> bag;
-  std::set<var_t> alive;
-  unsigned weight;
+	std::set<var_t> alive;
+	unsigned weight;
 };
 
 #include <treedec/treedec_traits.hpp>
@@ -26,6 +26,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 TREEDEC_TREEDEC_BAG_TRAITS(sbib_tdt, bag);
 TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 
+BOOST_STATIC_ASSERT( std::is_same< tree_dec_node, sbib_tdt::vertex_property_type >::value );
+
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_utility.hpp>
 
@@ -35,6 +37,7 @@ TREEDEC_TREEDEC_BAG_TRAITS(vbib_tdt, bag);
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <treedec/preprocessing.hpp>
+#include <treedec/combinations.hpp>
 #include <treedec/graph.hpp>
 #include <treedec/thorup.hpp>
 #ifdef HAVE_GALA_GRAPH_H
@@ -170,10 +173,18 @@ int main(int, char**)
 		typedef boost::adjacency_list<boost::vecS, boost::vecS,
 				  boost::bidirectionalS > G;
 		typedef treedec::thorup<G> alg_B;
-		G h;
+		G h(2);
 		alg_B B(h);
 		B.do_it();
+		auto Y=B.get_elimord();
 		auto X=B.get_tree_decomposition();
+		std::cout << "elimord\n";
+		unsigned sy=0;
+		for(auto y:*Y){
+			sy+=y;
+			std::cout << y << "\n";
+		}
+		assert(sy==1);
 		boost::copy_graph(X, st);
 
 		B.get_tree_decomposition(st);
@@ -186,4 +197,33 @@ int main(int, char**)
 //	boost::copy_graph(cbt, vt); not yet
 	boost::copy_graph(cbt, st);
 
+	assert(treedec::get_width(vt)==2);
+	assert(treedec::get_width(cpt)==2);
+
+	{
+		vbib_tdt g(2);
+		treedec::pending::PP_FI_TM<vbib_tdt> ppfitm(g);
+		ppfitm.do_it();
+
+		treedec::impl::preprocessing<vbib_tdt> alg(g);
+		alg.do_it();
+
+#ifdef HAVE_GALA_GRAPH_H
+		treedec::comb::ex17<vbib_tdt> ex(g);
+		ex.do_it();
+#endif
+	}
+	{
+		sbib_tdt g(2);
+		treedec::pending::PP_FI_TM<sbib_tdt> ppfitm(g);
+		ppfitm.do_it();
+
+		treedec::impl::preprocessing<sbib_tdt> alg(g);
+		alg.do_it();
+
+#ifdef HAVE_GALA_GRAPH_H
+		treedec::comb::ex17<sbib_tdt> ex(g);
+		ex.do_it();
+#endif
+	}
 }
