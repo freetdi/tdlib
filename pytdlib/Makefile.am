@@ -3,7 +3,7 @@ include $(top_srcdir)/cython.am
 SUBDIRS = . tests
 
 instdir = $(pythondir)/tdlib
-inst_PYTHON = __init__.py
+inst_PYTHON = __init__.py Graph.py Decomp.py
 inst_LTLIBRARIES = tdlib.la
 tdlib_la_SOURCES = tdlib.pyx python_tdlib.cpp
 
