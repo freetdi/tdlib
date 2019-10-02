@@ -39,7 +39,7 @@
 
 // #if __cplusplus >= 201103L
 // # include <unordered_set>
-// #include <stx/btree_set>
+// #include <tlx/container/btree_set>
 // #endif
 
 #include "platform.hpp"
@@ -47,8 +47,8 @@
 
 #include <stack>
 
-#ifdef HAVE_STX_BTREE_SET_H
-# include <stx/btree_set>
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
+# include <tlx/container/btree_set.hpp>
 #endif
 
 

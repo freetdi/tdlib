@@ -18,5 +18,5 @@
 - (squashen vom overlay)
 
 -use range(.) instead of list of vertices [0..]
--stx dependency needs to be fixed
+-tlx dependency needs to be fixed
 -td-validate dependency needs to be fixed

@@ -121,7 +121,7 @@ AS_IF([test "x$with_gala" != xno], [
 
 AM_CONDITIONAL([USE_GALA], [test $have_gala = yes])
 
-AC_CHECK_HEADERS([stx/btree_set.h])
+AC_CHECK_HEADERS([tlx/container/btree_set.hpp])
 AC_LANG_POP([C++])
 
 # BUG: in auto mode disable python if there are no headers...
