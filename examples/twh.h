@@ -90,8 +90,6 @@ bool trace=false;
 #include <gala/examples/ssg32i.h> // -> td.h
 #include <gala/examples/ssg16i.h> // -> td.h
 #include <gala/examples/ssg16ia.h> // -> td.h
-#include <gala/examples/svbs.h> // -> td.h
-#include <gala/examples/svbs_random.h> // -> td.h
 
 #include <gala/immutable.h>
 #else
