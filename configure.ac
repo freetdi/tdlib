@@ -104,6 +104,10 @@ CXXFLAGS="$CXXFLAGS -std=c++11"
 AC_CHECK_HEADERS([boost/tuple/tuple.hpp], [],
                  AC_MSG_ERROR([could not find a boost header])
 )
+AC_CHECK_LIB([boost_system], [main], ,
+             [AC_MSG_ERROR([Unable to find Boost System library])])
+AC_CHECK_LIB([boost_thread], [main], ,
+             [AC_MSG_ERROR([Unable to find Boost Thread library])])
 
 have_gala=no
 
