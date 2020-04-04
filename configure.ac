@@ -74,8 +74,10 @@ AM_CONDITIONAL([USE_PYTHON], [test x$python != xno] )
 
 cythonver_req="0.20.0"
 
+CYTHON=${CYTHON-cython}
+
 AS_IF([test "$python" != no], [
-	AC_PATH_PROGS([CYTHON], [cython], [no])
+	AC_PATH_PROGS([CYTHON], [$CYTHON], [no])
 	AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])],
     AC_MSG_CHECKING([for $CYTHON >= $cythonver_req])
     [cythonver=`$CYTHON --version 2>&1 | sed -e 's/[[^0-9\.]]//g'`]
@@ -174,7 +176,8 @@ AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
    prefix:     $prefix
-   python:     $python
+   PYTHON:     $PYTHON
+   CYTHON:     $CYTHON
    gala:       $have_gala
    CXX:        $CXX
    CPPFLAGS:   $CPPFLAGS
