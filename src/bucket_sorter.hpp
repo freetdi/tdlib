@@ -23,6 +23,11 @@
 #include <boost/limits.hpp>
 #include "trace.hpp"
 
+// the __FreeBSD__ condition is a wild guess.
+#if defined(BOOST_CLANG) && (1 == BOOST_CLANG) && defined(__FreeBSD__)
+#define ITERATOR_CONSTRUCTOR_WORKAROUND
+#endif
+
 namespace boost {
 
   template <class BucketType, class ValueType, class Bucket, 
@@ -40,11 +45,11 @@ namespace boost {
                   const ValueIndexMap& _id = ValueIndexMap()) 
       : next(_length+_max_bucket, invalid_value()), 
         prev(_length, invalid_value()),
-        head(next.size()?(&next[_length]):NULL),
+        head(next.begin() + _length),
         id_to_value(_length),
         bucket(_bucket), id(_id) {
           trace2("created bs", _length, _max_bucket);
-          assert(head==&next[_length]);
+          assert(head==next.begin()+_length);
           assert(!next.size() || head[0]==invalid_value());
         }
     bucket_sorter(){untested();
@@ -235,15 +240,30 @@ namespace boost {
       }
       // stack_(const stack_&&){untested();}
     public:
-      stack_(bucket_type _bucket_id, typename Iter_::value_type* h, Iter_ n, Iter_ p, IndexValueMap_ v,
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
             const ValueIndexMap& _id)
-      : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) {}
+#ifdef ITERATOR_CONSTRUCTOR_WORKAROUND
+        : bucket_id(_bucket_id), head(), next(), prev(), value(v), id(_id) { untested();
+        head = h;
+        next = n;
+        prev = p;
+#else
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { untested();
+#endif
+      }
 
       // Avoid using default arg for ValueIndexMap so that the default
       // constructor of the ValueIndexMap is not required if not used.
-      stack_(bucket_type _bucket_id, typename Iter_::value_type* h, Iter_ n, Iter_ p, IndexValueMap_ v)
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v) { untested(); }
-
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v)
+#ifdef ITERATOR_CONSTRUCTOR_WORKAROUND
+        : bucket_id(_bucket_id), head(), next(), prev(), value(v) { untested();
+        head = h;
+        next = n;
+        prev = p;
+#else
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v) { untested();
+#endif
+      }
 
       void push_back(const value_type&) { untested();
         incomplete();
@@ -319,7 +339,7 @@ namespace boost {
   protected:
     std::vector<size_type>   next;
     std::vector<size_type>   prev;
-    typename std::vector<size_type>::value_type* head;
+    typename std::vector<size_type>::iterator head;
     std::vector<value_type>  id_to_value;
     Bucket bucket;
     ValueIndexMap id;
