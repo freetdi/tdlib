@@ -110,4 +110,4 @@ the best currently known decomposition is printed.
 
 example:
 $ tdecomp --fi < my_graph.gr > my_decomposition.td
-$ td-validate my_graph.gr my_decomposition.td    # not included (yet).
+$ td-validate my_graph.gr my_decomposition.td
