@@ -1,2 +1,4 @@
 - directed decompositions only work in random cases including connected
   graphs. (roots are implicit.)
+- some algorithms require set based graphs and fail without warning
+- python_tdlib fails to compile on OpenBSD (llvm bug?)
