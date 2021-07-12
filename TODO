@@ -1,4 +1,5 @@
 - proper python interface
+- simpler build system
 - more solvers as classes
 - make clean (e.g. grtd)
 - use "using" instead of typedef for types that should not be exported

@@ -14,6 +14,11 @@ normative. deviations from conventions stated here are considered bugs.
 - boost (tested with >=1.62)
 - a c++ compiler with reasonable c++ support
 
+optional
+- python/cython (disable with --without-python)
+- gala headers. configure will detect, if available
+  (need libboost_graph in that case)
+
 == the interface ==
 
 a tree decomposition algorithm is a class template
