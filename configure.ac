@@ -54,6 +54,8 @@ AM_PATH_PYTHON([$python_version_required],,
 	)
 ])])
 
+AC_ARG_VAR([CYTHON], [the Cython compiler])
+
 AS_IF([test "$python" != no], [
 
 PYTHON_INCLUDE_DIR=$PYTHON_PREFIX/include
