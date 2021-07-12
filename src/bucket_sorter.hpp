@@ -243,12 +243,12 @@ namespace boost {
       stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
             const ValueIndexMap& _id)
 #ifdef ITERATOR_CONSTRUCTOR_WORKAROUND
-        : bucket_id(_bucket_id), head(), next(), prev(), value(v), id(_id) { untested();
+        : bucket_id(_bucket_id), head(), next(), prev(), value(v), id(_id) { itested();
         head = h;
         next = n;
         prev = p;
 #else
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { untested();
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) {
 #endif
       }
 
