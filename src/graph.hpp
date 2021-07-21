@@ -775,7 +775,7 @@ bool is_antisymmetric(G_t const &G){
     return true;
 }
 
-//checks if G is connected
+//check if G is connected (slow? obsolete?)
 template <typename G_t>
 bool is_connected_undirected(G_t const &G){
     std::vector<std::set<typename boost::graph_traits<G_t>::vertex_descriptor> > components;
@@ -798,15 +798,15 @@ bool is_tree(G_t const &G){
 //TODO: use vec<bool>
 template <typename O_t, typename G>
 bool is_vertex_permutation(O_t const &O, G const &g)
-{ itested();
+{
     std::set<typename boost::graph_traits<G>::vertex_descriptor> S, V;
 
     auto p=boost::vertices(g);
-    for(; p.first!=p.second; ++p.first){ itested();
+    for(; p.first!=p.second; ++p.first){
         V.insert(*p.first);
     }
 
-    for(auto x : O) { itested();
+    for(auto x : O) {
         S.insert(x);
     }
 

@@ -43,6 +43,8 @@ check_PROGRAMS = \
 	dead_simple \
 	elim0 \
 	inline \
+	iter0 \
+	iter1 \
 	graph \
 	pp \
 	pp0 \

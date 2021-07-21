@@ -197,10 +197,10 @@ public: // dangerous?
 	wrapped_type* operator->(){ untested();
 		return &_g;
 	}
-	wrapped_type& operator*(){ itested();
+	wrapped_type& operator*(){
 		return _g;
 	}
-	wrapped_type const& operator*() const{ itested();
+	wrapped_type const& operator*() const{
 		return _g;
 	}
 public: // unnecessary

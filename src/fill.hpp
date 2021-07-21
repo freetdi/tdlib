@@ -181,7 +181,7 @@ public: // construct
                            _vals[pos]==_max_fill);
                 }
 
-                if (!missing_edges){ itested();
+                if (!missing_edges){
                     trace2("found isol", *p.first, lazy_init);
                     // faster by a few percent. sometimes?
                     foundzero = lazy_init;

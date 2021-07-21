@@ -1199,7 +1199,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) cons
 
 	 for(; cmps_range.first!=cmps_range.second; ++cmps_range.first){
 		 top++;
-		 auto comp_range=*cmps_range.first;
+		 auto comp_range = *cmps_range.first;
 
 		 T cmp_i;
 		 assert(cmp_i.empty());

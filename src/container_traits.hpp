@@ -174,7 +174,7 @@ namespace detail{//
           c.insert(e);
         }
         template<class I>
-        static void merge(C& c, I b, I e) { itested();
+        static void merge(C& c, I b, I e) {
           for(; b!=e; ++b){
             insert(c, *b);
           }
