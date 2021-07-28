@@ -151,12 +151,11 @@ namespace boost{
 	template<class G>
 	struct property_map<treedec::grtdprinter<G>, vertex_all_t>
 	{
+		typedef treedec::grtdprinter<G> graph_type;
 		typedef property_map<treedec::grtdprinter<G>, vertex_all_t> type;
 		size_t& operator[](size_t& n) const { return n; }
 	public:
-		property_map<treedec::grtdprinter<G>, vertex_all_t>(
-				treedec::grtdprinter<G>& g) : _g(g)
-		{
+		property_map( graph_type & g) : _g(g) {
 		}
 
 	public: // for now
@@ -167,8 +166,7 @@ namespace boost{
 	struct property_map<treedec::grtdprinter<G>, vertex_all_t, treedec::bag_t> {
 		typedef property_map<treedec::grtdprinter<G>, vertex_all_t, treedec::bag_t> type;
 	public:
-		property_map<treedec::grtdprinter<G>, vertex_all_t, treedec::bag_t>(
-				treedec::grtdprinter<G>& g) : _g(g)
+		property_map( treedec::grtdprinter<G>& g) : _g(g)
 		{ untested();
 		}
 
