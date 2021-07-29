@@ -50,9 +50,11 @@ public:
         idmap_type, vertices_size_type, vertices_size_type&> degreemap_type;
     typedef treedec::draft::NUMBERING_1<D_t> numbering_type;
     struct sgm{
+        sgm(sgm const& n)
+          : _n(n._n) {
+        }
         sgm(numbering_type const& n)
-          : _n(n)
-        {
+          : _n(n) {
         }
         // which one?
         bool operator()(vertex_descriptor v) const{

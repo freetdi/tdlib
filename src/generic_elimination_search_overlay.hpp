@@ -84,7 +84,6 @@ template <typename G_t, typename VD_t>
 void delete_top_edges(G_t &G, VD_t v, unsigned howmany){
     auto deg = boost::out_degree(v, G);
     assert(howmany<=deg);
-    assert(howmany>=0);
     outedge_resize<G_t>::do_it(v, deg - howmany, G);
 
     assert( deg-howmany == boost::out_degree(v, G));

@@ -71,7 +71,7 @@ int main(int, char**)
 	{
 		graph_t g(n*n);
 		auto R = treedec::make_components_range(g);
-		int k = 0;
+		unsigned k = 0;
 		for(;R.first != R.second; ++R.first){
 			++k;
 		}

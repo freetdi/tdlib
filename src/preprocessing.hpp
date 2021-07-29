@@ -1340,7 +1340,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
     }
 
     auto p=adjacent_vertices(v);
-    vertex_descriptor special;
+    vertex_descriptor special = v; // dummy value
     for(; p.first!=p.second; ++p.first){
         trace2("neighbourhood", v, *p.first);
         assert(cnt+3>deg);

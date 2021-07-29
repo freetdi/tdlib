@@ -597,7 +597,6 @@ public: // check
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t f)
     {
-        assert(f>=0);
         int n=_fill.erase(std::make_pair(f,v));
         (void)n;
         assert(n==1 || _init);
@@ -774,7 +773,6 @@ public: // picking
                 // unknown...
                 missing_edges = treedec::count_missing_edges(*qi, _g);
             }
-            assert(missing_edges>=0);
             reg(*qi, missing_edges);
             assert(_vals[pos] == missing_edges);
             // assert(!contains(_eval_queue, *qi));

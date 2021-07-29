@@ -238,6 +238,16 @@ namespace boost {
           id(p.id)
       {untested();
       }
+
+      stack_& operator=(const stack_& p) {
+        bucket_id = p.bucket_id;
+        head = p.head;
+        next = p.next;
+        prev = p.prev;
+        value = p.value;
+        id = p.id;
+        return *this;
+      }
       // stack_(const stack_&&){untested();}
     public:
       stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
@@ -248,7 +258,7 @@ namespace boost {
         next = n;
         prev = p;
 #else
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) {
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { // }
 #endif
       }
 
@@ -343,7 +353,7 @@ namespace boost {
     std::vector<value_type>  id_to_value;
     Bucket bucket;
     ValueIndexMap id;
-  };
+  }; // stack_
   
 }
 

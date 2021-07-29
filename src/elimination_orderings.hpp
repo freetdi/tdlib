@@ -495,7 +495,7 @@ void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
         return;
     }
 
-    assert(num_vert = O.size());
+    assert(num_vert == O.size());
     O_t iOlocal;
     typedef boost::adjacency_matrix<boost::directedS> bamd;
 

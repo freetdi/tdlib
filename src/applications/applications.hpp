@@ -85,11 +85,10 @@ template <typename I_t>
 class encoded_iterator{
 public:
     encoded_iterator(unsigned number, I_t superIt, I_t superEnd)
-     : _num(number), _supIt(superIt), _supEnd(superEnd){
-        if(_num == 0){
+     : _num(number), _last(0), _supIt(superIt), _supEnd(superEnd) {
+        if(_num == 0){ untested();
              _supIt = _supEnd;
-        }
-        else{
+        }else{ untested();
             while(_num != 0){
                 if(_num & 1){
                     _last = *_supIt;
@@ -99,7 +98,7 @@ public:
                 _num >>= 1;
                 _supIt++;
             }
-        }      
+        }
     }
 
     bool operator==(const encoded_iterator& o) const{

@@ -28,5 +28,5 @@ int main()
 		std::cout << *i << "\n";
 	}
 
-	assert(count=2);
+	assert(count==2);
 }

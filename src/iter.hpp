@@ -194,7 +194,7 @@ public: // types
             assert(cs._stack.empty());
             if(v==_cs._range.second){
             }else{
-                auto pos=boost::get(boost::vertex_index, _cs._g, *_vi);
+                // auto pos=boost::get(boost::vertex_index, _cs._g, *_vi);
                 if(visit){
                    // _cs._visited.visit(pos);
                 }else{ untested();
