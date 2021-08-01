@@ -180,6 +180,9 @@ void generic_elimination_search_p17_jumper(G_t &G, unsigned max_nodes, unsigned 
     std::cout << "PP lb: " << PP.get_treewidth() << std::endl;
 
 
+    // valgrind is unhappy here when using
+    // boost::adjacency_list<boost::setS, boost::vecS>.
+    // looks like a boost bug.
     bool cond = true;
     while(cond){
         cond = false;
