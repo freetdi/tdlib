@@ -443,7 +443,7 @@ void immutable_clone(G const &g, typename graph_traits<G>::immutable_type& ig,
 
 // check if {*vd1, *vd2} is a subset of a bag adjacent to t.
 template<class VD_t, class T_t>
-class is_in_neighbour_bd{ //
+class is_in_neighbour_bd{
 public:
     is_in_neighbour_bd(T_t const& T,
         typename boost::graph_traits<T_t>::vertex_descriptor t)
@@ -479,7 +479,8 @@ private: //data
     T_t const &_T;
     typename boost::graph_traits<T_t>::vertex_descriptor _t;
 public: // HACK
-    long unsigned a, b;
+    long unsigned a{0l};
+    long unsigned b{0l};
 };
 
 // clone subgraph induced by bag into ig.

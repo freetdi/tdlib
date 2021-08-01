@@ -75,11 +75,9 @@ namespace impl{
 
 namespace detail {
 
-struct forgetprop
-{
+struct forgetprop {
   template <class G, class H>
-  void operator()(G, H) const
-  {
+  void operator()(G, H) const {
   }
 };
 
@@ -249,7 +247,7 @@ private:
         ISNUM(numbering_type const& n, D_t const& g) : _n(n), _g(g){}
     public:
         template<class E>
-        bool operator()(E e) const{
+        bool operator()(E e) const{ untested();
             vertex_descriptor v = boost::target(e, _g);
             return _n.is_numbered(v);
         }
@@ -257,7 +255,7 @@ private:
         numbering_type const& _n;
         D_t const& _g;
     };
-    void clear_out_edges(vertex_descriptor v){
+    void clear_out_edges(vertex_descriptor v){ untested();
         boost::remove_out_edge_if(v, [](edge_descriptor){ return true; }, _g);
     }
 public:
@@ -268,7 +266,7 @@ public:
         _lb_bs = l+1;
     }
     void do_it();
-    size_t get_bagsize() const{
+    size_t get_bagsize() const{ untested();
         return _lb_bs;
     }
     template<class BAG_t>
@@ -297,11 +295,11 @@ public:
         // remove edges from unnnumbered nodes.
         auto p=boost::vertices(_g);
         ISNUM p_isnum(_numbering, _g);
-        for(; p.first!=p.second; ++p.first){
-            if(_numbering.is_numbered(*p.first)){
+        for(; p.first!=p.second; ++p.first){ untested();
+            if(_numbering.is_numbered(*p.first)){ untested();
                 // don't touch, it's a bag actually
             }
-            else{
+            else{ untested();
                 clear_out_edges(*p.first);
             }
         }
@@ -309,7 +307,7 @@ public:
         assert(bags.size()==_elims.size());
     }
 
-    edges_size_type num_edges()const{
+    edges_size_type num_edges()const{ untested();
         return _num_edges;
     }
     // legacy support. don't use. don't touch.
@@ -407,6 +405,7 @@ public:
         if(!enable_dormant_nodes){
             assert(!_dormant.is_marked(n));
             return false;
+        }else{ untested();
         }
         return _dormant.is_marked(n);
     }
@@ -474,6 +473,7 @@ public:
         isolate_(v);
         if(isclique){ untested();
             return;
+        }else{
         }
 
         auto Is=adjacent_vertices(v);
@@ -503,15 +503,14 @@ private:
             boost::add_edge(v, w, _g);
             ++_degree[v]; // outdegree
             return 1;
-        }
-        else{
+        }else{
             return 0;
         }
     }
     bool is_numbered(vertex_descriptor v){
         return _numbering.is_numbered(v);
     }
-    void unlink_1_neighbourhood(vertex_descriptor v){
+    void unlink_1_neighbourhood(vertex_descriptor v){ untested();
         auto pp=adjacent_vertices(v);
         for(; pp.first!=pp.second; ++pp.first){ untested();
             _degs.unlink(*pp.first);
@@ -533,8 +532,7 @@ private:
             auto x=boost::target(e, _g);
             if(x==_a || x==_b){
                 return _enable_cleanup;
-            }
-            else{
+            }else{
                 _marker.mark(x);
                 return false;
             }
@@ -549,7 +547,7 @@ private:
     void cube_make_clique(vertex_descriptor u, vertex_descriptor v,
             vertex_descriptor w, vertex_descriptor x,
             vertex_descriptor a, vertex_descriptor b, vertex_descriptor c
-            ){ untested();
+            ){
         assert(boost::is_directed(_g));
 
         // x has degree three connected to a,b,c. not these
@@ -572,8 +570,7 @@ private:
 
         if(enable_edge_cleanup){ untested();
             clear_out_edges(x);
-        }
-        else{untested();
+        }else{
         }
 
         boost::add_edge(u, v, _g);
@@ -600,7 +597,7 @@ private:
     void addtoelims(vertex_descriptor v){
 #ifndef NDEBUG
         if(_degs.is_reg(v)){
-        }else{
+        }else{ untested();
             assert(!(disable_cube && disable_triangle && disable_buddy));
             //
         }
@@ -632,6 +629,7 @@ private: // graph update stuff.
     adjacent_vertices(vertex_descriptor v) const{
         auto p=boost::adjacent_vertices(v, _g);
         if(p.first==p.second){untested();
+        }else{
         }
         return std::make_pair(adjacency_iterator_filter(p.first, _numbering, p.second),
                 adjacency_iterator_filter(p.second, _numbering));
@@ -809,8 +807,7 @@ void Islet(G_t &G, B_t &bags, int &low_td)
 
             if(low_td<0){ untested();
                 low_td = 0;
-            }
-            else{ untested();
+            }else{ untested();
             }
         }else{ untested();
         }
@@ -881,10 +878,10 @@ bool preprocessing<G_t, CFG>::check_twins_3(
                 // aA=
                 // =xx
                 ++Ib;
-                if(a==*Ib){
+                if(a==*Ib){ untested();
                     ++Ib;
                     ret = A==*Ib;
-                }else if(A==*Ib){
+                }else if(A==*Ib){ untested();
                     ++Ib;
                     ret = a==*Ib;
                 }else{
@@ -931,6 +928,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
 
     if(_lb_bs < 2){
         _lb_bs = 2;
+    }else{
     }
 }
 
@@ -958,6 +956,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         if(_marker.is_marked(*Is.first)){
             need_edg=false;
             break;
+        }else{
         }
     }
 
@@ -969,8 +968,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         // needed?
         wake_up_node(x);
         wake_up_node(*f);
-    }
-    else{
+    }else{
         // degree decreases by 1;
         --_degree[*f];
         --_degree[x];
@@ -983,6 +981,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
 
     if(_lb_bs < 3){
         _lb_bs = 3;
+    }else{
     }
 }
 
@@ -1016,8 +1015,9 @@ bool preprocessing<G_t, CFG>::Buddy(
             auto It=adjacent_vertices(*Is.first);
             for(; It.first!=It.second; ++It.first){ untested();
                 _dormant.unmark(*It.first);
-                if(*It.first!=v){
+                if(*It.first!=v){ untested();
                     _degs.reg(*It.first);
+                }else{ untested();
                 }
             }
         }
@@ -1029,6 +1029,7 @@ bool preprocessing<G_t, CFG>::Buddy(
 
         if(_lb_bs < 4){
             _lb_bs = 4;
+        }else{
         }
         return true;
     }else{
@@ -1038,12 +1039,12 @@ bool preprocessing<G_t, CFG>::Buddy(
 
 template<class T, class I>
 inline void rearrange_neighs(T* N, T x, I i)
-{ untested();
+{
     if(N[0] == x){ untested();
         N[0] = *(++i);
-    } else if(N[1] == x){ untested();
+    } else if(N[1] == x){
         N[1] = *(++i);
-    } else{ untested();
+    } else{
     }
 }
 
@@ -1054,9 +1055,10 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 
     assert(_degree[x]==3);
 
-    if(disable_triangle){
+    if(disable_triangle){ untested();
         incomplete();
         return false;
+    }else{
     }
     vertex_descriptor a, b, c;
 
@@ -1065,16 +1067,19 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 
     if(_degree[a]!=3){
         return false;
+    }else{
     }
 
     b = *(++f);
     if(_degree[b]!=3){
         return false;
+    }else{
     }
 
     c = *(++f);
     if(_degree[c]!=3){
         return false;
+    }else{
     }
 
     std::set<vertex_descriptor> cbag;
@@ -1082,6 +1087,7 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 
     if(cbag.size() != 4){
         return false;
+    }else{
     }
 
     vertex_descriptor N[6];
@@ -1104,7 +1110,7 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 
     typename boost::graph_traits<G_t>::vertex_descriptor u, v, w;
 
-    if(Na[0] == Nb[0]){ untested();
+    if(Na[0] == Nb[0]){
         u = Na[0]; v = Na[1]; w = Nb[1];
     }else if(Na[0] == Nb[1]){ untested();
         u = Na[0]; v = Na[1]; w = Nb[0];
@@ -1117,7 +1123,7 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
     }
 
     if(  (Nc[0] == v && Nc[1] == w)
-      || (Nc[1] == v && Nc[0] == w)){ untested();
+      || (Nc[1] == v && Nc[0] == w)){
         assert(boost::edge(a, u, _g).second);
         assert(boost::edge(a, v, _g).second);
         assert(boost::edge(a, x, _g).second);
@@ -1147,6 +1153,7 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 
         if(_lb_bs < 4){
             _lb_bs = 4;
+        }else{ untested();
         }
 
         return true;
@@ -1161,7 +1168,7 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
 // (checks if the neighbors of v induce a clique.)
 template<class G_t, template<class G_> class CFG>
 bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
-{
+{ untested();
     auto p=adjacent_vertices(v);
     bool isClique=true;
 #if 0
@@ -1170,11 +1177,11 @@ bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
     adjacency_iterator nIt2;
     auto next=p.first;
 
-    for(; p.first!=p.second; p.first=next){
+    for(; p.first!=p.second; p.first=next){ untested();
         ++next;
         nIt2 = next;
-        for(; nIt2!=p.second; ++nIt2){
-            if(!boost::edge(*p.first, *nIt2, _g).second){
+        for(; nIt2!=p.second; ++nIt2){ untested();
+            if(!boost::edge(*p.first, *nIt2, _g).second){ untested();
                 isClique = false;
                 goto DOUBLE_BREAK;
             }
@@ -1190,21 +1197,21 @@ bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
 
     // mark neighbours one aftyer another
     // check if marked neighbours are connected to previous neighs.
-    if( p.first!=p.second){
+    if( p.first!=p.second){ untested();
         _marker.mark(*p.first);
         ++p.first;
     }
-    for(; p.first!=p.second; ++p.first){
+    for(; p.first!=p.second; ++p.first){ untested();
         ++cnt;
         unsigned missing = cnt;
 
         auto q=adjacent_vertices(*p.first);
-        for(; q.first!=q.second; ++q.first){
-            if(_marker.is_marked(*p.first)){
+        for(; q.first!=q.second; ++q.first){ untested();
+            if(_marker.is_marked(*p.first)){ untested();
                 --missing;
             }
         }
-        if(missing){
+        if(missing){ untested();
             isClique = false;
             break;
         }
@@ -1213,7 +1220,7 @@ bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
 #endif
 
 
-    if(isClique){
+    if(isClique){ untested();
         vd_type vd = get_vd(_g, v);
 
         unlink_1_neighbourhood(v, _g, _degs);
@@ -1223,13 +1230,13 @@ bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
         make_neigh_clique(v);
         redegree(v);
 
-        if (unsigned(_lb_tw) < deg){
+        if (unsigned(_lb_tw) < deg){ untested();
             _lb_tw = deg;
         }
 
         return true;
     }
-    else{
+    else{ untested();
         return false;
     }
 }
@@ -1238,7 +1245,7 @@ bool preprocessing<G_t, CFG>::Simplicial(vertex_descriptor v)
 //same as Simplicial, but specialNeighbour
 template<class G_t, template<class G_> class CFG>
 bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
-{
+{ untested();
     bool isAlmostSimplicial = true;
     bool specialNeighbourFound = false;
     adjacency_iterator next, nIt1, nIt2;
@@ -1247,21 +1254,21 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
 
     auto p=adjacent_vertices(v);
     next = p.first;
-    for(; p.first!=p.second; nIt1=next){
+    for(; p.first!=p.second; nIt1=next){ untested();
         nIt2 = ++next;
         missingEdgesCount = 0;
-        for(; nIt2!=p.second; ++nIt2){
-            if(!specialNeighbourFound){
+        for(; nIt2!=p.second; ++nIt2){ untested();
+            if(!specialNeighbourFound){ untested();
             }
-            else if(*nIt1 == specialNeighbour){
+            else if(*nIt1 == specialNeighbour){ untested();
                 continue;
             }
-            else if(*nIt2 == specialNeighbour){
+            else if(*nIt2 == specialNeighbour){ untested();
                 continue;
             }
 
-            if(!boost::edge(*nIt1, *nIt2, _g).second){
-                if(specialNeighbourFound){
+            if(!boost::edge(*nIt1, *nIt2, _g).second){ untested();
+                if(specialNeighbourFound){ untested();
                     //#special neighbours > 1.
                     isAlmostSimplicial = false;
                     goto DOUBLE_BREAK;
@@ -1273,12 +1280,12 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
             }
         }
 
-        if(missingEdgesCount > 0){
-            if(missingEdgesCount == 1){
+        if(missingEdgesCount > 0){ untested();
+            if(missingEdgesCount == 1){ untested();
                 //cand2 has to be the special neighbour.
                 specialNeighbour = cand2;
             }
-            else{
+            else{ untested();
                 //cand1 has to be the special neighbour.
                 specialNeighbour = cand1;
             }
@@ -1290,7 +1297,7 @@ bool preprocessing<G_t, CFG>::AlmostSimplicial(vertex_descriptor v)
 
     DOUBLE_BREAK:
 
-    if(isAlmostSimplicial){
+    if(isAlmostSimplicial){ untested();
         vertices_size_type deg_v = _degree[v];
         assert(deg_v);
         assert(_lb_tw>=0);
@@ -1322,8 +1329,9 @@ template<class G_t, template<class G_, class ...> class CFG>
 bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
 {
     assert(!boost::edge(v, v, _g).second);
-    if(disable_almost_simplicial && disable_simplicial){
+    if(disable_almost_simplicial && disable_simplicial){ untested();
         return false;
+    }else{
     }
     vertices_size_type deg=_degree[v];
     unsigned cnt=deg-1;
@@ -1368,6 +1376,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         else if(missing==1){
             if(!balance){
                 special = *p.first;
+            }else{
             }
             --balance;
         }
@@ -1388,16 +1397,16 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
         auto pp=adjacent_vertices(v);
         for(; pp.first!=pp.second; ++pp.first){
             auto n=*pp.first;
-            if(0 && enable_mass_elimination){
+            if(0 && enable_mass_elimination){ untested();
                 incomplete();
                 // degree update missing.
-                if(_degree[*pp.first]==deg-1){
+                if(_degree[*pp.first]==deg-1){ untested();
                     _numbering.put(n);
                     _numbering.increment();
                     _degs.unlink(n);
                     _num_edges-=(deg-1);
                     // eliminate
-                }else{
+                }else{ untested();
                     wake_up_node(n);
                 }
             }else{
@@ -1446,7 +1455,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
                 _marker.unmark(*Is.first);
                 trace1("unmark sneigh", *Is.first);
                 if(*Is.first==v){ untested();
-                }else if(is_dormant(*Is.first)){
+                }else if(is_dormant(*Is.first)){ untested();
                     wake_up_node(*Is.first);
                 }else{
                     _degs.update(*Is.first);
@@ -1478,7 +1487,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
             redegree(v);
 
             return true;
-        }else if(_lb_bs < deg){ untested();
+        }else if(_lb_bs < deg){
             _lb_bs = deg;
             return true;
         }else{
@@ -1549,6 +1558,7 @@ void preprocessing<G_t, CFG>::do_it()
 
     if(num_vert == 0){
         return;
+    }else{
     }
 
     const degs_type& cdegs(_degs);
@@ -1616,7 +1626,7 @@ void preprocessing<G_t, CFG>::do_it()
                 ++next;
                 ++cnt; // needed later for Cube.
 #ifdef NEGATIVE_TAGS
-                if(_dormant.is_marked(*it1)){
+                if(_dormant.is_marked(*it1)){ untested();
                     incomplete();
                     // continue;
                 }else{untested();
@@ -1638,7 +1648,7 @@ void preprocessing<G_t, CFG>::do_it()
                     trace2("buddyloop", *it1, *it2);
                     assert(*it1!=*it2);
 #ifdef NEGATIVE_TAGS
-                    if(_dormant.is_marked(*it2)){
+                    if(_dormant.is_marked(*it2)){ untested();
                         incomplete();
                         // continue;
                     }else{untested();
@@ -1653,7 +1663,7 @@ void preprocessing<G_t, CFG>::do_it()
                     }
                 }
 #ifdef NEGATIVE_TAGS
-                if(cnt<4){
+                if(cnt<4){ untested();
                     // cannot do anything about this degree 3 node.
                     // (no cube rule will change that)
                     set_dormant(*it1);
@@ -1666,7 +1676,7 @@ void preprocessing<G_t, CFG>::do_it()
             if(cnt>3)
             for(; it1!=B.end(); ++it1){
                 if(disable_cube){ untested();
-                }else if(Cube(*it1)){ untested();
+                }else if(Cube(*it1)){
                     trace1("==============Cube", *it1);
                     goto NEXT_ITER;
                 }else{
@@ -1699,27 +1709,27 @@ void preprocessing<G_t, CFG>::do_it()
                     }else{
                     }
 
-                    if(disable_simplicial && disable_almost_simplicial){
+                    if(disable_simplicial && disable_almost_simplicial){ untested();
                     }else if(BothSimplicial(*it)){
                         goto NEXT_ITER;
                     }else{
                     }
 #if 0
-                    if(disable_simplicial){
-                    }else if(Simplicial(*it)){
+                    if(disable_simplicial){ untested();
+                    }else if(Simplicial(*it)){ untested();
                         std::cout<< "s" << *it << "\n";
                         std::cout<< "d" << _degree[*it] << "\n";
                         std::cout<< "d" << boost::degree(*it, _g) << "\n";
                       //  assert(false);
                         goto NEXT_ITER;
-                    }else if(disable_almost_simplicial){
-                    }else if(AlmostSimplicial(*it)){
+                    }else if(disable_almost_simplicial){ untested();
+                    }else if(AlmostSimplicial(*it)){ untested();
                         std::cout<< "a" << *it << "\n";
                         std::cout<< "d" << _degree[*it] << "\n";
                         std::cout<< "d" << boost::degree(*it, _g) << "\n";
                       //  assert(false);
                         goto NEXT_ITER;
-                    }else{
+                    }else{ untested();
                         std::cout << "nope\n";
                     }
 #endif

@@ -1397,6 +1397,7 @@ inline void exact_ta<EXTA_a>::try_extend_union(
 
 	for( ; x.first!=trie_t::end(); x.first.inc(&cond)){
 		tassert(x.first->block);
+#ifndef NDEBUG
 		auto const& iternode=x.first;
 
 		tassert(!cbset::contains(uc, iternode.back()));
@@ -1405,6 +1406,7 @@ inline void exact_ta<EXTA_a>::try_extend_union(
 		tassert(!cbset::intersects(iternode->block->component, uc));
 		tassert(!cbset::intersects(iternode->block->component, un));
 		tassert(x.first->block->component.back() < nodeback);
+#endif
 
 		try_combine_new(x.first, v, uc, un);
 		// hmm v is in the neighborhood in between
