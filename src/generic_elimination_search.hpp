@@ -48,7 +48,7 @@ generic_elimination_search_base<G_t, CFG_t, CFGT_t>::
       : algo1(CFG_t::name()),
         _active(*new std::vector<BOOL>(boost::num_vertices(g), true)),
         _g(*new internal_graph_type(g,
-                    boost::make_iterator_property_map(&_active[0],
+                    boost::make_iterator_property_map(_active.size()?(&_active[0]):nullptr,
                                boost::typed_identity_property_map<vertex_descriptor>() ))),
         _best_ordering    (*new std::vector<vd>  (boost::num_vertices(g))),
         _current_ordering (*new std::vector<vd>  (boost::num_vertices(g))),

@@ -132,7 +132,7 @@ public: // construct
          _vals(boost::num_vertices(g)),
          _degs(boost::num_vertices(g), // length
                boost::num_vertices(g) /*-1?*/,  // max_bucket
-               boost::make_iterator_property_map(&_vals[0], _vi, size_type()),
+               boost::make_iterator_property_map(_vals.size()?(&_vals[0]):nullptr, _vi, size_type()),
                _vi)
     {
         // delegate construction? how?
@@ -144,7 +144,7 @@ public: // construct
          _vals(boost::num_vertices(g)),
          _degs(boost::num_vertices(g), // length
                boost::num_vertices(g) /*-1?*/,  // max_bucket
-               boost::make_iterator_property_map(&_vals[0], _vi, size_type()),
+               boost::make_iterator_property_map(_vals.size()?(&_vals[0]):nullptr, _vi, size_type()),
                _vi)
     {
         init();

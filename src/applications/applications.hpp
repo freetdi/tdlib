@@ -86,9 +86,9 @@ class encoded_iterator{
 public:
     encoded_iterator(unsigned number, I_t superIt, I_t superEnd)
      : _num(number), _last(0), _supIt(superIt), _supEnd(superEnd) {
-        if(_num == 0){ untested();
+        if(_num == 0){
              _supIt = _supEnd;
-        }else{ untested();
+        }else{
             while(_num != 0){
                 if(_num & 1){
                     _last = *_supIt;
