@@ -31,4 +31,6 @@ endif
 SUBDIRS = tests examples $(pytdlib) src
 
 
-EXTRA_DIST = cython.am
+EXTRA_DIST = \
+	py_log_compiler \
+	cython.am

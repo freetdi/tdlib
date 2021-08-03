@@ -14,6 +14,7 @@ class TestTdLib(unittest.TestCase):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
         lb = tdlib.lower_bound(G, "deltaC_least_c")
         self.assertEqual(lb, 4)
+        print("pass")
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,54 @@
+edges before PP: 0
+vertices before PP: 0
+PP lb: 0
+fully reduced by PP!
+edges before PP: 0
+vertices before PP: 1
+PP lb: 0
+fully reduced by PP!
+edges before PP: 0
+vertices before PP: 5
+PP lb: 0
+fully reduced by PP!
+edges before PP: 10
+vertices before PP: 5
+PP lb: 4
+edges after PP: 0
+vertices after PP: 1
+#: 0
+edges before PP: 5
+vertices before PP: 6
+PP lb: 1
+edges after PP: 0
+vertices after PP: 1
+#: 0
+edges before PP: 15
+vertices before PP: 10
+PP lb: 4
+edges after PP: 15
+vertices after PP: 10
+#: 0
+edges before PP: 30
+vertices before PP: 20
+PP lb: 4
+edges after PP: 30
+vertices after PP: 20
+#: 0
+edges before PP: 12
+vertices before PP: 8
+PP lb: 4
+edges after PP: 12
+vertices after PP: 8
+#: 0
+edges before PP: 27
+vertices before PP: 18
+PP lb: 4
+edges after PP: 27
+vertices after PP: 18
+#: 0
+edges before PP: 40
+vertices before PP: 25
+PP lb: 4
+edges after PP: 28
+vertices after PP: 13
+#: 0

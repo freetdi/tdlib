@@ -464,7 +464,7 @@ int gc_exact_decomposition_ex17(std::vector<unsigned int> &V_G, std::vector<unsi
     incomplete();
 #endif
     std::cerr << "ta T " << boost::num_vertices(T) << " " << boost::num_edges(T) << "\n";
-    incomplete();
+    // incomplete(); //really?
 
     assert(treedec::is_valid_treedecomposition(G, T));
 

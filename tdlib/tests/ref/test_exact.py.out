@@ -1,0 +1,42 @@
+corner case 0 -1
+corner case 1 0
+corner case 2 0
+corner case 3 4
+P6 1
+Petersen 4
+Petersen_double 4
+Wagner 4
+Grid_5_5 5
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+random..
+=== dynamic
+corner 0 -1
+corner 1 0
+corner 2 0
+corner 3 4
+P6 4
+K5 4

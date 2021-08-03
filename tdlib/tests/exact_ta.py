@@ -16,40 +16,15 @@ class TestTdLib_exact(unittest.TestCase):
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_1(self):
-        G = Graph(V_P6, E_P6)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 1)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        Gs = [ Graph(V_P6, E_P6), Graph(V_Petersen, E_Petersen),
+            Graph(V_Petersen_double, E_Petersen_double),
+            Graph(V_Wagner, E_Wagner), Graph(V_Pappus, E_Pappus),
+            Graph(V_Grid_5_5, E_Grid_5_5) ]
 
-    def test_3(self):
-        G = Graph(V_Petersen, E_Petersen)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 4)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-
-    def test_4(self):
-        G = Graph(V_Petersen_double, E_Petersen_double)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 4)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-
-    def test_5(self):
-        G = Graph(V_Wagner, E_Wagner)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 4)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-
-    def test_6(self):
-        G = Graph(V_Pappus, E_Pappus)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 6)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
-
-    def test_7(self):
-        G = Graph(V_Grid_5_5, E_Grid_5_5)
-        T, w = tdlib.exact_decomposition_ex17(G)
-        self.assertEqual(w, 5)
-        self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        for G in Gs:
+            T, w = tdlib.exact_decomposition_ex17(G)
+            self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+            print("TA", w)
 
     def test_8(self):
         for n in range(0, 13):

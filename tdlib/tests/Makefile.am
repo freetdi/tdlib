@@ -4,7 +4,11 @@ GALA_TESTS = \
 	exact_ta.py
 endif
 
-TESTS = $(LONG_TESTS) \
+PYTHON = python3
+
+TESTS = $(PY_TESTS) $(LONG_TESTS)
+
+PY_TESTS = $(GALA_TESTS) \
 	dclc_g5.py \
 	test_generic_search_CFG1.py \
 	test_generic_search_CFG2.py \
@@ -58,14 +62,16 @@ longcheck:
 
 $(TESTS:%.py=%.log): all-am
 
-$(LONG_TESTS:%.py=%.log): AM_PY_LOG_DRIVER_FLAGS=
+$(LONG_TESTS:%.py=%.log): PY_LOG_FLAGS=SKIP
 
 TEST_EXTENSIONS = .py
-PY_LOG_COMPILER = $(PYTHON)
+PY_LOG_COMPILER = $(top_srcdir)/py_log_compiler
 AM_TESTS_ENVIRONMENT = \
-    export PYTHONPATH='.';
+    export PYTHON=python3; \
+    export PYTHONPATH='.':${srcdir};
 
 EXTRA_DIST = \
+	${PY_TESTS:%=ref/%.out} \
 	$(TESTS) \
 	CFGs.py \
 	Dimacs.py \
@@ -74,5 +80,15 @@ EXTRA_DIST = \
 	RandomGNM_250_1000.py \
 	util.py
 
+all-local:
+	-${LN_S} ${srcdir}/ref ref
+
+SED_OUT = cat
+
+${PY_TESTS:%.py=%.py.out}: %.py.out: %.py
+	PYTHONPATH=${PYTHONPATH}:${srcdir} \
+	${PYTHON} < ${srcdir}/$*.py | ${SED_OUT} > $@; exit $${PIPESTATUS[0]}
+
 $(TESTS:%.py=%.log): P
+$(TESTS:%.py=%.py.out): P
 .PHONY: P

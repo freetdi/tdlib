@@ -10,33 +10,40 @@ sys.argv=sys.argv[:1]
 
 class TestTdLib_exact(unittest.TestCase):
     def test_exact_decomposition_cutset_0(self):
+        i = 0
         for V, E in cornercases:
             G = Graph(V, E)
             T, w = tdlib.exact_decomposition_cutset(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+            print("corner case", i, w)
+            i+=1
 
     def test_exact_decomposition_cutset_1(self):
         G = Graph(V_P6, E_P6)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("P6", w)
         self.assertEqual(w, 1)
 
     def test_exact_decomposition_cutset_3(self):
         G = Graph(V_Petersen, E_Petersen)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("Petersen", w)
         self.assertEqual(w, 4)
 
     def test_exact_decomposition_cutset_4(self):
         G = Graph(V_Petersen_double, E_Petersen_double)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("Petersen_double", w)
         self.assertEqual(w, 4)
 
     def test_exact_decomposition_cutset_5(self):
         G = Graph(V_Wagner, E_Wagner)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("Wagner", w)
         self.assertEqual(w, 4)
 
     """ takes too long
@@ -44,6 +51,7 @@ class TestTdLib_exact(unittest.TestCase):
         G = Graph(V_Pappus, E_Pappus)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("Pappus", w)
         self.assertEqual(w, 6)
     """
 
@@ -51,6 +59,7 @@ class TestTdLib_exact(unittest.TestCase):
         G = Graph(V_Grid_5_5, E_Grid_5_5)
         T, w = tdlib.exact_decomposition_cutset(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+        print("Grid_5_5", w)
         self.assertEqual(w, 5)
 
     def test_exact_decomposition_cutset_8(self):
@@ -60,6 +69,7 @@ class TestTdLib_exact(unittest.TestCase):
                 G = Graph(V, E)
                 T, w = tdlib.exact_decomposition_cutset(G)
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+            print("random..")
 
     def test_exact_decomposition_cutset_9(self):
         status = True
@@ -77,26 +87,32 @@ class TestTdLib_exact(unittest.TestCase):
                     print("proper width_PP_FI_TM: " + str(width) + " " + str(hrgl))
                     self.assertEqual(hrgl, 0)
                     status = False
+            print("random..")
 
         self.assertEqual(status, True)
 
     def test_exact_decomposition_dynamic_0(self):
+        print("=== dynamic")
+        i = 0
         for V, E in cornercases:
             G = Graph(V, E)
             T, w = tdlib.exact_decomposition_dynamic(G)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
+            print("corner", i, w)
+            i+=1
 
-    def test_exact_decomposition_dynamic_1(self):
         G = Graph(V_P6, E_P6)
         T, tw = tdlib.exact_decomposition_dynamic(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(tw, 1)
+        print("P6", w)
 
-    def test_exact_decomposition_dynamic_2(self):
         G = Graph(V_K5, E_K5)
         T, tw = tdlib.exact_decomposition_dynamic(G)
         self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
         self.assertEqual(tw, 4)
+
+        print("K5", w)
 
 if __name__ == '__main__':
     unittest.main()

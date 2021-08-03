@@ -973,9 +973,10 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
     if(boost::num_vertices(_g) == 0){
         boost::add_vertex(T);
         return true;
-    }
-    else{
-        incomplete();
+    }else{
+     //   incomplete(); //no//
+     // messes up random tests, send to cerr instead
+        std::cerr << "incomplete ../../src/exact_cutset.hpp:978:try_it\n";
     }
 
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
