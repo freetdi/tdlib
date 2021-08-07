@@ -209,7 +209,7 @@ using bsd=cbset::BSET_DYNAMIC<K, CHUNK_T, cbset::nohowmany_t, cbset::nooffset_t,
 
 /*--------------------------------------------------------------------------*/
 template<class G, template<class G_, class ...> class CFGT=ta_config_default>
-class exact_ta{ //
+class exact_ta : public treedec::algo::draft::algo1 {
 public: // types
 	typedef CFGT<G> CFG;
 	constexpr static unsigned L=CFG::max_vertex_index;
@@ -314,19 +314,6 @@ public:
 			return false;
 		}
 	}
-#if 0
-	TD& get_treedec()
-	{ untested();
-		make_td(_t);
-		return _t;
-	}
-#endif
-#if 0
-	void get_treedec(TT t, map)
-	{ untested();
-		make_td(t);
-	}
-#endif
 
 private:
 	size_t n() const{
@@ -449,12 +436,31 @@ private:
 	                T const& onb, vertex_t v, T& cand, D& delta,
 	                S const* comm=NULL);
 	void registerForVertex(vertex_t v, BLOCK *block);
-public:
-	void do_it(unsigned n=2);
+
+public: // interface
+	void do_it(){
+		return do_it(2);
+	}
+	void do_it(unsigned);
 	template<class T>
 	void do_it(T&, unsigned& bagsize);
 	template<class t>
 	void make_td(t&) const;
+
+	template<class TREEDEC_t>
+	void get_tree_decomposition(TREEDEC_t& td) const {
+		return make_td(td);
+	}
+#if 0
+	TD& get_treedec()
+	{ untested();
+		make_td(_t);
+		return _t;
+	}
+#endif
+	unsigned bagsize() const{
+		return _bag_size;
+	}
 private:
 	bool try_decompose(unsigned bs); // try_it?!
 	template<class TREEDEC_>
@@ -579,7 +585,8 @@ private: // here?
 EXTA_t
 template<class oG, class M>
 exact_ta<EXTA_a>::exact_ta(oG const& g, M const& m)
-    : _g(),
+    : treedec::algo::draft::algo1("exact_ta"),
+	   _g(),
       _trie(boost::num_vertices(g),
             trie_t(boost::num_vertices(g), _shared_trie_area)),
       _range_scratch(make_range_scratch(_trie[0]

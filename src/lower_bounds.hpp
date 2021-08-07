@@ -826,7 +826,7 @@ namespace impl{
 template <typename G_t,
           template<class G, class...> class CFGT=algo::default_config>
 class deltaC_least_c
-  : private treedec::impl::greedy_base<
+  : public treedec::impl::greedy_base<
                  G_t,
                  std::vector< typename boost::graph_traits<G_t>::vertex_descriptor >,
                  CFGT>

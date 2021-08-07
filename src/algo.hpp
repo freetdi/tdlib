@@ -93,6 +93,15 @@ public:
 
 	virtual void do_it() = 0;
 
+public: // results. to be reimplemnted.
+    unsigned lower_bound_bagsize() const{
+        incomplete();
+        return 0;
+    }
+    unsigned bagsize() const{
+        incomplete();
+        return 0;
+    }
 //for now
 public:
 	double get_runtime(){

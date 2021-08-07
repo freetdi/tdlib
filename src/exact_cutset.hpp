@@ -63,11 +63,11 @@ namespace treedec{
 
 template<class S, class T>
 void check_same(S const& s, T const& t)
-{
+{ untested();
     assert(s.size()==t.size());
     BOOST_AUTO(si, s.begin());
     BOOST_AUTO(ti, t.begin());
-    for(; si!=s.end(); ++si){
+    for(; si!=s.end(); ++si){ untested();
         assert(*si==*ti);
         ++ti;
     }
@@ -91,7 +91,7 @@ template<class TV>
 inline typename TV::bag_type const& bag(
        TV const&,
        typename TV::const_vertex_descriptor x)
-{
+{ untested();
     return x->second;
 }
 
@@ -99,7 +99,7 @@ template<class TV>
 inline typename TV::bag_type& bag(
         TV &,
         typename TV::const_vertex_descriptor x)
-{
+{ untested();
     return const_cast<typename TV::T_vertex_descriptor>(x)->second;
 }
 
@@ -116,7 +116,7 @@ template<class TV>
 inline typename TV::bag_type const& bag(
         TV const&,
         typename TV::vertex_descriptor x)
-{
+{ untested();
     return x->second;
     return const_cast<typename TV::vertex_descriptor>(x)->second;
 }
@@ -129,8 +129,7 @@ namespace detail{
 template<class G>
 class excut_control;
 template<class G>
-class excut_worker : public VECTOR_TD<G>
-    {
+class excut_worker : public VECTOR_TD<G> {
 public: // common types
     typedef typename boost::graph_traits<G>::vertex_descriptor vd;
     typedef typename std::vector<vd>::iterator A;// bag_iter
@@ -172,7 +171,8 @@ public:
 public:
         cjob_t(G const& g, bag_type const& b)
             : _candidates_b(g,0), _candidates_e(g, 0), _cutbag(&b)
-        {}
+        {
+        }
 
 public:
         typename excut_worker<G>::bfs_range::first_type _candidates_b;
@@ -197,8 +197,7 @@ public:
             assert(_cutbag);
             return *_cutbag;
         }
-        void attach_cutbag(bag_type const& b)
-        {
+        void attach_cutbag(bag_type const& b) {
             _cutbag = &b;
         }
     private:
@@ -264,8 +263,7 @@ private: // common stuff
          }
          return J;
      }
-     void recycle(cjob_t* trash)
-     {
+     void recycle(cjob_t* trash){
          _cjs_trash.push(trash);
      }
 
@@ -277,16 +275,14 @@ public: // construct
 #ifdef EXCUT_USE_DELTAC
             ,_rorigin(boost::num_vertices(_g))
 #endif
+    {
+    }
 
-    {}
-
-    VECTOR_TD<G>& v()
-    { untested();
+    VECTOR_TD<G>& v() { untested();
         return *this;
     }
 
-    ~excut_worker()
-    {
+    ~excut_worker() {
          while(!_cjs_trash.empty()) {
              delete _cjs_trash.top();
              _cjs_trash.pop();
@@ -295,7 +291,7 @@ public: // construct
 
 private: // common data
     const G& _g;
-    unsigned _bagsize;
+    unsigned _bagsize{0};
     /*static*/ std::stack<cjob_t*> _cjs_trash;
 
 #ifdef EXCUT_USE_DELTAC
@@ -335,11 +331,13 @@ public:
         _success = _results.q_explore_cutsets(cut_red_bag, root, ccm, c, cmps, nrs);
     }
 
-    void run() const{}
-
-    bool join() const
-    {
+    void run() const{
+    }
+    bool join() const{
         return _success;
+    }
+    unsigned bagsize() const{
+        return _bagsize;
     }
 
 private:
@@ -362,8 +360,7 @@ bool excut_worker<G>::viceatovin(td_vd cut_ext, cr& cut_red_bag, cmp& cc_mask,
 {
     BOOST_AUTO(const &ce_bag, bagdraft::bag(*this, cut_ext));
     cut_red_bag.resize(ce_bag.size());
-    for(BOOST_AUTO(sIt, ce_bag.begin()); sIt!=ce_bag.end(); ++sIt)
-    {
+    for(BOOST_AUTO(sIt, ce_bag.begin()); sIt!=ce_bag.end(); ++sIt) {
         typename boost::graph_traits<G>::adjacency_iterator nIt, nEnd;
         typename boost::graph_traits<G>::vertex_descriptor II = *sIt;
 
@@ -384,7 +381,7 @@ bool excut_worker<G>::viceatovin(td_vd cut_ext, cr& cut_red_bag, cmp& cc_mask,
 #ifdef EXCUT_USE_DELTAC
 template<class G>
 void excut_worker<G>::add_induced_edges(unsigned cliquesize, excg_graph& h)
-{
+{ untested();
     unsigned nv=_origin.size();
     unsigned compsize=nv-cliquesize;
 
@@ -395,15 +392,15 @@ void excut_worker<G>::add_induced_edges(unsigned cliquesize, excg_graph& h)
     for(unsigned i=0; i<compsize; ++i){ itested();
         auto A=boost::adjacent_vertices(_origin[i], _g);
 
-        for(; A.first!=A.second; ++A.first){
+        for(; A.first!=A.second; ++A.first){ untested();
             assert(_rorigin[*A.first]<nv);
             boost::add_edge(i, _rorigin[*A.first], h);
         }
 
     }
-    for(unsigned i=nv-cliquesize; i<nv; ++i){
+    for(unsigned i=nv-cliquesize; i<nv; ++i){ untested();
         unsigned j=i+1;
-        for(; j<nv; ++j){
+        for(; j<nv; ++j){ untested();
             boost::add_edge(i, j, h);
         }
     }
@@ -412,25 +409,26 @@ void excut_worker<G>::add_induced_edges(unsigned cliquesize, excg_graph& h)
 // also insert clique
 template<class G>
 void excut_worker<G>::add_induced_edges_square(unsigned cliquesize, excg_graph& h)
-{
+{ untested();
     unsigned nv=_origin.size();
-    while(boost::num_vertices(h)>nv){
+    while(boost::num_vertices(h)>nv){ untested();
         boost::remove_vertex(boost::num_vertices(h)-1, h);
     }
-    while(boost::num_vertices(h)<nv){
+    while(boost::num_vertices(h)<nv){ untested();
         boost::add_vertex(h);
     }
     for(unsigned i=0; i<nv-1; ++i){ itested();
         unsigned j=i+1;
-        for(; j<nv-cliquesize; ++j){
-            if(boost::edge(_origin[i], _origin[j], _g).second){
+        for(; j<nv-cliquesize; ++j){ untested();
+            if(boost::edge(_origin[i], _origin[j], _g).second){ untested();
                 boost::add_edge(i, j, h);
+            }else{ untested();
             }
         }
     }
-    for(unsigned i=nv-cliquesize; i<nv; ++i){
+    for(unsigned i=nv-cliquesize; i<nv; ++i){ untested();
         unsigned j=i+1;
-        for(; j<nv; ++j){
+        for(; j<nv; ++j){ untested();
             boost::add_edge(i, j, h);
         }
     }
@@ -495,9 +493,8 @@ excut_worker<G>::do_component(cvd& cut_ext,
     }
 #ifdef COUNTERS
     assert(cos<=number_unvisited);
-    if(neighs){
-    }
-    else if(cos==number_unvisited){
+    if(neighs){ untested();
+    }else if(cos==number_unvisited){ untested();
         // there's only one component...
         return false;
     }
@@ -515,22 +512,19 @@ excut_worker<G>::do_component(cvd& cut_ext,
 
     if(!red_successful){
         return 0;
-    }
-    else{
+    }else{
         cut_red_bag.resize(redsize);
     }
 
 #ifdef EXCUT_USE_DELTAC
 //    if(3+redsize<_bagsize)
     assert(redsize<_bagsize);
-    if(cos<_bagsize){
+    if(cos<_bagsize){ untested();
         // compon too small
-    }
-    else if(cos>5*_bagsize){
+    }else if(cos>5*_bagsize){ untested();
         //TODO: using of constant! copy too expensive
-    }
-    else if(redsize+1==_bagsize){
-        for(auto i : cut_red_bag){
+    }else if(redsize+1==_bagsize){ untested();
+        for(auto i : cut_red_bag){ untested();
             _rorigin[i] = _origin.size();
             _origin.push_back(i);
         }
@@ -544,7 +538,7 @@ excut_worker<G>::do_component(cvd& cut_ext,
             return 0;
         }
     }
-    else{
+    else{ untested();
         // deltaC does not help a lot
     }
 #endif
@@ -563,8 +557,7 @@ excut_worker<G>::do_component(cvd& cut_ext,
         target.push_back(some_element);
         trace2("small done", cut_red_bag.size(), cos);
         success = true;;
-    }
-    else if (visited_all){
+    }else if (visited_all){ untested();
         incomplete();
         // reuse stack
 #if IN_PLACE
@@ -584,8 +577,7 @@ excut_worker<G>::do_component(cvd& cut_ext,
         boost::add_edge(cut_ext2, cut_ext, *this);
         assert(cos);
         return cos;
-    }
-    else{
+    }else{
         // free the vertex.
         boost::remove_vertex(cut_ext2, *this);
         // undo visited mask?
@@ -615,8 +607,7 @@ bool excut_worker<G2>::q_explore_cutsets(
         target.push_back(celt);
         boost::add_edge(leaf, parent, *this); // HERE??!
         return true;
-    }
-    else{
+    }else{
 #ifdef EXTRABAG
         /// extra bag at root. prbably a bug.
         td_vd cut_ext=boost::add_vertex(*this);
@@ -624,11 +615,10 @@ bool excut_worker<G2>::q_explore_cutsets(
         cutred_bag2=cutred_bag; // one element (root case only here)
 
         bool success=explore_cutsets(cutred_bag2, cc_mask, celt, cmps, nrs, cut_ext);
-        if(success){
+        if(success){ untested();
             boost::add_edge(cut_ext, parent, *this);
             return true;
-        }
-        else{
+        }else{ untested();
             boost::remove_vertex(cut_ext, *this);
             return false;
         }
@@ -654,9 +644,9 @@ excut_worker<G_t>::compile_candidates_range(unsigned, B const& cut, const G_t& G
 #ifndef NDEBUG
 template<class CB, class C>
 void bagfillassert(CB& ext_bag, CB const& cut, C cand)
-{
+{ untested();
     assert(contains(ext_bag, cand));
-    for(auto i: cut){
+    for(auto i: cut){ untested();
         assert(contains(ext_bag, i));
     }
 }
@@ -750,7 +740,10 @@ bool excut_worker<G>::try_candidate_set(cjob_t& comp_job,
 #ifndef COUNTERS
         (void) neighbours;
 #endif
-        if(!all_successful) break;
+        if(!all_successful){
+            break;
+        }else{
+        }
 
         cmps_sum += all_successful;
         ++cmps_num;
@@ -760,7 +753,7 @@ bool excut_worker<G>::try_candidate_set(cjob_t& comp_job,
         return true;
     }else{
 #if 0 // later?
-        for(auto ic=cand_start; ic!= cand_end; ++ic){
+        for(auto ic=cand_start; ic!= cand_end; ++ic){ untested();
             BOOST_AUTO(pos, get_pos(*ic, _g));
         }
 #endif
@@ -841,10 +834,12 @@ bool excut_worker<G>::work_candidates(cjob_t& comp_job)
 
             if(number_of_candidates==1){
                 assert(cutextbag.back() == *candi);
+            }else{
             }
             success = try_candidate_set(comp_job, neighbours);
             if(success){
                 return true;
+            }else{
             }
 
             // keep prefix. next subset...
@@ -853,7 +848,7 @@ bool excut_worker<G>::work_candidates(cjob_t& comp_job)
         // use in next loop.
         candidate_cache.push_back(*candi);
 #if COUNTERS
-        if(neighbours){
+        if(neighbours){ untested();
             neighbours = candi.is_neighbour();
         }
 #endif
@@ -942,25 +937,42 @@ namespace draft{
 
 template <typename G_t,
         template<class G_, class ...> class config=algo::default_config>
-class exact_cutset { // baseclass?
+class exact_cutset : public treedec::algo::draft::algo1 {
 public:
     exact_cutset(G_t const& g)
-        : _g(g) {}
+       : treedec::algo::draft::algo1("exact_cutset"),
+         _g(g) {}
     ~exact_cutset() {
+        delete _c;
     }
 
 public:
     template<class T_t>
     bool try_it(T_t &T, unsigned bs);
     template<class T_t>
-    void do_it(T_t &T, unsigned& bs){
-        while(!try_it(T, bs)){
+    void do_it(T_t &T, unsigned& bs){ untested();
+        while(!try_it(T, bs)){ untested();
             bs++;
+        }
+    }
+    void do_it(){ untested();
+        unsigned bs=0;
+        typename treedec::graph_traits<G_t>::treedec_type T;
+        do_it(T, bs);
+    }
+    template<class T_t>
+    void get_tree_decomposition(T_t &T) const;
+    unsigned bagsize() const{
+        if(_c){ untested();
+            return _c->bagsize();
+        }else{
+            return -1u;
         }
     }
 
 private:
     G_t const& _g;
+    treedec::detail::excut_control<G_t>* _c{nullptr};
 };
 
 template <typename G_t, template<class G_, class ...> class config>
@@ -970,7 +982,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
     assert_connected(_g);
 
     typedef typename boost::graph_traits<T_t>::vertex_descriptor vertex_descriptor_T;
-    if(boost::num_vertices(_g) == 0){
+    if(boost::num_vertices(_g) == 0){ untested();
         boost::add_vertex(T);
         return true;
     }else{
@@ -982,24 +994,26 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
     typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
     boost::tie(vIt, vEnd) = boost::vertices(_g);
 
-    if(boost::num_vertices(_g) == 1){
+    if(boost::num_vertices(_g) == 1){ untested();
         vertex_descriptor_T t=boost::add_vertex(T);
         auto& b=boost::get(bag_t(), T, t);
 
         insert(b, *vIt);
-        if(bagsize <= 1){
+        if(bagsize <= 1){ untested();
             return true;
+        }else{ untested();
+            return false;
         }
-        return false;
     }
 
-    treedec::detail::excut_control<G_t> c(_g, bagsize);
+    assert(!_c);
 
-    VECTOR_TD<G_t>& results=c._results;
-
-    if(bagsize<=1){
+    if(bagsize<=1){ untested();
         return false;
+    }else{
+        _c = new treedec::detail::excut_control<G_t>(_g, bagsize);
     }
+    VECTOR_TD<G_t>& results = _c->_results;
 
     typedef typename treedec::detail::excut_worker<G_t>::T_vertex_descriptor T_vertex_descriptor;
 
@@ -1021,25 +1035,31 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
     ccm[M.first] = true;
 
     assert(ccm.size() == boost::num_vertices(_g));
-    c.q_root_cutset(root, ccm, M.first, nv-1, nrsp);
-    c.run();
-    bool success=c.join();
+    _c->q_root_cutset(root, ccm, M.first, nv-1, nrsp);
+    _c->run();
+    bool success = _c->join();
     delete nrsp;
 
     if(success){
-    }
-    else{
+    } else{
         results.erase(results.begin(), results.end());
+        delete _c;
+        _c = nullptr;
     }
 
-    if(success){
-    }
-    else{
-        return false;
-    }
+    return success;
+} // try_it
 
+template <typename G_t, template<class G_, class ...> class config>
+template<class T_t>
+//T_t&
+void  exact_cutset<G_t, config>::get_tree_decomposition(T_t &T) const
+{
     // TODO: just use results as tree.
     assert(!boost::num_vertices(T));
+    assert(_c);
+
+    VECTOR_TD<G_t>& results = _c->_results;
 
     for(BOOST_AUTO(ii, results.begin()); ii!=results.end(); ++ii){
         boost::add_vertex(T);
@@ -1097,6 +1117,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
                 for(; lN.first!=lN.second; ++(lN.first)){
                     if(contains(parentB, *(lN.first))){
                         insert(target_bag, *(lN.first));
+                    }else{ untested();
                     }
                 }
             }
@@ -1109,10 +1130,8 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 
         ++bag_index;
     }
-
-    return true;
-
-} // do_it
+//    return T;
+} // get_tree_decomposition
 
 } // draft
 
@@ -1121,7 +1140,12 @@ bool exact_cutset(G_t const &G, T_t &T, int tw)
 {
     draft::exact_cutset<G_t> a(G);
     unsigned bs=tw+1;
-    return a.try_it(T, bs);
+    if(a.try_it(T, bs)){
+        a.get_tree_decomposition(T);
+        return true;
+    }else{
+        return false;
+    }
 }
 
 // compute a tree decomposition
@@ -1131,9 +1155,10 @@ unsigned exact_cutset(G_t &G, T_t &T){ untested();
     int lb_bs = 0;
 
     draft::exact_cutset<G_t> a;
-    while(!a.do_it(G, T, lb_bs)){
+    while(!a.do_it(G, T, lb_bs)){ untested();
         ++lb_bs;
     }
+    a.get_tree_decomposition(T);
     return lb_bs;
 }
 
