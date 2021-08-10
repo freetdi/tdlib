@@ -1,3 +1,4 @@
+#cython: language_level=3
 r"""
 Interface with TdLib (algorithms for tree decompositions)
 
