@@ -41,7 +41,7 @@ symlinks:
 	ln -sf $(srcdir)/__init__.py
 
 AM_CPPFLAGS = @PYTHON_INCLUDES@ -I$(top_srcdir)/src
-AM_LDFLAGS = -module -omit-version
+AM_LDFLAGS = -module -avoid-version
 
 EXTRA_DIST = \
 	graphs.py \
