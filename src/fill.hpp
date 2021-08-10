@@ -1,4 +1,4 @@
-// Felix Salfelder 2016-2017
+// Felix Salfelder 2016-2017, 2021
 // Lukas Larisch 2016
 //
 // This program is free software; you can redistribute it and/or modify it
@@ -211,17 +211,18 @@ public:
 #endif
     void reg(const vertex_descriptor& v, size_t missing_edges)
     {
+        auto pos = boost::get(boost::get(boost::vertex_index, _g), v);
         if(missing_edges<_max_fill){
+            _vals[pos].set_value(missing_edges);
         }else{ untested();
             //std::cerr<<"found " << missing_edges << " for " << v << "\n";
             //incomplete();
-            missing_edges=_max_fill;
+            missing_edges = _max_fill;
+            _vals[pos].set_lb(missing_edges);
         }
         assert(treedec::is_valid(v,_g));
 
-        unsigned int pos = boost::get(boost::get(boost::vertex_index, _g), v);
         trace2("push", pos, missing_edges);
-        _vals[pos].set_value(missing_edges);
         _fill.push(v); // updates reverse map.
     } // reg
 public:
@@ -380,11 +381,12 @@ private:
 #endif
                         assert("wrong fill" && 0);
                     }
-                    if(me>_max_fill){
+                    if(me>_max_fill){ untested();
                         me = _max_fill;
-                        _vals[pos].set_lb();
+                        _vals[pos].set_lb(me);
+                    }else{
+                        _vals[pos].set_value(me); // unsets lb
                     }
-                    _vals[pos].set_value(me); // unsets lb
                     _fill.update(f);
                 }
             }else{
