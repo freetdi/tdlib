@@ -62,6 +62,7 @@
 #endif
 #include "treedec_copy.hpp"
 
+#include <boost/graph/copy.hpp>
 #include <boost/graph/graph_utility.hpp>
 
 namespace treedec{
@@ -354,8 +355,20 @@ private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 public: // construct
-    PP_FI(G& g) : _g(g){
-        _low_tw = -1;
+    PP_FI(G& g) : _g(&g), _low_tw(-1){
+    }
+    template<class G_in>
+    PP_FI(G_in const& g) :
+       _g(new G),
+       _low_tw(-1),
+       _own_g(true){
+        boost::copy_graph(g, *_g);
+    }
+    ~PP_FI() {
+        if(_own_g){
+            delete _g;
+        }else{
+        }
     }
 public: // random stuff
     void set_lower_bound(unsigned lb){
@@ -367,14 +380,14 @@ public: // random stuff
 public: // algo interface
     void do_it(){
         // incomplete(); // use comp::
-        if(boost::num_vertices(_g) == 0){ untested();
+        if(boost::num_vertices(g()) == 0){ untested();
             boost::add_vertex(_t);
             return;
         }else{
 
             // BUG, somehow need to cast CFGT to ppconfig
             // "message" is getting lost here, need pp_cfg+CFGT
-            impl::preprocessing<G> A(_g);
+            impl::preprocessing<G> A(g());
             A.set_treewidth(_low_tw, -1u);
             A.do_it();
 
@@ -391,11 +404,21 @@ public: // algo interface
     }
 
 private:
-    G& _g;
+    G& g(){return *_g;};
+
+private:
+    G* _g{nullptr};
     T _t;
     // std::vector<vertex_descriptor> _o;
     int _low_tw;
+    bool _own_g{false};
 }; // PPFI
+
+struct do_nothing {
+    template <typename T1, typename T2>
+    void operator()(const T1& , T2& ) const {
+    }
+};
 
 // pending
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
@@ -405,8 +428,19 @@ private:
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
 public: // construct
-    PP_FI_TM(G& g) : _g(g){
+    PP_FI_TM(G& g) : _g(&g){
         _low_tw = -1;
+    }
+    template<class G_in>
+    PP_FI_TM(G_in const& g) : _g(new G), _own_g(true){
+        boost::copy_graph(g, *_g);
+        _low_tw = -1;
+    }
+    ~PP_FI_TM() {
+        if(_own_g){
+            delete _g;
+        }else{
+        }
     }
 
 public: // random stuff
@@ -420,7 +454,7 @@ public: // random stuff
 public: // algo interface
     void do_it(){
 
-        if(boost::num_vertices(_g) == 0){
+        if(boost::num_vertices(g()) == 0){
             boost::add_vertex(_t);
             return;
         }
@@ -430,15 +464,15 @@ public: // algo interface
                      std::vector<vertex_descriptor> > > bags;
 
 #if 0
-        treedec::preprocessing(_g, bags, _low_tw);
+        treedec::preprocessing(g(), bags, _low_tw);
 #else
-            impl::preprocessing<G> A(_g);
+            impl::preprocessing<G> A(g());
             A.set_treewidth(_low_tw, -1u);
             A.do_it();
             A.get_bags(bags);
-            A.get_graph(_g);
+            A.get_graph(g());
 
-            trace1("done PP in PPFITM", boost::num_edges(_g));
+            trace1("done PP in PPFITM", boost::num_edges(g()));
 #endif
 
         for(auto const& x : bags){
@@ -446,30 +480,30 @@ public: // algo interface
             trace1("B", B.size());
         }
 
-        if(boost::num_edges(_g) > 0){
+        if(boost::num_edges(g()) > 0){
 //            typename std::vector<vertex_descriptor> old_elim_ordering;
             typename std::vector<vertex_descriptor> new_elim_ordering;
 
             // BUG this must work in ordering_to_treedec
             boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> H;
-            boost::copy_graph(_g, H,
+            boost::copy_graph(g(), H,
 				 boost::vertex_copy(hack::forgetprop()).
 				 edge_copy(hack::forgetprop()));
 
             trace0("backedup to H");
             trace0("doit");
-            treedec::impl::fillIn<G> a(_g);
+            treedec::impl::fillIn<G> a(g());
             a.set_ignore_isolated();
             a.do_it();
             trace0("done fi");
             auto& old_elim_ordering = a.get_elimination_ordering();
 
-            trace2("mC", boost::num_edges(H), boost::num_vertices(_g));
+            trace2("mC", boost::num_edges(H), boost::num_vertices(g()));
 
             // changes H, but doesn't matter
             treedec::minimalChordal(H, old_elim_ordering, new_elim_ordering);
-            trace3("", old_elim_ordering.size(), new_elim_ordering.size(), boost::num_vertices(_g));
-            assert(is_vertex_permutation(new_elim_ordering, _g));
+            trace3("", old_elim_ordering.size(), new_elim_ordering.size(), boost::num_vertices(g()));
+            assert(is_vertex_permutation(new_elim_ordering, g()));
 
 
             typename std::vector<vertex_descriptor>
@@ -478,7 +512,7 @@ public: // algo interface
 
             unsigned c = 0;
             for(auto n=new_elim_ordering.begin(); n!=new_elim_ordering.end(); ++n){
-                if(boost::degree(*n, _g) > 0){
+                if(boost::degree(*n, g()) > 0){
                     trace2("eo", c, *n);
                     assert(c<new_elim_ordering_.size());
                     new_elim_ordering_[c++] = *n;
@@ -513,7 +547,10 @@ public: // algo interface
     }
 
 private:
-    G& _g;
+    G& g() { assert(_g); return *_g; }
+private:
+    G* _g{nullptr};
+    bool _own_g{false};
     // T _t; // FIXME. does not work yet
 
     // TD_tree_dec_t _t; // BUG

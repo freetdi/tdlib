@@ -53,6 +53,7 @@ check_PROGRAMS = \
 	print_concept \
 	sdcc_bb \
 	sdcc_ub \
+	sdcc_ub_set \
 	sdcc_uu \
 	sdcc_bu \
 	vec2tree
