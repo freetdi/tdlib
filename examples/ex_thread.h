@@ -18,14 +18,12 @@ typedef sg_dvv16 G_work;
         go();
     }
 
-    void do_print_results(std::ostream& o)
-    {
+    void do_print_results(std::ostream& o) {
         trace2("EXR", base::_result, treedec::get_bagsize(_t));
         base::print_results_tree(o, _t, &_work);
     }
 
-    void run()
-    {
+    void run() {
         auto &g=_work; // nonconst, local
         treedec::exact_decomposition_cutset(g, _t);
         unsigned r = treedec::get_bagsize(_t); // inefficient

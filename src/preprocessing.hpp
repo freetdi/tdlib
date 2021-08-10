@@ -1774,7 +1774,7 @@ NEXT_ITER:
 template<class G, template<class G_, class ...> class CFG>
 template<class T>
 void preprocessing<G, CFG>::get_tree_decomposition(T& t) const
-{
+{ untested();
     assert(!boost::num_vertices(t));
     if(boost::num_vertices(_g)){
 

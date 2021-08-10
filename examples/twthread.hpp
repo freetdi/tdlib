@@ -54,7 +54,7 @@
 // FIXME: this is tdecomp
 template<class T, class G>
 static void outdata(T const &t, G const& g, std::ostream& o)
-{
+{ untested();
 	size_t nv=boost::num_vertices(g);
 	size_t bs=boost::num_vertices(t);
 
@@ -365,10 +365,10 @@ TWTt
 template<class T>
 void TWTHREAD<TWTa>::print_results_tree(std::ostream& o, T const& t, G const* g_override)
 {
-	if(g_override){
+	if(g_override){ untested();
 		// HACK/workaround. dont use.
 		outdata(t, *g_override, o);
-	}else{
+	}else{ untested();
 		outdata(t, _g, o);
 	}
 }

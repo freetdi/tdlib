@@ -70,14 +70,12 @@ namespace draft {
 			}
 			_s << "\nb " << ++_nva;
 		}
-		void push_back(size_t x)
-		{
+		void push_back(size_t x) {
 			_s << " " << x+_offset;
 		}
 		// kludge: just tell something has been added.
 		// (which is not completely wrong)
-		std::pair<bool, bool> insert(size_t x)
-		{
+		std::pair<bool, bool> insert(size_t x) {
 			_s << " " << x+_offset;
 			return std::make_pair(true, true);
 		}

@@ -26,14 +26,10 @@ public:
         base::go();
     }
 
-    void do_print_results(std::ostream&)
-    { untested();
-        // auto &g=TWTHREAD<G>::_g;
-		  // treedec::grtdprinter<G> P(o, _work);
-		  // size_t numbags = boost::num_vertices(_work); // ask P?!
-		  // P.head(numbags, _result);
-		  // assert(_PP);
-		  // _PP->get_tree_decomposition(P);
+    void do_print_results(std::ostream& o) { untested();
+//        _PP->get_tree_decomposition(_printer); ?
+        trace2("PP", base::_result, treedec::get_bagsize(_t));
+        base::print_results_tree(o, _t, &_work);
     }
 
     void run() {
@@ -42,7 +38,7 @@ public:
 		  CFG::message(bLOG, "PP edges left %d\n", _PP->num_edges());
         unsigned r = _PP->get_bagsize();
         // assert(boost::num_vertices(_work) || r==0);
-		  incomplete();
+        _PP->get_tree_decomposition(_t);
         base::commit_result(r);
         base::unlock_results();
     }
