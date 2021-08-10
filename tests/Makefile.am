@@ -48,6 +48,8 @@ check_PROGRAMS = \
 	graph \
 	pp \
 	pp0 \
+	pp1 \
+	pp_path \
 	print_concept \
 	sdcc_bb \
 	sdcc_ub \

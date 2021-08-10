@@ -1,9 +1,9 @@
 // Lukas Larisch, 2014 - 2017
-// Felix Salfelder 2016 - 2018
+// Felix Salfelder 2016 - 2018, 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
-// Free Software Foundation; either version 2, or (at your option) any
+// Free Software Foundation; either version 3, or (at your option) any
 // later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -176,8 +176,8 @@ private:
     class adjacency_iterator_filter_ : public adjacency_iterator{
     public:
         adjacency_iterator_filter_(const adjacency_iterator_filter_& o) :
-            adjacency_iterator(o), _numbering(o._numbering), _end(o._end)
-        { }
+            adjacency_iterator(o), _numbering(o._numbering), _end(o._end) {
+        }
 
         adjacency_iterator_filter_(A a, N const& n, A e)
             : adjacency_iterator(a), _numbering(n), _end(e){
@@ -242,6 +242,7 @@ public:
         _lb_bs = 1;
     }
 private:
+#if 0 // not used (yet?)
     class ISNUM{
     public:
         ISNUM(numbering_type const& n, D_t const& g) : _n(n), _g(g){}
@@ -255,6 +256,7 @@ private:
         numbering_type const& _n;
         D_t const& _g;
     };
+#endif
     void clear_out_edges(vertex_descriptor v){ untested();
         boost::remove_out_edge_if(v, [](edge_descriptor){ return true; }, _g);
     }
@@ -269,6 +271,15 @@ public:
     size_t get_bagsize() const{ untested();
         return _lb_bs;
     }
+    size_t lower_bound_bagsize() const{ untested();
+        return _lb_bs;
+    }
+    size_t bagsize() const{ untested();
+        return -1u; // upper bound.
+    }
+    template<class T>
+    void get_tree_decomposition(T& t) const;
+
     template<class BAG_t>
     void get_bags(BAG_t& bags) { // for now
 
@@ -280,11 +291,12 @@ public:
             boost::get<0>(bags.back()) = v;
 
             // yes, need boost::
-            auto Is=boost::adjacent_vertices(v, _g);
+            auto Is = boost::adjacent_vertices(v, _g);
             for(; Is.first!=Is.second; ++Is.first){
                 assert(treedec::is_valid(*Is.first, _g));
                 if(_numbering.is_before(v, *Is.first)){
                     push(B, *Is.first);
+                }else{
                 }
             }
             // expensive?
@@ -350,8 +362,7 @@ public:
             if(_numbering.is_numbered(*p.first)){
                 continue; // fixme. not here.
                           // use induced subgraph, or boost::filtered_graph.
-            }
-            else{ itested();
+            }else{ itested();
                 assert(seek<m.size());
                 pm[*p.first] = seek;
                 m[seek++] = *p.first;
@@ -476,8 +487,8 @@ public:
         }else{
         }
 
-        auto Is=adjacent_vertices(v);
-        auto next=Is.first;
+        auto Is = adjacent_vertices(v);
+        auto next = Is.first;
         for(; Is.first!=Is.second; Is.first=next){
             ++next;
             auto Ii=next;
@@ -595,6 +606,8 @@ private:
     }
 
     void addtoelims(vertex_descriptor v){
+        trace1("========= elim.", v);
+
 #ifndef NDEBUG
         if(_degs.is_reg(v)){
         }else{ untested();
@@ -641,6 +654,14 @@ private: // graph update stuff.
         return p;
     }
 #endif
+    template<class V>
+    bool is_numbered(V const&v) const{
+        return _numbering.is_numbered(v);
+    }
+    template<class V>
+    typename numbering_type::value_type get_position(V const&v) const{
+        return _numbering.get_position(v);
+    }
 private:
    // G_t _g;
     directed_view_type _g;
@@ -686,7 +707,7 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
     get_graph(g);
 
 #if 1
-    if(boost::num_edges(g) == 0){ untested();
+    if(boost::num_edges(g) == 0){
         // BUG
         treedec::glue_bags(bags, t);
         return;
@@ -694,6 +715,7 @@ void preprocessing<G_t, CFG>::do_the_rest(T& t)
     }
 #endif
 
+    trace0("do the rest");
     do_components<T, A>(t, g);
 
     // no, g has been disassembled
@@ -723,7 +745,9 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         // BUG: Ignore isolated vertices (already included in 'bags').
         trace2("found component ", i->size(), components.size());
         if(i->size() == 1){ itested();
-            incomplete();
+//            incomplete();
+            std::cerr << "incomplete ../../src/preprocessing.hpp:741:do_components\n";
+
             continue;
             auto nv=boost::add_vertex(t);
             auto& B=boost::get(bag_t(), t, nv);
@@ -743,9 +767,8 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         unsigned compsize = i->size();
         CFG::message(0, "component of size %d", compsize); // BUG: lost.
 #ifndef NDEBUG
-        std::cerr<<"component of size " << compsize << "\n";
+        std::cerr << "do_components component of size " << compsize << "\n";
 #endif
-
 
         auto comp_range = *i;
         immutable_type H(compsize);
@@ -759,17 +782,22 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
         // T_t T_; // doesn't work (probably should?)
         boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, treedec::bag_t> T_;
 
-        incomplete();
+//        incomplete();
+        std::cerr << " incomplete ../../src/preprocessing.hpp:810:do_components\n";
         G gggg;
         boost::copy_graph(G_, gggg,
                 boost::vertex_copy(detail::forgetprop()).
                 edge_copy(detail::forgetprop())); // avoid, fix immutable_clone
+
+        trace2("got copy", boost::num_vertices(gggg), boost::num_edges(gggg));
+
         // assert_connected(gggg); // BUG
 
 #ifndef NDEBUG
         G backup;
         boost::copy_graph(gggg, backup);
 #endif
+
         A<G, CFGT> kern(gggg);
 
         kern.do_it();
@@ -912,7 +940,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
 
     _num_edges -= 1;
 
-    trace4("========= ex_1", v, *f, _degree[*f], _num_edges);
+    trace4("========= elim1", v, *f, _degree[*f], _num_edges);
     addtoelims(v);
     assert(_degs.is_reg(*f));
     assert(_degs.is_reg(*f));
@@ -937,7 +965,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
         typename preprocessing<G_t, CFGT>::vertex_descriptor v)
 {
 
-    trace1("========= ex_2", v);
+    trace1("========= elim2", v);
     auto f=adjacent_vertices(v).first;
     auto x=*f;
 
@@ -949,12 +977,12 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
 
     _marker.clear();
     _marker.mark(*f);
-    bool need_edg=true;
+    bool need_edg = true;
 
-    auto Is=adjacent_vertices(*(++f));
+    auto Is = adjacent_vertices(*(++f));
     for(; Is.first!=Is.second; ++Is.first){
         if(_marker.is_marked(*Is.first)){
-            need_edg=false;
+            need_edg = false;
             break;
         }else{
         }
@@ -963,7 +991,7 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_2(
     if(need_edg) {
         boost::add_edge(x, *f, _g);
         boost::add_edge(*f, x, _g);
-        _num_edges+=1;
+        ++_num_edges;
 
         // needed?
         wake_up_node(x);
@@ -1404,7 +1432,7 @@ bool preprocessing<G_t, CFG>::BothSimplicial(vertex_descriptor v)
                     _numbering.put(n);
                     _numbering.increment();
                     _degs.unlink(n);
-                    _num_edges-=(deg-1);
+                    _num_edges -= (deg-1);
                     // eliminate
                 }else{ untested();
                     wake_up_node(n);
@@ -1554,7 +1582,7 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 template<class G_t, template<class G_, class ...> class CFG>
 void preprocessing<G_t, CFG>::do_it()
 {
-    typename boost::graph_traits<G_t>::vertices_size_type num_vert = boost::num_vertices(_g);
+    auto num_vert = boost::num_vertices(_g);
 
     if(num_vert == 0){
         return;
@@ -1574,7 +1602,7 @@ void preprocessing<G_t, CFG>::do_it()
     }else{
     }
 
-    auto const& B=cdegs[0];
+    auto const& B = cdegs[0];
     auto I=B.begin();
     auto E=B.end();
     for(; I!=E; ++I){
@@ -1584,8 +1612,7 @@ void preprocessing<G_t, CFG>::do_it()
     }
 
     unsigned min_ntd = 1;
-    while(_num_edges)
-    {
+    while(_num_edges) {
         trace2("", boost::num_edges(_g), _num_edges);
         if(min_ntd>1){
             --min_ntd;
@@ -1737,11 +1764,64 @@ void preprocessing<G_t, CFG>::do_it()
                 }
             }
         }
-        return;
+        break;
 NEXT_ITER:
         ;
     } // main loop
+    // _numbering.increment();
 } // pp::do_it
+
+template<class G, template<class G_, class ...> class CFG>
+template<class T>
+void preprocessing<G, CFG>::get_tree_decomposition(T& t) const
+{
+    assert(!boost::num_vertices(t));
+    if(boost::num_vertices(_g)){
+
+        size_t pos = _elims.size();
+        t = T(pos+1);
+
+        trace2("check", _elims.size(), _numbering.total());
+        assert(_elims.size() == _numbering.total());
+
+        auto vv = boost::vertices(_g);
+        for(; vv.first != vv.second; ++vv.first){
+            auto v = *vv.first;
+            size_t pos;
+            if(is_numbered(v)){
+                pos = get_position(v);
+            }else{
+                pos = _elims.size();
+            }
+            size_t num = _elims.size() - pos;
+            auto& b = boost::get(treedec::bag_t(), t, num);
+//            boost::add_edge(r, e, t); // wrong.
+            trace2("get_tree_decomposition loop", v, pos);
+            auto Is = boost::adjacent_vertices(v, _g);
+            push(b, v);
+            size_t smallest = _elims.size();
+
+            if(is_numbered(v)){
+                for(; Is.first!=Is.second; ++Is.first){
+                    assert(treedec::is_valid(*Is.first, _g));
+                    if(_numbering.is_before(v, *Is.first)){
+                        push(b, *Is.first); // could use adjacency range?
+
+                        if(smallest > get_position(*Is.first)){
+                            smallest = get_position(*Is.first);
+                        }else{
+                        }
+                    }else{
+                        trace2("bag no visit", v, *Is.first);
+                    }
+                }
+                boost::add_edge(_elims.size()-smallest, _elims.size()-pos, t);
+            }else{
+            }
+        }
+    }else{
+    }
+} // pp::get_tree_decomposition
 
 } //namespace impl
 
@@ -1756,6 +1836,7 @@ void preprocessing(G_t &G, BV_t &bags, int &low)
         // obsolete interface. possibly slow
         A.get_bags(bags);
         A.get_graph(G);
+    }else{
     }
 }
 
