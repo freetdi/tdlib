@@ -22,6 +22,8 @@
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class BMD_THREAD : public TWTHREAD<G, cfgt> {
 public:
+	using TWTHREAD<G, cfgt>::get_result;
+public:
     typedef std::vector<int> iorder_t;
 	typedef TWTHREAD<G, cfgt> base;
 	typedef cfgt<G> CFG;
@@ -36,7 +38,14 @@ public:
 #ifdef HAVE_GALA_GRAPH_H
         _g.make_symmetric(true);
 #endif
-        base::print_results_order(o, _elimord);
+        // base::print_results_order(o, _elimord);
+
+        std::cerr<< "c size " << boost::num_vertices(_g) << "\n";
+        // auto &g=TWTHREAD<G>::_g;
+		  treedec::grtdprinter<G> P(o, _g);
+		  size_t numbags = boost::num_vertices(_t);
+		  P.head(numbags, get_result());
+		  boost::copy_graph(_t, P);
     }
 
     void run() {
@@ -49,7 +58,7 @@ public:
             treedec::check(*pg16);
             pg16->make_symmetric(true);
             assert_symmetric(*pg16);
-        }else{ untested();
+        }else{itested();
             pg32=new sg_dvv32(base::_g);
             treedec::check(*pg32);
             pg32->make_symmetric(true);
@@ -66,15 +75,17 @@ public:
         balvvd_t& g32(g16);
 #endif
         unsigned s;
-        if(_mag<M16){
+        if(_mag<M16){ untested();
             trace1("BMD", boost::num_edges(g16));
-            treedec::impl::bmdo<sg_dvv16> A(g16, _elimord);
+            treedec::impl::bmdo<sg_dvv16> A(g16);
 				A.do_it();
+				A.get_tree_decomposition(_t);
 				s = A.bagsize();
-        }else{ untested();
+        }else{itested();
             trace1("BMD", boost::num_edges(g32));
-            treedec::impl::bmdo<sg_dvv32> A(g32, _elimord);
+            treedec::impl::bmdo<sg_dvv32> A(g32);
 				A.do_it();
+				A.get_tree_decomposition(_t);
 				s = A.bagsize();
         }
         trace1("BMD", s);
@@ -83,6 +94,7 @@ public:
     }
 private:
    G& _g; // print hack.
-   iorder_t _elimord;
+//   iorder_t _elimord;
+   decomp_t<G> _t;
    mag_t _mag;
 };

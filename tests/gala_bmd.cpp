@@ -151,6 +151,7 @@ int main(int argc, char** argv)
 	std::vector<int> o(n, 0);
 
 	G h(g);
+	G gcopy(g);
 	assert(boost::num_edges(g)==boost::num_edges(g));
 
 	// assert(n + iso.size() == size);
@@ -209,7 +210,9 @@ int main(int argc, char** argv)
 	}
 
 	std::vector<unsigned>& ou=reinterpret_cast<std::vector<unsigned>&>(o);
-	treedec::draft::vec_ordering_to_tree(g, ou, t );
+	std::vector<unsigned>& iou=reinterpret_cast<std::vector<unsigned>&>(io);
+	treedec::draft::vec_ordering_to_tree(g, ou, t, &iou );
+   // treedec::draft::inplace_bmdo_tree(g, ou, t, &iou);
 	assert(boost::num_edges(t)+1==boost::num_vertices(t));
 	assert(boost::num_edges(t)+1==boost::num_vertices(g));
 
@@ -221,14 +224,18 @@ int main(int argc, char** argv)
 	}
 #endif
 
+	// BUG: need to sort bags upfront.
+	auto tt = boost::vertices(t);
+	for(; tt.first!=tt.second; ++tt.first){
+		std::vector<unsigned>& s = boost::get(treedec::bag_t(), t, *tt.first);
+		std::sort(s.begin(), s.end());
+	}
 
-	// does not work on vectors. (?!)
 	status = treedec::check_treedec(g, t);
 
 	if (!status){
 		std::cout << "treedec is valid!!\n";
-	}else{
-		incomplete();
+	}else{ untested();
 		std::cout << "something is wrong\n";
 	}
 	std::cout << "bagsize " << treedec::get_bagsize(t) << " status " << status <<"\n";
@@ -236,6 +243,30 @@ int main(int argc, char** argv)
 
 	assert(w == treedec::get_bagsize(t));
 
+
+	{
+		using treedec::impl::bmdo;
+		typedef treedec::impl::bmdo<G> bmd;
+		bmd A(gcopy);
+		A.do_it();
+
+		typename treedec::graph_traits<G>::treedec_type t;
+		A.get_tree_decomposition(t);
+		// BUG: need to sort bags upfront.
+		auto tt = boost::vertices(t);
+		for(; tt.first!=tt.second; ++tt.first){
+			std::vector<unsigned>& s = boost::get(treedec::bag_t(), t, *tt.first);
+			std::sort(s.begin(), s.end());
+		}
+
+		status = treedec::check_treedec(g, t);
+		if (!status){
+			std::cout << "treedec is valid!!\n";
+		}else{ untested();
+			std::cout << "something is wrong\n";
+		}
+		assert(!status);
+	}
 #endif // HAVE_GALA
 
 }

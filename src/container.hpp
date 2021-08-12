@@ -1,4 +1,4 @@
-// Felix Salfelder 2016
+// Felix Salfelder 2016, 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -88,6 +88,12 @@ void insert(C& c, E e)
 {
     // assert(!contains...)
     detail::container_modify<C>::insert(c, e);
+}
+
+template<class C, class E>
+void assign(C& c, E e)
+{
+    detail::container_assign<C, typename std::remove_reference<E>::type>::assign(c, e);
 }
 
 template<class C, class B, class E>

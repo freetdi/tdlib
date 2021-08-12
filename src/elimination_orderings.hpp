@@ -1,5 +1,5 @@
 // Lukas Larisch, 2014 - 2017
-// Felix Salfelder, 2016 - 2017
+// Felix Salfelder, 2016 - 2017, 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -69,7 +69,12 @@
 
 #include "impl/greedy_heuristic.hpp"
 
+#ifdef HAVE_GALA_GRAPH_H
+#include <gala/sfinae.h>
+#endif
+
 #define get_pos(a,b) ( boost::get(boost::vertex_index, b, a) )
+
 
 namespace treedec{ //
 
@@ -190,6 +195,313 @@ struct dummy_callback{
 
 }
 
+namespace draft{
+
+template<class G, class O>
+class io_smaller_than{
+    typedef typename boost::property_map< G, boost::vertex_index_t >::const_type::value_type vertex_index_type;
+public:
+    explicit io_smaller_than(size_t k, O const& o, G const& g) : _k(k), _o(o), _g(g) {
+    }
+    template<class E>
+    bool operator()(E const& e) const{
+        auto t = boost::target(e, _g);
+        auto idm = boost::get(boost::vertex_index, _g);
+        return idm[_o[t]] < _k;
+    }
+private:
+    vertex_index_type _k;
+    O const& _o;
+    G const& _g;
+};
+
+template<class N>
+class mapped_order{
+public:
+    mapped_order(N const& n):_n(n){}
+
+    template<class V, class W>
+    bool operator()(V const& a, W const& b) const{
+        return _n[a] < _n[b];
+    }
+private:
+    N const& _n;
+};
+
+template<class I, class N, class G, class O, class M>
+void cleanup_bmdo(I j, N const& numbering, G& g, O const&, M const& my_numbering_order)
+{
+    io_smaller_than<G, O> P(numbering[j], numbering, g);
+    vertex_descriptor_G b(j);
+    boost::remove_out_edge_if(b, P, g);
+
+    std::sort(g->vertices()[j].begin(), g->vertices()[j].end(), my_numbering_order);
+}
+
+template <typename G, typename O_t, class T>
+void inplace_bmdo_tree(G &g, O_t const& O, T& t, O_t const* io=NULL)
+{
+    typedef typename boost::property_map<G, boost::vertex_index_t>::type::value_type vertex_index_type;
+    size_t num_vert = boost::num_vertices(g);
+
+    if(num_vert == 0){ untested();
+        boost::add_vertex(t);
+    }else{
+
+        assert(num_vert == O.size());
+        O_t iOlocal;
+
+        if(io){
+            trace2("DBG", io->size(), num_vert);
+            assert(io->size()==num_vert);
+            for(vertex_index_type i = 0; i < num_vert; i++){
+                // bug? does O map to vertex_descriptors?
+                assert(vertex_index_type((*io)[O[i]]) == i);
+            }
+        }else{ untested();
+            iOlocal.resize(num_vert);
+            io=&iOlocal;
+            for(unsigned i = 0; i < num_vert; i++){
+                iOlocal[O[i]] = i;
+            }
+        }
+        //    O_t const& iO=*io;
+        O_t const& numbering=*io;
+
+        auto invalid=num_vert;
+        std::vector<unsigned> edges(num_vert-1u, invalid);
+        assert(edges.size()==num_vert-1);
+
+        mapped_order<O_t> my_numbering_order(numbering);
+
+        for(unsigned j = 0; j < num_vert; j++){
+        }
+
+        std::vector<unsigned char> clean(num_vert, 0);
+
+        std::vector<vertex_descriptor_G> buf;
+        auto nodes_left = O.size();
+
+        for(auto oi : O){
+            --nodes_left;
+            if(clean[oi]){
+            }else{
+                cleanup_bmdo(oi, numbering, g, O, my_numbering_order);
+                clean[oi] = true;
+            }
+            auto i = numbering[oi];
+            auto R = boost::adjacent_vertices(oi, g);
+            auto D = boost::out_degree(oi, g);
+
+            for(;R.first!=R.second;++R.first) {
+                auto j = *R.first;
+                unsigned iO_n_node = numbering[j];
+                if(iO_n_node < edges[i]){
+                    edges[i] = iO_n_node;
+                }else{
+                }
+            }
+
+            if(D == nodes_left){
+                // the rest is one big bag, no matter what.
+                break;
+            }else{
+            }
+
+            auto const& NN = g->vertices()[oi];
+            // NN is now "bag O[i]"
+            // R = boost::adjacent_vertices(oi, g);
+
+            // rewire bag at O[i]. will become bag i.
+            for( auto j_ = NN.begin(); j_ != NN.end(); ++j_ ) {
+                auto k_ = j_;
+                ++k_;
+                auto j = *j_;
+
+                buf.resize(0);
+                if(clean[j]){
+                }else{
+                    cleanup_bmdo(j, numbering, g, O, my_numbering_order);
+                    clean[j] = true;
+                }
+
+                auto Aj = boost::adjacent_vertices(j, g);
+
+                // could try canonical order... but then NN is wrong.
+                std::set_union(k_, NN.end(), Aj.first, Aj.second, std::back_inserter(buf), my_numbering_order);
+                std::swap(g->vertices()[j], buf);
+
+                for( ; k_!=NN.end() ; ++k_ ){
+                    auto k = *k_;
+                    assert(numbering[j] < numbering[k]);
+
+                    if((unsigned)numbering[k] < edges[numbering[j]]){
+                        edges[numbering[j]] = numbering[k];
+                    }else{
+                    }
+                }
+            }
+        }
+
+        trace2("loop done", nodes_left, num_vert);
+        assert(! boost::num_vertices(t));
+
+        for(unsigned i = 0; i < num_vert-nodes_left; ++i){
+            boost::add_vertex(t);
+            assert(i+1 == boost::num_vertices(t));
+            auto& b = boost::get(treedec::bag_t(), t, i);
+
+            auto& NN = g->vertices()[O[i]];
+            assign(b, std::move(NN));
+            push(b, O[i]);
+        }
+
+        assert(boost::num_vertices(t) == num_vert-nodes_left);
+
+        // invert edge direction?
+        for(unsigned i = 0; i < num_vert-nodes_left-1u; ++i){
+            assert(edges[i]>i || edges[i]==invalid);
+            if(edges[i] >= num_vert-nodes_left){
+                edges[i] = num_vert-nodes_left-1;
+                boost::add_edge(i, edges[i], t);
+            }else if(edges[i]!=invalid){
+                // normal edge, as computed above.
+                boost::add_edge(i, edges[i], t);
+            }else if(i+1!=num_vert){ untested();
+                // edge to next component
+                boost::add_edge(i, i+1, t);
+            }else{ untested();
+                incomplete(); // ?
+                trace2("edging exit", i, edges[i]);
+                // exiting last connected component.
+                // ... dont connect
+            }
+        }
+
+        assert(boost::num_vertices(t) == num_vert-nodes_left);
+        assert(boost::num_edges(t) +1 == boost::num_vertices(t));
+
+        for(unsigned i = 0; i < num_vert-nodes_left; i++){
+            auto& b=boost::get(treedec::bag_t(), t, i);
+            assert(b.size());
+            treedec::sort(b); // bug in check_tree_decomp, need sorted bags...
+        }
+    }
+
+} // inplace_bmdo
+
+template <typename G_t, typename O_t, class T>
+void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
+        boost::adjacency_matrix<boost::directedS> *em=NULL )
+{
+    size_t num_vert = boost::num_vertices(G);
+
+    if(num_vert == 0){
+        boost::add_vertex(t);
+        return;
+    }
+
+    assert(num_vert == O.size());
+    O_t iOlocal;
+    typedef boost::adjacency_matrix<boost::directedS> bamd;
+
+
+    bamd* b{nullptr};
+    if(em){ untested();
+        b = em;
+    }else{
+        // TODO: free!
+        b = new boost::adjacency_matrix<boost::directedS>(num_vert);
+    }
+    bamd& bags=*b;
+
+    if(io){
+        assert(io->size()==num_vert);
+    }else{
+        iOlocal.resize(num_vert);
+        io=&iOlocal;
+    }
+    O_t& iO=*io;
+
+    //TODO: use adjacency matrix
+    auto invalid=num_vert;
+    std::vector<unsigned> edges(num_vert-1u, invalid);
+    assert(edges.size()==num_vert-1);
+
+    for(unsigned i = 0; i < num_vert; i++){
+        iO[O[i]] = i;
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        auto R = boost::adjacent_vertices(O[i], G);
+        for(; R.first!=R.second; ++R.first) {
+            unsigned n_node = *R.first;
+            if((unsigned)iO[n_node] > i){
+                boost::add_edge(i, n_node, bags);
+            }else{
+            }
+        }
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        std::vector<unsigned> N;
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                N.push_back(j);
+                unsigned iO_n_node = iO[j];
+                if(iO_n_node < edges[i]){
+                    edges[i] = iO_n_node;
+                }
+            }
+        }
+
+        for(unsigned j = 0; j < N.size(); j++){
+            for(unsigned k = 0; k < N.size(); k++){
+                if(iO[N[k]] > iO[N[j]]){
+                    boost::add_edge(iO[N[j]], N[k], bags);
+                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
+                        edges[iO[N[j]]] = iO[N[k]];
+                    }else{
+                    }
+                }
+            }
+        }
+    }
+
+    for(unsigned i = 0; i < num_vert; i++){
+        boost::add_vertex(t);
+        auto& b=boost::get(treedec::bag_t(), t, i);
+        push(b, O[i]);
+        for(unsigned j = 0; j < num_vert; j++){
+            if(boost::edge(i, j, bags).second){
+                push(b, j);
+            }else{
+            }
+         }
+     }
+
+    for(unsigned i = 0; i < num_vert-1u; i++){
+        assert(edges[i]>i || edges[i]==invalid);
+        if(edges[i]!=invalid){
+            // normal edge, as computed above.
+            boost::add_edge(i, edges[i], t);
+        }else if(i+1!=num_vert){
+            // edge to next component
+            boost::add_edge(i, i+1, t);
+        }else{ untested();
+            // exiting last connected component.
+            // ... dont connect
+        }
+    }
+
+    if(!em){
+        delete b;
+    }else{
+    }
+}
+
+} // draft
+
 namespace impl{
 
 template <typename G_t>
@@ -228,8 +540,8 @@ typename boost::graph_traits<G_t>::vertices_size_type
     unsigned w = boost::minimum_degree_ordering
              (G,
               boost::make_iterator_property_map(&degree[0], id, degree[0]),
-              &inverse_perm[0],
-              &O[0],
+              &inverse_perm[0], // numbering. node n is at position ip[n]
+              &O[0],   // "ordering" as in eliminate O[0] then O[1] ...
               boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
               0,
               id);
@@ -261,6 +573,26 @@ void fillIn_decomp(G_t &G, T_t &T, unsigned ub=UINT_MAX, bool ignore_isolated=fa
 
 namespace impl{
 
+template<class G, class T, class X=void>
+struct bmdo_{
+    template<class D, class O, class N>
+    static void gtd(D const& g, O o, T& t, N const& numbering){ untested();
+        // ordering_to_treedec(_g, *_o, t);
+        treedec::draft::vec_ordering_to_tree(g, o, t, numbering);
+    }
+};
+
+#ifdef HAVE_GALA_GRAPH_H // TODO: define graph trait
+template<class G, class T>
+struct bmdo_<G, T, typename gala::sfinae::is_vector<typename G::vertex_container_type>::type>
+{
+    template<class D, class O, class N>
+    static void gtd(D& g, O o, T& t, N const& numbering){
+        treedec::draft::inplace_bmdo_tree(g, o, t, numbering);
+    }
+};
+#endif
+
 
 // hack?
 //using boost::target;
@@ -275,17 +607,46 @@ public:
     typedef treedec::draft::directed_view<G_t> D_t;
 public:
     bmdo(G_t &G, std::vector<int> &O)
-      : _g(G), _o(O)
-    {
-        untested();
+      : _g(G),
+        _o(&O) { untested();
     }
+    bmdo(G_t &G)
+      : _g(G),
+        _o(new std::vector<int>()),
+        _own_o(true) {
+    }
+    ~bmdo(){
+        if(_own_o){
+            delete _o;
+        }else{
+        }
+    }
+
+public:
     vertices_size_type bagsize() const{
         return _bs;
     }
+    unsigned lower_bound_bagsize() const{
+        incomplete();
+        return 0;
+    }
+    template<class T>
+    void get_tree_decomposition(T& t) const{
+        incomplete();
+    }
+    template<class T>
+    void get_tree_decomposition(T& t){
+        bmdo_<G_t, T>::gtd(_g, o(), t, &_inverse_perm);
+    }
     void do_it();
 private:
+    std::vector<int>& o(){assert(_o); return *_o;}
+    std::vector<int> const& o() const{assert(_o); return *_o;}
+private:
     D_t _g;
-    std::vector<int>& _o;
+    std::vector<int> _inverse_perm; //TODO: use signed_type(vertex_index_t)
+    std::vector<int>* _o{nullptr};
+    bool _own_o{false};
     vertices_size_type _bs;
 }; // bmdo
 
@@ -295,41 +656,40 @@ void bmdo<G_t>::do_it()
     vertices_size_type n=boost::num_vertices(_g);
     edges_size_type e=boost::num_edges(_g);
 
-    _o.resize(n);
+    o().resize(n);
+    _inverse_perm.resize(n);
 
     // check: is this still necessary?!
     unsigned i = 0;
     if(n == 0){ untested();
         _bs = 0;
-        return;
-    }else if(n*(n-1u) == boost::num_edges(_g) || e == 0){ untested();
+    }else if(n*(n-1u) == boost::num_edges(_g) || e == 0){
         auto p=boost::vertices(_g);
-        for(; p.first!=p.second; ++p.first){untested();
-            _o[i++] = *p.first;
+        for(; p.first!=p.second; ++p.first){
+            _inverse_perm[*p.first] = i;
+            o()[i++] = *p.first;
         }
-        if(e==0){ untested();
+        if(e==0){
             _bs = 1;
-            return;
-        }else{ untested();
+        }else{
             _bs = n;
-            return;
         }
+    }else{
+
+        std::vector<int> supernode_sizes(n, 1);
+        auto id = boost::get(boost::vertex_index, _g);
+        std::vector<int> degree(n, 0);
+
+        _bs = boost::minimum_degree_ordering
+                 (_g,
+                  boost::make_iterator_property_map(&degree[0], id, degree[0]),
+                  &_inverse_perm[0],
+                  &o()[0],
+                  boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+                  0,
+                  id);
     }
-
-    std::vector<int> inverse_perm(n, 0);
-    std::vector<int> supernode_sizes(n, 1);
-    typename boost::property_map<D_t, boost::vertex_index_t>::type id = boost::get(boost::vertex_index, _g);
-    std::vector<int> degree(n, 0);
-
-    _bs = boost::minimum_degree_ordering
-             (_g,
-              boost::make_iterator_property_map(&degree[0], id, degree[0]),
-              &inverse_perm[0],
-              &_o[0],
-              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
-              0,
-              id);
-} // do_it
+} // bmdo::do_it
 
 } //namespace impl
 
@@ -480,119 +840,6 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
 
     ordering_to_treedec(G, O_, T);
 }
-
-namespace draft{
-
-//TODO
-template <typename G_t, typename O_t, class T>
-void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
-        boost::adjacency_matrix<boost::directedS> *em=NULL )
-{
-    size_t num_vert = boost::num_vertices(G);
-
-    if(num_vert == 0){
-        boost::add_vertex(t);
-        return;
-    }
-
-    assert(num_vert == O.size());
-    O_t iOlocal;
-    typedef boost::adjacency_matrix<boost::directedS> bamd;
-
-
-    bamd* b;
-    if(em){ untested();
-        b = em;
-    }else{
-        // TODO: free!
-        b = new boost::adjacency_matrix<boost::directedS>(num_vert);
-    }
-    bamd& bags=*b;
-
-    if(io){
-        assert(io->size()==num_vert);
-    }else{
-        iOlocal.resize(num_vert);
-        io=&iOlocal;
-    }
-    O_t& iO=*io;
-
-    //TODO: use adjacency matrix
-    auto invalid=num_vert;
-    std::vector<unsigned> edges(num_vert-1u, invalid);
-    assert(edges.size()==num_vert-1);
-
-    for(unsigned i = 0; i < num_vert; i++){
-        iO[O[i]] = i;
-    }
-
-    for(unsigned i = 0; i < num_vert; i++){
-        auto R=boost::adjacent_vertices(O[i], G);
-        for(;R.first!=R.second;++R.first) {
-            unsigned n_node = *R.first;
-            if((unsigned)iO[n_node] > i){
-                boost::add_edge(i, n_node, bags);
-            }
-        }
-    }
-
-    for(unsigned i = 0; i < num_vert; i++){
-        std::vector<unsigned> N;
-        for(unsigned j = 0; j < num_vert; j++){
-            if(boost::edge(i, j, bags).second){
-                N.push_back(j);
-                unsigned iO_n_node = iO[j];
-                if(iO_n_node < edges[i]){
-                    edges[i] = iO_n_node;
-                }
-            }
-        }
-
-        for(unsigned j = 0; j < N.size(); j++){
-            for(unsigned k = 0; k < N.size(); k++){
-                if(iO[N[k]] > iO[N[j]]){
-                    boost::add_edge(iO[N[j]], N[k], bags);
-                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
-                        edges[iO[N[j]]] = iO[N[k]];
-                    }
-                }
-            }
-        }
-    }
-
-    for(unsigned i = 0; i < num_vert; i++){
-        boost::add_vertex(t);
-        auto& b=boost::get(treedec::bag_t(), t, i);
-        push(b, O[i]);
-        for(unsigned j = 0; j < num_vert; j++){
-            if(boost::edge(i, j, bags).second){
-                push(b, j);
-            }
-         }
-     }
-
-    for(unsigned i = 0; i < num_vert-1u; i++){
-        assert(edges[i]>i || edges[i]==invalid);
-        if(edges[i]!=invalid){
-            // normal edge, as computed above.
-            boost::add_edge(i, edges[i], t);
-        }
-        else if(i+1!=num_vert){
-            // edge to next component
-            boost::add_edge(i, i+1, t);
-        }
-        else{ untested();
-            // exiting last connected component.
-            // ... dont connect
-        }
-    }
-
-    if(!em){
-        delete &bags;
-    }
-}
-
-} // draft
 
 namespace impl{
 

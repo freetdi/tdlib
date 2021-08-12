@@ -96,12 +96,12 @@ struct dwt< gala::graph<SGARGS>,
 	typedef typename gala::graph<SGARGS>::directed_type type;
 	static std::string dbg(){ return "gala wrapper\n"; }
 
-	static type init(G&){ untested();
+	static type init(G&){
 		return type();
 	}
 
 	template<class GG, class H>
-	static void copy(GG && g, H& h){ untested();
+	static void copy(GG && g, H& h){
 		h = std::move(g);
 	}
 };
@@ -194,7 +194,7 @@ public:
 	}
 
 public: // dangerous?
-	wrapped_type* operator->(){ untested();
+	wrapped_type* operator->(){
 		return &_g;
 	}
 	wrapped_type& operator*(){

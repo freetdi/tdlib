@@ -1,4 +1,4 @@
-// Felix Salfelder 2016
+// Felix Salfelder 2016, 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -15,7 +15,7 @@
 // Foundation, 51 Franklin Street - Suite 500, Boston, MA 02110-1335, USA.
 //
 
-// container access
+// container access. FIXME: these are not traits.
 
 #ifndef TREEDEC_CONTAINER_TRAITS_HPP
 #define TREEDEC_CONTAINER_TRAITS_HPP
@@ -97,7 +97,7 @@ namespace detail{//
         }
     };
     template<class C, class X=void>
-    struct container_modify{//
+    struct container_modify{
         // push, insert new item
         template<class E>
         static void push(C& c, E e) {
@@ -111,6 +111,18 @@ namespace detail{//
         }
         // sort. no-op for some containers
         static void insert(C& c) { untested();
+            incomplete();
+        }
+    };
+    template<class C, class E, class X=void>
+    struct container_assign{
+        template<class O>
+        static void assign(C& c, O const& o){ untested();
+            container_modify<C>::push(c, o.begin(), o.end());
+        }
+        template<class O>
+        static void assign(C& c, O&& o){
+            container_modify<C>::push(c, o.begin(), o.end());
         }
     };
     template<class C>
@@ -121,18 +133,16 @@ namespace detail{//
         typename C::allocator_type> >::value
         >::type >{//
         // push, insert new item
-        static void push(C& c, typename C::value_type e)
-        {
+        static void push(C& c, typename C::value_type e) {
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }
-        static void insert(C& c, typename C::value_type e)
-        { untested();
+        static void insert(C& c, typename C::value_type e) { untested();
           assert(!container_inspect<C>::contains(c, e));
           c.push_back(e);
         }
         template<class I>
-        static void push(C& c, I b, I e) {
+        static void push(C& c, I b, I e) { untested();
           for(; b!=e; ++b){
             push(c, *b);
           }
@@ -147,6 +157,23 @@ namespace detail{//
         }
         static void sort(C& c) {
             std::sort(c.begin(), c.end());
+        }
+    };
+    template<class C, class E>
+    struct container_assign<C, E,
+      typename std::enable_if< std::is_same<
+         typename std::remove_reference<C>::type,
+         typename std::remove_reference<E>::type >::value >::type >{
+
+        template<class O>
+        static void assign(C& c, O const& o){ untested();
+            for(auto x : o){ untested();
+                push(c, x);
+            }
+        }
+        template<class O>
+        static void assign(C& c, O&& o){
+            c = std::move(o);
         }
     };
     template<class C>

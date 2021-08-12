@@ -489,7 +489,7 @@ void twh(P& p, mag_t m, unsigned mask)
     auto B=BE.first;
     auto E=BE.second;
 
-    if(m>M15){ untested();
+    if(m>M15){itested();
         G32p pg32(B, E, n, e);
         g32 = std::move(pg32);
 
@@ -641,7 +641,7 @@ void twh(P& p, mag_t m, unsigned mask)
     if(! ( mask & ( 1 << nBMD ))) {
     }else if(m < M16){
         reg_thread(threads, nBMD, new BMD_THREAD<uG16, grtd_algo_config>(g16, "BMD16", m));
-    }else if(m < M32){ untested();
+    }else if(m < M32){itested();
         reg_thread(threads, nBMD, new BMD_THREAD<uG32, grtd_algo_config>(g32, "BMD32", m));
     }else{
         incomplete();
@@ -793,7 +793,7 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nPPFITM);
         }else if(!strncmp("--ppfi", argv[i], 6)){
             mask_in |= (1<<nPPFI);
-        }else if(!strncmp("--bmd", argv[i], 5)){ untested();
+        }else if(!strncmp("--bmd", argv[i], 5)){itested();
             mask_in |= (1<<nBMD);
         }else if(!strncmp("--fi", argv[i], 4)){
             mask_in |= (1<<nFI);
@@ -840,7 +840,7 @@ static void parseargs(int argc, char * const * argv)
     if(m){ untested();
     }else if(global_result >= (1l<<31)-1){ untested();
         m = M32;
-    }else if(global_result >= (1<<16)-1){ untested();
+    }else if(global_result >= (1<<16)-1){itested();
         m = M31;
     }else if(global_result >= (1<<15)-1){ untested();
         m = M16;

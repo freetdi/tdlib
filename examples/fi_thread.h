@@ -96,8 +96,7 @@ public:
         base::go();
     }
 
-    void do_print_results(std::ostream& o)
-    {
+    void do_print_results(std::ostream& o) {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
