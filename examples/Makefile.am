@@ -82,7 +82,7 @@ TIME=1
 $(GRTDP_AMNAME).gcda: $(PROFILE_GRAPH) tdecomp-profile ${TD_VALIDATE}
 	rm -f $@
 	@TD=$$(basename $<).td; \
-	for i in --ex17 --fi --ppfi; do \
+	for i in --ex17 --fi --ppfi --bmd --pp; do \
 		echo "./tdecomp-profile $$i < $< > $$TD$$i & p=\$$!; sleep $(TIME); kill -TERM \$$p;"; \
 		./tdecomp-profile $$i < $< > $$TD.i$$i & p=$$!; sleep $(TIME); kill -TERM $$p 2>/dev/null; \
       wait $$p; \

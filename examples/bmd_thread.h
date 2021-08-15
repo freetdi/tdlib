@@ -18,6 +18,20 @@
 //
 //  boost min-degree thread
 //
+// use these globally?
+typedef boost::property<treedec::bag_t, std::vector<uint16_t> > uint16_bag_p;
+typedef boost::property<treedec::bag_t, std::vector<uint32_t> > uint32_bag_p;
+typedef boost::property<treedec::bag_t, std::vector<uint64_t> > uint64_bag_p;
+
+// #define tree_directedness_ boost::bidirectionalS //  broken?
+#define tree_directedness_ boost::undirectedS
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                              tree_directedness_, uint16_bag_p> _gsgvvu16_treedec;
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                              tree_directedness_, uint32_bag_p> _gsgvvu32_treedec;
+
 
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class BMD_THREAD : public TWTHREAD<G, cfgt> {
@@ -43,9 +57,31 @@ public:
         std::cerr<< "c size " << boost::num_vertices(_g) << "\n";
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _g);
+
+#if 0
 		  size_t numbags = boost::num_vertices(_t);
 		  P.head(numbags, get_result());
 		  boost::copy_graph(_t, P);
+#else
+		  // make -q work. possibly too slow
+		  if(_a16){
+			  _gsgvvu16_treedec t;
+			  _a16->get_tree_decomposition(t);
+//			  _a16->get_tree_decomposition(P); // TODO
+			  size_t numbags = boost::num_vertices(t);
+			  P.head(numbags, get_result());
+			  boost::copy_graph(t, P);
+		  }else if(_a32){ untested();
+			  _gsgvvu32_treedec t;
+			  _a32->get_tree_decomposition(t);
+//			  _a16->get_tree_decomposition(P); // TODO
+			  size_t numbags = boost::num_vertices(t);
+			  P.head(numbags, get_result());
+			  boost::copy_graph(t, P);
+		  }else{
+			  unreachable();
+		  }
+#endif
     }
 
     void run() {
@@ -75,7 +111,7 @@ public:
         balvvd_t& g32(g16);
 #endif
         unsigned s;
-        if(_mag<M16){ untested();
+        if(_mag<M16){
             trace1("BMD", boost::num_edges(g16));
             treedec::impl::bmdo<sg_dvv16> A(g16);
 				A.do_it();
@@ -97,4 +133,6 @@ private:
 //   iorder_t _elimord;
    decomp_t<G> _t;
    mag_t _mag;
+	treedec::impl::bmdo<sg_dvv16>* _a16{nullptr};
+	treedec::impl::bmdo<sg_dvv32>* _a32{nullptr};
 };

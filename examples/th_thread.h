@@ -46,11 +46,10 @@ public:
 		 base::unlock_results();
     }
 private:
-#ifdef HAVE_GALA_GRAPH_H
 	algo_type* _TH;
+#ifdef HAVE_GALA_GRAPH_H
 	//(_work);
 #else
-   incomplete
    G _work;
 #endif
    decomp_t<G> _t;

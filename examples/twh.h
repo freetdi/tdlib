@@ -103,6 +103,7 @@ bool trace=false;
 #include <treedec/elimination_orderings.hpp>
 #include <boost/graph/copy.hpp>
 
+#ifdef HAVE_GALA_GRAPH_H
 // undirected simple loopless graph
 template<class G>
 struct uvv_config : gala::graph_cfg_default<G> {
@@ -116,7 +117,6 @@ typedef gala::graph<std::vector, std::vector, uint16_t, uvv_config> sg_dvv16;
 typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
 
 
-#ifdef HAVE_GALA_GRAPH_H
 #include <gala/boost_copy.h>
 #include <gala/td.h>
 #endif
@@ -479,9 +479,12 @@ void twh(P& p, mag_t m, unsigned mask)
     typedef sg_dpvv16 G16p;
     typedef sg_dpvv32 G32p;
 
+#endif
+
     size_t n=boost::num_vertices(p);
     size_t e=boost::num_edges(p);
 
+#ifdef HAVE_GALA_GRAPH_H
     uG16 g16;
     uG32 g32;
     sg_odsvv16 tg;
@@ -522,8 +525,8 @@ void twh(P& p, mag_t m, unsigned mask)
 #endif
 /*--------------------------------------------------------------------------*/
 
-
     std::cout << "c n: " << n << ", e: " << e << std::endl;
+
 #ifdef HAVE_GALA_GRAPH_H
     std::cout << "c gala on" << std::endl;
 #endif
@@ -801,7 +804,7 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nFITM);
         }else if(!strncmp("--ppmd", argv[i], 6)){ untested();
             mask_in |= (1<<nPPMD);
-        }else if(!strncmp("--pp", argv[i], 4)){ untested();
+        }else if(!strncmp("--pp", argv[i], 4)){
             mask_in |= (1<<nPP);
         }else if(!strncmp("-T", argv[i], 2)){ untested();
             trace = true;

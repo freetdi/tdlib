@@ -114,87 +114,6 @@ typename boost::graph_traits<G_t>::vertices_size_type
     return MD.get_bagsize()-1;
 }
 
-
-// TODO: duplicate. use impl.
-template <typename G_t, typename O_t>
-int boost_minDegree_ordering(G_t &G, O_t &O, O_t &iO, unsigned ub = UINT_MAX)
-{ untested();
-    unsigned n = boost::num_vertices(G);
-    unsigned e = boost::num_edges(G);
-
-    O.resize(n);
-    unsigned i = 0;
-    if(n == 0) { untested();
-    }else if(n*(n-1u)==e || e==0){ untested();
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(G); vIt != vEnd; vIt++){ untested();
-            O[i++] = *vIt;
-        }
-        if(e==0){ untested();
-            return 1;
-        }
-        else{ untested();
-            return n;
-        }
-    }
-
-    std::vector<int> inverse_perm(n, 0); //TODO: use signed_type(vertex_index_t)
-    std::vector<int> supernode_sizes(n, 1);
-    auto id = boost::get(boost::vertex_index, G);
-    std::vector<int> degree(n, 0);
-
-    /*
-     * (Graph& G,
-     *  DegreeMap degree,
-     *  InversePermutationMap inverse_perm,
-     *  PermutationMap perm,
-     *  SuperNodeMap supernode_size,
-     *  int delta,
-     *  VertexIndexMap vertex_index_map)
-     */
-
-    int w =
-#ifndef HAVE_MINDEGREE_FORK
-        0;
-    untested();
-#endif
-    boost::minimum_degree_ordering
-             (G,
-              boost::make_iterator_property_map(&degree[0], id, degree[0]),
-              &iO[0],
-              &O[0],
-              boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
-              0,
-              id
-#ifdef HAVE_MINDEGREE_FORK
-              , ub
-#endif
-              );
-
-#ifdef HAVE_MINDEGREE_FORK
-    return w;
-#else
-    untested();
-#endif
-}
-
-template <typename G_t, typename O_t>
-int boost_minDegree_ordering(G_t &G, O_t &O, unsigned ub=UINT_MAX)
-{ untested();
-    O_t iO(boost::num_vertices(G), 0);
-    return boost_minDegree_ordering(G, O, iO, ub);
-}
-
-
-namespace hack_cleanup_later{
-template<class ARG>
-struct dummy_callback{
-    public:
-        void operator()(ARG){}
-};
-
-}
-
 namespace draft{
 
 template<class G, class O>
@@ -207,7 +126,11 @@ public:
     bool operator()(E const& e) const{
         auto t = boost::target(e, _g);
         auto idm = boost::get(boost::vertex_index, _g);
-        return idm[_o[t]] < _k;
+        if(idm[_o[t]] < _k){
+            return true;
+        }else{
+            return false;
+        }
     }
 private:
     vertex_index_type _k;
@@ -239,8 +162,9 @@ void cleanup_bmdo(I j, N const& numbering, G& g, O const&, M const& my_numbering
 }
 
 template <typename G, typename O_t, class T>
-void inplace_bmdo_tree(G &g, O_t const& O, T& t, O_t const* io=NULL)
+void inplace_bmdo_tree(G &g, O_t const& O, T& t, size_t bagsize, O_t const& io_)
 {
+    auto const* io = &io_;
     typedef typename boost::property_map<G, boost::vertex_index_t>::type::value_type vertex_index_type;
     size_t num_vert = boost::num_vertices(g);
 
@@ -274,21 +198,16 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, O_t const* io=NULL)
 
         mapped_order<O_t> my_numbering_order(numbering);
 
-        for(unsigned j = 0; j < num_vert; j++){
+        for(unsigned j = 0; j < num_vert-bagsize; j++){
+            cleanup_bmdo(O[j], numbering, g, O, my_numbering_order);
         }
-
-        std::vector<unsigned char> clean(num_vert, 0);
 
         std::vector<vertex_descriptor_G> buf;
         auto nodes_left = O.size();
 
-        for(auto oi : O){
+        for(auto oi_ = O.begin(); ; ++oi_){
+            auto oi = *oi_;
             --nodes_left;
-            if(clean[oi]){
-            }else{
-                cleanup_bmdo(oi, numbering, g, O, my_numbering_order);
-                clean[oi] = true;
-            }
             auto i = numbering[oi];
             auto R = boost::adjacent_vertices(oi, g);
             auto D = boost::out_degree(oi, g);
@@ -302,8 +221,15 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, O_t const* io=NULL)
                 }
             }
 
-            if(D == nodes_left){
+            if(bagsize == nodes_left + 1){
                 // the rest is one big bag, no matter what.
+                auto& last_adj = g->vertices()[oi];
+                last_adj.resize(bagsize-1);
+                size_t f = 0;
+                while(++oi_ != O.end()){
+                    last_adj[f++] = *oi_;
+                }
+                assert(last_adj.size() + 1 == bagsize);
                 break;
             }else{
             }
@@ -319,17 +245,16 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, O_t const* io=NULL)
                 auto j = *j_;
 
                 buf.resize(0);
-                if(clean[j]){
-                }else{
-                    cleanup_bmdo(j, numbering, g, O, my_numbering_order);
-                    clean[j] = true;
-                }
 
                 auto Aj = boost::adjacent_vertices(j, g);
 
                 // could try canonical order... but then NN is wrong.
-                std::set_union(k_, NN.end(), Aj.first, Aj.second, std::back_inserter(buf), my_numbering_order);
-                std::swap(g->vertices()[j], buf);
+                //
+                if(numbering[j] < num_vert-bagsize){ untested();
+                    std::set_union(k_, NN.end(), Aj.first, Aj.second, std::back_inserter(buf), my_numbering_order);
+                    std::swap(g->vertices()[j], buf);
+                }else{
+                }
 
                 for( ; k_!=NN.end() ; ++k_ ){
                     auto k = *k_;
@@ -576,9 +501,9 @@ namespace impl{
 template<class G, class T, class X=void>
 struct bmdo_{
     template<class D, class O, class N>
-    static void gtd(D const& g, O o, T& t, N const& numbering){ untested();
+    static void gtd(D const& g, O o, T& t, size_t, N const& numbering){ untested();
         // ordering_to_treedec(_g, *_o, t);
-        treedec::draft::vec_ordering_to_tree(g, o, t, numbering);
+        treedec::draft::vec_ordering_to_tree(g, o, t, &numbering);
     }
 };
 
@@ -587,8 +512,8 @@ template<class G, class T>
 struct bmdo_<G, T, typename gala::sfinae::is_vector<typename G::vertex_container_type>::type>
 {
     template<class D, class O, class N>
-    static void gtd(D& g, O o, T& t, N const& numbering){
-        treedec::draft::inplace_bmdo_tree(g, o, t, numbering);
+    static void gtd(D& g, O o, T& t, size_t bs, N const& numbering){
+        treedec::draft::inplace_bmdo_tree(g, o, t, bs, numbering);
     }
 };
 #endif
@@ -608,12 +533,14 @@ public:
 public:
     bmdo(G_t &G, std::vector<int> &O)
       : _g(G),
-        _o(&O) { untested();
+        _o(&O),
+        _ub(-1u) { untested();
     }
     bmdo(G_t &G)
       : _g(G),
         _o(new std::vector<int>()),
-        _own_o(true) {
+        _own_o(true),
+        _ub(-1u) {
     }
     ~bmdo(){
         if(_own_o){
@@ -636,7 +563,7 @@ public:
     }
     template<class T>
     void get_tree_decomposition(T& t){
-        bmdo_<G_t, T>::gtd(_g, o(), t, &_inverse_perm);
+        bmdo_<G_t, T>::gtd(_g, o(), t, _bs, _inverse_perm);
     }
     void do_it();
 private:
@@ -648,6 +575,7 @@ private:
     std::vector<int>* _o{nullptr};
     bool _own_o{false};
     vertices_size_type _bs;
+    vertices_size_type _ub;
 }; // bmdo
 
 template<class G_t>
@@ -680,14 +608,23 @@ void bmdo<G_t>::do_it()
         auto id = boost::get(boost::vertex_index, _g);
         std::vector<int> degree(n, 0);
 
-        _bs = boost::minimum_degree_ordering
+        _bs =
+#ifndef HAVE_MINDEGREE_FORK
+        0;
+    untested();
+#endif
+        boost::minimum_degree_ordering
                  (_g,
                   boost::make_iterator_property_map(&degree[0], id, degree[0]),
                   &_inverse_perm[0],
                   &o()[0],
                   boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
                   0,
-                  id);
+                  id
+#ifdef HAVE_MINDEGREE_FORK
+              , _ub
+#endif
+                  );
     }
 } // bmdo::do_it
 
@@ -720,7 +657,7 @@ typename boost::graph_traits<G_t>::vertices_size_type
         //TODO/CHECK: this is not in use... yet?
     }
 
-    impl::minDegree<G_t> MD(G, ignore_isolated_vertices);
+    treedec::impl::minDegree<G_t> MD(G, ignore_isolated_vertices);
     MD.do_it();
     auto o=MD.get_elimination_ordering();
     elim_ordering = o; // HACK
@@ -1155,6 +1092,17 @@ namespace he {
     template<class x, template<class G_, class ...> class C=treedec::algo::default_config>
     using fill_in=treedec::impl::fillIn<x, C>;
 }
+
+template <typename G_t, typename O_t>
+int boost_minDegree_ordering(G_t &G, O_t &O, unsigned ub=UINT_MAX)
+{ untested();
+    impl::bmdo<G_t> b(G);
+    b.set_ub(ub);
+    b.do_it();
+    b.get_elimination_ordering(O);
+    return b.get_bagsize()-1;
+}
+
 
 } //namespace treedec
 

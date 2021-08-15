@@ -26,7 +26,7 @@ public:
         base::go();
     }
 
-    void do_print_results(std::ostream& o) { untested();
+    void do_print_results(std::ostream& o) {
 //        _PP->get_tree_decomposition(_printer); ?
         trace2("PP", base::_result, treedec::get_bagsize(_t));
         base::print_results_tree(o, _t, &_work);
@@ -50,14 +50,13 @@ private:
    // work on svbs
    // INCOMPLETE, hardwire 16bit!
    GWORKFI _work;
-	algo_type* _PP;
 	//(_work);
    decomp_t<GWORKFI> _t;
 #else
-   incomplete
    decomp_t<G> _t;
    G _work;
 #endif
+	algo_type* _PP;
    // why?
    //iorder_t _elimord;
 };

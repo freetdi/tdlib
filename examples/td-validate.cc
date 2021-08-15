@@ -582,8 +582,8 @@ void read_tree_decomposition(std::ifstream& fin, tree_decomposition& T)
     }
   }
 
-  if (current_state == BAGS) { untested();
-    for (auto it = bags.begin(); it != bags.end(); it++) { untested();
+  if (current_state == BAGS) {
+    for (auto it = bags.begin(); it != bags.end(); it++) {
       T.add_bag(*it);
     }
   }
