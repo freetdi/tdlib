@@ -115,6 +115,30 @@ private:
 
 }; // minDegree
 
+namespace detail{
+
+template<class G, class O>
+class eliminated_before{
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    typedef typename boost::property_map< G, boost::vertex_index_t >::const_type::value_type vertex_index_type;
+public:
+    explicit eliminated_before(vertex_descriptor c, O const& num, G const& g)
+        : _c(c), _numbering(num), _g(g) { untested();
+    }
+    template<class E>
+    bool operator()(E const& e) const{ untested();
+        auto t = boost::target(e, _g);
+        trace2("b4", t, _c);
+        return _numbering.is_before(t, _c);
+    }
+private:
+    vertex_descriptor _c;
+    O const& _numbering;
+    G const& _g;
+};
+
+}
+
 // the fillIn heuristic.
 template<typename G_t,
          template<class GG, class ...> class CFGT=algo::default_config>
@@ -122,7 +146,8 @@ class fillIn : public greedy_base< G_t,
                std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>,
                CFGT>{ //
 public: //types
-    typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
+    typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O;
+    typedef O O_t; //?
     typedef typename directed_view_select<G_t>::type D_t;
     typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
     typedef greedy_base<G_t, O_t, CFGT> baseclass;
@@ -206,10 +231,14 @@ public: // implementation
         }
     }
 
+    using baseclass::_g;
+    using baseclass::_numbering;
+    using baseclass::numbering_type;
     // TODO more useful specialisation?
     // ... finish minDegree, then lets see.
     // fillIn::
-    void eliminate(typename baseclass::vertex_descriptor c){
+    void eliminate(typename baseclass::vertex_descriptor c){ untested();
+
         long fill_c = _min;
         trace2("elim", vertices_left(), _degree[c]);
         trace2("elim", _fill.max_fill(), _fill.is_lb(c) );
@@ -222,14 +251,16 @@ public: // implementation
         // use remove_out_edge_if?
         _fill.mark_neighbours(c, _min); // relevant in q_decrement
                                        // different marker
-                                       //
+        detail::eliminated_before<D_t, typename baseclass::numbering_type> P(c, _numbering, _g);
+        boost::remove_out_edge_if(c, P, _g);
+
         // bug: idmap!
         auto degc = baseclass::_degreemap[c];
 
         assert(fill_c<=long(degc*(degc-1)));
 
-        baseclass::_numbering.put(c);
-        baseclass::_numbering.increment();
+        _numbering.put(c);
+        _numbering.increment();
 
         { // make clique
             // todo?: faster special cases for small numbers?!
