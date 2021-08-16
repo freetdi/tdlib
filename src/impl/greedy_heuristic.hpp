@@ -182,9 +182,8 @@ public: // implementation
 
     // fillIn::
     bool next(typename baseclass::vertex_descriptor &c){
-        trace2("next", _num_edges, vertices_left());
         auto n = vertices_left();
-        // assert(_vertices_left);
+        trace2("next loop", _num_edges, vertices_left());
 
         if (0 && _num_edges == (n*(n-1))/2){ untested();
             // something is wrong with the condition
@@ -212,7 +211,7 @@ public: // implementation
     // fillIn::
     void eliminate(typename baseclass::vertex_descriptor c){
         long fill_c = _min;
-        trace5("elim", c, _num_edges, _degree[c], fill_c, _fill.get_value(c));
+        trace2("elim", vertices_left(), _degree[c]);
         trace2("elim", _fill.max_fill(), _fill.is_lb(c) );
 
 #ifndef NDEBUG
@@ -395,7 +394,7 @@ public: // implementation
       //       }
 
             auto w = _fill.pick_min(0, 0, true).first;
-            trace1("post", w);
+            trace2("post", w, baseclass::_degreemap[w]);
             (*_o)[baseclass::_i++] = w;
             baseclass::_numbering.put(w);
             baseclass::_numbering.increment();

@@ -289,6 +289,9 @@ public:
         _o->resize(_num_vert);
         assert(elim_vertices.size() == _num_vert);
         vertex_descriptor c;
+        // assert(_num_vert == vertices_left());
+
+        auto cnt = _num_vert;
 
         while(next(c)){
             trace2("greedy. next is", _i, c);
@@ -311,6 +314,9 @@ public:
             // assert(bags_i);?!
 
             eliminate(c);
+            --cnt;
+            // assert(cnt == vertices_left());
+
 
             assert(_numbering.total()==_i+1);
 
