@@ -184,6 +184,9 @@ public:
     }
 
 public:
+    vertices_size_type bagsize(){
+        return _ub_tw+1;
+    }
     vertices_size_type get_bagsize(){
         return _ub_tw+1;
     }
