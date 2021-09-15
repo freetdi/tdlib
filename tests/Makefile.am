@@ -47,6 +47,9 @@ ${TESTS:%=%.o}: treedec
 TESTS = $(check_PROGRAMS)
 LOG_COMPILER = $(top_srcdir)/log_compiler
 
+# too slow with -O0 .. (does not work)
+supergraph1_CXXFLAGS = ${AM_CXXFLAGS} -O2
+
 AM_DEFAULT_SOURCE_EXT=.cpp
 
 BUILT_SOURCES = treedec

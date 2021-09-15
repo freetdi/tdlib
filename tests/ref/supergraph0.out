@@ -1,0 +1,46 @@
+v 0 pos 0
+g 0 -> 1
+v 1 pos 1
+g 1 -> 0
+g 1 -> 2
+v 2 pos 2
+g 2 -> 1
+g 2 -> 3
+v 3 pos 3
+g 3 -> 2
+g 3 -> 4
+v 4 pos 4
+g 4 -> 3
+g 4 -> 5
+bag 0
+ -- 1
+bag 1
+ -- 2
+bag 2
+ -- 3
+bag 3
+ -- 4
+bag 4
+ -- 5
+======== test 1
+== eliminate 1
+adj 0
+ 0 2 3 4
+adj 2
+ 0 5
+== eliminate 0
+adj 0
+ 2 3 4
+adj 1
+ 0
+adj 2
+ 1 2 3 4 5
+======== test 2
+B0
+ -- 3
+ -- 2
+N2
+3
+ 3 2 4 1
+N2
+ 3 2 4 2 5

@@ -90,10 +90,11 @@ struct visited_mask{
 
 } // detail
 
+template<class T>
 inline
-detail::visited_mask<std::vector<BOOL> > make_incidence_mask(std::vector<BOOL>& v)
+detail::visited_mask<std::vector<T> > make_incidence_mask(std::vector<T>& v)
 {
-	return detail::visited_mask<std::vector<BOOL> >(v);
+	return detail::visited_mask<std::vector<T> >(v);
 }
 
 } //util
@@ -112,7 +113,8 @@ inline size_t count_missing_edges(
         for(; nIt2 != nEnd; nIt2++){
             if(!boost::edge(*nIt1, *nIt2, G).second){
                 ++missing_edges;
-            }
+            }else{
+				}
         }
     }
     return missing_edges;
@@ -124,29 +126,57 @@ inline size_t count_missing_edges(
         const typename boost::graph_traits<G_t>::vertex_descriptor v,
 		  MARKER& marker, G_t const &g)
 {
-	size_t missing_edges = 0;
+	size_t e = 0;
+	marker.clear();
+	auto pp = boost::adjacent_vertices(v, g);
+	for(; pp.first!=pp.second; ++pp.first){
+		marker.mark(*pp.first);
+	}
 
-	auto p=boost::adjacent_vertices(v, g);
-	for(; p.first!=p.second; ++p.first){
-//		trace2("visit", v, *p.first);
-		marker.clear();
-		mark_neighbours(marker, *p.first, g);
-
-		auto q=adjacent_vertices(v, g);
+	pp = boost::adjacent_vertices(v, g);
+	for(; pp.first!=pp.second; ++pp.first){
+		auto q = boost::adjacent_vertices(*pp.first, g);
 		for(; q.first!=q.second; ++q.first){
-			if(*q.first>=*p.first){
-				// skip. TODO: more efficient skip
-			}else if(marker.is_marked(*q.first)){
-				// done, reachable from *p.first
+			if(marker.is_marked(*q.first)){
+				++e;
 			}else{
-//				trace2("found", *p.first, *q.first);
-				++missing_edges;
 			}
 		}
 	}
-//	trace2("counted_missing_edges w/marker", v, missing_edges);
-	return missing_edges;
+
+	size_t d = boost::out_degree(v, g);
+	assert(!(e%2));
+	return (d*(d-1) - e)/2;
 } // count_missing_edges
+
+// return value: true - vertex removed
+//              false - vertex isolated
+template <typename G>
+bool eliminate_vertex(
+        const typename boost::graph_traits<G>::vertex_descriptor v, G& g)
+{
+	auto check = boost::num_vertices(g);
+
+	auto adjv = boost::adjacent_vertices(v, g);
+
+
+	adjv = boost::adjacent_vertices(v, g);
+	make_clique(adjv, g);
+
+	typedef typename boost::graph_traits<G>::directed_category Cat;
+	if(boost::detail::is_directed(Cat())){ untested();
+		for(;adjv.first!=adjv.second; ++adjv.first){ untested();
+			boost::remove_edge(*adjv.first, v, g);
+		}
+	}else{
+	}
+	boost::clear_vertex(v, g);	
+
+	boost::remove_vertex(v, g);	
+
+	assert(check-1 == boost::num_vertices(g));
+	return true;
+}
 
 } // treedec
 

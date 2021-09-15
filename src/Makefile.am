@@ -37,6 +37,7 @@ pkginclude_HEADERS = \
   graph_util.hpp \
   grparse.h \
   induced_subgraph.hpp \
+  induced_supergraph.hpp \
   iter.hpp \
   lower_bounds.hpp \
   marker.hpp \

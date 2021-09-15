@@ -21,6 +21,8 @@ check_PROGRAMS = \
 	pp1 \
 	pp_path \
 	print_concept \
+	supergraph0 \
+	supergraph1 \
 	sdcc_bb \
 	sdcc_ub \
 	sdcc_ub_set \
