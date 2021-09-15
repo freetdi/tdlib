@@ -32,5 +32,6 @@ SUBDIRS = tests examples $(pytdlib) src
 
 
 EXTRA_DIST = \
+	log_compiler \
 	py_log_compiler \
 	cython.am

@@ -71,6 +71,7 @@ notyets = \
 ${TESTS:%=%.o}: treedec
 
 TESTS = $(check_PROGRAMS)
+LOG_COMPILER = $(top_srcdir)/log_compiler
 
 AM_DEFAULT_SOURCE_EXT=.cpp
 
@@ -82,6 +83,9 @@ AM_CXXFLAGS = -O0 -g
 
 treedec:
 	-ln -sf $(top_srcdir)/src treedec
+
+all-local:
+	-${LN_S} ${srcdir}/ref .
 
 EXTRA_DIST = \
 	bucket_sorter_2u.cpp \
