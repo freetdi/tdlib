@@ -239,11 +239,16 @@ inline size_t get_bagsize(T_t const &T){
     return (max);
 }
 
-template <typename T_t>
-int get_width(T_t const &T){
-    return get_bagsize(T)-1;
+template <class T>
+int get_width(T const &t)
+{
+    return get_bagsize(t)-1;
 }
 
+template <class T>
+void set_bagsize(T&, size_t)
+{
+}
 
 } // treedec
 
@@ -335,8 +340,9 @@ namespace boost{
 namespace treedec{
 namespace draft{
 template<class T>
-void dump_tree_decomposition(T const& t){
-	auto p=boost::vertices(t);
+void dump_tree_decomposition(T const& t)
+{
+	auto p = boost::vertices(t);
 	for(;p.first!=p.second; ++p.first){
 		std::cout << *p.first << ":";
 		auto q=boost::get(bag_t(), t, *p.first);
