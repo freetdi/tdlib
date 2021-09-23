@@ -32,7 +32,6 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               tree_directedness_, uint32_bag_p> _gsgvvu32_treedec;
 
-
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class BMD_THREAD : public TWTHREAD<G, cfgt> {
 public:
@@ -47,10 +46,9 @@ public:
         base::go(); // ??
     }
 
-    void do_print_results(std::ostream& o)
-    {
+    void do_print_results(std::ostream& o) {
 #ifdef HAVE_GALA_GRAPH_H
-        _g.make_symmetric(true);
+        // _g.make_symmetric(true); // ???
 #endif
         // base::print_results_order(o, _elimord);
 
@@ -113,16 +111,14 @@ public:
         unsigned s;
         if(_mag<M16){
             trace1("BMD", boost::num_edges(g16));
-            treedec::impl::bmdo<sg_dvv16> A(g16);
-				A.do_it();
-				A.get_tree_decomposition(_t);
-				s = A.bagsize();
+            _a16 = new treedec::impl::bmdo<sg_dvv16>(g16);
+				_a16->do_it();
+				s = _a16->bagsize();
         }else{itested();
             trace1("BMD", boost::num_edges(g32));
-            treedec::impl::bmdo<sg_dvv32> A(g32);
-				A.do_it();
-				A.get_tree_decomposition(_t);
-				s = A.bagsize();
+            _a32 = new treedec::impl::bmdo<sg_dvv32>(g32);
+				_a32->do_it();
+				s = _a32->bagsize();
         }
         trace1("BMD", s);
         base::commit_result(s);

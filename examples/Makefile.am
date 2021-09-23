@@ -52,7 +52,10 @@ endif
 td_validate_CPPFLAGS=${AM_CPPFLAGS} -I${top_srcdir}/src
 
 if TDECOMP
-TDECOMP_TESTS = test-fi.sh test-ppfi.sh
+TDECOMP_TESTS = \
+	test-bmd.sh \
+	test-fi.sh \
+	test-ppfi.sh
 endif
 
 TESTS = ${TDECOMP_TESTS}
