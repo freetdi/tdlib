@@ -69,6 +69,8 @@
 #include "overlay.hpp"
 #include "treedec_misc.hpp"
 
+#define old_assert(x)
+
 namespace treedec{
 
 namespace impl{
@@ -268,17 +270,23 @@ public:
         _lb_bs = l+1;
     }
     void do_it();
-    size_t get_bagsize() const{ untested();
+    size_t get_bagsize() const{
         return _lb_bs;
     }
-    size_t lower_bound_bagsize() const{ untested();
+    size_t lower_bound_bagsize() const{
         return _lb_bs;
     }
-    size_t bagsize() const{ untested();
+    size_t bagsize() const{
         return -1u; // upper bound.
     }
     template<class T>
     void get_tree_decomposition(T& t) const;
+
+    template<class T>
+    void get_tree_decomposition(T& t){
+        auto const* c=this;
+        return c->get_tree_decomposition(t);
+    }
 
     template<class BAG_t>
     void get_bags(BAG_t& bags) { // for now
@@ -319,7 +327,7 @@ public:
         assert(bags.size()==_elims.size());
     }
 
-    edges_size_type num_edges()const{ untested();
+    edges_size_type num_edges()const{
         return _num_edges;
     }
     // legacy support. don't use. don't touch.
@@ -432,22 +440,22 @@ public:
     void wake_up_node(vertex_descriptor n){
         trace3("wakeup", n, _degree[n], _dormant.is_marked(n));
 #ifndef NDEBUG
-        trace2("wakeup", _degs.is_reg(0), _degs.is_reg(1));
+        // trace2("wakeup", _degs.is_reg(0), _degs.is_reg(1));
 #endif
         if(_dormant.is_marked(n)){ untested();
             _dormant.unmark(n);
             // wake up!
             _degs.reg(n);
         }else{
-            assert(_degs.is_reg(n));
+            old_assert(_degs.is_reg(n));
             // back/front?
             //
             _degs.update(n);
             //_degs.reg(n);
         }
-        assert(_degs.is_reg(n));
+        old_assert(_degs.is_reg(n));
 #ifndef NDEBUG
-        trace2("wokeup", _degs.is_reg(0), _degs.is_reg(1));
+        // trace2("wokeup", _degs.is_reg(0), _degs.is_reg(1));
 #endif
     }
 
@@ -539,7 +547,7 @@ private:
             : _a(a), _b(b), _marker(m), _count(0),
               _g(g), _enable_cleanup(eec){}
 
-        bool operator()(edge_descriptor e){
+        bool operator()(edge_descriptor e) const{
             auto x=boost::target(e, _g);
             if(x==_a || x==_b){
                 return _enable_cleanup;
@@ -608,7 +616,7 @@ private:
     void addtoelims(vertex_descriptor v){
         trace1("========= elim.", v);
 
-#ifndef NDEBUG
+#if 0 // NDEBUG
         if(_degs.is_reg(v)){
         }else{ untested();
             assert(!(disable_cube && disable_triangle && disable_buddy));
@@ -616,7 +624,7 @@ private:
         }
 #endif
         _degs.unlink(v);
-        assert(!_degs.is_reg(v));
+        old_assert(!_degs.is_reg(v));
         _elims.push_back(v);
         _numbering.put(v);
         _numbering.increment();
@@ -906,10 +914,10 @@ bool preprocessing<G_t, CFG>::check_twins_3(
                 // aA=
                 // =xx
                 ++Ib;
-                if(a==*Ib){ untested();
+                if(a==*Ib){
                     ++Ib;
                     ret = A==*Ib;
-                }else if(A==*Ib){ untested();
+                }else if(A==*Ib){
                     ++Ib;
                     ret = a==*Ib;
                 }else{
@@ -932,25 +940,25 @@ void preprocessing<G_t, CFGT>::eliminate_vertex_1(
     assert(_degree[v]==1);
 
     // queue for redegree
-    assert(_degs.is_reg(v));
-    auto f=adjacent_vertices(v).first;
+    // assert(_degs.is_reg(v));
+    auto f = adjacent_vertices(v).first;
 
-    auto& df=_degree[*f];
+    auto& df = _degree[*f];
     // _degs.unlink(*f, df);
 
     _num_edges -= 1;
 
     trace4("========= elim1", v, *f, _degree[*f], _num_edges);
     addtoelims(v);
-    assert(_degs.is_reg(*f));
-    assert(_degs.is_reg(*f));
-    assert(_degs.is_reg(*f));
+    old_assert(_degs.is_reg(*f));
+    old_assert(_degs.is_reg(*f));
+    old_assert(_degs.is_reg(*f));
     _degs.unlink(*f, df);
-    assert(!_degs.is_reg(*f));
+    old_assert(!_degs.is_reg(*f));
     --df;
-    assert(!_degs.is_reg(*f));
+    old_assert(!_degs.is_reg(*f));
     _degs.reg(*f, df);
-    assert(_degs.is_reg(*f));
+    old_assert(_degs.is_reg(*f));
 
     assert(df==_degree[*f]);
 
@@ -1554,11 +1562,11 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
 
     if(have_edg) {
         trace4("edg", deg, v, N[0], N[1]);
-        assert(_degs.is_reg(v));
+        old_assert(_degs.is_reg(v));
 
         // installs at most 2 edges.
         make_neigh_clique(v);
-        assert(!_degs.is_reg(v));
+        old_assert(!_degs.is_reg(v));
 
         wake_up_neighs(N[0]);
         wake_up_neighs(N[1]);
@@ -1568,7 +1576,7 @@ bool preprocessing<G_t, CFG>::Triangle(vertex_descriptor v)
            _lb_bs = 4;
         }else{
         }
-        assert(!_degs.is_reg(v));
+        old_assert(!_degs.is_reg(v));
         return true;
     }else{
         // there is no edge.
@@ -1631,7 +1639,7 @@ void preprocessing<G_t, CFG>::do_it()
         if(min_ntd==1){
             auto f=adjacent_vertices(v).first;
             *f;
-#ifndef NDEBUG
+#if 0 // does no longer work
             trace3("", v, *f, _degs.is_reg(*f));
 #endif
             eliminate_vertex_1(v);
@@ -1641,7 +1649,7 @@ void preprocessing<G_t, CFG>::do_it()
             ++f;
             *f;
             eliminate_vertex_2(v);
-            assert(_degs.is_reg(*f));
+            old_assert(_degs.is_reg(*f));
             continue;
         }else if(min_ntd==3){
             //degree 3-rules
@@ -1774,7 +1782,7 @@ NEXT_ITER:
 template<class G, template<class G_, class ...> class CFG>
 template<class T>
 void preprocessing<G, CFG>::get_tree_decomposition(T& t) const
-{ untested();
+{
     assert(!boost::num_vertices(t));
     if(boost::num_vertices(_g)){
 
@@ -1857,5 +1865,6 @@ void preprocessing(G_t &G, BV_t &bags)
 } //namespace treedec
 
 #endif //TREEDEC_PREPROCESSING_HPP
+#undef old_assert
 
 // vim:ts=8:sw=4:et

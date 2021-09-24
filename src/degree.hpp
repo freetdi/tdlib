@@ -163,7 +163,7 @@ private:
             _vals[pos] = boost::out_degree(*vIt, _g);
             trace2("deginit", pos, _vals[pos]);
             _degs.push(*vIt);
-            assert(is_reg(*vIt));
+            // old_assert(is_reg(*vIt));
         }
     }
 
@@ -185,7 +185,7 @@ public: // queueing
     void unlink(const vertex_descriptor& v, size_t /*x*/)
     {
         assert(treedec::is_valid(v, _g));
-#ifndef NDEBUG
+#if 0 // # ndef NDEBUG
         if(!is_reg(v)){
             incomplete();
             // bug in your code?
@@ -193,8 +193,8 @@ public: // queueing
 #endif
         _degs.remove(v);
         // trace1("rmd", v);
-        assert(!is_reg(v));
-        assert(!_degs.is_known(v));
+        // old_assert(!is_reg(v));
+        // old_assert(!_degs.is_known(v));
     }
     void unlink(const vertex_descriptor& v)
     {

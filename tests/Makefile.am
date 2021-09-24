@@ -38,6 +38,7 @@ check_PROGRAMS = \
 	bug_19 \
 	bucket_sorter_1 \
 	bucket_sorter_2 \
+	bucket_sorter_3 \
 	common_out_edges \
 	custom_td \
 	dead_simple \

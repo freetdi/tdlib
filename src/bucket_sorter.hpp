@@ -1,21 +1,33 @@
+// Felix Salfelder, 2016-2017, 2021
 //
-//=======================================================================
-// Copyright 1997, 1998, 1999, 2000 University of Notre Dame.
-// Authors: Andrew Lumsdaine, Lie-Quan Lee, Jeremy G. Siek
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option) any
+// later version.
 //
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//=======================================================================
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 51 Franklin Street - Suite 500, Boston, MA 02110-1335, USA.
 //
 //
-// Revision History:
-//   13 June 2001: Changed some names for clarity. (Jeremy Siek)
-//   01 April 2001: Modified to use new <boost/limits.hpp> header. (JMaddock)
-//
-//   2016: iterable bucket stacks (Felix Salfelder)
-//
-#ifndef BOOST_GRAPH_DETAIL_BUCKET_SORTER_HPP
+// // contains code from boost/graph
+// //=======================================================================
+// // Copyright 1997, 1998, 1999, 2000 University of Notre Dame.
+// // Authors: Andrew Lumsdaine, Lie-Quan Lee, Jeremy G. Siek
+// //
+// // Distributed under the Boost Software License, Version 1.0. (See
+// // accompanying file LICENSE_1_0.txt or copy at
+// // http://www.boost.org/LICENSE_1_0.txt)
+// //=======================================================================
+#ifndef TREEDEC_BUCKET_SORTER_HPP
+#define TREEDEC_BUCKET_SORTER_HPP
+
+// avoid including the the other one
 #define BOOST_GRAPH_DETAIL_BUCKET_SORTER_HPP
 
 #include <vector>
@@ -44,20 +56,29 @@ namespace boost {
                   const Bucket& _bucket = Bucket(), 
                   const ValueIndexMap& _id = ValueIndexMap()) 
       : next(_length+_max_bucket, invalid_value()), 
-        prev(_length, invalid_value()),
+        prev(_length+_max_bucket, invalid_value()),
         head(next.begin() + _length),
+        tail(prev.begin() + _length),
         id_to_value(_length),
         bucket(_bucket), id(_id) {
           trace2("created bs", _length, _max_bucket);
           assert(head==next.begin()+_length);
           assert(!next.size() || head[0]==invalid_value());
+
+
+          auto l = _length;
+          auto h = head;
+          for(; l < _length + _max_bucket; ++l){
+            *h = l;
+            ++h;
+          }
         }
     bucket_sorter(){untested();
     }
 
     void remove(const value_type& x) {
-      const size_type i = get(id, x);
-      assert(x<size());
+      size_type i = get(id, x);
+      assert(i<size());
 #if 0
       trace3("rm", x, i, bucket[x]);
       trace1("rm", head[bucket[x] ]);
@@ -67,60 +88,27 @@ namespace boost {
       auto prev_node = prev[i];
       assert(prev_node!=i);
 
-      //check if i is the end of the bucket list
-      if ( next_node != invalid_value() ){
-        assert(next_node != prev_node);
-        prev[next_node] = prev_node;
-      }else{
-      }
-      //check if i is the begin of the bucket list
-      if( prev_node == invalid_value() ){
-        unreachable();
-        // double remove?
-      }else{
-        next[prev_node] = next_node;
-      }
-      if(next_node == prev_node){
-        // double remove?
-      }else{
-      }
+      prev[next_node] = prev_node;
+      next[prev_node] = next_node;
 
-      assert(head[bucket[x]]!=x);
-#if 0
-      assert(head[bucket[x]]!=x);
-      untested();
-      trace3("rdm", x, i, bucket[x]);
-      trace1("rmd", head[bucket[x] ]);
-
-      auto const& T=*this;
-      const const_stack& b = T[bucket[x]];
-      trace1("rmd", b.top());
-      trace2("rmd", prev[i], next[i]);
-#endif
-      // BUG? , (why) is this needed?
-      next[i] = invalid_value();
-
-#ifndef NDEBUG
-      // indicate that this element is not listed in a bucket.
-      // genenerally, the user needs to keep track, not us.
-      prev[i] = invalid_value();
-#endif
     } // remove
 
-    void push_back(const value_type& x) { untested();
+    void push_back(const value_type& x) {
       assert(x<next.size());
       id_to_value[get(id, x)] = x;
       (*this)[bucket[x]].push_back(x);
     }
-
-    void push(const value_type& x) {
+    void push_front(const value_type& x) {
       // dont know how to do this right now, but i mean it.
       // assert( !is_in_bucket(x) );
       assert(x<next.size());
       id_to_value[get(id, x)] = x;
-      (*this)[bucket[x]].push(x);
+      (*this)[bucket[x]].push_front(x);
     }
-#ifndef NDEBUG
+    void push(const value_type& x) {
+      return push_front(x);
+    }
+#if 0 // this is broken..
     bool is_known(const value_type& v) const {
 
       //trace4("is_known", v, k, id_to_value[v], bucket[v]);
@@ -130,23 +118,33 @@ namespace boost {
       const const_stack& b = (*this)[bucket[v]];
       if( prev[id_to_value[v]] < next.size()){
         return true;
-      }else if( b.empty()){
+      }else if( b.empty()){ untested();
       //  trace3("empty", v, bucket[v], head[bucket[v]]);
         return false;
       } else if( head[bucket[v]] == v){ itested();
         return true;
-      }else{
+      }else{ untested();
         //trace3("buckettop is", v, k, b.top());
         return false;
       }
     }
 #endif
 
-    void update(const value_type& x) {
+    // update_back?
+    void update_front(const value_type& x) {
       // dont know how to do this right now, but i mean it.
       // assert( is_in_bucket(x) );
       remove(x);
       (*this)[bucket[x]].push(x);
+    }
+    void update(const value_type& x) {
+      return update_front(x);
+    }
+    void update_back(const value_type& x) { itested();
+      // dont know how to do this right now, but i mean it.
+      // assert( is_in_bucket(x) );
+      remove(x);
+      (*this)[bucket[x]].push_back(x);
     }
 
 #if 0
@@ -234,6 +232,7 @@ namespace boost {
           head(p.head),
           next(p.next),
           prev(p.prev),
+          tail(p.tail),
           value(p.value),
           id(p.id)
       {untested();
@@ -244,13 +243,14 @@ namespace boost {
         head = p.head;
         next = p.next;
         prev = p.prev;
+        tail = p.tail;
         value = p.value;
         id = p.id;
         return *this;
       }
       // stack_(const stack_&&){untested();}
     public:
-      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v,
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, Iter_ t, IndexValueMap_ v,
             const ValueIndexMap& _id)
 #ifdef ITERATOR_CONSTRUCTOR_WORKAROUND
         : bucket_id(_bucket_id), head(), next(), prev(), value(v), id(_id) { itested();
@@ -258,27 +258,24 @@ namespace boost {
         next = n;
         prev = p;
 #else
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v), id(_id) { // }
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), tail(t), value(v), id(_id) { // }
 #endif
       }
 
       // Avoid using default arg for ValueIndexMap so that the default
       // constructor of the ValueIndexMap is not required if not used.
-      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, IndexValueMap_ v)
+      stack_(bucket_type _bucket_id, Iter_ h, Iter_ n, Iter_ p, Iter_ t, IndexValueMap_ v)
 #ifdef ITERATOR_CONSTRUCTOR_WORKAROUND
         : bucket_id(_bucket_id), head(), next(), prev(), value(v) { untested();
         head = h;
         next = n;
         prev = p;
 #else
-        : bucket_id(_bucket_id), head(h), next(n), prev(p), value(v) { untested();
+        : bucket_id(_bucket_id), head(h), next(n), prev(p), tail(t), value(v) { untested();
 #endif
       }
 
-      void push_back(const value_type&) { untested();
-        incomplete();
-      }
-      void push(const value_type& x) {
+      void push_front(const value_type& x) {
         const size_type new_head = get(id, x);
         assert(new_head < size());
         const size_type current = head[bucket_id];
@@ -288,29 +285,58 @@ namespace boost {
         if ( current != invalid_value() ){
           assert(current!=new_head);
           prev[current] = new_head;
+        }else{ untested();
+          tail[bucket_id] = new_head;
         }
 
         prev[new_head] = bucket_id + (head - next);
         next[new_head] = current;
         head[bucket_id] = new_head;
       }
+      void push_back(const value_type& x) {
+        const size_type new_tail = get(id, x);
+        assert(new_tail < size());
+        const size_type current = tail[bucket_id];
+
+        if(new_tail == current){ untested();
+//          assert(false);
+        }
+        if ( current != invalid_value() ){
+          assert(current!=new_tail);
+          next[current] = new_tail;
+        }else{
+          head[bucket_id] = new_tail;
+        }
+
+        prev[new_tail] = current;
+        next[new_tail] = bucket_id + (head - next);
+        tail[bucket_id] = new_tail;
+      }
+      void push(const value_type& x) {
+        return push_front(x);
+      }
       void pop() {
+        assert(!empty());
         assert(bucket_id<size());
         size_type current = head[bucket_id];
         size_type next_node = next[current];
         head[bucket_id] = next_node;
         // prev[bucket_id] = bucket_id + (head - prev);
         if ( next_node != invalid_value() ){
-          assert(next_node != prev[current]);
+//          assert(next_node != prev[current]);
           prev[next_node] = bucket_id + (head - next);
+        }else{ untested();
+          unreachable();
         }
-        assert(next_node != prev[current]);
+        // assert(next_node != prev[current]);
       }
       value_type const& top() const { return value[ head[bucket_id] ]; }
       value_type& top() { return value[ head[bucket_id] ]; }
       value_type const& front() const { return value[ head[bucket_id] ]; }
       value_type& front() { return value[ head[bucket_id] ]; }
-      bool empty() const { return head[bucket_id] == invalid_value(); }
+      bool empty() const {
+        return begin() == end();
+      }
     public: // iterator access
       const_iterator begin() const{
         return const_iterator(head[bucket_id], *this);
@@ -319,7 +345,9 @@ namespace boost {
       const_iterator rbegin() const{ untested();
         return const_iterator(head[bucket_id], *this);
       }
-      const_iterator end() const{ return const_iterator(invalid_value(), *this); }
+      const_iterator end() const{
+        return const_iterator(size()+bucket_id, *this);
+      }
     public: // debug
       size_t size()const{return head-next;}
     private:
@@ -327,6 +355,7 @@ namespace boost {
       Iter_ head;
       Iter_ next;
       Iter_ prev;
+      Iter_ tail;
       IndexValueMap_ value;
       ValueIndexMap id;
     }; // stack
@@ -336,13 +365,12 @@ namespace boost {
     
     const_stack operator[](const bucket_type& i) const{
       assert(i < next.size());
-
-      return const_stack(i, head, next.begin(), prev.begin(),
+      return const_stack(i, head, next.begin(), prev.begin(), tail,
                    id_to_value.begin(), id);
     }
     stack operator[](const bucket_type& i) {
       assert(i < next.size());
-      return stack(i, head, next.begin(), prev.begin(),
+      return stack(i, head, next.begin(), prev.begin(), tail,
                    id_to_value.begin(), id);
     }
     unsigned size() const{ return prev.size(); }
@@ -350,6 +378,7 @@ namespace boost {
     std::vector<size_type>   next;
     std::vector<size_type>   prev;
     typename std::vector<size_type>::iterator head;
+    typename std::vector<size_type>::iterator tail;
     std::vector<value_type>  id_to_value;
     Bucket bucket;
     ValueIndexMap id;
