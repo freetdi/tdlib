@@ -142,7 +142,7 @@ namespace detail{//
           c.push_back(e);
         }
         template<class I>
-        static void push(C& c, I b, I e) { untested();
+        static void push(C& c, I b, I e) {
           for(; b!=e; ++b){
             push(c, *b);
           }

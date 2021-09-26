@@ -16,6 +16,7 @@ int main(){
 	 container_type B(10, 10, M);
 
 	 for(auto i : B[0] ){ untested();
+		 (void)i;
 		 assert(false);
 	 }
 
@@ -30,6 +31,7 @@ int main(){
 
 	 assert(B[0].begin() == B[0].end());
 	 for(auto i : B[0] ){ untested();
+		 (void)i;
 		 assert(false);
 	 }
 

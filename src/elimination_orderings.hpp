@@ -210,7 +210,6 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, size_t bagsize, O_t const& io_)
             --nodes_left;
             auto i = numbering[oi];
             auto R = boost::adjacent_vertices(oi, g);
-            auto D = boost::out_degree(oi, g);
 
             for(;R.first!=R.second;++R.first) {
                 auto j = *R.first;
@@ -250,7 +249,7 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, size_t bagsize, O_t const& io_)
 
                 // could try canonical order... but then NN is wrong.
                 //
-                if(numbering[j] < num_vert-bagsize){ untested();
+                if(numbering[j] + bagsize < num_vert){
                     std::set_union(k_, NN.end(), Aj.first, Aj.second, std::back_inserter(buf), my_numbering_order);
                     std::swap(g->vertices()[j], buf);
                 }else{
@@ -534,13 +533,13 @@ public:
     bmdo(G_t &G, std::vector<int> &O)
       : _g(G),
         _o(&O),
-        _ub(-1u) { untested();
+        _ub(vertices_size_type(-1u)) { untested();
     }
     bmdo(G_t &G)
       : _g(G),
         _o(new std::vector<int>()),
         _own_o(true),
-        _ub(-1u) {
+        _ub(vertices_size_type(-1)) {
     }
     ~bmdo(){
         if(_own_o){
