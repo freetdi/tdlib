@@ -184,8 +184,9 @@ public: // algo interface
         A.get_graph(_g);
 #endif
 
-        if(boost::num_edges(_g) > 0){
+        if(boost::num_edges(_g) > 0){ untested();
             unsigned low2=-1;
+            trace2("calling fillIn", low2, num_vertices(_g));
             treedec::impl::fillIn_decomp(_g, _t, low2, true); //ignore_isolated
             _low_tw = low2;
         }
@@ -349,16 +350,20 @@ namespace pending {
 // TODO: faster.
 // TODO: more generic
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
-class PP_FI{
+class PP_FI : public algo::draft::algo1 {
 public:
 private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 public: // construct
-    PP_FI(G& g) : _g(&g), _low_tw(-1){
+    PP_FI(G& g) :
+       algo::draft::algo1("pp_fi"),
+       _g(&g),
+       _low_tw(-1){
     }
     template<class G_in>
     PP_FI(G_in const& g) :
+       algo::draft::algo1("pp_fi"),
        _g(new G),
        _low_tw(-1),
        _own_g(true){
@@ -377,13 +382,17 @@ public: // random stuff
     unsigned lower_bound()const{
         return _low_tw + 1;
     }
+    unsigned bagsize()const{ untested();
+        // incomplete
+        return get_bagsize(_t);
+    }
 public: // algo interface
     void do_it(){
         // incomplete(); // use comp::
-        if(boost::num_vertices(g()) == 0){ untested();
+        if(boost::num_vertices(g()) == 0){
             boost::add_vertex(_t);
             return;
-        }else{
+        }else{ untested();
 
             // BUG, somehow need to cast CFGT to ppconfig
             // "message" is getting lost here, need pp_cfg+CFGT
@@ -399,7 +408,11 @@ public: // algo interface
     }
 
     template<class TT>
-    void get_tree_decomposition(TT& t) const{
+    void get_tree_decomposition(TT& t) const{ untested();
+        boost::copy_graph(_t, t);
+    }
+    template<class TT>
+    void get_tree_decomposition(TT& t) { untested();
         boost::copy_graph(_t, t);
     }
 
@@ -422,22 +435,28 @@ struct do_nothing {
 
 // pending
 template<class G, template<class G_, class ...> class CFGT=algo::default_config>
-class PP_FI_TM{
+class PP_FI_TM : public algo::draft::algo1 {
 private:
     typedef typename treedec::graph_traits<G>::treedec_type T;
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 
 public: // construct
-    PP_FI_TM(G& g) : _g(&g){
-        _low_tw = -1;
+    PP_FI_TM(G& g)
+      : algo::draft::algo1("pp_fi_tm"),
+       _g(&g),
+       _low_tw(-1){ untested();
     }
     template<class G_in>
-    PP_FI_TM(G_in const& g) : _g(new G), _own_g(true){
+    PP_FI_TM(G_in const& g)
+      : algo::draft::algo1("pp_fi_tm"),
+       _g(new G),
+       _low_tw(-1),
+       _own_g(true) { untested();
         boost::copy_graph(g, *_g);
         _low_tw = -1;
     }
     ~PP_FI_TM() {
-        if(_own_g){
+        if(_own_g){ untested();
             delete _g;
         }else{
         }
@@ -449,6 +468,9 @@ public: // random stuff
     }
     unsigned lower_bound()const{ untested();
         return _low_tw + 1;
+    }
+    unsigned bagsize()const{
+        return get_bagsize(_t);
     }
 
 public: // algo interface
@@ -511,11 +533,11 @@ public: // algo interface
             new_elim_ordering_(boost::num_vertices(H));
 
             unsigned c = 0;
-            for(auto n=new_elim_ordering.begin(); n!=new_elim_ordering.end(); ++n){
-                if(boost::degree(*n, g()) > 0){
-                    trace2("eo", c, *n);
+            for(auto n : new_elim_ordering) {
+                trace4("eo", c, n, boost::degree(n, g()), boost::out_degree(n, g()));
+                if(boost::degree(n, g()) > 0){
                     assert(c<new_elim_ordering_.size());
-                    new_elim_ordering_[c++] = *n;
+                    new_elim_ordering_[c++] = n;
                 }else{
                 }
             }
@@ -537,7 +559,12 @@ public: // algo interface
     }
 
     template<class TT>
-    void get_tree_decomposition(TT& t) const{
+    void get_tree_decomposition(TT& t){
+        // incomplete();
+        treedec::obsolete_copy_treedec(_t, t);
+    }
+    template<class TT>
+    void get_tree_decomposition(TT& t) const{ untested();
         // todo: assemble td here.
 #if 0
         // boost::copy_graph(_t, t); // FIXME
@@ -567,7 +594,8 @@ private:
 //current tree decomposition this version applies the minDegree-heuristic on
 //not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
-void PP_FI(G_t &G, T_t &T, int &low_tw){
+void PP_FI(G_t &G, T_t &T, int &low_tw)
+{
     treedec::comb::PP_FI<G_t> a(G);
     a.set_lower_bound(low_tw+1);
     a.do_it();
@@ -580,8 +608,8 @@ void PP_FI(G_t &G, T_t &T, int &low_tw){
 //current tree decomposition. This version applies the fillIn-heuristic followed
 //by triangulation minimization on not fully preprocessable graph instances.
 template <typename G_t, typename T_t>
-void PP_FI_TM(G_t &G, T_t &T, int &low){
-
+void PP_FI_TM(G_t &G, T_t &T, int &low)
+{
     comb::PP_FI_TM<G_t> a(G);
     a.set_lower_bound(low+1);
     a.do_it();
