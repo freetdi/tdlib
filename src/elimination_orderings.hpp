@@ -564,6 +564,14 @@ public:
     void get_tree_decomposition(T& t){
         bmdo_<G_t, T>::gtd(_g, o(), t, _bs, _inverse_perm);
     }
+    template<class O>
+    void get_elimination_ordering(O& v) const{ untested();
+        if(_o){ untested();
+            v = O(_o->begin(), _o->end());
+        }else{ untested();
+            incomplete();
+        }
+    }
     void do_it();
 private:
     std::vector<int>& o(){assert(_o); return *_o;}
