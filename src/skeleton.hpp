@@ -205,8 +205,8 @@ public:
     void do_it(){
         if(boost::num_vertices(_b) == 0){ untested();
             return;
-        }else if(boost::num_vertices(_b) == boost::num_vertices(_t)){ untested();
-        }else if(!boost::num_vertices(_t)){ untested();
+        }else if(boost::num_vertices(_b) == boost::num_vertices(_t)){
+        }else if(!boost::num_vertices(_t)){
             //Bag for the u-th elimination vertex will be stored in T[u].
             for( auto x : boost::make_iterator_range(boost::vertices(_b))){
                 std::ignore = x;

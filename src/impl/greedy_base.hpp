@@ -185,7 +185,7 @@ protected: // implementation
 public:
     // dump a tree decomposition into t
     template<class T>
-    void get_tree_decomposition(T& t){ untested();
+    void get_tree_decomposition(T& t){
         size_t numbags = _numbering.total();
         trace2("gt", numbags, _i);
 
@@ -227,7 +227,7 @@ public:
     }
 
     // later
-    O_t& get_elimination_ordering() { untested();
+    O_t& get_elimination_ordering() {
         for (auto x: _zeroes){ untested();
             // HACK
             _o->push_back(x); // HACK
