@@ -333,7 +333,8 @@ public:
 		  _depth(depth),
 	     _size(0)
 	{
-			incomplete();
+			// incomplete();
+		std::cerr << "incomplete ../../src/bits/trie.hpp:336:TRIE\n";
 		// _root = new_node(-1u);
 	}
 	TRIE(Alloc const& alloc=Alloc())

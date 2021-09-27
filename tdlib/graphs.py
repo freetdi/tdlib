@@ -71,7 +71,7 @@ def randomGNP(n, p):
 
 
 
-#?what is this?
+#?what is this? (duplicate in treedec/tests/graph2.py)
 V_Gs_at_ipo = [1,2,3,4,5,6,7,8]
 E_Gs_at_ipo = [(1,2),(1,3),(1,4),(2,6),(2,7),(3,6),(3,8),(4,7),(4,8),(5,6),(5,7),(5,8)]
 

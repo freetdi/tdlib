@@ -11,9 +11,6 @@
 #include <treedec/treedec.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> bald_t;
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu_t;
-
-// typedef bald_t parsegr_t;
 
 int main(int argc, char** argv)
 {
@@ -24,11 +21,13 @@ int main(int argc, char** argv)
 	boost::mt19937 rng;
 	if(argc>2){
 		rng.seed(atoi(argv[2]));
+	}else{
+		rng.seed(0);
 	}
 
 	typedef bald_t G;
 	bald_t g;
-	boost::generate_random_graph(g, size, ne, rng);
+	boost::generate_random_graph(g, size, ne, rng, false, false);
 	size_t e=boost::num_edges(g);
 	size_t n=boost::num_vertices(g);
 	std::cout << "generated " << e << " edges, " << n << " vertices\n";
@@ -37,6 +36,7 @@ int main(int argc, char** argv)
 	for(;EE.first!=EE.second; ++EE.first){
 		auto s=boost::source(*EE.first, g);
 		auto t=boost::target(*EE.first, g);
+		assert(s!=t);
 		if(!boost::edge(t, s, g).second){
 			boost::add_edge(t, s, g);
 		}
@@ -52,10 +52,13 @@ int main(int argc, char** argv)
 	for(;E.first!=E.second; ++E.first){
 		++i;
 
-		std::cout << boost::source(*E.first, g) << " -- " <<
-			boost::target(*E.first, g) << "\n";
+		auto s =  boost::source(*E.first, g);
+		auto t =  boost::target(*E.first, g);
 
-		if(i==5) break;
+		std::cout << s << " -- " << t << "\n";
+		assert(s != t);
+
+//		if(i==5) break;
 
 	}
 
@@ -110,8 +113,8 @@ int main(int argc, char** argv)
 	/*
 	 * (Graph& g,
 	 *  DegreeMap degree,
-	 *  InversePermutationMap inverse_perm,
-	 *  PermutationMap perm,
+	 *  InversePermutationMap inverse_perm, io
+	 *  PermutationMap perm,                o    "ordering"
 	 *  SuperNodeMap supernode_size,
 	 *  int delta,
 	 *  VertexIndexMap vertex_index_map)
@@ -127,8 +130,8 @@ int main(int argc, char** argv)
 	boost::minimum_degree_ordering
 		(g,
 		 boost::make_iterator_property_map(&degree[0], id, degree[0]),
-		 &io[0],
-		 &o[0],
+		 &io[0], // the numbering.
+		 &o[0],  // the indexes in a new order.
 		 boost::make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
 		 0,
 		 id
@@ -149,6 +152,12 @@ int main(int argc, char** argv)
 	std::cout << "same as bagsize! " << w <<"\n";
 	assert(w == treedec::get_bagsize(t)); /// checks if BMD works!
 #endif
+
+	int k=0;
+	for(auto i : o){
+		trace2("i", k, i);
+		++k;
+	}
 
 	treedec::draft::vec_ordering_to_tree(g, o, t );
 

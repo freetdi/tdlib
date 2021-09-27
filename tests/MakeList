@@ -1,0 +1,29 @@
+
+check_PROGRAMS = \
+	${GPROG} \
+	bmd \
+	directed_view \
+	bag \
+	bug_19 \
+	bucket_sorter_1 \
+	bucket_sorter_2 \
+	bucket_sorter_3 \
+	common_out_edges \
+	custom_td \
+	dead_simple \
+	elim0 \
+	inline \
+	iter0 \
+	iter1 \
+	graph \
+	pp \
+	pp0 \
+	pp1 \
+	pp_path \
+	print_concept \
+	sdcc_bb \
+	sdcc_ub \
+	sdcc_ub_set \
+	sdcc_uu \
+	sdcc_bu \
+	vec2tree

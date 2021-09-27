@@ -13,6 +13,7 @@ class TestTdLib_exact(unittest.TestCase):
         for V, E in cornercases:
             G = Graph(V, E)
             T, w = tdlib.exact_decomposition_ex17(G)
+            print(w)
             self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     def test_1(self):
@@ -32,6 +33,7 @@ class TestTdLib_exact(unittest.TestCase):
                 V, E = randomGNP(n, 0.2)
                 G = Graph(V, E)
                 T, w = tdlib.exact_decomposition_ex17(G)
+                G = Graph(V, E)
                 self.assertEqual(tdlib.is_valid_treedecomposition(G, T), True)
 
     """ not yet

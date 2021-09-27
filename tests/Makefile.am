@@ -30,34 +30,7 @@ else
 GPROG =
 endif
 
-check_PROGRAMS = \
-	${GPROG} \
-	bmd \
-	directed_view \
-	bag \
-	bug_19 \
-	bucket_sorter_1 \
-	bucket_sorter_2 \
-	bucket_sorter_3 \
-	common_out_edges \
-	custom_td \
-	dead_simple \
-	elim0 \
-	inline \
-	iter0 \
-	iter1 \
-	graph \
-	pp \
-	pp0 \
-	pp1 \
-	pp_path \
-	print_concept \
-	sdcc_bb \
-	sdcc_ub \
-	sdcc_ub_set \
-	sdcc_uu \
-	sdcc_bu \
-	vec2tree
+include MakeList
 
 inline_SOURCES=sdcc_bb.cpp inline.cpp
 inline_CXXFLAGS=${AM_CXXFLAGS}
@@ -79,7 +52,7 @@ AM_DEFAULT_SOURCE_EXT=.cpp
 BUILT_SOURCES = treedec
 CLEANFILES = ${BUILT_SOURCES} *~
 
-AM_CPPFLAGS = -I. -I${srcdir} -DTRACE_UNTESTED -UNDEBUG
+AM_CPPFLAGS = -I. -I${srcdir} -I${abs_top_srcdir}/src -DTRACE_UNTESTED -UNDEBUG
 AM_CXXFLAGS = -O0 -g
 
 treedec:
@@ -89,6 +62,7 @@ all-local:
 	-${LN_S} ${srcdir}/ref .
 
 EXTRA_DIST = \
+	MakeList \
 	bucket_sorter_2u.cpp \
 	g.h sdcc_.cpp g_19.h
 # 	svbs_random.h

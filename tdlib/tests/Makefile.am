@@ -54,7 +54,7 @@ AM_PY_LOG_DRIVER_FLAGS=$(DEBUGFLAG)
 all-am: | tdlib
 
 tdlib:
-	$(LN_S) ../ tdlib
+	[ -L tdlib ] || $(LN_S) ../ tdlib
 
 
 longcheck:
@@ -71,6 +71,7 @@ AM_TESTS_ENVIRONMENT = \
     export PYTHONPATH='.':${srcdir};
 
 EXTRA_DIST = \
+	${EXTRALONG_TESTS} \
 	${PY_TESTS:%=ref/%.out} \
 	$(TESTS) \
 	CFGs.py \
@@ -80,8 +81,10 @@ EXTRA_DIST = \
 	RandomGNM_250_1000.py \
 	util.py
 
+CLEANFILES = *.out
+
 all-local:
-	-${LN_S} ${srcdir}/ref ref
+	-${LN_S} ${srcdir}/ref .
 
 SED_OUT = cat
 
