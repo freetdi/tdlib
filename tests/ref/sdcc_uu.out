@@ -249,7 +249,6 @@ PP+MD
 20: 20
 incomplete ../../tests/sdcc_.cpp:105:do_it
 ppta
-incomplete ./treedec/exact_base.hpp:335:try_it
 incomplete ./treedec/bits/trie.hpp:336:TRIE
 0 <--> 1 11 12 13 14 
 1 <--> 2 0 10 

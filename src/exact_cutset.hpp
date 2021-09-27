@@ -950,20 +950,26 @@ public:
     template<class T_t>
     bool try_it(T_t &T, unsigned bs);
     template<class T_t>
-    void do_it(T_t &T, unsigned& bs){ untested();
-        while(!try_it(T, bs)){ untested();
+    void do_it(T_t &T, unsigned& bs){
+        while(!try_it(T, bs)){
             bs++;
         }
     }
-    void do_it(){ untested();
+    void do_it(){
         unsigned bs=0;
         typename treedec::graph_traits<G_t>::treedec_type T;
         do_it(T, bs);
     }
+    template<class T>
+    void get_tree_decomposition(T &t){
+        auto const* c=this;
+        return c->get_tree_decomposition(t);
+    }
+
     template<class T_t>
     void get_tree_decomposition(T_t &T) const;
     unsigned bagsize() const{
-        if(_c){ untested();
+        if(_c){
             return _c->bagsize();
         }else{
             return -1u;
@@ -1008,7 +1014,7 @@ bool exact_cutset<G_t, config>::try_it(T_t &T, unsigned bagsize)
 
     assert(!_c);
 
-    if(bagsize<=1){ untested();
+    if(bagsize<=1){
         return false;
     }else{
         _c = new treedec::detail::excut_control<G_t>(_g, bagsize);

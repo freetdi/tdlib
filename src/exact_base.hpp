@@ -95,8 +95,12 @@ public:
         }else{
         }
     }
-public:
-    void do_it(unsigned lb_bs=0){
+
+public: // interface
+    void do_it(){
+        do_it(0);
+    }
+    void do_it(unsigned lb_bs){
         try_it(_t, lb_bs);
     }
     template<class T>
@@ -104,9 +108,19 @@ public:
         boost::copy_graph(_t, t);
     }
     template<class T>
+    void get_tree_decomposition(T& t){
+        boost::copy_graph(_t, t);
+    }
+    template<class T>
     void try_it(T&, unsigned lb_bs);
     template<class G, class T>
     void run_kernel(G const&, T&, unsigned& lb_bs);
+    unsigned bagsize() const{
+        return _bagsize;
+    }
+    unsigned lower_bound_bagsize() const{
+        return _bagsize;
+    }
 private:
     template<class T_t>
     void do_components(T_t&, unsigned lb_bs);
@@ -116,6 +130,7 @@ private:
     //                                                but we don't know yet.
     TD_dir_tree_dec_t _t; // BUG, this must not be hardcoded.
     bool _cleanup_g;
+    unsigned _bagsize{0u};
 }; // exact_decomposition
 
 
@@ -153,6 +168,9 @@ inline void exact_decomposition<G_t, config, kernel>::run_kernel(
         kern.do_it(T, lb_bs);
     }
     assert(boost::num_vertices(T) == boost::num_edges(T)+1);
+
+    _bagsize = std::max(_bagsize, unsigned(lb_bs));
+
 }
 
 template<typename G_t,
@@ -326,37 +344,41 @@ void exact_decomposition<G_t, config, kernel>::try_it(T_t& T, unsigned lb_bs)
         treedec::glue_bags(bags, T);
         return;
     }else{
+
+        CFG::message(0, "PP said tw %d\n", low);
+
+        //Lower bound on the treewidth of the reduced instance of G.
+        G_t H(_g);
+//        incomplete(); //deltac does not seem to work
+        std::cerr << "incomplete ../../src/exact_base.hpp:348:try_it\n";
+
+        int tw_lb_deltaC = 0; // treedec::lb::deltaC_least_c(H);
+
+        CFG::message(0, "deltaC said tw %d\n", tw_lb_deltaC);
+
+        trace3("excut comb", lb_tw, low, tw_lb_deltaC);
+        if(low > lb_tw){
+            lb_tw = low;
+        }else{ untested();
+        }
+
+        if (tw_lb_deltaC > lb_tw){ untested();
+            lb_tw = tw_lb_deltaC;
+        }else{
+        }
+
+        trace3("excut comb", lb_tw, boost::num_vertices(_g), boost::num_edges(_g));
+
+        do_components(T, lb_tw+1);
+        trace1("did components", bags.size());
+        assert(boost::num_vertices(T) == boost::num_edges(T)+1);
+
+        treedec::glue_bags(bags, T);
+        trace2("done", boost::num_vertices(T), boost::num_edges(T));
+        assert(boost::num_vertices(T) == boost::num_edges(T)+1);
     }
 
-    CFG::message(0, "PP said tw %d\n", low);
-
-    //Lower bound on the treewidth of the reduced instance of G.
-    G_t H(_g);
-    incomplete(); //deltac does not seem to work
-    int tw_lb_deltaC = 0; // treedec::lb::deltaC_least_c(H);
-
-    CFG::message(0, "deltaC said tw %d\n", tw_lb_deltaC);
-
-    trace3("excut comb", lb_tw, low, tw_lb_deltaC);
-    if(low > lb_tw){
-        lb_tw = low;
-    }else{ untested();
-    }
-
-    if (tw_lb_deltaC > lb_tw){ untested();
-        lb_tw = tw_lb_deltaC;
-    }else{
-    }
-
-    trace3("excut comb", lb_tw, boost::num_vertices(_g), boost::num_edges(_g));
-
-    do_components(T, lb_tw+1);
-    trace1("did components", bags.size());
-    assert(boost::num_vertices(T) == boost::num_edges(T)+1);
-
-    treedec::glue_bags(bags, T);
-    trace2("done", boost::num_vertices(T), boost::num_edges(T));
-    assert(boost::num_vertices(T) == boost::num_edges(T)+1);
+    _bagsize = std::max(_bagsize, unsigned(lb_tw+1));
 } // try_it
 
 }// draft

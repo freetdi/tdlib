@@ -447,8 +447,12 @@ public: // interface
 	template<class t>
 	void make_td(t&) const;
 
-	template<class TREEDEC_t>
-	void get_tree_decomposition(TREEDEC_t& td) const {
+	template<class T>
+	void get_tree_decomposition(T& td) const {
+		return make_td(td);
+	}
+	template<class T>
+	void get_tree_decomposition(T& td) {
 		return make_td(td);
 	}
 #if 0
@@ -1012,7 +1016,7 @@ inline void exact_ta<EXTA_a>::q_base_set(vertex_t v)
 	if (cbset::size(onb) + _delta.size() > _bag_size) { untested();
 	}else{
 		registerBlock(c, onb, _delta);
-		if(_solution){ untested();
+		if(_solution){
 			// BUG
 			// sometimes looking for tw=5 finds a td of width 4. why?!
 			return;
@@ -1177,7 +1181,7 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) cons
       int j = addBag(cbset::union_(b->component, b->neighbours()), td);
       if (k >= 0) {
 			boost::add_edge(k, j, *td);
-      }else{ untested();
+      }else{
 			r = j;
 		}
       continue;
