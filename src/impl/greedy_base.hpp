@@ -36,7 +36,10 @@ template <typename G_t, typename O_t,
           template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_base : public ::treedec::algo::draft::algo1{
 private: // forbidden
-    greedy_base(){unreachable();}
+    greedy_base() = delete;
+    greedy_base(greedy_base&&) = delete;
+    greedy_base(greedy_base const&) = delete;
+    // greedy_base(){unreachable();}
 public:
     typedef typename directed_view_select<G_t>::type graph_type;
     using D_t=graph_type;
@@ -63,7 +66,7 @@ public:
         bool operator[](vertex_descriptor v) const{ untested();
             return _n.is_not_numbered(v);
         }
-        sgm& operator=(const sgm& o){
+        sgm& operator=(const sgm& o){ untested();
             assert(&_n==&o._n);
             return *this;
         }
@@ -76,7 +79,13 @@ public:
     typedef typename std::vector<vertex_descriptor> bag_t;
 
 protected: // construct/destruct
-    greedy_base(G_t &g, unsigned ub, bool ignore_isolated_vertices=false)
+    //greedy_base(G_t const &g, unsigned ub, bool ignore_isolated_vertices=false)
+    //  : greedy_base(g, ub, ignore_isolated_vertices) { untested();
+    //      trace1("got own g", &_g);
+    //      _own_g = true;
+    //  }
+    template<class G_maybe_const>
+    greedy_base(G_maybe_const &g, unsigned ub, bool ignore_isolated_vertices=false)
       : algo1("."),
         _g(g),
         _o(NULL), _own_o(true), _ub_in(ub),
@@ -94,10 +103,23 @@ protected: // construct/destruct
         _subgraph(_g, member_pred_type(_numbering), _degreemap),
         _marker(boost::num_vertices(_g))
     {
-        trace2("ghb", _num_vert, _num_edges);
+        trace2("greedy_base", _num_vert, _num_edges);
+#if 0
+        auto vv = boost::vertices(g);
+        for(; vv.first != vv.second; ++vv.first){ untested();
+        }
+        auto ee = boost::edges(g);
+        for(; ee.first != ee.second; ++ee.first){ untested();
+            auto s = boost::source(*ee.first, g);
+            auto t = boost::target(*ee.second, g);
+            std::cout << "(" << s << "," << t << "),";
+        }
+        std::cout << "\n";
+#endif
+
         if(_own_o){
             _o = new O_t;
-        }else{
+        }else{ untested();
         }
 
         // BUG. part of subgraph constructor?!
@@ -121,9 +143,14 @@ protected: // construct/destruct
     }
 
     virtual ~greedy_base(){
+        if(_own_g){ untested();
+            trace1("delete own g", &_g);
+//            delete &_g;
+        }else{
+        }
         if(_own_o){
             delete _o;
-        }else{
+        }else{ untested();
         }
     }
 
@@ -156,11 +183,17 @@ protected: // implementation
     }
 
 public:
-	 // dump a tree decomposition into t
-	 template<class T>
-    void get_tree_decomposition(T& t){
+    // dump a tree decomposition into t
+    template<class T>
+    void get_tree_decomposition(T& t){ untested();
+        size_t numbags = _numbering.total();
+        trace2("gt", numbags, _i);
+
+        t = T(_i);
+        treedec::set_bagsize(t, bagsize());
         assert(_o);
         _o->resize(_i);
+        assert(_i == boost::num_vertices(_g));
         get_elimination_ordering(*_o);
 #ifndef NDEBUG
         for(auto x: *_o){
@@ -169,7 +202,7 @@ public:
         auto p=boost::vertices(_g);
         for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
-                trace2("number", *p.first, _numbering.get_position(*p.first));
+                trace2("numbered", *p.first, _numbering.get_position(*p.first));
             }
         }
 #endif
@@ -177,10 +210,12 @@ public:
         typedef treedec::draft::SKELETON<D_t, numbering_type, O_t> skeleton_type;
         skeleton_type skel(_g, _numbering, *_o);
 
-        assert(_i==skel.size());
+        // assert(_numbering.total()==skel.size()); // not in develop.
+        trace1("skel?", _numbering.total());
         treedec::detail::skeleton_helper<D_t, T, skeleton_type, numbering_type>
             S(_g, t, skel, _numbering);
         S.do_it();
+        trace1("td?", boost::num_vertices(t));
     }
 
 public:
@@ -192,7 +227,7 @@ public:
     }
 
     // later
-    O_t& get_elimination_ordering() {
+    O_t& get_elimination_ordering() { untested();
         for (auto x: _zeroes){ untested();
             // HACK
             _o->push_back(x); // HACK
@@ -216,7 +251,7 @@ public:
                 assert(pos<o.size());
                 o[pos] = _idmap[*p.first];
                 assert(o[pos] == (*_o)[pos]);
-            }else{
+            }else{ untested();
             }
         }
     }
@@ -228,10 +263,12 @@ public:
 
     // greedy_base::
     void do_it(){
-        trace2("do_it", _i, _num_vert);
+        trace2("greedy_base::do_it", _i, _num_vert);
+        check(_g);
+
         timer_on();
 
-        if(!_num_vert){
+        if(!_num_vert){ untested();
             timer_off();
             return;
         }else{
@@ -250,12 +287,13 @@ public:
         vertex_descriptor c;
 
         while(next(c)){
+            trace2("greedy. next is", _i, c);
 
 #if 0 // maybe later.
             //Abort if the width of this decomposition would be larger than 'ub'.
             if(_min >= _ub_in){ untested();
                 throw exception_unsuccessful();
-            }else{
+            }else{ untested();
             }
 #endif
 
@@ -295,10 +333,16 @@ public:
     }
 
 protected:
+    size_t vertices_left() const{
+        return _num_vert - _numbering.total();
+    }
+
+protected:
     D_t _g;
     //T_t* _t;
     O_t* _o;
     bool _own_o;
+    bool _own_g{false};
 
     vertices_size_type _ub_in;
     bool _iiv;

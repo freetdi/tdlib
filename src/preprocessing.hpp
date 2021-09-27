@@ -810,6 +810,7 @@ void preprocessing<G, CFGT>::do_components(T& t, G const& gg) const
 
         kern.do_it();
         kern.get_tree_decomposition(T_);
+        trace1("got T_", boost::num_vertices(T_));
 
         assert(is_valid_treedecomposition(backup, T_));
 

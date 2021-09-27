@@ -205,12 +205,16 @@ public:
     void do_it(){
         if(boost::num_vertices(_b) == 0){ untested();
             return;
-        }
-
-        //Bag for the u-th elimination vertex will be stored in T[u].
-        for( auto x : boost::make_iterator_range(boost::vertices(_b))){
-            std::ignore = x;
-            boost::add_vertex(_t);
+        }else if(boost::num_vertices(_b) == boost::num_vertices(_t)){ untested();
+        }else if(!boost::num_vertices(_t)){ untested();
+            //Bag for the u-th elimination vertex will be stored in T[u].
+            for( auto x : boost::make_iterator_range(boost::vertices(_b))){
+                std::ignore = x;
+                boost::add_vertex(_t);
+            }
+        }else{
+            trace2("skeleton::do_it mismatch", boost::num_vertices(_b), boost::num_vertices(_t));
+            incomplete();
         }
 
         //Since we made the neighbourhood N of the u-th vertex a clique,

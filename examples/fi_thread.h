@@ -35,7 +35,7 @@ public:
         // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
 		  size_t numbags = boost::num_vertices(_work); // ask P?!
-		  P.head(numbags, _result);
+		  // P.head(numbags, _result);
 		  assert(_FI);
 		  _FI->get_tree_decomposition(P);
     }
