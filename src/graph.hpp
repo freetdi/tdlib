@@ -814,6 +814,20 @@ bool is_vertex_permutation(O_t const &O, G const &g)
     return S == V;
 }
 
+template<class G>
+typename boost::graph_traits<G>::vertices_size_type degree(
+        typename boost::graph_traits<G>::vertex_descriptor v,
+        G const& g){
+    return boost::degree(v, g);
+}
+
+template<class A, class B>
+typename boost::graph_traits<boost::adjacency_list<A, B, boost::directedS> >::vertices_size_type degree(
+        typename boost::graph_traits<boost::adjacency_list<A, B, boost::directedS> >::vertex_descriptor v,
+        boost::adjacency_list<A, B, boost::directedS> const& g){
+    return boost::out_degree(v, g);
+}
+
 } // treedec
 
 #endif // guard

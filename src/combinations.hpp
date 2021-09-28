@@ -534,8 +534,8 @@ public: // algo interface
 
             unsigned c = 0;
             for(auto n : new_elim_ordering) {
-                trace4("eo", c, n, boost::degree(n, g()), boost::out_degree(n, g()));
-                if(boost::degree(n, g()) > 0){
+                trace4("eo", c, n, degree(n, g()), boost::out_degree(n, g()));
+                if(degree(n, g()) > 0){
                     assert(c<new_elim_ordering_.size());
                     new_elim_ordering_[c++] = n;
                 }else{
