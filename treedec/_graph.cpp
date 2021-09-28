@@ -2,7 +2,7 @@
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
-// Free Software Foundation; either version 2, or (at your option) any
+// Free Software Foundation; either version 3, or (at your option) any
 // later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -73,36 +73,6 @@ struct makelong {
 };
 #endif
 
-template<class graph>
-boost::python::object preprocessing(graph& g)
-{
-	 pp_data_type b;
-    size_t lb_bs = g.preprocessing(b); // pass pythonstuff?
-	 boost::python::list a, ret;
-
-	 /// YUCK
-	 // pass something resonable to PP
-	 // WRONG PLACE. has nothing to do with python.
-	 for(auto const& i: b){
-		 boost::python::list c;
-		 unsigned j = boost::get<0>(i);
-		 c.append(g.maphack(j)); // this is the eliminated node.
-		                         // bad/FIXME: the order is lost.
-
-		 auto const& bagi=boost::get<1>(i);
-		 for(auto const& j : bagi){
-			 c.append(g.maphack(j));
-		 }
-
-		 a.append(c);
-	 }
-
-	 ret.append(g); // FIXME (remove)
-	 ret.append(a);
-	 ret.append(int(lb_bs)-1); // yuck
-	 return ret;
-}
-
 // BUG? detail..
 static PyObject *pythonExceptionType = NULL;
 static PyObject* createExceptionClass(const char* name, PyObject* baseTypeObj = PyExc_Exception)
@@ -119,66 +89,6 @@ static PyObject* createExceptionClass(const char* name, PyObject* baseTypeObj = 
 }
 
 namespace detail{
-
-#if 0
-unsigned stringtotype(const std::string& type)
-{
-	unsigned typenumber=graph::b_default;
-	if(type==""){
-	}else if(type=="badjl_vvd"){
-		typenumber = graph::b_badjl_vvd;
-	}else{ untested();
-		throw exception_invalid("type");
-	}
-	return typenumber;
-}
-
-template<class what>
-static boost::shared_ptr<what> graph_factory(
-		boost::python::list const& x, boost::python::list const& edgl, std::string const& type)
-{ untested();
-	typedef boost::python::stl_input_iterator<typename what::vertex_descriptor> iterator_type;
-	iterator_type i(x);
-	iterator_type e;
-	unsigned typenumber=stringtotype(type);
-
-	typedef typename what::vertex_descriptor vd;
-	typedef ::detail::pyedge_input_iterator<std::pair<vd, vd> > pi;
-
-	trace1("fact", typenumber);
-	return boost::shared_ptr<what>(new what(pi(edgl), pi(), i, e, typenumber));
-}
-
-struct below_checker{
-	below_checker(unsigned max=-1u):_m(max){}
-	bool operator()(unsigned what) const{return what<_m;}
-
-	unsigned _m;
-};
-
-template<class what>
-static boost::shared_ptr<what> graph_factory_n(
-		 unsigned max, boost::python::list const& y, std::string const& type)
-{
-	trace1("fact_n", max);
-	unsigned typenumber=stringtotype(type);
-
-	typedef ::detail::pyedge_input_iterator<std::pair<int, int>, below_checker > pi;
-
-	below_checker C(max);
-
-	trace1("fact", typenumber);
-	return boost::shared_ptr<what>(
-			new what(pi(y,C), pi(), max, typenumber));
-}
-
-template<class what>
-static boost::shared_ptr<what> graph_factory_n0(
-		unsigned x, boost::python::list const& y)
-{
-	return graph_factory_n<what>(x, y, "");
-}
-#endif
 
 template<class what>
 static boost::shared_ptr<what> graph_factory0(
@@ -272,8 +182,6 @@ py::object get_second(std::pair<py::object, py::object>& p)
 	class_< gid ## _eip >( #gid "_edge_range", no_init ) \
 		 .def("__iter__" , py::range(& gid ## _eip::first, & gid ## _eip::second)) \
 		 ;
-//	def("preprocessing", preprocessing<gid>)
-//
 
 template<class T, StringLiteral n>
 static std::string make_string(T const& g)
@@ -307,28 +215,6 @@ static std::string make_string(T const& g)
 		 .def("__iter__" , py::range(& gid ## _eip::first, & gid ## _eip::second)) \
 		 ;
 
-#define COMMON_BOOST_GRAPH_PY_IFACE_WIP(gid) \
-	class_< gid, boost::noncopyable >(#gid, init<>()) \
-		.def("__init__", make_constructor(::detail::init_boost_graph< gid >)) \
-		.def("__init__", make_constructor(::detail::init_boost_graph0< gid >)) \
-		.def(init<size_t>()) \
-		.def("num_vertices", &boost_num_vertices< gid >) \
-		.def("num_edges",    &boost_num_edges< gid >) \
-		.def("vertices",     &boost_vertices< gid >) \
-		.def("edges",        &boost_edges< gid >) \
-		.def("add_vertex",   &boost_add_vertex< gid >) \
-		.def("add_edge",     &boost_add_edge< gid >) \
-		.def("__repr__",     &make_string<gid, #gid> ) \
-		; \
-	typedef pair_<typename boost::graph_traits<gid>::vertex_iterator > gid ## _vip; \
-	class_< gid ## _vip >( #gid "_vertex_range", no_init ) \
-		 .def("__iter__" , py::range(& gid ## _vip::first, & gid ## _vip::second)) \
-		;
-	//typedef pair_<typename boost::graph_traits<gid>::edge_iterator > gid ## _eip; \
-	//class_< gid ## _eip >( #gid "_edge_range", no_init ) \
-	//	 .def("__iter__" , py::range(& gid ## _eip::first, & gid ## _eip::second)) \
-	//	 ;
-
 template<class G>
 size_t boost_num_vertices(G const& g)
 {
@@ -340,8 +226,6 @@ size_t boost_num_edges(G const& g)
 	return boost::num_edges(g);
 }
 
-
-
 template<class G>
 struct edg2pair{
 	edg2pair(G const& g) : _g(g)
@@ -350,8 +234,8 @@ struct edg2pair{
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef std::pair<vertex_descriptor, vertex_descriptor> edge_descriptor;
 	template<class E>
-	// std::pair<vertex_descriptor, vertex_descriptor>
-	std::pair<unsigned, unsigned>
+	std::pair<vertex_descriptor, vertex_descriptor>
+	// std::pair<unsigned, unsigned>
 	operator()(E edg) const {
 		auto s=boost::source(edg, _g);
 		auto t=boost::target(edg, _g);
@@ -444,11 +328,26 @@ BOOST_PYTHON_MODULE(_graph)
 //		COMMON_GRAPH_PY_IFACE(graph_balu_wrap)
 //		;
 //
+//
+#if 1
 	typedef std::pair<wrap::graph<_balvvu>::edge_iterator,
 	                  wrap::graph<_balvvu>::edge_iterator> graph_eip_1;
 	class_< graph_eip_1 >( "graph_edge_range", no_init ) \
 		 .def("__iter__" , range(& graph_eip_1::first, & graph_eip_1::second)) \
-		; \
+		;
+
+	typedef std::pair<wrap::graph<_gsgvvu16, std::vector<uint16_t> >::edge_iterator,
+	                  wrap::graph<_gsgvvu16, std::vector<uint16_t> >::edge_iterator> graph_eip_16;
+	class_< graph_eip_16 >( "graph_edge_range", no_init ) \
+		 .def("__iter__" , range(& graph_eip_16::first, & graph_eip_16::second)) \
+		;
+
+	typedef std::pair<wrap::graph<_gsgvvu32, std::vector<uint32_t>>::edge_iterator,
+	                  wrap::graph<_gsgvvu32, std::vector<uint32_t>>::edge_iterator> graph_eip_32;
+	class_< graph_eip_32 >( "graph_edge_range", no_init ) \
+		 .def("__iter__" , range(& graph_eip_32::first, & graph_eip_32::second)) \
+		;
+#endif
 
 	typedef std::pair<wrap::graph<_balvvu>::raw_vertex_iterator,
 	                  wrap::graph<_balvvu>::raw_vertex_iterator> graph_vip_1;
@@ -488,19 +387,22 @@ BOOST_PYTHON_MODULE(_graph)
 // 		.def("__init__", make_constructor(::detail::graph_factory<Graph>))
 // 		COMMON_GRAPH_PY_IFACE(Graph)
 // 		;
+//
+
+	typedef pair_<typename boost::graph_traits<_gsgvvu32>::edge_iterator > test_eip;
+	class_< test_eip >( "test_edge_range", no_init )
+		 .def("__iter__" , py::range(& test_eip::first, & test_eip::second)) ;
 
 #ifdef HAVE_GALA_GRAPH_H
-	COMMON_BOOST_GRAPH_PY_IFACE_WIP(_gsgvvu16)
-	COMMON_BOOST_GRAPH_PY_IFACE_WIP(_gsgvvu32)
-	COMMON_BOOST_GRAPH_PY_IFACE_WIP(_gsgvvu64)
+	COMMON_BOOST_GRAPH_PY_IFACE(_gsgvvu16)
+	COMMON_BOOST_GRAPH_PY_IFACE(_gsgvvu32)
+	COMMON_BOOST_GRAPH_PY_IFACE(_gsgvvu64)
 #endif
 
 	COMMON_BOOST_GRAPH_PY_IFACE(_balvvd)
 	COMMON_BOOST_GRAPH_PY_IFACE(_balsvd)
 	COMMON_BOOST_GRAPH_PY_IFACE(_balvvu)
 	COMMON_BOOST_GRAPH_PY_IFACE(_balsvu)
-
-
 
 	class_<exception_invalid> cpp_exception_invalid_class("exception_invalid", init<std::string>());
 	cpp_exception_invalid_class.def("what", &exception_invalid::what);

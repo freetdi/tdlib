@@ -9,6 +9,7 @@ TDLIB_TESTS = \
 
 PY_TESTS = \
 	graph_bal0.py \
+	graph_gala0.py \
 	excut_0.py \
 	exta_0.py \
 	fi_0.py \
