@@ -20,7 +20,10 @@
 #ifndef TREEDEC_INDUCED_SUBGRAPH_HPP
 #define TREEDEC_INDUCED_SUBGRAPH_HPP
 
+#include <boost/graph/graph_traits.hpp>
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/graph/vertex_and_edge_range.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 // graph const&+member_pred const&=induced subgraph.
 //

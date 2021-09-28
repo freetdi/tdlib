@@ -32,7 +32,7 @@ public:
         }
     }
 
-    O_t& get_elimination_ordering() { untested();
+    O_t& get_elimination_ordering() {
 
         return *_o;
     }
@@ -76,14 +76,16 @@ public:
     virtual void eliminate(vertex_descriptor v) = 0;
     virtual void postprocessing() = 0;
 
-    void disable_td(){
+    void disable_td(){ untested();
         // stupid hack
         _do_tree_decomposition = true;
     }
 
+    // greedy_heuristic.
     void do_it() {
+        trace1("greedy_heuristic::do_it", boost::num_vertices(_g));
         if(_do_tree_decomposition){
-            _t=new T_t;
+            _t = new T_t;
             // bags seem to be unnecessary
             _bags.resize(_num_vert);
         }else{untested();
@@ -92,7 +94,7 @@ public:
 
         timer_on();
 
-        if(!_num_vert){ untested();
+        if(!_num_vert){
             timer_off();
             return;
         }else{

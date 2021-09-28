@@ -158,6 +158,7 @@ protected: // implementation
     void initialize(){
         // yuck.
         auto p=boost::vertices(_g);
+        assert(_numbering.total()==0);
         unsigned checksum=0;
         for(; p.first!=p.second; ++p.first){
             auto d=boost::out_degree(*p.first, _g); // BUG
@@ -244,10 +245,13 @@ public:
 		 // incomplete(); inefficient perhaps
 
         o.resize(_i);
-        auto p=boost::vertices(_g);
+        trace2("get_elimination_ordering", _i, _numbering.total());
+        assert(_i==_numbering.total()); // for now.
+        auto p = boost::vertices(_g);
+
         for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
-                auto pos=_numbering.get_position(*p.first);
+                auto pos = _numbering.get_position(*p.first);
                 assert(pos<o.size());
                 o[pos] = _idmap[*p.first];
                 assert(o[pos] == (*_o)[pos]);
@@ -308,6 +312,8 @@ public:
 
             eliminate(c);
 
+            assert(_numbering.total()==_i+1);
+
 #if 0
             if(!_t){ untested();
                 _current_N->clear();
@@ -319,6 +325,7 @@ public:
 
         // BUG
         trace2("done loop", _i, _num_vert);
+        assert(_numbering.total()==_i);
 
         // add one more node maybe.
         // should list remaining clique, not implemented

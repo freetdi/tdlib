@@ -184,7 +184,7 @@ public: // algo interface
         A.get_graph(_g);
 #endif
 
-        if(boost::num_edges(_g) > 0){ untested();
+        if(boost::num_edges(_g) > 0){
             unsigned low2=-1;
             trace2("calling fillIn", low2, num_vertices(_g));
             treedec::impl::fillIn_decomp(_g, _t, low2, true); //ignore_isolated

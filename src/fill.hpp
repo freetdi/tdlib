@@ -102,7 +102,7 @@ private: // types
             // TODO: negative value indicates LB?
             _lb = x;
         }
-        void set_lb(size_t v) { untested();
+        void set_lb(size_t v) {
             _value = v;
             _lb = true;
         }

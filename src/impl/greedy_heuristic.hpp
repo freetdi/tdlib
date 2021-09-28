@@ -51,7 +51,7 @@ public:
     minDegree(G_t &G, bool ignore_isolated_vertices)
         : baseclass(G, -1u, ignore_isolated_vertices),
           _degs(baseclass::_g)
-    { untested();
+    {
     }
 
 #if 0 // base
@@ -65,7 +65,7 @@ public:
         BOOST_AUTO(it, zerodegbag1.begin());
 
         if(!baseclass::_iiv){
-            for(; it!=zerodegbag1.end(); ++it){ untested();
+            for(; it!=zerodegbag1.end(); ++it){
                 (*baseclass::_o)[baseclass::_i++] = *it;
             }
         }else{
@@ -151,6 +151,13 @@ public: //types
     }; // update_cb
 
 public: // construct
+    fillIn(G_t const &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
+        : baseclass(g, ub, ignore_isolated_vertices),
+          _fill(baseclass::_subgraph, boost::num_vertices(g))
+    { untested();
+//        boost::print_graph(g);
+        treedec::check(g);
+    }
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
           _fill(baseclass::_subgraph, boost::num_vertices(g))
@@ -169,28 +176,48 @@ public: // construct
 
 public: // implementation
     using baseclass::_min;
+    using baseclass::vertices_left;
     using baseclass::_num_edges;
     using baseclass::_degree; // bug?
 
     // fillIn::
     bool next(typename baseclass::vertex_descriptor &c){
-        trace1("next", _num_edges);
-        if(_num_edges){
+        trace2("next", _num_edges, vertices_left());
+        auto n = vertices_left();
+        // assert(_vertices_left);
+
+        if (0 && _num_edges == (n*(n-1))/2){ untested();
+            // something is wrong with the condition
+            return false;
+        }else if(!_num_edges){
+            return false;
+        }else{
             // todo: what do we know about lower bound?
-            auto p=_fill.pick_min(0, -1u, true);
+            auto p = _fill.pick_min(0, -1u, true);
             c = p.first;
+            trace2("next picked", c, _min);
+
+            if(_min<0){
+                // 
+            }else{
+            }
+
             _min = p.second; // the fill of c.
             return true;
-        }else{
-            return false;
         }
     }
 
     // TODO more useful specialisation?
     // ... finish minDegree, then lets see.
+    // fillIn::
     void eliminate(typename baseclass::vertex_descriptor c){
-        long fill_c=_min;
-        trace4("elim", c, _num_edges, _degree[c], fill_c);
+        long fill_c = _min;
+        trace5("elim", c, _num_edges, _degree[c], fill_c, _fill.get_value(c));
+        trace2("elim", _fill.max_fill(), _fill.is_lb(c) );
+
+#ifndef NDEBUG
+        // check_vertex(c);
+#endif
 
         /// _min is fill(v).
         // use remove_out_edge_if?
@@ -207,7 +234,7 @@ public: // implementation
 
         { // make clique
             // todo?: faster special cases for small numbers?!
-            // if(fill==1 && degree==2){
+            // if(fill==1 && degree==2){ untested();
             //    easy.
             // }
             //
@@ -221,9 +248,28 @@ public: // implementation
                 baseclass::_marker.clear();
                 // count overlap with c neighbourhood
                 // use remove_out_edge_if?
+#if 0
                 size_t overlap = mark_neighbours_c(
                         baseclass::_marker, n, baseclass::_subgraph,
                         _fill.marked() );
+#else
+// template<class M, typename V, class G, class P>
+// size_t mark_neighbours_c(M& marker, V v, G const& g, P const& p /*bug*/)
+    size_t overlap=0;
+{
+    auto& g = baseclass::_subgraph;
+    auto& p = _fill.marked();
+    auto pp=boost::adjacent_vertices(n, g); // ???
+    for(; pp.first!=pp.second; ++pp.first){
+        baseclass::_marker.mark(*pp.first);
+        if(p(*pp.first)){
+            ++overlap;
+        }else{
+        }
+    }
+}
+#endif
+
                 long degn=baseclass::_degreemap[n];
                 auto const fill_n=_fill.get_value(n);
                 trace5("------------> ", n, degn, fill_n, degc, overlap);
@@ -329,17 +375,37 @@ public: // implementation
     } // eliminate(c)
 
     using baseclass::_i;
+    using baseclass::_o; // BUG
     using baseclass::_subgraph;
     void postprocessing(){
-        if(_i == baseclass::_num_vert){
+        trace2("post", _i, baseclass::_num_vert);
+        if(_i == baseclass::_num_vert){ untested();
+            unreachable(); //?
             // no nodes at all?!
         }else{
             // the last node is missing, but why?
-            ++_i;
-            auto v = _fill.pick_min(0, 0, true).first;
-            assert(_i == baseclass::_o->size());
-            baseclass::_o->back() = v;
-            baseclass::_numbering.put(v);
+      //       auto v = _fill.pick_min(0, 0, true).first;
+      //       (*_o)[_i++] = v;
+      //       baseclass::_numbering.put(v);
+
+      //       auto x = _subgraph.adjacent_vertices(v);
+      //       for(;x.first!=x.second;++x.first){ untested();
+      //           baseclass::_o->push_back(*x.first);
+      //           (*_o)[_i++] = *x.first;
+      //       }
+
+            auto w = _fill.pick_min(0, 0, true).first;
+            trace1("post", w);
+            (*_o)[baseclass::_i++] = w;
+            baseclass::_numbering.put(w);
+            baseclass::_numbering.increment();
+
+            for(; _i < baseclass::_num_vert; ++_i){ untested();
+                auto v = _fill.pick_min(0, 0, true).first;
+//                treedec::add_edge(w, v, baseclass::_g); already there.
+                assert(_i < _o->size());
+                (*_o)[baseclass::_i] = v;
+            }
         }
         assert(baseclass::_i == baseclass::_num_vert);
     }
@@ -370,7 +436,6 @@ private: // debugging
             assert(!degn);
         }
     }
-
 private:
     fill_type _fill;
 //    fill_update_cb _cb;
@@ -392,16 +457,16 @@ public: //types
         fill_update_cb(fill_type* d, G_t const& g) :
             _fill(d), G(g){}
 
-        void operator()(vertex_descriptor v){ untested();
+        void operator()(vertex_descriptor v){
             _fill->q_eval(v);
         }
-        void operator()(vertex_descriptor s, vertex_descriptor t) { untested();
+        void operator()(vertex_descriptor s, vertex_descriptor t) {
             assert(s < t); // likely not. is this necessary below?
             // e has just been inserted.
             BOOST_AUTO(cni, common_out_edges(s, t, G));
             BOOST_AUTO(i, cni.first);
             BOOST_AUTO(e, cni.second);
-            for(; i!=e; ++i){ untested();
+            for(; i!=e; ++i){
                 assert(*i != s);
                 assert(*i != t);
     //            no. maybe theres only half an edge.
@@ -421,24 +486,24 @@ public: // construct
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
          _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    { untested();
+    {
     }
 
     fillIn(G_t &G, bool ignore_isolated_vertices, unsigned ub=-1u)
         : baseclass(G, ub, ignore_isolated_vertices),
           _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    { untested();
+    {
     }
 
 public: // implementation
-    void initialize(){ untested();
+    void initialize(){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
             if(boost::out_degree(*vIt, baseclass::_g) == 0){
                 if(!baseclass::_iiv){
                     (*baseclass::_o)[baseclass::_i++] = *vIt;
                 }
-                else{ untested();
+                else{
                     --baseclass::_num_vert;
                 }
             }
@@ -463,8 +528,8 @@ public: // implementation
         _fill.unmark_neighbours(*baseclass::_current_N);
     }
 
-    void postprocessing(){ untested();
-        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){ untested();
+    void postprocessing(){
+        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){
             auto v = _fill.pick_min(0, 0, true).first;
             (*baseclass::_o)[baseclass::_i] = v;
         }

@@ -18,6 +18,8 @@
 #ifndef TREEDEC_MARKER_UTIL_HPP
 #define TREEDEC_MARKER_UTIL_HPP
 
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp> // ?
 #include "marker.hpp"
 //#include "graph_util.hpp" // no. used by graph_util
 
@@ -51,7 +53,11 @@ size_t mark_neighbours_c(M& marker, V v, G const& g, P const& p /*bug*/)
 template<class M, typename V, class G>
 void mark_neighbours(M& marker, V v, G const& g)
 {
-    auto pp=boost::adjacent_vertices(v, g);
+    // typename boost::graph_traits<G>::vertex_descriptor v_ = v;
+	 auto& gg = const_cast<G&>(g);
+    long unsigned v_ = v;
+    assert(v_ == v);
+    auto pp = boost::adjacent_vertices(v, gg);
     for(; pp.first!=pp.second; ++pp.first){
         marker.mark(*pp.first);
     }

@@ -68,6 +68,9 @@ public: // construct
     }
 public:
     size_t size() const{
+        trace2("skeleton::size", _n.total(), _o.size());
+        assert(_n.total() == _o.size());
+        return _n.total();
         return _o.size();
     }
 //    bag_range operator[](vertices_size_type x){
@@ -104,6 +107,7 @@ namespace boost{
 template<class VD, class B>
 size_t num_vertices( std::vector< std::pair<VD, B> > const& skel )
 {
+    trace1("boost wrap", skel.size());
     return skel.size();
 }
 
@@ -208,8 +212,7 @@ public:
         }else if(boost::num_vertices(_b) == boost::num_vertices(_t)){
         }else if(!boost::num_vertices(_t)){
             //Bag for the u-th elimination vertex will be stored in T[u].
-            for( auto x : boost::make_iterator_range(boost::vertices(_b))){
-                std::ignore = x;
+            for( size_t x=0 ; x<_numbering.total(); ++x){
                 boost::add_vertex(_t);
             }
         }else{
@@ -220,7 +223,7 @@ public:
         //Since we made the neighbourhood N of the u-th vertex a clique,
         //the bag of the neighbour of this vertex with lowest elimination index
         //will have N as a subset.
-        unsigned max = boost::num_vertices(_b)-1u;
+        unsigned max = _numbering.total()-1u; // boost::num_vertices(_b)-1u;
 
 #if 0 // swapping ordering (HACK). td format... (incomplete tdprinter)
         for(unsigned u = 0; u < max; u++){
@@ -250,13 +253,17 @@ public:
 //
         for(; p.first!=p.second; ++p.first){
             auto v=boost::get(boost::vertex_owner, *p.first, _b);
-            auto b=boost::get(treedec::bag_t(), *p.first, _b);
-            auto& target_bag=boost::get(treedec::bag_t(), _t, u);
-            bag_to_treedec(b, target_bag);
-            push(target_bag, v); // insert?
-            ++u;
-        }
 
+            if(_numbering.is_numbered(v)){
+                auto b=boost::get(treedec::bag_t(), *p.first, _b);
+                auto& target_bag=boost::get(treedec::bag_t(), _t, u);
+                bag_to_treedec(b, target_bag);
+                push(target_bag, v); // insert?
+                ++u;
+             }else{ untested();
+             }
+        }
+        assert(u==_numbering.total());
 
         for(unsigned u = 0; u < max; u++){
             unsigned min_index = max; //note: if there's an empty bag, we can glue
