@@ -25,10 +25,15 @@
 ACLOCAL_AMFLAGS = -Im4
 
 if USE_PYTHON
-pytdlib = tdlib
+if DIST
+treedec_dir = treedec
+endif
+if USE_CYTHON
+pytdlib_dir = tdlib
+endif
 endif
 
-SUBDIRS = tests examples $(pytdlib) src
+SUBDIRS = tests $(treedec_dir) examples $(pytdlib_dir) src
 
 
 EXTRA_DIST = \

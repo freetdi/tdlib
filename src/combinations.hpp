@@ -382,7 +382,7 @@ public: // random stuff
     unsigned lower_bound()const{
         return _low_tw + 1;
     }
-    unsigned bagsize()const{ untested();
+    unsigned bagsize()const{
         // incomplete
         return get_bagsize(_t);
     }

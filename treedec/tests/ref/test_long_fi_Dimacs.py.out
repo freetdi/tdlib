@@ -1,0 +1,32 @@
+---FI---
+dimacs_queen14_14[196,4186]
+treedec numverices 196
+0 163
+dimacs_miles250[125,387]
+treedec numverices 125
+1 9
+dimacs_queen9_9[81,1056]
+treedec numverices 81
+2 65
+dimacs_le450_15b[429,7707]
+treedec numverices 429
+3 283
+dimacs_queen6_6[36,290]
+treedec numverices 36
+4 26
+dimacs_queen11_11[121,1980]
+treedec numverices 121
+5 95
+---PP+FI---
+0 dimacs_queen14_14[196,4186]
+0 163
+1 dimacs_miles250[125,387]
+1 9
+2 dimacs_queen9_9[81,1056]
+2 65
+3 dimacs_le450_15b[429,7707]
+3 283
+4 dimacs_queen6_6[36,290]
+4 26
+5 dimacs_queen11_11[121,1980]
+5 95

@@ -18,6 +18,8 @@
 #ifndef TREEDEC_GRAPH_UTIL_HPP
 #define TREEDEC_GRAPH_UTIL_HPP
 
+#include <boost/graph/adjacency_list.hpp>
+#include "graph.hpp"
 #include "marker_util.hpp"
 
 namespace treedec {

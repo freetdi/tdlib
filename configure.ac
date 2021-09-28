@@ -9,6 +9,8 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([])
 LT_INIT()
 
+AM_CONDITIONAL([DIST], [false] )
+
 # debugging
 AC_MSG_CHECKING([if debug code should be compiled in])
 AC_ARG_ENABLE([debug],
@@ -80,7 +82,10 @@ CYTHON=${CYTHON-cython}
 
 AS_IF([test "$python" != no], [
 	AC_PATH_PROGS([CYTHON], [$CYTHON], [no])
-	AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])],
+	AS_IF([test "$CYTHON" = no], [
+			 cython=no
+			 AC_MSG_RESULT([cannot find cython.])
+			 ],
     AC_MSG_CHECKING([for $CYTHON >= $cythonver_req])
     [cythonver=`$CYTHON --version 2>&1 | sed -e 's/[[^0-9\.]]//g'`]
     AS_IF([test -n "$cythonver"], [
@@ -93,8 +98,11 @@ AS_IF([test "$python" != no], [
       AC_MSG_RESULT([not identified])
 	 ])
     unset cythonver
+	 cython=no
 	)
 ])
+
+AM_CONDITIONAL([USE_CYTHON], [test x$cython != xno] )
 
 # Checks for libraries.
 
@@ -166,6 +174,8 @@ AC_CONFIG_FILES([examples/Makefile])
 AC_CONFIG_FILES([examples/gr/Makefile])
 AC_CONFIG_FILES([tdlib/Makefile])
 AC_CONFIG_FILES([tdlib/tests/Makefile])
+AC_CONFIG_FILES([treedec/Makefile])
+AC_CONFIG_FILES([treedec/tests/Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/bits/Makefile])
 AC_CONFIG_FILES([src/applications/Makefile])

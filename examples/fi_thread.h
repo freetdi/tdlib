@@ -29,13 +29,9 @@ public:
         base::go();
     }
 
-    void do_print_results(std::ostream& o)
-    {
+    void do_print_results(std::ostream& o) {
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
-        // auto &g=TWTHREAD<G>::_g;
 		  treedec::grtdprinter<G> P(o, _work);
-		  size_t numbags = boost::num_vertices(_work); // ask P?!
-		  // P.head(numbags, _result);
 		  assert(_FI);
 		  _FI->get_tree_decomposition(P);
     }

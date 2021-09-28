@@ -48,6 +48,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
+// #include <boost/graph/graph_utility.hpp> // print
 
 #include <boost/graph/copy.hpp>
 
@@ -344,17 +345,17 @@ void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, N* io=NULL,
     }else{
         iOlocal.resize(num_vert);
         io=&iOlocal;
+        for(unsigned i = 0; i < num_vert; i++){
+            iOlocal[O[i]] = i;
+        }
     }
-    O_t& iO=*io;
+    N& iO=*io;
 
     //TODO: use adjacency matrix
     auto invalid=num_vert;
     std::vector<unsigned> edges(num_vert-1u, invalid);
     assert(edges.size()==num_vert-1);
 
-    for(unsigned i = 0; i < num_vert; i++){
-        iO[O[i]] = i;
-    }
 
     for(unsigned i = 0; i < num_vert; i++){
         auto R = boost::adjacent_vertices(O[i], G);
@@ -500,7 +501,7 @@ namespace impl{
 template<class G, class T, class X=void>
 struct bmdo_{
     template<class D, class O, class N>
-    static void gtd(D const& g, O o, T& t, size_t, N const& numbering){ untested();
+    static void gtd(D const& g, O o, T& t, size_t, N const& numbering){
         // ordering_to_treedec(_g, *_o, t);
         treedec::draft::vec_ordering_to_tree(g, o, t, &numbering);
     }
