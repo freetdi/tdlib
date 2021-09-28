@@ -130,7 +130,7 @@ struct graph_traits_base : public boost::graph_traits<G_t> {};
 // TODO: use graph_traits. see below
 // namespace detail{ not yet
 template<class G>
-struct treedec_chooser{ //
+struct treedec_chooser{
     typedef unsigned value_type;
     typedef std::set<unsigned> bag_type;
 #ifdef AVOID_BUNDLES_PROPERTY_BAGS
@@ -171,7 +171,7 @@ struct default_directed_select< boost::adjacency_list<X, Y, boost::undirectedS, 
 
 // this makes some sense...
 template<class G_t>
-struct graph_traits : public graph_traits_base<G_t> { //
+struct graph_traits : public graph_traits_base<G_t> {
     typedef typename treedec_chooser<G_t>::type treedec_type;
     typedef typename std::set<unsigned> outedge_set_type;
     typedef typename boost::adjacency_list<boost::vecS, boost::vecS,

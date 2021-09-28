@@ -75,6 +75,11 @@ struct dwt<G,
 		return g;
 	}
 
+//	static G& init(G const& g){
+//		incomplete(); // memory leak
+//		return *new G(g);
+//	}
+
 	template<class GG, class H>
 	static void copy(GG const&, H&){
 	}
@@ -167,11 +172,14 @@ public:
 
 	typedef typename boost::directed_tag directed_category;
 	typedef typename boost::adjacency_graph_tag traversal_category;
+	typedef std::pair<adjacency_iterator, adjacency_iterator> adjacency_range;
+	typedef directed_view type;
 
 private:
 	directed_view(){ unreachable(); }
 	directed_view(const directed_view& ) { unreachable();}
 public:
+//	template<class G_maybe_const>
 	directed_view(G& g, bool commit=false)
 	 : _g(wrapper_help::init(g)),
 	   _commit(commit)
@@ -403,6 +411,14 @@ void remove_out_edge_if(
 }
 
 template<class G>
+void clear_out_edges(
+		typename treedec::draft::directed_view<G>::vertex_descriptor v,
+		treedec::draft::directed_view<G>& g)
+{
+	return clear_out_edges(v, *g);
+}
+
+template<class G>
 std::pair<typename treedec::draft::directed_view<G>::edge_descriptor, bool >
 edge(
 	typename treedec::draft::directed_view<G>::vertex_descriptor v,
@@ -469,9 +485,7 @@ out_edges(
 }
 
 template<class G>
-std::pair<
-	typename treedec::draft::directed_view<G>::adjacency_iterator,
-	typename treedec::draft::directed_view<G>::adjacency_iterator>
+typename treedec::draft::directed_view<G>::adjacency_range
 adjacent_vertices(
 		typename treedec::draft::directed_view<G>::vertex_descriptor v,
 		treedec::draft::directed_view<G> const& g)
@@ -479,20 +493,24 @@ adjacent_vertices(
 	return g.adjacent_vertices(v);
 }
 
-    template<class G>
-    struct vertex_bundle_type<treedec::draft::directed_view<G> > {
-      typedef typename vertex_bundle_type<G>::type type;
-    };
+template<class G>
+struct vertex_bundle_type<treedec::draft::directed_view<G> > {
+	typedef typename vertex_bundle_type<G>::type type;
+};
 
 } // boost
 
 namespace treedec {
 
-template<class G>
+template<class G, class = void>
 struct directed_view_select{
     typedef treedec::draft::directed_view<G> type;
 };
 
-}
+// template<class G>
+// struct directed_view_select<G, typename std::enable_if< std::is_same<G, const G>::value>::type >{
+// };
+
+} // treedec
 
 #endif // guard
