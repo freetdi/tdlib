@@ -104,6 +104,7 @@ int main(int argc, char** argv)
 	std::vector<int> degree(n, 0);
 	std::vector<int> io(n, 0);
 	std::vector<int> o(n, 0);
+	std::vector<int>* num=nullptr;
 
 	G h(g);
 	assert(boost::num_edges(g)==boost::num_edges(g));
@@ -159,7 +160,7 @@ int main(int argc, char** argv)
 		++k;
 	}
 
-	treedec::draft::vec_ordering_to_tree(g, o, t );
+	treedec::draft::vec_ordering_to_tree(g, o, t, num);
 
 	status=treedec::check_treedec(g, t);
 	if (!status) std::cout << "treedec is valid!!\n";

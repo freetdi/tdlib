@@ -314,8 +314,8 @@ void inplace_bmdo_tree(G &g, O_t const& O, T& t, size_t bagsize, O_t const& io_)
 
 } // inplace_bmdo
 
-template <typename G_t, typename O_t, class T>
-void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
+template <typename G_t, typename O_t, class T, class N>
+void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, N* io=NULL,
         boost::adjacency_matrix<boost::directedS> *em=NULL )
 {
     size_t num_vert = boost::num_vertices(G);
@@ -368,10 +368,10 @@ void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
     }
 
     for(unsigned i = 0; i < num_vert; i++){
-        std::vector<unsigned> N;
+        std::vector<unsigned> neigh;
         for(unsigned j = 0; j < num_vert; j++){
             if(boost::edge(i, j, bags).second){
-                N.push_back(j);
+                neigh.push_back(j);
                 unsigned iO_n_node = iO[j];
                 if(iO_n_node < edges[i]){
                     edges[i] = iO_n_node;
@@ -379,12 +379,12 @@ void vec_ordering_to_tree(G_t const &G, O_t const& O, T& t, O_t* io=NULL,
             }
         }
 
-        for(unsigned j = 0; j < N.size(); j++){
-            for(unsigned k = 0; k < N.size(); k++){
-                if(iO[N[k]] > iO[N[j]]){
-                    boost::add_edge(iO[N[j]], N[k], bags);
-                    if((unsigned)iO[N[k]] < edges[iO[N[j]]]){
-                        edges[iO[N[j]]] = iO[N[k]];
+        for(unsigned j = 0; j < neigh.size(); j++){
+            for(unsigned k = 0; k < neigh.size(); k++){
+                if(iO[neigh[k]] > iO[neigh[j]]){
+                    boost::add_edge(iO[neigh[j]], neigh[k], bags);
+                    if((unsigned)iO[neigh[k]] < edges[iO[neigh[j]]]){
+                        edges[iO[neigh[j]]] = iO[neigh[k]];
                     }else{
                     }
                 }
