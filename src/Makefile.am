@@ -24,6 +24,7 @@ pkginclude_HEADERS = \
   exact_base.hpp \
   exact_cutset.hpp \
   exact_ta.hpp \
+  exception.hpp \
   fill.hpp \
   generic_base.hpp \
   generic_elimination_search_configs.hpp \
