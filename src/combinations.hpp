@@ -392,7 +392,7 @@ public: // algo interface
         if(boost::num_vertices(g()) == 0){
             boost::add_vertex(_t);
             return;
-        }else{ untested();
+        }else{
 
             // BUG, somehow need to cast CFGT to ppconfig
             // "message" is getting lost here, need pp_cfg+CFGT
@@ -412,7 +412,7 @@ public: // algo interface
         boost::copy_graph(_t, t);
     }
     template<class TT>
-    void get_tree_decomposition(TT& t) { untested();
+    void get_tree_decomposition(TT& t) {
         boost::copy_graph(_t, t);
     }
 
@@ -444,19 +444,19 @@ public: // construct
     PP_FI_TM(G& g)
       : algo::draft::algo1("pp_fi_tm"),
        _g(&g),
-       _low_tw(-1){ untested();
+       _low_tw(-1){
     }
     template<class G_in>
     PP_FI_TM(G_in const& g)
       : algo::draft::algo1("pp_fi_tm"),
        _g(new G),
        _low_tw(-1),
-       _own_g(true) { untested();
+       _own_g(true) {
         boost::copy_graph(g, *_g);
         _low_tw = -1;
     }
     ~PP_FI_TM() {
-        if(_own_g){ untested();
+        if(_own_g){
             delete _g;
         }else{
         }

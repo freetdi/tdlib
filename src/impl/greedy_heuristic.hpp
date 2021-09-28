@@ -34,7 +34,6 @@ namespace treedec{
 
 namespace impl{
 
-
 template <typename G_t, template<class G, class...> class CFG=algo::default_config>
 class minDegree : public greedy_heuristic_base<G_t, CFG>{
 public:
@@ -52,7 +51,7 @@ public:
     minDegree(G_t &G, bool ignore_isolated_vertices)
         : baseclass(G, -1u, ignore_isolated_vertices),
           _degs(baseclass::_g)
-    {
+    { untested();
     }
 
 #if 0 // base
@@ -66,7 +65,7 @@ public:
         BOOST_AUTO(it, zerodegbag1.begin());
 
         if(!baseclass::_iiv){
-            for(; it!=zerodegbag1.end(); ++it){
+            for(; it!=zerodegbag1.end(); ++it){ untested();
                 (*baseclass::_o)[baseclass::_i++] = *it;
             }
         }else{
@@ -84,6 +83,7 @@ public:
         boost::tie(c, baseclass::_min) = _degs.pick_min(baseclass::_min, baseclass::_num_vert);
     }
 
+    // md::
     void eliminate(typename baseclass::vertex_descriptor v){
         typename baseclass::adjacency_iterator I, E;
         for(boost::tie(I, E) = boost::adjacent_vertices(v, baseclass::_g); I!=E; ++I){
@@ -120,7 +120,7 @@ template<typename G_t,
          template<class GG, class ...> class CFGT=algo::default_config>
 class fillIn : public greedy_base< G_t,
                std::vector<typename boost::graph_traits<G_t>::vertex_descriptor>,
-               CFGT>{
+               CFGT>{ //
 public: //types
     typedef std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> O_t;
     typedef typename directed_view_select<G_t>::type D_t;
@@ -135,7 +135,7 @@ public: //types
 
         fill_update_cb(fill_type* d, G const& g) :
             _fill(d), _g(g)
-        {
+        { untested();
         }
 
         void operator()(vertex_descriptor v){ untested();
@@ -198,7 +198,7 @@ public: // implementation
                                        // different marker
                                        //
         // bug: idmap!
-        auto degc=baseclass::_degreemap[c];
+        auto degc = baseclass::_degreemap[c];
 
         assert(fill_c<=long(degc*(degc-1)));
 
@@ -234,10 +234,11 @@ public: // implementation
                 long DN = degn - overlap - 1; // nodes connected to n but not (to) c
 
                 trace5("DC?", fill_n, fill_c, degc, overlap, degn);
-                trace2("DC?", DC, DN);
+                trace5("DC?", c, n, DC, DN, _fill.is_lb(n));
+
                 long offset = - long(fill_c);
 #if 0
-              if(degc==2 && overlap==1){
+              if(degc==2 && overlap==1){ untested();
                   no need to queue.
                   assert(fillc==0)
                   offset = - long(DN);
@@ -249,23 +250,23 @@ public: // implementation
 //                    offset -= overlap*DC + (DC-1)*DC/2
                     offset -= DN; // no more need to connect edges behind
 //                    offset = - long(fill_n); // TODO
-                    trace3("DC", n, fill_n, offset);
+                    trace4("DC", n, fill_n, offset, _fill.is_lb(n));
 
                     _fill.shift(n, offset);
                     _fill.q_eval(n); // treat as lb
-                }else{ // !DC
+                }else{
                     // this is exact, unless an edge is missing.
                     // (then it is flagged lb, later);
                     offset = - long(fill_c) - DN;
-                    trace3("noDC", n, fill_n, offset);
+                    trace6("noDC, shift", n, fill_c, fill_n, offset, DN, DC);
                     _fill.shift(n, offset);
                 }
 
-                auto q=adjacent_vertices(c, _subgraph);
                 ///q.first=next;
 
                 // iterate {n2,n} \subset 1-neighborhood
                 // n2 < n... add edges to previously visited n2 only
+                auto q = adjacent_vertices(c, _subgraph);
                 for(; q.first!=p.first; ++q.first){
 //                for(; q.first!=q.second; ++q.first) // careful!
                     auto n2=*q.first;
@@ -323,22 +324,7 @@ public: // implementation
         treedec::check(_subgraph);
 
 #ifndef NDEBUG
-        auto p=boost::adjacent_vertices(c, _subgraph);
-        for(; p.first!=p.second; ++p.first){
-            auto n=*p.first;
-            long degn=baseclass::_degreemap[n];
-            trace3("check", n, _fill.get_value(n), degn);
-            assert(2*_fill.get_value(n)<=size_t(degn*(degn-1)));
-
-            auto q=boost::adjacent_vertices(n, _subgraph);
-            for(; q.first!=q.second; ++q.first){
-                auto n2=*q.first;
-                trace1("neigh", n2);
-                --degn;
-            }
-            trace2("check", n, degn);
-            assert(!degn);
-        }
+        check_vertex(c);
 #endif
     } // eliminate(c)
 
@@ -356,6 +342,33 @@ public: // implementation
             baseclass::_numbering.put(v);
         }
         assert(baseclass::_i == baseclass::_num_vert);
+    }
+
+private: // debugging
+    void check_vertex(vertex_descriptor c) {
+        size_t k=0;
+        for(auto p=boost::adjacent_vertices(c, _subgraph); p.first!=p.second; ++p.first){
+            ++k;
+        }
+        assert(k==baseclass::_degreemap[c]);
+
+        auto p=boost::adjacent_vertices(c, _subgraph);
+        for(; p.first!=p.second; ++p.first){
+            auto n=*p.first;
+            long degn = baseclass::_degreemap[n];
+            trace4("adj", c, *p.first, degn, baseclass::_degreemap[c]);
+            trace4("checking neigh", n, _fill.get_value(n), degn, _fill.is_lb(n));
+            assert(2*_fill.get_value(n)<=size_t(degn*(degn-1)));
+
+            auto q=boost::adjacent_vertices(n, _subgraph);
+            for(; q.first!=q.second; ++q.first){
+                auto n2=*q.first;
+                trace1("neigh", n2);
+                --degn;
+            }
+            trace2("check", n, degn);
+            assert(!degn);
+        }
     }
 
 private:
@@ -379,16 +392,16 @@ public: //types
         fill_update_cb(fill_type* d, G_t const& g) :
             _fill(d), G(g){}
 
-        void operator()(vertex_descriptor v){
+        void operator()(vertex_descriptor v){ untested();
             _fill->q_eval(v);
         }
-        void operator()(vertex_descriptor s, vertex_descriptor t) {
+        void operator()(vertex_descriptor s, vertex_descriptor t) { untested();
             assert(s < t); // likely not. is this necessary below?
             // e has just been inserted.
             BOOST_AUTO(cni, common_out_edges(s, t, G));
             BOOST_AUTO(i, cni.first);
             BOOST_AUTO(e, cni.second);
-            for(; i!=e; ++i){
+            for(; i!=e; ++i){ untested();
                 assert(*i != s);
                 assert(*i != t);
     //            no. maybe theres only half an edge.
@@ -408,36 +421,38 @@ public: // construct
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
          _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    {
+    { untested();
     }
 
     fillIn(G_t &G, bool ignore_isolated_vertices, unsigned ub=-1u)
         : baseclass(G, ub, ignore_isolated_vertices),
           _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    {
+    { untested();
     }
 
 public: // implementation
-    void initialize(){
+    void initialize(){ untested();
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
             if(boost::out_degree(*vIt, baseclass::_g) == 0){
                 if(!baseclass::_iiv){
                     (*baseclass::_o)[baseclass::_i++] = *vIt;
                 }
-                else{
+                else{ untested();
                     --baseclass::_num_vert;
                 }
             }
         }
     }
 
+    // obs::fillIn::
     void next(typename baseclass::vertex_descriptor &c){
         _fill.check();
         boost::tie(c, baseclass::_min) = _fill.pick_min(0, -1, true);
         _fill.check();
     }
 
+    // obs::fillIn::
     void eliminate(typename baseclass::vertex_descriptor v){
         _fill.mark_neighbors(v, baseclass::_min);
 
@@ -448,8 +463,8 @@ public: // implementation
         _fill.unmark_neighbours(*baseclass::_current_N);
     }
 
-    void postprocessing(){
-        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){
+    void postprocessing(){ untested();
+        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){ untested();
             auto v = _fill.pick_min(0, 0, true).first;
             (*baseclass::_o)[baseclass::_i] = v;
         }

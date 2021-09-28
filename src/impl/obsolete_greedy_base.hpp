@@ -5,7 +5,6 @@ namespace treedec{
 
 namespace impl{
 
-// use greedy_base instead.
 template<class G_t, template<class G, class...> class CFGT_t=algo::default_config>
 class greedy_heuristic_base : public ::treedec::algo::draft::algo1{
 public:
@@ -28,12 +27,12 @@ public:
 
 
     ~greedy_heuristic_base(){
-        if(_own_o){
+        if(_own_o){ untested();
             delete _o;
         }
     }
 
-    O_t& get_elimination_ordering() {
+    O_t& get_elimination_ordering() { untested();
 
         return *_o;
     }
@@ -93,7 +92,7 @@ public:
 
         timer_on();
 
-        if(!_num_vert){
+        if(!_num_vert){ untested();
             timer_off();
             return;
         }else{
@@ -116,28 +115,33 @@ public:
             vertex_descriptor c;
 
             next(c);
+            trace2("greedy_heuristic next was", c, boost::out_degree(c, _g));
 
             //Abort if the width of this decomposition would be larger than 'ub'.
             if(_min >= _ub_in){ untested();
                 assert(_t); // ouch?
                 _t->clear(); //could be also not the case
                 throw exception_unsuccessful();
+            }else{
             }
 
             elim_vertices[_i] = c;
 
             if(_t){
                 _current_N = &_bags[_i];
-            }else{
+            }else{ untested();
             }
 
-            _ub = (boost::out_degree(c, _g)>_ub)?boost::out_degree(c, _g):_ub;
+            if (boost::out_degree(c, _g)>_ub){
+                _ub = boost::out_degree(c, _g);
+            }else{
+            }
 
             // assert(bags_i);?!
 
             eliminate(c);
 
-            if(!_t){
+            if(!_t){ untested();
                 _current_N->clear();
             }else{
             }

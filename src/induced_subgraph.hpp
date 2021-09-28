@@ -69,7 +69,8 @@ public:
 		  return vertex_range(fb, fe);
 	}
 	adjacency_range adjacent_vertices(vertex_descriptor v) const{
-		auto p=boost::adjacent_vertices(v, _g);
+		auto& _gg = const_cast<G&>(_g);
+		auto p = boost::adjacent_vertices(v, _gg);
 
 		adjacency_iterator fb(_m, p.first, p.second);
 		adjacency_iterator fe(_m, p.second, p.second);

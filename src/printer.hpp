@@ -81,8 +81,8 @@ namespace draft {
 		void edge(size_t x, size_t y) { itested();
 			s() << "\n" << x+_offset << " " << y+_offset;
 		}
-		void announce_bag(size_t x) {
-			if(_nva==x){
+		void announce_bag(size_t x) { untested();
+			if(_nva==x){ untested();
 			}else{ untested();
 				incomplete(); //?
 			}
@@ -98,7 +98,7 @@ namespace draft {
 			return std::make_pair(true, true);
 		}
 
-		printer& bag(unsigned i){
+		printer& bag(unsigned i){ untested();
 			announce_bag(i);
 			return *this;
 		}
@@ -181,7 +181,7 @@ namespace boost{
 
 	template<class G>
 	treedec::grtdprinter<G>& get(treedec::bag_t,
-			treedec::grtdprinter<G>& g, unsigned i) {
+			treedec::grtdprinter<G>& g, unsigned i) { untested();
 		return g.bag(i);
 	}
 
@@ -201,7 +201,7 @@ namespace boost{
 	template<class G>
 	std::pair<std::pair<size_t, size_t>, bool>
 	add_edge(size_t x, size_t y, treedec::grtdprinter<G>& p)
-	{
+	{ untested();
 		p.edge(x,y);
 		return std::make_pair( std::make_pair(x, y), true );
 	}

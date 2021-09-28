@@ -772,8 +772,7 @@ public: // O(1) neighbor stuff.
     //   |X| = deg(n)-deg(c)
     //   queue new_fill(n) = old_fill(n) - old_fill(c) - |X|
     // (override in case n is incdent to a newly inserted edge)
-    void mark_neighbors(vertex_descriptor c, size_t cfill)
-    {
+    void mark_neighbors(vertex_descriptor c, size_t cfill) {
         trace2("mark_neigh", c, cfill);
         typedef typename boost::graph_traits<G_t>::vertices_size_type vertices_size_type;
         unsigned int posc = boost::get(boost::get(boost::vertex_index, _g), c);
