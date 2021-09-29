@@ -269,76 +269,77 @@ namespace boost {
              class VertexIndexMap>
     class mmd_impl
     {
-      // Typedefs
-      typedef graph_traits<Graph> Traits;
-      typedef typename Traits::vertices_size_type size_type;
-      typedef typename detail::integer_traits<size_type>::difference_type 
-        diff_t;
-      typedef typename Traits::vertex_descriptor vertex_t;
-      typedef typename Traits::adjacency_iterator adj_iter;
-      typedef iterator_property_map<vertex_t*, 
-        identity_property_map, vertex_t, vertex_t&> IndexVertexMap;
-      typedef detail::Stacks<diff_t> Workspace;
-      typedef bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
-        DegreeLists;
-      typedef Numbering<InversePermutationMap, diff_t, vertex_t,VertexIndexMap>
-        NumberingD;
-      typedef degreelists_marker<diff_t, vertex_t, VertexIndexMap> 
-        DegreeListsMarker;
-      typedef Marker<diff_t, vertex_t, VertexIndexMap> MarkerP;
+        // Typedefs
+        typedef graph_traits<Graph> Traits;
+        typedef typename Traits::vertices_size_type size_type;
+        typedef typename detail::integer_traits<size_type>::difference_type 
+          diff_t;
+        typedef typename Traits::vertex_descriptor vertex_t;
+        typedef typename Traits::adjacency_iterator adj_iter;
+        typedef iterator_property_map<vertex_t*, 
+          identity_property_map, vertex_t, vertex_t&> IndexVertexMap;
+        typedef detail::Stacks<diff_t> Workspace;
+        typedef bucket_sorter<size_type, vertex_t, DegreeMap, VertexIndexMap> 
+          DegreeLists;
+        typedef Numbering<InversePermutationMap, diff_t, vertex_t,VertexIndexMap>
+          NumberingD;
+        typedef degreelists_marker<diff_t, vertex_t, VertexIndexMap> 
+          DegreeListsMarker;
+        typedef Marker<diff_t, vertex_t, VertexIndexMap> MarkerP;
 
-      // Data Members
+        // Data Members
 
-      // input parameters
-      Graph& G;
-      DegreeMap degree;
-      InversePermutationMap inverse_perm;
-      PermutationMap perm;
-      SuperNodeMap supernode_size;
-      VertexIndexMap vertex_index_map;
+        // input parameters
+        Graph& G;
+        int delta;
+        DegreeMap degree;
+        InversePermutationMap inverse_perm;
+        PermutationMap perm;
+        SuperNodeMap supernode_size;
+        VertexIndexMap vertex_index_map;
 
-      // internal data-structures
-      std::vector<vertex_t> index_vertex_vec;
-      size_type n;
-      IndexVertexMap index_vertex_map;
-      DegreeLists degreelists;
-      NumberingD numbering;
-      DegreeListsMarker degree_lists_marker;
-      MarkerP marker;
-      Workspace work_space;
-      unsigned ub;
-      unsigned c1, c2, c3, c4, c5;
-      unsigned c;
+        // internal data-structures
+        std::vector< vertex_t > index_vertex_vec;
+        size_type n;
+        IndexVertexMap index_vertex_map;
+        DegreeLists degreelists;
+        NumberingD numbering;
+        DegreeListsMarker degree_lists_marker;
+        MarkerP marker;
+        Workspace work_space;
+        unsigned ub;
+        unsigned c1, c2, c3, c4, c5;
+        unsigned c;
     public:
-      unsigned bagsize;
+        unsigned bagsize;
 
-      mmd_impl(Graph& g, size_type n_, DegreeMap degree, 
-               InversePermutationMap inverse_perm, 
-               PermutationMap perm,
-               SuperNodeMap supernode_size, 
-               VertexIndexMap id,
-               unsigned ub_) 
-        : G(g), degree(degree), 
-        inverse_perm(inverse_perm), 
-        perm(perm), 
-        supernode_size(supernode_size), 
-        vertex_index_map(id),
-        index_vertex_vec(n_), 
-        n(n_),
-        degreelists(n_ + 1, n_, degree, id),
-        numbering(inverse_perm, n_, vertex_index_map),
-        degree_lists_marker(n_, vertex_index_map), 
-        marker(n_, vertex_index_map),
-        work_space(n_),
-        ub(ub_),
-        c(0),
-        bagsize(0)
-      {
-        typename graph_traits<Graph>::vertex_iterator v, vend;
-        size_type vid = 0;
-        for (tie(v, vend) = vertices(G); v != vend; ++v, ++vid)
-          index_vertex_vec[vid] = *v;
-        index_vertex_map = IndexVertexMap(&index_vertex_vec[0]);
+        mmd_impl(Graph& g, size_type n_, int delta, DegreeMap degree, 
+            InversePermutationMap inverse_perm, PermutationMap perm,
+            SuperNodeMap supernode_size, VertexIndexMap id,
+            unsigned ub_) 
+        : G(g)
+        , delta(delta)
+        , degree(degree)
+        , inverse_perm(inverse_perm)
+        , perm(perm)
+        , supernode_size(supernode_size)
+        , vertex_index_map(id)
+        , index_vertex_vec(n_)
+        , n(n_)
+        , degreelists(n_ + 1, n_, degree, id)
+        , numbering(inverse_perm, n_, vertex_index_map)
+        , degree_lists_marker(n_, vertex_index_map)
+        , marker(n_, vertex_index_map)
+        , work_space(n_)
+        , ub(ub_)
+        , c(0)
+        , bagsize(0)
+        {
+            typename graph_traits< Graph >::vertex_iterator v, vend;
+            size_type vid = 0;
+            for (tie(v, vend) = vertices(G); v != vend; ++v, ++vid)
+              index_vertex_vec[vid] = *v;
+            index_vertex_map = IndexVertexMap(&index_vertex_vec[0]);
 
         // Initialize degreelists.  Degreelists organizes the nodes
         // according to their degree.
@@ -348,37 +349,59 @@ namespace boost {
         }
       }
 
-      void do_mmd()
-      {
-        // Eliminate the isolated nodes -- these are simply the nodes
-        // with no neighbors, which are accessible as a list (really, a
-        // stack) at location 0.  Since these don't affect any other
-        // nodes, we can eliminate them without doing degree updates.
-        typename DegreeLists::stack list_isolated = degreelists[0];
-        while (!list_isolated.empty()) {
-          vertex_t node = list_isolated.top();
-          marker.mark_done(node);
-          numbering(node);
-          numbering.increment();
-          list_isolated.pop();
-        }
-        size_type min_degree = 1;
-        typename DegreeLists::stack list_min_degree = degreelists[min_degree];
+        void do_mmd()
+        {
+            // Eliminate the isolated nodes -- these are simply the nodes
+            // with no neighbors, which are accessible as a list (really, a
+            // stack) at location 0.  Since these don't affect any other
+            // nodes, we can eliminate them without doing degree updates.
+            typename DegreeLists::stack list_isolated = degreelists[0];
+            while (!list_isolated.empty())
+            {
+                vertex_t node = list_isolated.top();
+                marker.mark_done(node);
+                numbering(node);
+                numbering.increment();
+                list_isolated.pop();
+            }
+            size_type min_degree = 1;
+            typename DegreeLists::stack list_min_degree = degreelists[min_degree];
 
-        while (list_min_degree.empty()) {
-          ++min_degree;
-          list_min_degree = degreelists[min_degree];
-        }
+            while (list_min_degree.empty())
+            {
+                ++min_degree;
+                list_min_degree = degreelists[min_degree];
+            }
 
-        // check if the whole eliminating process is done
-        while (!numbering.all_done()) {
-          typename Workspace::stack llist = work_space.make_stack();
+            // check if the whole eliminating process is done
+            while (!numbering.all_done())
+            {
+                size_type min_degree_limit = min_degree + delta; // WARNING
+                if(delta<0){
+                    min_degree_limit = size_type(-1);
+                }else{
+                }
+                trace3("dbg", min_degree_limit, min_degree, delta);
+                typename Workspace::stack llist = work_space.make_stack();
 
-            // Find the next non-empty degree
-            for (list_min_degree = degreelists[min_degree]; 
-                 list_min_degree.empty() && min_degree < n;
-                 ++min_degree, list_min_degree = degreelists[min_degree])
-              ;
+                // multiple elimination
+                do {
+
+                    // Find the next non-empty degree
+                    for (list_min_degree = degreelists[min_degree];
+                         list_min_degree.empty()
+                         && min_degree < n
+                         && min_degree <= min_degree_limit
+                         ;
+                         ++min_degree,
+                         list_min_degree = degreelists[min_degree])
+                         ;
+
+                     if (delta<0){
+                     }else if (list_min_degree.empty()){
+                         break;
+                     }else{
+                     }
 
 #ifdef RANDOMPOP
             vertex_t node;
@@ -389,44 +412,56 @@ namespace boost {
                node = list_min_degree.bottom();
                list_min_degree.pop_back();
             }
+                    const size_type node_id = get(vertex_index_map, node);
 #else
-            const vertex_t node = list_min_degree.top();
-            list_min_degree.pop();
+                    const vertex_t node = list_min_degree.top();
+                    const size_type node_id = get(vertex_index_map, node);
+                    list_min_degree.pop();
 #endif
 
+                    unsigned actual_deg = min_degree+supernode_size[node];
 
-            const size_type node_id = get(vertex_index_map, node);
+                    if (actual_deg >= ub){ untested();
+                        throw treedec::exception_unsuccessful();
+                    }else{
+                    }
 
-            unsigned actual_deg = min_degree+supernode_size[node];
+                    if(actual_deg > bagsize){
+                        bagsize = actual_deg;
+                    }else{
+                    }
 
-            if (actual_deg >= ub)
-              throw treedec::exception_unsuccessful();
+                    trace2("numbering", node, supernode_size[node]);
+                    numbering(node);
 
-            if(actual_deg > bagsize){
-               bagsize = actual_deg;
-            }else{
+                    // check if node is the last one
+                    if (numbering.all_done(supernode_size[node]))
+                    {
+                        numbering.increment(supernode_size[node]);
+                        break;
+                    }
+                    marker.increment_tag();
+                    marker.mark_tagged(node);
+
+                    this->eliminate(node);
+
+                    numbering.increment(supernode_size[node]);
+                    if (numbering.all_done()){
+                        trace1("all_done nop?", node);
+                    }else if (numbering.all_done(1)){
+                        trace1("all_done nop 1?", node);
+                    }
+                    llist.push(node_id);
+                } // multiple elimination
+                while (delta>=0);
+
+                if (numbering.all_done()){
+                    trace0("all done1");
+                    break;
+                }else{
+                    this->update(llist, min_degree);
+                }
             }
-
-            numbering(node);
-
-            // check if node is the last one
-            if (numbering.all_done(supernode_size[node])) {
-              numbering.increment(supernode_size[node]);
-              break;
-            }
-            marker.increment_tag();
-            marker.mark_tagged(node);
-
-            this->eliminate(node);
-
-            numbering.increment(supernode_size[node]);
-            llist.push(node_id);
-
-          if (numbering.all_done()) 
-            break;
-
-          this->update( llist, min_degree);
-        }
 
 #ifdef SOME_WEIRD_EXTRA_CODE
 
@@ -440,56 +475,68 @@ namespace boost {
           //c++;
         }
 #endif
-      } // do_mmd()
+        } // do_mmd()
 
-      void eliminate(vertex_t node)
-      {
-        typename Workspace::stack element_neighbor = work_space.make_stack();
+        void eliminate(vertex_t node)
+        {
+            trace1("mmd elim", node);
+            typename Workspace::stack element_neighbor
+                = work_space.make_stack();
 
-        // Create two function objects for edge removal
-        typedef typename Workspace::stack WorkStack;
-        predicateRemoveEdge1<Graph, MarkerP, NumberingD, 
-                             WorkStack, VertexIndexMap>
-          p(G, marker, numbering, element_neighbor, vertex_index_map);
+            // Create two function objects for edge removal
+            typedef typename Workspace::stack WorkStack;
+            predicateRemoveEdge1< Graph, MarkerP, NumberingD, WorkStack,
+                VertexIndexMap >
+                p(G, marker, numbering, element_neighbor, vertex_index_map);
 
-        predicate_remove_tagged_edges<Graph, MarkerP> p2(G, marker);
+            predicate_remove_tagged_edges< Graph, MarkerP> p2(G, marker);
 
-        // Reconstruct the adjacent node list, push element neighbor in a List.
-        remove_out_edge_if(node, p, G);
-        //during removal element neighbors are collected.
+            // Reconstruct the adjacent node list, push element neighbor in a
+            // List.
+            remove_out_edge_if(node, p, G);
+            // during removal element neighbors are collected.
 
-        while (!element_neighbor.empty()) {
-          // element absorb
-          size_type e_id = element_neighbor.top();
-          vertex_t element = get(index_vertex_map, e_id);
-          adj_iter i, i_end;
-          for (boost::tie(i, i_end) = adjacent_vertices(element, G); i != i_end; ++i){
-            vertex_t i_node = *i;
-            if (!marker.is_tagged(i_node) && !numbering.is_numbered(i_node)) {
-              marker.mark_tagged(i_node);
-              add_edge(node, i_node, G);
-            }
-          }
-          element_neighbor.pop();
+            while (!element_neighbor.empty())
+            {
+                // element absorb
+                size_type e_id = element_neighbor.top();
+                vertex_t element = get(index_vertex_map, e_id);
+                adj_iter i, i_end;
+                for (boost::tie(i, i_end) = adjacent_vertices(element, G);
+                     i != i_end; ++i)
+                {
+                    vertex_t i_node = *i;
+                    if (!marker.is_tagged(i_node)
+                        && !numbering.is_numbered(i_node)) {
+                        marker.mark_tagged(i_node);
+                        add_edge(node, i_node, G);
+                    }
+                }
+                element_neighbor.pop();
         }
         adj_iter v, ve;
         for (boost::tie(v, ve) = adjacent_vertices(node, G); v != ve; ++v) {
           vertex_t v_node = *v;
           if (!degree_lists_marker.need_update(v_node) 
               && !degree_lists_marker.outmatched_or_done(v_node)) {
+
+            trace2("degr", v_node, node);
             degreelists.remove(v_node);
           }
           //update out edges of v_node
           remove_out_edge_if(v_node, p2, G);
 
-          if ( out_degree(v_node, G) == 0 ) { // indistinguishable nodes
+          if ( out_degree(v_node, G) == 0 ) { untested();
+              // indistinguishable nodes
             supernode_size[node] += supernode_size[v_node];
             supernode_size[v_node] = 0;
 
+            trace2("indist2", v_node, node);
             numbering.indistinguishable(v_node, node);
             marker.mark_done(v_node);
             degree_lists_marker.mark(v_node);
-          } else {                           // not indistinguishable nodes
+          } else {
+              // not indistinguishable nodes
             add_edge(v_node, node, G);
             degree_lists_marker.mark_need_update(v_node);
           }
@@ -555,6 +602,7 @@ namespace boost {
                     if ( out_degree(i_node, G) == 2 ) { // is indistinguishable
                       supernode_size[u_node] += supernode_size[i_node];
                       supernode_size[i_node] = 0;
+                      trace2("indist", i_node, u_node);
                       numbering.indistinguishable(i_node, u_node);
                       marker.mark_done(i_node);
                       degree_lists_marker.mark(i_node);
@@ -625,7 +673,7 @@ namespace boost {
             if (min_degree > deg)
               min_degree = deg;
             qxlist.pop();
-          } // while (!qxlist.empty()) {
+          } // while (!qxlist.empty())
 
           marker.set_tag_as_multiple_tag();
           llist.pop();
@@ -640,39 +688,51 @@ namespace boost {
         // collect the permutation info
         size_type i;
         for (i = 0; i < n; ++i) {
+			  trace3("bp", i, next[i], supernode_size[i]);
           diff_t size = supernode_size[get(index_vertex_map, i)];
-          if ( size <= 0 ) {
+          if ( size <= 0 ) { untested();
             prev[i] = next[i];
             supernode_size[get(index_vertex_map, i)]
               = next[i] + 1;  // record the supernode info
-          } else
-            prev[i] = - next[i];
+          } else {
+            next[i] = - next[i] - 1; // final value.
+            prev[i] = next[i] + 1;
+          }
         }
-        for (i = 1; i < n + 1; ++i) {
-          if ( prev[i-1] > 0 )
+        // fill gaps in next
+        for (i = 0; i < n; ++i) {
+          if ( prev[i] > 0 ){
+            // all set.
+            assert(next[i]>=0);
             continue;
+          }else{
+            assert(next[i]<0); // pointing towards parent.
+          }
           diff_t parent = i;
-          while ( prev[parent - 1] < 0 ) {
-            parent = - prev[parent - 1];
+          while ( prev[parent] < 0 ) {
+            parent = - prev[parent] - 1;
           }
 
           diff_t root = parent;
-          diff_t num = prev[root - 1] + 1;
-          next[i-1] = - num;
-          prev[root-1] = num;
+          diff_t num = prev[root];
+          next[i] = num;
+          ++prev[root]; // increment number in parent.
+                        // so next node gets this one...
 
+          // redirect children.
           parent = i;
-          diff_t next_node = - prev[parent - 1];
-          while (next_node > 0) {
-            prev[parent-1] = - root;
-            parent = next_node;
-            next_node = - prev[parent - 1];
+          while (prev[parent] < 0) {
+            prev[parent] = - root - 1;
+            parent = - prev[parent] - 1;
           }
         }
         for (i = 0; i < n; i++) {
-          diff_t num = - next[i] - 1;
-          next[i] = num;
+          diff_t num = next[i];
           prev[num] = i;
+//          next[i] = -num-1; // really?
+        }
+        for (unsigned num=0; num < n; num++) {
+            trace4("bp", num, next[num], prev[num], supernode_size[prev[num]]);
         }
       } // build_permutation()
     };
@@ -680,20 +740,19 @@ namespace boost {
   } //namespace detail
 
 
-  // MMD algorithm
-  // 
-  //The implementation presently includes the enhancements for mass
-  //elimination, incomplete degree update, multiple elimination, and
-  //external degree.
-  //
-  //Important Note: This implementation requires the BGL graph to be
-  //directed.  Therefore, nonzero entry (i, j) in a symmetrical matrix
-  //A coresponds to two directed edges (i->j and j->i).
-  //
-  //see Alan George and Joseph W. H. Liu, The Evolution of the Minimum
-  //Degree Ordering Algorithm, SIAM Review, 31, 1989, Page 1-19
-  template<class Graph, class DegreeMap, 
-           class InversePermutationMap, 
+// MMD algorithm
+//
+// The implementation presently includes the enhancements for mass
+// elimination, incomplete degree update, multiple elimination, and
+// external degree.
+//
+// Important Note: This implementation requires the BGL graph to be
+// directed.  Therefore, nonzero entry (i, j) in a symmetrical matrix
+// A coresponds to two directed edges (i->j and j->i).
+//
+// see Alan George and Joseph W. H. Liu, The Evolution of the Minimum
+// Degree Ordering Algorithm, SIAM Review, 31, 1989, Page 1-19
+template< class Graph, class DegreeMap, class InversePermutationMap, 
            class PermutationMap,
            class SuperNodeMap, class VertexIndexMap>
   unsigned minimum_degree_ordering
@@ -702,13 +761,13 @@ namespace boost {
      InversePermutationMap inverse_perm, 
      PermutationMap perm, 
      SuperNodeMap supernode_size, 
-     int /* delta */,
+     int delta,
      VertexIndexMap vertex_index_map,
      unsigned ub = UINT_MAX)
   {
     detail::mmd_impl<Graph,DegreeMap,InversePermutationMap,
       PermutationMap, SuperNodeMap, VertexIndexMap> 
-      impl(G, boost::num_vertices(G), degree, inverse_perm, 
+      impl(G, boost::num_vertices(G), delta, degree, inverse_perm, 
            perm, supernode_size, vertex_index_map, ub);
     impl.do_mmd();
     impl.build_permutation(inverse_perm, perm);
@@ -719,3 +778,4 @@ namespace boost {
 } // namespace boost
 
 #endif // MINIMUM_DEGREE_ORDERING_HPP
+// vim:ts=8:sw=4:et:
