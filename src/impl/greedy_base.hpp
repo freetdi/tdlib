@@ -267,7 +267,7 @@ public:
 
     // greedy_base::
     void do_it(){
-        trace2("greedy_base::do_it", _i, _num_vert);
+        trace3("greedy_base::do_it", _i, _num_vert, _numbering.total());
         check(_g);
 
         timer_on();
@@ -316,7 +316,6 @@ public:
             eliminate(c);
             --cnt;
             // assert(cnt == vertices_left());
-
 
             assert(_numbering.total()==_i+1);
 

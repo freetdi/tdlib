@@ -788,9 +788,8 @@ void ordering_to_treedec(G_t &G, std::vector<int> &O, T_t &T)
 
 namespace impl{
 
-template <typename G_t, typename T_t>
-void treedec_to_ordering(T_t &T,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+template <class T_t, class O_t>
+void treedec_to_ordering(T_t &T, O_t& O)
 {
     bool leaf_found = false;
 
@@ -834,15 +833,15 @@ void treedec_to_ordering(T_t &T,
         auto& b=boost::get(bag_t(), T, leaf);
         b.clear();
 
-        impl::treedec_to_ordering<G_t, T_t>(T, O);
+        impl::treedec_to_ordering<T_t, O_t>(T, O);
+    }else{
     }
 }
 
 } //namespace impl
 
-template <typename G_t, typename T_t>
-void treedec_to_ordering(T_t &T,
-      std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> &O)
+template <typename T_t, typename O_t>
+void treedec_to_ordering(T_t &T, O_t& O)
 {
     if(boost::num_vertices(T) == 0){ untested();
         return;
@@ -857,7 +856,7 @@ void treedec_to_ordering(T_t &T,
         return;
     }
 
-    treedec::impl::treedec_to_ordering<G_t, T_t>(T, O);
+    treedec::impl::treedec_to_ordering<T_t, O_t>(T, O);
 }
 
 //Make G a filled graph according to the provided elimination_ordering. Stores
