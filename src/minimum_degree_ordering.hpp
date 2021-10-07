@@ -526,7 +526,7 @@ namespace boost {
           //update out edges of v_node
           remove_out_edge_if(v_node, p2, G);
 
-          if ( out_degree(v_node, G) == 0 ) { untested();
+          if ( out_degree(v_node, G) == 0 ) {
               // indistinguishable nodes
             supernode_size[node] += supernode_size[v_node];
             supernode_size[v_node] = 0;
@@ -690,7 +690,7 @@ namespace boost {
         for (i = 0; i < n; ++i) {
 			  trace3("bp", i, next[i], supernode_size[i]);
           diff_t size = supernode_size[get(index_vertex_map, i)];
-          if ( size <= 0 ) { untested();
+          if ( size <= 0 ) {
             prev[i] = next[i];
             supernode_size[get(index_vertex_map, i)]
               = next[i] + 1;  // record the supernode info

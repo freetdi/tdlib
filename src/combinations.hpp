@@ -130,6 +130,10 @@ public: // random stuff, should be in algo. later
         treedec::obsolete_copy_treedec(_t, t);
 #endif
     }
+    template<class O>
+    void get_elimination_ordering(O&) const{
+        incomplete();
+    }
 
 private:
     G& _g;
@@ -415,6 +419,10 @@ public: // algo interface
     void get_tree_decomposition(TT& t) {
         boost::copy_graph(_t, t);
     }
+    template<class O>
+    void get_elimination_ordering(O&) const{
+        incomplete();
+    }
 
 private:
     G& g(){return *_g;};
@@ -471,6 +479,10 @@ public: // random stuff
     }
     unsigned bagsize()const{
         return get_bagsize(_t);
+    }
+    template<class O>
+    void get_elimination_ordering(O&) const{
+        incomplete();
     }
 
 public: // algo interface

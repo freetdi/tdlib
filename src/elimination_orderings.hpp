@@ -48,8 +48,10 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
+#include <boost/graph/properties.hpp>
 // #include <boost/graph/graph_utility.hpp> // print
 
+#include "treedec_traits.hpp"
 #include <boost/graph/copy.hpp>
 
 #include "trace.hpp"
@@ -62,6 +64,7 @@
 #include "misc.hpp"
 #include "skeleton.hpp"
 #include "treedec.hpp"
+#include "treedec_copy.hpp"
 
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
 # include "minimum_degree_ordering.hpp"
@@ -854,10 +857,96 @@ void treedec_to_ordering(T_t &T, O_t& O)
             O.push_back(*sIt);
         }
         return;
+    }else{
+        treedec::impl::treedec_to_ordering<T_t, O_t>(T, O);
+
+    }
+}
+
+template<class G, class T=typename treedec::graph_traits<G>::treedec_type>
+class to_elimination_ordering : public treedec::algo::draft::algo1 {
+public:
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+    typedef std::vector<vertex_descriptor> O;
+    typedef typename boost::property_map< G, boost::vertex_index_t >::const_type vertex_index_map;
+public:
+    explicit to_elimination_ordering(G const& g)
+      : algo1("toeo")
+      , _idmap(boost::get(boost::vertex_index, g))
+      , _nv(boost::num_vertices(g)){
+    }
+    ~to_elimination_ordering(){
+        if(_own_t){
+            delete _t;
+            _t = nullptr;
+        }else{ untested();
+        }
     }
 
-    treedec::impl::treedec_to_ordering<T_t, O_t>(T, O);
-}
+    template<class TT>
+    void set_tree_decomposition(TT const* t) {
+        assert(t);
+        auto nt = new T();
+        _t = nt;
+
+        // boost::copy_graph(*t, *_t);
+        treedec::obsolete_copy_treedec(*t, *nt);
+//        incomplete();
+//        _t = t;
+        _own_t = true;
+    }
+
+    template<class TT>
+    void get_tree_decomposition(TT& t){
+        incomplete();
+    }
+
+    void do_it(){
+    }
+
+    void get_elimination_ordering(O& o) const{
+        o.resize(_nv);
+        assert(_s.empty());
+        if(_t){
+            build_postordering(*_t, _s);
+            size_t s = _nv;
+            o.resize(s);
+            _visited.resize(0);
+            _visited.resize(s);
+
+            size_t i = 0;
+            while(!_s.empty()){
+                auto t = _s.top();
+                _s.pop();
+                auto const& b = boost::get(bag_t(), *_t, t);
+                for(auto v : b) {
+                    auto idx = _idmap[v];
+                    if(_visited[idx]){
+                    }else{
+                        assert(i<o.size());
+                        o[i] = v;
+                        ++i;
+                        _visited[idx] = true;
+                    }
+                }
+            }
+
+        }else{ untested();
+        }
+    }
+
+
+private:
+    T const* _t{nullptr};
+    bool _own_t{false};
+    mutable std::stack<vertex_descriptor> _s;
+    mutable std::vector<BOOL> _visited;
+    O _o;
+    // numbering?
+    // partial numbering?
+    vertex_index_map _idmap;
+    size_t _nv{-1};
+};
 
 //Make G a filled graph according to the provided elimination_ordering. Stores
 //the cliques in C and the additional edges in F.

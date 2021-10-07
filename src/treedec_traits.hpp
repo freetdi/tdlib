@@ -24,14 +24,13 @@
 
 #include "graph_traits.hpp"
 
-namespace treedec{ //
-
-namespace detail{ //
+namespace treedec {
+namespace detail {
 
 template<class B, class T, class V>
-struct tmpbaghack{ //
-    static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v)
-    { //incomplete();
+struct tmpbaghack {
+    static typename treedec_traits<T>::bag_type& get_bag(T& t, V& v) {
+        //incomplete();
         return t[v];
     }
     static typename treedec_traits<T>::bag_type const& get_bag(T const& t, V const& v) {

@@ -66,7 +66,7 @@ public:
         bool operator[](vertex_descriptor v) const{ untested();
             return _n.is_not_numbered(v);
         }
-        sgm& operator=(const sgm& o){ untested();
+        sgm& operator=(const sgm& o){
             assert(&_n==&o._n);
             return *this;
         }

@@ -106,6 +106,10 @@ namespace detail{//
           c.insert(e);
         }
         template<class E>
+        static void push(C& c, E b, E e) {
+          incomplete();
+        }
+        template<class E>
         static void insert(C& c, E e) { untested();
           c.insert(e);
         }

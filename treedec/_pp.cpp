@@ -165,6 +165,7 @@ int preprocessing(graph& g)
 
 BOOST_PYTHON_MODULE(_pp)
 { itested();
+	boost::python::numpy::initialize();
 	namespace py=boost::python;
 	using namespace boost::python;
 

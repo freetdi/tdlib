@@ -51,6 +51,7 @@
 #include "platform.hpp"
 #include "trace.hpp"
 #include "treedec.hpp"
+#include "misc.hpp" // build_po
 
 #ifndef NDEBUG
 #include <iostream>
@@ -137,9 +138,8 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
     return t;
 }
 
-
-template <typename T_t>
-void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> &S)
+template <typename T_t, class stack=typename boost::graph_traits<T_t>::vertex_descriptor>
+void build_postordering(T_t &T, stack& S)
 {
     std::stack<typename boost::graph_traits<T_t>::vertex_descriptor> S_tmp;
 
@@ -163,6 +163,12 @@ void postorder_traversal(T_t &T, std::stack<typename boost::graph_traits<T_t>::v
             }
         }
     }
+}
+
+template <typename T_t, class stack>
+void postorder_traversal(T_t &T, stack& S)
+{
+    return build_postordering(T, S);
 }
 
 template <typename T_t>

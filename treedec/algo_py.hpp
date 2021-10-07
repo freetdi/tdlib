@@ -19,6 +19,10 @@
 #ifndef TREEDEC_ALGO_PY_H
 #define TREEDEC_ALGO_PY_H
 #include "util_py.hpp"
+#include "boost/python/numpy.hpp"
+
+namespace py = boost::python;
+namespace bn = boost::python::numpy;
 
 template<class what, class G>
 static boost::shared_ptr<what> algo_factory( G& g )
@@ -32,6 +36,20 @@ static std::string make_string(T const&)
 	return std::string(n.value);
 }
 
+template<class T, class G>
+static auto get_ordering(T const& t)
+{
+	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+
+	std::vector<vertex_descriptor> v;
+	t.get_elimination_ordering(v); // bug: pass numpy array data
+
+	Py_intptr_t shape[1] = { Py_intptr_t(v.size()) };
+	bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<vertex_descriptor>());
+	std::copy(v.begin(), v.end(), reinterpret_cast<vertex_descriptor*>(result.get_data()));
+	return result;
+}
+
 #define defgt(A, G, H) \
 		    .def("get_treedec", static_cast<void ( A ## G:: * )(H ## _treedec&)> \
 					     ( &A ## G::get_tree_decomposition< H ## _treedec >) )
@@ -42,6 +60,7 @@ static std::string make_string(T const&)
 			  defgt(A, G, G) \
 			 .def("__repr__", &make_string<A ## G, # A # G > ) \
 			 .def("bagsize", &A ## G::bagsize) \
+			 .def("get_ordering", &get_ordering<A ## G, G>) \
 			 .def("lower_bound_bagsize", &A ## G::lower_bound_bagsize) \
 			 .def("do_it", static_cast<void ( A ## G:: *)()> \
 				        (&A ## G ::do_it) )

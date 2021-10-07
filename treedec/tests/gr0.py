@@ -1,3 +1,1 @@
-from treedec import graph
-
-
+from treedec import _graph as gr

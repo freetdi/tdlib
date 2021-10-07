@@ -121,6 +121,10 @@ public: // interface
     unsigned lower_bound_bagsize() const{
         return _bagsize;
     }
+    template<class O>
+    void get_elimination_ordering(O&) const{
+        incomplete();
+    }
 private:
     template<class T_t>
     void do_components(T_t&, unsigned lb_bs);

@@ -2,36 +2,39 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 instdir = $(pythondir)/treedec
 
 inst_PYTHON = \
+	comb.py \
+	exact.py \
+	graph.py \
+	greedy.py \
 	__init__.py \
-   comb.py \
-   exact.py \
-	pp.py \
 	lb.py \
-   greedy.py \
-   treedec.py \
-   graph.py
+	order.py \
+	pp.py \
+	treedec.py
 
 inst_LTLIBRARIES = \
-	_graph.la \
-	_pp.la \
-	_lb.la \
 	_comb.la \
 	_exact.la \
+	_graph.la \
+	_greedy.la \
+	_lb.la \
 	_misc.la \
-	_treedec.la \
-	_greedy.la
+	_order.la \
+	_pp.la \
+	_treedec.la
 
 SUBDIRS = . tests
 
 # TODO: ask python (what to ask?!)
-BOOST_PYTHON_LIBS = -lboost_python39
+BOOST_PYTHON_LIBS = -lboost_python39 -lboost_numpy39
 
-_exact_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _comb_la_LIBADD = ${BOOST_PYTHON_LIBS}
+_exact_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _graph_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _greedy_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _lb_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _misc_la_LIBADD = ${BOOST_PYTHON_LIBS}
+_order_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _pp_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _treedec_la_LIBADD = ${BOOST_PYTHON_LIBS}
 

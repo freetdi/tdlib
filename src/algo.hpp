@@ -102,6 +102,10 @@ public: // results. to be reimplemnted.
         incomplete();
         return 0;
     }
+    template<class O>
+    void get_elimination_ordering(O& o) const{
+        unreachable();
+    }
 //for now
 public:
 	double get_runtime(){

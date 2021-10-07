@@ -14,6 +14,7 @@ PY_TESTS = \
 	exta_0.py \
 	fi_0.py \
 	fi_dimacs.py \
+	order0.py \
 	pp_dimacs.py \
 	pp_cfg.py \
 	misc_0.py

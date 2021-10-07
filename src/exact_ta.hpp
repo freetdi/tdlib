@@ -455,6 +455,10 @@ public: // interface
 	void get_tree_decomposition(T& td) {
 		return make_td(td);
 	}
+	template<class O>
+	void get_elimination_ordering(O&) const{
+		incomplete();
+	}
 #if 0
 	TD& get_treedec()
 	{ untested();
