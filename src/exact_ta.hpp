@@ -25,12 +25,14 @@
 #ifndef TREEDEC_EXACT_TA_HPP
 #define TREEDEC_EXACT_TA_HPP
 
+#include "treedec_traits.hpp"
 #include "bits/trie.hpp"
 #include "bits/predicates.hpp"
 #include "graph.hpp"
 #include "graph_util.hpp"
 
 #include <gala/boost.h>
+#include <gala/td.h>
 #include "graph_gala.hpp"
 
 // #include "status.hpp"
@@ -42,6 +44,7 @@
 #endif
 
 #include <boost/graph/copy.hpp>
+#include "elimination_orderings.hpp"
 
 #undef tassert
 #define tassert(x) assert(x)
@@ -228,6 +231,7 @@ public: // types
 	template<class A, class...>
 	using myset=T;
 	typedef gala::graph<myset, std::vector, unsigned> graph_type;
+	typedef typename graph_traits<G>::treedec_type treedec_type;
 
 #ifdef STDHASH
 	// incomplete
@@ -456,8 +460,20 @@ public: // interface
 		return make_td(td);
 	}
 	template<class O>
-	void get_elimination_ordering(O&) const{
-		incomplete();
+	void get_elimination_ordering(O& o) const{ untested();
+
+		if(_td){ untested();
+		}else{ untested();
+			_td = new treedec_type;
+			make_td(*_td);
+		}
+
+		treedec::to_elimination_ordering<graph_type> a(_g);
+		untested();
+		a.set_tree_decomposition(_td);
+		trace1("exta::geo", boost::num_vertices(*_td));
+		untested();
+		a.get_elimination_ordering(o);
 	}
 #if 0
 	TD& get_treedec()
@@ -475,6 +491,7 @@ private:
 	unsigned make_td(BLOCK const* b, TREEDEC_* td) const;
 private: // i/o
 	graph_type _g;
+	G _g_in;
 	unsigned _trieMax; // obsolete
    TRIE_SHARED_AREA<node_size> _shared_trie_area;
 	std::vector<trie_t> _trie;
@@ -531,7 +548,7 @@ private: // here?
 //	  trace1("gh", h);
 //	  trace1("gh", nHash);
 //	  assert(h<x->size());
-	  while (x[h].bi) { // }
+	  while (x[h].bi) {
 		 trace1("eq?", component);
 		 if(x[h].bi->component == component){
 			return &x[h];
@@ -548,7 +565,7 @@ private: // here?
 	  trace1("gh", _nHash);
 	  trace1("gh", component);
 	  trace1("gh", h);
-	  while (x[h].bi) { // }
+	  while (x[h].bi) {
 		 trace1("eq?", component);
 		 if(x[h].bi->component == component){ untested();
 			return &x[h];
@@ -587,7 +604,10 @@ private: // here?
 	{ untested();
 	}
 #endif
-};
+
+private:
+	mutable treedec_type* _td{nullptr};
+}; // exact_ta
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 EXTA_t
@@ -616,8 +636,8 @@ exact_ta<EXTA_a>::exact_ta(oG const& g, M const& m)
 	auto EM=treedec::util::make_edge_map(m, g);
 	auto g_edges=boost::edges(g);
 
-	auto edgbegin=boost::make_transform_iterator(g_edges.first, EM);
-	auto edgend=boost::make_transform_iterator(g_edges.second, EM);
+	auto edgbegin = boost::make_transform_iterator(g_edges.first, EM);
+	auto edgend = boost::make_transform_iterator(g_edges.second, EM);
 
 	CFG::message(0, "graph size %d of %d\n", nv, L+1);
 	CFG::message(0, "using %d chunks of size %d bit\n", K, 8*sizeof(CHUNK_T));
@@ -862,7 +882,7 @@ void exact_ta<EXTA_a>::registerBlock(N const& component, N& onb, D const& delt)
   tassert(m==1);
 #endif
 
-  trace1("ghs", component);
+//  trace1("ghs", component);
   BLOCK const*& NH=getHashSpot(hashTable, component);
 
   if (NH){
@@ -1097,6 +1117,7 @@ inline void exact_ta<EXTA_a>::do_it(unsigned bs)
 		try_decompose(bs);
 		if(!_solution){
 			++bs;
+		}else{
 		}
 	}
 	assert(_solution);
@@ -1109,8 +1130,8 @@ EXTA_t
 template<class TREEDEC_t>
 inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
 {
-  auto component=_solution->component;
-  trace2("TDTDTDTD", component, cbset::size(component));
+  auto component = _solution->component;
+  trace2("exact_da::make_td", component, cbset::size(component));
   //boost::clear(td);
   assert(boost::num_vertices(td)==0);
 
@@ -1121,7 +1142,7 @@ inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
     auto& b=boost::get(bag_t(), td, k);
 	 T s=cbset::diff(all, component);
     treedec::merge(b, s);
-    unsigned j=make_td(_solution, &td);
+    unsigned j = make_td(_solution, &td);
     boost::add_edge(k, j, td);
   }else{ untested();
     // all in one...
@@ -1170,10 +1191,10 @@ inline unsigned exact_ta<EXTA_a>::make_td(BLOCK const* block, TREEDEC_* td) cons
   std::vector<BLOCK const*> bStack(n());
   std::vector<int> aStack(n());
 
-  bStack[0]=block;
-  aStack[0]=-1;
-  int top=0;
-  unsigned r=0;
+  bStack[0] = block;
+  aStack[0] = -1;
+  int top = 0;
+  unsigned r = 0;
 
   while (top >= 0) {
     trace1("", top);

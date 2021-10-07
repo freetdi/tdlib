@@ -107,7 +107,9 @@ namespace detail{//
         }
         template<class E>
         static void push(C& c, E b, E e) {
-          incomplete();
+          for(; b!=e; ++b){ untested();
+            c.insert(*b);
+          }
         }
         template<class E>
         static void insert(C& c, E e) { untested();

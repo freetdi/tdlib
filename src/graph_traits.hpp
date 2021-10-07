@@ -219,13 +219,27 @@ struct vdstuff<false, T> {
     typedef typename T::value_type::value_type type;
     typedef typename T::value_type bag_type;
 };
+
+template<class T, class X=void>
+struct typehack{
+	typedef void type;
+};
+template<class T>
+struct typehack<T, typename T::vertex_property_type>{
+	typedef typename T::vertex_property_type type;
+};
+
 } //detail
 
 template<class T>
 struct treedec_traits{
-// TODO should be this (does not work, why?)
-//    typedef typename boost::graph_traits<T>::vertex_property_type vertex_property_type;
+#if 0
+	// TODO should be sth like these (does not work, why?)
+    typedef typename boost::graph_traits<T>::vertex_property_type vertex_property_type;
+	 typedef typename detail::typehack<T>::type vertex_property_type;
+#else
     typedef typename T::vertex_property_type vertex_property_type;
+#endif
     typedef typename detail::vdstuff<
        boost::is_same<vertex_property_type, bag_t >::value,
          vertex_property_type >::type vd_type;

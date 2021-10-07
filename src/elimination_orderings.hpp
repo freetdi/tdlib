@@ -904,7 +904,8 @@ public:
     void do_it(){
     }
 
-    void get_elimination_ordering(O& o) const{
+    template<class OO>
+    void get_elimination_ordering(OO& o) const{
         o.resize(_nv);
         assert(_s.empty());
         if(_t){

@@ -12,6 +12,10 @@ print(g)
 a = ta(g)
 a.do_it()
 t = td._balvvu_treedec()
+
+ord = a.get_ordering()
+print(ord)
+
 a.get_treedec(t)
 print(a, "bagsize", a.bagsize(), t)
 
@@ -20,4 +24,3 @@ o.set_treedec(t)
 
 ord = o.get_ordering()
 print(ord)
-

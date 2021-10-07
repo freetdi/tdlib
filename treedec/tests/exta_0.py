@@ -30,6 +30,7 @@ a.do_it()
 t = td._balvvu_treedec()
 a.get_treedec(t)
 print(a, "bagsize", a.bagsize(), t)
+print(a.get_ordering())
 
 for i in t.edges():
 	print(i)

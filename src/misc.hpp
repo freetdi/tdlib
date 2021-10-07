@@ -120,7 +120,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
     typename boost::graph_traits<T_t>::vertex_descriptor t = *(boost::vertices(T).first);
 
     typename boost::graph_traits<T_t>::in_edge_iterator e, e_end;
-    boost::tie(e, e_end)=boost::in_edges(t, T);
+    boost::tie(e, e_end) = boost::in_edges(t, T);
     std::vector<BOOL> visited(boost::num_vertices(T), false);
     visited[t] = true;
 

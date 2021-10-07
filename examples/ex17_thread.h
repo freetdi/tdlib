@@ -142,8 +142,7 @@ public:
         base::print_results_tree(o, _t);
     }
 
-    void run()
-    {
+    void run() {
 # if 1 // HACK
         // PP old(?) interface (used in exact.hpp) refuses gala
         G_work _work;
