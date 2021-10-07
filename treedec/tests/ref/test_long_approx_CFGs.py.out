@@ -6,7 +6,7 @@ bmd 1 2
 stdlib_strncat[30,32]
 bmd 2 2
 stdlib_modulong[34,37]
-bmd 3 2
+bmd 3 3
 stdlib_isgraph[16,17]
 bmd 4 2
 stdlib_strcat[21,22]
@@ -14,15 +14,15 @@ bmd 5 2
 stdlib_tanhf[81,84]
 bmd 6 2
 stdlib_output_2digits[16,15]
-bmd 7 1
+bmd 7 2
 stdlib_log10f[10,9]
-bmd 8 1
+bmd 8 2
 stdlib_ctime[9,8]
-bmd 9 1
+bmd 9 2
 stdlib_print_format[544,609]
 bmd 10 4
 stdlib_mulsuchar[11,10]
-bmd 11 1
+bmd 11 2
 stdlib_modsint[29,31]
 bmd 12 2
 stdlib_fs2schar[17,18]
@@ -34,11 +34,11 @@ bmd 15 3
 stdlib_powf[27,29]
 bmd 16 2
 stdlib_modsuchar[11,10]
-bmd 17 1
+bmd 17 2
 stdlib_mulschar[10,9]
-bmd 18 1
+bmd 18 2
 stdlib_sint2fs[8,7]
-bmd 19 1
+bmd 19 2
 stdlib_strcpy[15,15]
 bmd 20 2
 stdlib_fs2ulong[35,36]
@@ -48,7 +48,7 @@ bmd 22 2
 stdlib_uitoa[42,44]
 bmd 23 2
 stdlib_put_char_to_string[10,9]
-bmd 24 1
+bmd 24 2
 stdlib_strcspn[20,21]
 bmd 25 2
 stdlib_fseq[26,27]
@@ -56,11 +56,11 @@ bmd 26 2
 stdlib_realloc[83,88]
 bmd 27 3
 stdlib_vprintf[10,9]
-bmd 28 1
+bmd 28 2
 stdlib_fabsf[13,12]
-bmd 29 1
+bmd 29 2
 stdlib_moduschar[11,10]
-bmd 30 1
+bmd 30 2
 stdlib_strstr[38,43]
 bmd 31 3
 stdlib_iscntrl[15,16]
@@ -68,13 +68,13 @@ bmd 32 2
 stdlib_divsint[30,32]
 bmd 33 2
 stdlib_sinhf[8,7]
-bmd 34 1
+bmd 34 2
 stdlib_divslong[32,34]
 bmd 35 2
 stdlib_divuschar[11,10]
-bmd 36 1
+bmd 36 2
 stdlib_RtcRead[5,4]
-bmd 37 1
+bmd 37 2
 stdlib_rrulonglong[56,56]
 bmd 38 2
 stdlib_asincosf[128,133]
@@ -82,15 +82,15 @@ bmd 39 3
 stdlib_fs2uint[13,13]
 bmd 40 2
 stdlib_sprintf[19,18]
-bmd 41 1
+bmd 41 2
 stdlib_isupper[17,18]
 bmd 42 2
 stdlib_rand[13,12]
-bmd 43 1
+bmd 43 2
 stdlib_toupper[17,18]
 bmd 44 2
 stdlib_uchar2fs[8,7]
-bmd 45 1
+bmd 45 2
 stdlib_cosf[11,11]
 bmd 46 2
 stdlib_strrchr[24,27]
@@ -98,7 +98,7 @@ bmd 47 2
 stdlib_strncmp[26,29]
 bmd 48 3
 stdlib_muluschar[11,10]
-bmd 49 1
+bmd 49 2
 stdlib_ispunct[21,23]
 bmd 50 2
 stdlib_strncpy[30,32]
@@ -112,47 +112,47 @@ bmd 54 3
 stdlib_fs2sint[17,18]
 bmd 55 2
 stdlib_ldexpf[25,24]
-bmd 56 1
+bmd 56 2
 stdlib_fsdiv[132,140]
 bmd 57 2
 stdlib_modulonglong[34,37]
-bmd 58 2
+bmd 58 3
 stdlib_memcmp[33,35]
 bmd 59 3
 stdlib_modschar[10,9]
-bmd 60 1
+bmd 60 2
 stdlib_gets[45,48]
 bmd 61 2
 stdlib_vsprintf[15,14]
-bmd 62 1
+bmd 62 2
 stdlib_mullonglong[36,37]
 bmd 63 2
 stdlib_strpbrk[26,29]
 bmd 64 3
 stdlib_schar2fs[8,7]
-bmd 65 1
+bmd 65 2
 stdlib_fslt[44,48]
 bmd 66 3
 stdlib_islower[17,18]
 bmd 67 2
 stdlib_uint2fs[8,7]
-bmd 68 1
+bmd 68 2
 stdlib_sqrtf[66,69]
-bmd 69 2
+bmd 69 3
 stdlib_divulonglong[28,30]
 bmd 70 2
 stdlib_sincosf[130,136]
-bmd 71 2
+bmd 71 3
 stdlib_divslonglong[31,33]
 bmd 72 2
 stdlib_modff[14,13]
-bmd 73 1
+bmd 73 2
 stdlib_rrslonglong[65,66]
 bmd 74 2
 stdlib_mktime[93,97]
 bmd 75 3
 stdlib_isspace[23,28]
-bmd 76 2
+bmd 76 3
 stdlib_strspn[20,21]
 bmd 77 2
 stdlib_isblank[15,16]
@@ -164,7 +164,7 @@ bmd 80 2
 stdlib_calloc[17,17]
 bmd 81 2
 stdlib_rlslonglong[7,6]
-bmd 82 1
+bmd 82 2
 stdlib_memcpy[23,23]
 bmd 83 2
 stdlib_cotf[24,25]
@@ -174,7 +174,7 @@ bmd 85 2
 stdlib_sinf[11,11]
 bmd 86 2
 stdlib_asctime[52,51]
-bmd 87 1
+bmd 87 2
 stdlib_fsmul[138,144]
 bmd 88 2
 stdlib_ceilf[28,29]
@@ -188,13 +188,13 @@ bmd 92 2
 stdlib_slong2fs[15,15]
 bmd 93 2
 stdlib_srand[6,5]
-bmd 94 1
+bmd 94 2
 stdlib_printf[15,14]
-bmd 95 1
+bmd 95 2
 stdlib_strcmp[21,22]
 bmd 96 2
 stdlib_mullong[143,142]
-bmd 97 1
+bmd 97 2
 stdlib_itoa[19,20]
 bmd 98 2
 stdlib_fs2slong[20,21]
@@ -202,11 +202,11 @@ bmd 99 2
 stdlib_strtok[49,55]
 bmd 100 3
 stdlib_mulint[29,28]
-bmd 101 1
+bmd 101 2
 stdlib_rlulonglong[52,52]
 bmd 102 2
 stdlib_frexpf[26,25]
-bmd 103 1
+bmd 103 2
 stdlib_fsneq[26,27]
 bmd 104 2
 stdlib_modslonglong[31,33]
@@ -232,11 +232,11 @@ bmd 114 3
 stdlib_atoi[56,66]
 bmd 115 3
 stdlib_localtime[7,6]
-bmd 116 1
+bmd 116 2
 stdlib_put_char_to_stdout[6,5]
-bmd 117 1
+bmd 117 2
 stdlib_divsuchar[11,10]
-bmd 118 1
+bmd 118 2
 stdlib_calculate_digit[31,32]
 bmd 119 2
 stdlib_puts[20,20]
@@ -248,29 +248,29 @@ bmd 122 2
 stdlib_floorf[27,28]
 bmd 123 2
 stdlib_fssub[11,10]
-bmd 124 1
+bmd 124 2
 stdlib_tanf[8,7]
-bmd 125 1
+bmd 125 2
 stdlib_labs[13,13]
 bmd 126 2
 stdlib_strxfrm[12,11]
-bmd 127 1
+bmd 127 2
 stdlib_ltoa[19,20]
 bmd 128 2
 stdlib_strchr[18,20]
 bmd 129 2
 stdlib_divschar[10,9]
-bmd 130 1
+bmd 130 2
 stdlib_logf[88,89]
 bmd 131 2
 stdlib_assert[13,11]
-bmd 132 1
+bmd 132 2
 stdlib_memchr[24,25]
 bmd 133 2
 stdlib_fsgt[44,48]
 bmd 134 3
 stdlib_coshf[8,7]
-bmd 135 1
+bmd 135 2
 stdlib_output_digit[17,18]
 bmd 136 2
 stdlib_atanf[98,102]
@@ -280,13 +280,13 @@ bmd 138 3
 stdlib_memmove[47,49]
 bmd 139 2
 stdlib_tancotf[122,127]
-bmd 140 2
+bmd 140 3
 stdlib_isalpha[23,26]
 bmd 141 3
 contiki_shell-netperf_send_ctrl_command[16,15]
-bmd 142 1
+bmd 142 2
 contiki_process_process_nevents[8,7]
-bmd 143 1
+bmd 143 2
 contiki_uip-over-mesh_uip_over_mesh_make_announced_gateway[26,26]
 bmd 144 2
 contiki_channel_channel_lookup[23,24]
@@ -294,7 +294,7 @@ bmd 145 2
 contiki_calc_process_thread_calc_process[387,418]
 bmd 146 3
 contiki_ctk_ctk_window_open[50,56]
-bmd 147 2
+bmd 147 3
 contiki_nullrdc_packet_input[28,30]
 bmd 148 3
 contiki_packetbuf_packetbuf_copyto[34,34]
@@ -302,13 +302,13 @@ bmd 149 2
 contiki_ifft_bitrev[17,17]
 bmd 150 2
 contiki_trickle_trickle_close[13,12]
-bmd 151 1
+bmd 151 2
 contiki_announcement_announcement_register_listen_callback[5,4]
-bmd 152 1
+bmd 152 2
 contiki_mesh_mesh_close[10,9]
-bmd 153 1
+bmd 153 2
 contiki_abc_abc_send[8,7]
-bmd 154 1
+bmd 154 2
 contiki_shell-vars_process_thread_shell_var_process[159,164]
 bmd 155 3
 contiki_collect_add_packet_to_recent_packets[33,33]
@@ -316,17 +316,17 @@ bmd 156 2
 contiki_xmac_on[10,11]
 bmd 157 2
 contiki_shell-downloa_process_thread_shell_download_server_process[37,39]
-bmd 158 2
+bmd 158 3
 contiki_shell-rime-sniff_output_sniffer[11,11]
 bmd 159 2
 contiki_process_process_alloc_event[7,6]
-bmd 160 1
+bmd 160 2
 contiki_uip_uip_htons[8,7]
-bmd 161 1
+bmd 161 2
 contiki_ctk_process_thread_ctk_process[353,398]
 bmd 162 3
 contiki_collect-link-estimate_collect_link_estimate_update_tx_fail[8,7]
-bmd 163 1
+bmd 163 2
 contiki_shell-tcpsen_process_thread_shell_tcpsend_process[102,110]
 bmd 164 4
 contiki_chameleon-bitopt_header_size[18,18]
@@ -334,25 +334,25 @@ bmd 165 2
 contiki_contikimac_off[11,13]
 bmd 166 2
 contiki_cfs-ram_cfs_opendir[5,4]
-bmd 167 1
+bmd 167 2
 contiki_shell-time_process_thread_shell_timestamp_process[89,94]
 bmd 168 3
 contiki_xmac_channel_check_interval[5,4]
-bmd 169 1
+bmd 169 2
 contiki_polite_polite_close[16,16]
 bmd 170 2
 contiki_ircc_parse_host[15,14]
-bmd 171 1
+bmd 171 2
 contiki_nullrdc-noframer_on[8,7]
-bmd 172 1
+bmd 172 2
 contiki_list_list_head[7,6]
-bmd 173 1
+bmd 173 2
 contiki_announcement_announcement_bump[18,18]
 bmd 174 2
 contiki_shell-udpsen_send_line[9,8]
-bmd 175 1
+bmd 175 2
 contiki_collect-neighbor_collect_neighbor_tx_fail[14,13]
-bmd 176 1
+bmd 176 2
 contiki_mtarch_mtarch_yield[8,8]
 bmd 177 2
 contiki_list_list_insert[15,15]
@@ -360,25 +360,25 @@ bmd 178 2
 contiki_dhcpc_dhcpc_appcall[12,13]
 bmd 179 2
 contiki_elfloader_elfloader_init[5,4]
-bmd 180 1
+bmd 180 2
 contiki_shell_shell_strtolong[48,53]
 bmd 181 3
 contiki_nullrdc_send_packet[47,50]
 bmd 182 2
 contiki_shell_shell_time[7,6]
-bmd 183 1
+bmd 183 2
 contiki_contikimac_qsend_packet[15,15]
 bmd 184 2
 contiki_shell-memdebug_process_thread_shell_poke_process[78,81]
 bmd 185 3
 contiki_shell-irc_ircc_closed[13,12]
-bmd 186 1
+bmd 186 2
 contiki_procinit_procinit_init[17,17]
 bmd 187 2
 contiki_ctk_ctk_desktop_redraw[22,24]
 bmd 188 3
 contiki_multihop_multihop_close[7,6]
-bmd 189 1
+bmd 189 2
 contiki_ctk_select_widget[49,51]
 bmd 190 2
 contiki_lpp_input_packet[173,185]
@@ -386,9 +386,9 @@ bmd 191 3
 contiki_calc_calculate[31,35]
 bmd 192 2
 contiki_ircc_ircc_part[7,6]
-bmd 193 1
+bmd 193 2
 contiki_compower_compower_clear[8,7]
-bmd 194 1
+bmd 194 2
 contiki_rmh_rmh_send[49,51]
 bmd 195 2
 contiki_contiki-desktop-main_main[56,55]
@@ -398,7 +398,7 @@ bmd 197 2
 contiki_cxmac_qsend_packet[20,20]
 bmd 198 2
 contiki_webclient_webclient_port[7,6]
-bmd 199 1
+bmd 199 2
 contiki_process_exit_process[72,82]
 bmd 200 3
 contiki_polite_sent[4,3]
@@ -408,7 +408,7 @@ bmd 202 2
 contiki_shell-file_process_thread_shell_rm_process[15,16]
 bmd 203 2
 contiki_rudolph2_send_data[16,15]
-bmd 204 1
+bmd 204 2
 contiki_route_route_add[50,52]
 bmd 205 2
 contiki_collect_collect_print_stats[4,3]
@@ -416,9 +416,9 @@ bmd 206 1
 contiki_shell-netperf_recv_mesh[25,27]
 bmd 207 2
 contiki_shell-rime-sniff_process_thread_shell_sniff_process[7,6]
-bmd 208 1
+bmd 208 2
 contiki_webclient_init_connection[28,27]
-bmd 209 1
+bmd 209 2
 contiki_tcpip_tcp_connect[18,18]
 bmd 210 2
 contiki_shell-rime-debug_process_thread_shell_unicast_process[123,130]
@@ -428,11 +428,11 @@ bmd 212 2
 contiki_tcpip_tcp_unlisten[26,28]
 bmd 213 3
 contiki_ctk_ctk_restore[11,10]
-bmd 214 1
+bmd 214 2
 contiki_shell-base64_base64_decode_char[35,42]
 bmd 215 3
 contiki_dhcpc_add_msg_type[14,13]
-bmd 216 1
+bmd 216 2
 contiki_ipolite_sent[4,3]
 bmd 217 1
 contiki_ctimer_ctimer_restart[21,21]
@@ -440,17 +440,17 @@ bmd 218 2
 contiki_ircc_data_or_command[25,28]
 bmd 219 2
 contiki_collect_send_ack[53,52]
-bmd 220 1
+bmd 220 2
 contiki_unicast_unicast_close[7,6]
-bmd 221 1
+bmd 221 2
 contiki_webclient_window_copy[36,39]
 bmd 222 2
 contiki_collect_collect_open[62,61]
-bmd 223 1
+bmd 223 2
 contiki_multihop_data_packet_received[75,78]
 bmd 224 2
 contiki_httpd-cfs_httpd_init[11,10]
-bmd 225 1
+bmd 225 2
 contiki_ircc_send_message[75,77]
 bmd 226 2
 contiki_polite_recv[56,61]
@@ -458,27 +458,27 @@ bmd 227 2
 contiki_shell-time_process_thread_shell_randwait_process[138,150]
 bmd 228 4
 contiki_tcpip_tcpip_set_outputfunc[5,4]
-bmd 229 1
+bmd 229 2
 contiki_etimer_etimer_expired[9,8]
-bmd 230 1
+bmd 230 2
 contiki_nullradio_channel_clear[5,4]
-bmd 231 1
+bmd 231 2
 contiki_uip-over-mesh_timedout[8,8]
 bmd 232 2
 contiki_shell_shell_start[24,23]
-bmd 233 1
+bmd 233 2
 contiki_uip-neighbor_uip_neighbor_init[15,15]
 bmd 234 2
 contiki_shell_shell_output[23,24]
 bmd 235 2
 contiki_broadcast_broadcast_send[13,12]
-bmd 236 1
+bmd 236 2
 contiki_cfs-ram_cfs_seek[19,21]
 bmd 237 2
 contiki_unicast_sent_by_broadcast[13,13]
 bmd 238 2
 contiki_frame802154_frame802154_hdrlen[24,23]
-bmd 239 1
+bmd 239 2
 contiki_timetable-aggregate_timetable_aggregate_print_detailed[42,42]
 bmd 240 2
 contiki_uaodv_handle_incoming_rerr[73,81]
@@ -488,23 +488,23 @@ bmd 242 4
 contiki_polite-announcement_new_announcement[15,15]
 bmd 243 2
 contiki_shell-rime_process_thread_shell_mac_process[72,74]
-bmd 244 2
+bmd 244 3
 contiki_dhcpc_add_server_id[19,18]
-bmd 245 1
+bmd 245 2
 contiki_ringbuf_ringbuf_size[9,8]
-bmd 246 1
+bmd 246 2
 contiki_uip_arch_uip_ipchksum[5,4]
-bmd 247 1
+bmd 247 2
 contiki_collect-neighbor_collect_neighbor_list_remove[20,20]
 bmd 248 2
 contiki_polite-announcement_polite_announcement_init[20,19]
-bmd 249 1
+bmd 249 2
 contiki_shell-time_shell_time_init[20,19]
-bmd 250 1
+bmd 250 2
 contiki_ringbuf_ringbuf_put[29,29]
 bmd 251 2
 contiki_rudolph0_rudolph0_close[10,9]
-bmd 252 1
+bmd 252 2
 contiki_memb_memb_free[40,42]
 bmd 253 2
 contiki_shell-reboot_process_thread_shell_reboot_process[96,105]
@@ -514,31 +514,31 @@ bmd 255 3
 contiki_sicslowmac_input_packet[64,70]
 bmd 256 3
 contiki_stimer_stimer_reset[10,9]
-bmd 257 1
+bmd 257 2
 contiki_rudolph0_rudolph0_set_version[8,7]
-bmd 258 1
+bmd 258 2
 contiki_stbroadcast_stbroadcast_close[10,9]
-bmd 259 1
+bmd 259 2
 contiki_uip_uip_unlisten[19,20]
 bmd 260 2
 contiki_shell_process_thread_shell_process[77,89]
 bmd 261 4
 contiki_nullradio_on[5,4]
-bmd 262 1
+bmd 262 2
 contiki_packetbuf_packetbuf_attr[10,9]
-bmd 263 1
+bmd 263 2
 contiki_announcement_announcement_remove[8,7]
-bmd 264 1
+bmd 264 2
 contiki_compower_compower_init[8,7]
-bmd 265 1
+bmd 265 2
 contiki_shell-netperf_sent_mesh[8,7]
-bmd 266 1
+bmd 266 2
 contiki_rucb_rucb_close[7,6]
-bmd 267 1
+bmd 267 2
 contiki_etimer_etimer_expiration_time[10,9]
-bmd 268 1
+bmd 268 2
 contiki_list_list_copy[8,7]
-bmd 269 1
+bmd 269 2
 contiki_ircc_parse_word[12,12]
 bmd 270 2
 contiki_elfloader_elfloader_load[428,451]
@@ -546,7 +546,7 @@ bmd 271 3
 contiki_webclient_webclient_appcall[98,111]
 bmd 272 3
 contiki_collect-view-template_collect_view_arch_read_sensors[9,8]
-bmd 273 1
+bmd 273 2
 contiki_etimer_add_timer[27,29]
 bmd 274 3
 contiki_profile_profile_aggregate_print_detailed[43,43]
@@ -560,11 +560,11 @@ bmd 278 1
 contiki_shell-irc_ircc_sent[4,3]
 bmd 279 1
 contiki_announcement_announcement_list[8,7]
-bmd 280 1
+bmd 280 2
 contiki_uaodv-rt_uaodv_rt_flush_all[17,17]
 bmd 281 2
 contiki_stimer_stimer_elapsed[9,8]
-bmd 282 1
+bmd 282 2
 contiki_ctimer_ctimer_set[32,32]
 bmd 283 2
 contiki_unicast_recv_from_broadcast[19,19]
@@ -574,81 +574,81 @@ bmd 285 2
 contiki_process_process_run[12,12]
 bmd 286 2
 contiki_abc_abc_open[15,14]
-bmd 287 1
+bmd 287 2
 contiki_queuebuf_queuebuf_new_from_packetbuf[46,48]
-bmd 288 2
+bmd 288 3
 contiki_shell-rime_process_thread_shell_routes_process[64,65]
 bmd 289 2
 contiki_shell-netperf_construct_reply[48,50]
 bmd 290 2
 contiki_random_random_init[6,5]
-bmd 291 1
+bmd 291 2
 contiki_collect-neighbor_collect_neighbor_rx[10,9]
-bmd 292 1
+bmd 292 2
 contiki_webclient_webclient_close[6,5]
-bmd 293 1
+bmd 293 2
 contiki_twitter_handle_output[251,275]
-bmd 294 3
+bmd 294 4
 contiki_shell-rime_process_thread_shell_collect_process[34,37]
 bmd 295 3
 contiki_neighbor-discovery_send_adv[21,21]
 bmd 296 2
 contiki_collect_send_next_packet[26,25]
-bmd 297 1
+bmd 297 2
 contiki_ircc_parse_name[15,14]
-bmd 298 1
+bmd 298 2
 contiki_cxmac_turn_off[15,15]
 bmd 299 2
 contiki_collect_received_announcement[52,59]
 bmd 300 2
 contiki_polite-announcement_polite_announcement_stop[13,12]
-bmd 301 1
+bmd 301 2
 contiki_ringbuf_ringbuf_init[13,12]
-bmd 302 1
+bmd 302 2
 contiki_shell-ping_process_thread_shell_ping_process[74,81]
 bmd 303 4
 contiki_shell_shell_stop[5,4]
-bmd 304 1
+bmd 304 2
 contiki_ircc_list_channel[70,76]
 bmd 305 3
 contiki_nullrdc_channel_check_interval[5,4]
-bmd 306 1
+bmd 306 2
 contiki_rudolph2_recv[135,147]
-bmd 307 2
+bmd 307 3
 contiki_etimer_process_thread_etimer_process[94,107]
 bmd 308 3
 contiki_ctk_arrange_icons[25,26]
 bmd 309 2
 contiki_shell-irc_shell_irc_init[8,7]
-bmd 310 1
+bmd 310 2
 contiki_uaodv_last_known_seqno[15,15]
 bmd 311 2
 contiki_uip-udp-packet_uip_udp_packet_send[4,3]
 bmd 312 1
 contiki_netfloo_netflood_open[16,15]
-bmd 313 1
+bmd 313 2
 contiki_etimer_update_time[37,39]
 bmd 314 2
 contiki_uip-fw_uip_fw_output[17,18]
 bmd 315 2
 contiki_ipolite_ipolite_open[15,14]
-bmd 316 1
+bmd 316 2
 contiki_uip-over-mesh_recv_data[85,88]
 bmd 317 2
 contiki_nullradio_pending_packet[5,4]
-bmd 318 1
+bmd 318 2
 contiki_collect_rtmetric_compute[20,20]
 bmd 319 2
 contiki_shell-wget_open_url[160,175]
 bmd 320 3
 contiki_shell-rime-sniff_shell_rime_sniff_init[8,7]
-bmd 321 1
+bmd 321 2
 contiki_shell-file_shell_file_init[24,23]
-bmd 322 1
+bmd 322 2
 contiki_ctk_ctk_window_close[49,55]
 bmd 323 3
 contiki_timer_timer_set[9,8]
-bmd 324 1
+bmd 324 2
 contiki_uip-fw_uip_fw_forward[138,152]
 bmd 325 3
 contiki_collect_timedout[53,53]
@@ -656,31 +656,31 @@ bmd 326 2
 contiki_nullrdc_off[14,14]
 bmd 327 2
 contiki_timetable-aggregate_find_aggregate_category[49,51]
-bmd 328 2
+bmd 328 3
 contiki_shell-power_process_thread_shell_power_process[71,71]
 bmd 329 2
 contiki_runicast_runicast_is_transmitting[7,6]
-bmd 330 1
+bmd 330 2
 contiki_shell-rime-unicast_shell_rime_unicast_init[20,19]
-bmd 331 1
+bmd 331 2
 contiki_shell-downloa_shell_download_init[17,16]
-bmd 332 1
+bmd 332 2
 contiki_csma_channel_check_interval[11,11]
 bmd 333 2
 contiki_shell-tcpsen_telnet_connected[12,11]
-bmd 334 1
+bmd 334 2
 contiki_timetable_timetable_timediff[61,66]
-bmd 335 2
+bmd 335 3
 contiki_nullrdc_on[8,7]
-bmd 336 1
+bmd 336 2
 contiki_broadcast-announcement_adv_packet_received[61,62]
 bmd 337 2
 contiki_mt_mt_start[12,11]
-bmd 338 1
+bmd 338 2
 contiki_shell_shell_unregister_command[8,7]
-bmd 339 1
+bmd 339 2
 contiki_channel_channel_close[8,7]
-bmd 340 1
+bmd 340 2
 contiki_shell-text_process_thread_shell_hd_process[130,141]
 bmd 341 3
 contiki_lpp_send_probe[92,94]
@@ -688,29 +688,29 @@ bmd 342 2
 contiki_collect-neighbor_collect_neighbor_list_purge[20,20]
 bmd 343 2
 contiki_shell-irc_parse_line[137,142]
-bmd 344 2
+bmd 344 3
 contiki_xmac_turn_off[15,15]
 bmd 345 2
 contiki_trickle_reset_interval[9,8]
-bmd 346 1
+bmd 346 2
 contiki_shell-time_process_thread_shell_time_process[60,62]
 bmd 347 2
 contiki_multihop_multihop_open[18,17]
-bmd 348 1
+bmd 348 2
 contiki_shell-sendtest_process_thread_shell_sendtest_process[247,256]
 bmd 349 3
 contiki_dhcpc_dhcpc_request[27,27]
 bmd 350 2
 contiki_shell-netstat_shell_netstat_init[8,7]
-bmd 351 1
+bmd 351 2
 contiki_process-list_killproc[89,95]
 bmd 352 3
 contiki_rmh_rmh_close[7,6]
-bmd 353 1
+bmd 353 2
 contiki_runicast_runicast_close[7,6]
-bmd 354 1
+bmd 354 2
 contiki_shell-memdebug_shell_memdebug_init[12,11]
-bmd 355 1
+bmd 355 2
 contiki_collect_send_queued_packet[95,99]
 bmd 356 2
 contiki_telnet_telnet_send[16,16]
@@ -718,15 +718,15 @@ bmd 357 2
 contiki_stunicast_send[17,17]
 bmd 358 2
 contiki_process-list_processes_quit[8,7]
-bmd 359 1
+bmd 359 2
 contiki_shell-rime-debug-runicast_sent_ruc[18,17]
-bmd 360 1
+bmd 360 2
 contiki_ipolite_ipolite_cancel[14,14]
 bmd 361 2
 contiki_lpp_turn_radio_on_for_neighbor[40,41]
 bmd 362 2
 contiki_uip-over-mesh_uip_over_mesh_init[35,34]
-bmd 363 1
+bmd 363 2
 contiki_rudolph0_sent[20,20]
 bmd 364 2
 contiki_shell-file_process_thread_shell_write_process[1,0]
@@ -734,81 +734,81 @@ bmd 365 0
 contiki_mtarch_mtarch_pstart[4,3]
 bmd 366 1
 contiki_shell-udpsen_newdata[15,14]
-bmd 367 1
+bmd 367 2
 contiki_rudolph2_send_nack[27,26]
-bmd 368 1
+bmd 368 2
 contiki_etimer_etimer_start_time[7,6]
-bmd 369 1
+bmd 369 2
 contiki_xmac_powercycle_turn_radio_off[7,8]
 bmd 370 2
 contiki_shell-tcpsen_telnet_aborted[13,12]
-bmd 371 1
+bmd 371 2
 contiki_stunicast_stunicast_receiver[7,6]
-bmd 372 1
+bmd 372 2
 contiki_shell-rime-unicast_recv_uc[45,45]
 bmd 373 2
 contiki_contikimac_broadcast_rate_drop[5,4]
-bmd 374 1
+bmd 374 2
 contiki_shell-run_process_thread_shell_run_process[41,43]
 bmd 375 3
 contiki_packetbuf_packetbuf_copyto_hdr[16,15]
-bmd 376 1
+bmd 376 2
 contiki_shell-collect-view_shell_collect_view_init[8,7]
-bmd 377 1
+bmd 377 2
 contiki_shell-tcpsen_telnet_text_output[32,32]
 bmd 378 2
 contiki_timer_timer_reset[10,9]
-bmd 379 1
+bmd 379 2
 contiki_shell-rime-ping_process_thread_shell_rime_ping_process[132,142]
 bmd 380 4
 contiki_calc_calc_quit[8,7]
-bmd 381 1
+bmd 381 2
 contiki_contikimac_init[24,23]
-bmd 382 1
+bmd 382 2
 contiki_slip_slip_poll_handler[107,118]
-bmd 383 2
+bmd 383 3
 contiki_tcpdump_d[8,7]
-bmd 384 1
+bmd 384 2
 contiki_xmac_init[30,29]
-bmd 385 1
+bmd 385 2
 contiki_csma_start_transmission_timer[20,21]
 bmd 386 2
 contiki_rudolph1_recv_trickle[12,12]
 bmd 387 2
 contiki_chameleon-raw_output[94,99]
-bmd 388 2
+bmd 388 3
 contiki_mesh_found_route[41,43]
 bmd 389 2
 contiki_compower_compower_accumulate_attrs[18,17]
-bmd 390 1
+bmd 390 2
 contiki_compower_compower_attrconv[24,23]
-bmd 391 1
+bmd 391 2
 contiki_slip_slip_send[39,42]
 bmd 392 2
 contiki_mt_mt_yield[9,8]
-bmd 393 1
+bmd 393 2
 contiki_packetbuf_packetbuf_set_addr[14,13]
-bmd 394 1
+bmd 394 2
 contiki_mt-test_process_thread_mt_process[1,0]
 bmd 395 0
 contiki_shell_shell_register_command[42,45]
-bmd 396 2
+bmd 396 3
 contiki_packetbuf_packetbuf_clear_hdr[5,4]
-bmd 397 1
+bmd 397 2
 contiki_shell-rime-sendcm_process_thread_shell_sendcmd_server_process[47,55]
-bmd 398 3
+bmd 398 4
 contiki_serial-line_serial_line_input_byte[1,0]
 bmd 399 0
 contiki_uip_uip_send[29,31]
 bmd 400 2
 contiki_timetable_timetable_clear[7,6]
-bmd 401 1
+bmd 401 2
 contiki_uaodv_send_rreq[55,55]
 bmd 402 2
 contiki_shell-rime-neighbors_received_announcement[38,38]
 bmd 403 2
 contiki_broadcast_recv_from_abc[20,19]
-bmd 404 1
+bmd 404 2
 contiki_shell-sendtest_write_chunk[4,3]
 bmd 405 1
 contiki_webclient_casecmp[26,28]
@@ -820,7 +820,7 @@ bmd 408 2
 contiki_rudolph1_read_data[19,19]
 bmd 409 2
 contiki_powertrace_input_sniffer[6,5]
-bmd 410 1
+bmd 410 2
 contiki_timetable_timetable_entry[12,12]
 bmd 411 2
 contiki_shell-rime-neighbors_process_thread_shell_neighbors_process[44,48]
@@ -830,17 +830,17 @@ bmd 413 3
 contiki_shell-rime-ping_recv_mesh[47,47]
 bmd 414 2
 contiki_collect_collect_set_keepalive[9,8]
-bmd 415 1
+bmd 415 2
 contiki_shell-rime-debug-runicast_recv_ruc[26,25]
-bmd 416 1
+bmd 416 2
 contiki_lpp_stream_off[5,4]
-bmd 417 1
+bmd 417 2
 contiki_rime_input[30,32]
 bmd 418 2
 contiki_ctk_add_redrawwidget[32,34]
 bmd 419 3
 contiki_rime_rime_sniffer_remove[8,7]
-bmd 420 1
+bmd 420 2
 contiki_webclient_parse_statusline[99,106]
 bmd 421 3
 contiki_stbroadcast_stbroadcast_send_stubborn[23,24]
@@ -848,43 +848,43 @@ bmd 422 2
 contiki_collect-neighbor_collect_neighbor_is_congested[12,12]
 bmd 423 2
 contiki_shell-rime-sendcm_shell_rime_sendcmd_init[16,15]
-bmd 424 1
+bmd 424 2
 contiki_telnet_telnet_close[12,12]
 bmd 425 2
 contiki_netfloo_send[12,11]
-bmd 426 1
+bmd 426 2
 contiki_unicast_unicast_open[18,17]
-bmd 427 1
+bmd 427 2
 contiki_collect-link-estimate_collect_link_estimate_new[8,7]
-bmd 428 1
+bmd 428 2
 contiki_shell-netperf_clear_stats[17,16]
-bmd 429 1
+bmd 429 2
 contiki_collect_update_rtmetric[34,38]
 bmd 430 2
 contiki_broadcast-announcement_set_timers[27,26]
-bmd 431 1
+bmd 431 2
 contiki_dhcpc_send_request[27,26]
-bmd 432 1
+bmd 432 2
 contiki_shell-downloa_timedout[4,3]
 bmd 433 1
 contiki_collect_collect_close[18,18]
 bmd 434 2
 contiki_channel_channel_init[6,5]
-bmd 435 1
+bmd 435 2
 contiki_libconio_z80_ctk_arch_draw_char[33,34]
 bmd 436 2
 contiki_uip_arch_upper_layer_chksum[5,4]
-bmd 437 1
+bmd 437 2
 contiki_tcpdump_tcpflags[36,40]
 bmd 438 2
 contiki_crc16_crc16_data[19,19]
 bmd 439 2
 contiki_stimer_stimer_expired[14,13]
-bmd 440 1
+bmd 440 2
 contiki_runicast_runicast_open[24,23]
-bmd 441 1
+bmd 441 2
 contiki_ctk_ctk_window_clear[13,12]
-bmd 442 1
+bmd 442 2
 contiki_ctk_activate[101,108]
 bmd 443 3
 contiki_rmh_sent[4,3]
@@ -892,25 +892,25 @@ bmd 444 1
 contiki_shell_shell_start_command[35,40]
 bmd 445 3
 contiki_shell-rime-neighbors_shell_rime_neighbors_init[19,18]
-bmd 446 1
+bmd 446 2
 contiki_shell-rime-netcm_process_thread_shell_netcmd_server_process[52,60]
 bmd 447 3
 contiki_netstack_netstack_init[16,15]
-bmd 448 1
+bmd 448 2
 contiki_collect-neighbor_collect_neighbor_set_congested[9,8]
-bmd 449 1
+bmd 449 2
 contiki_psock_buf_setup[8,7]
-bmd 450 1
+bmd 450 2
 contiki_route_periodic[39,40]
 bmd 451 2
 contiki_list_list_remove[32,35]
 bmd 452 3
 contiki_nullrdc-noframer_init[5,4]
-bmd 453 1
+bmd 453 2
 contiki_shell-collect-view_process_thread_collect_view_data_process[61,62]
 bmd 454 2
 contiki_rudolph0_rudolph0_send[28,27]
-bmd 455 1
+bmd 455 2
 contiki_libconio_z80_scroll[40,40]
 bmd 456 2
 contiki_shell_input_to_child_command[27,27]
@@ -920,19 +920,19 @@ bmd 458 2
 contiki_uip-neighbor_uip_neighbor_add[67,71]
 bmd 459 3
 contiki_stunicast_stunicast_close[9,8]
-bmd 460 1
+bmd 460 2
 contiki_elfloader_find_program_processes[50,52]
 bmd 461 3
 contiki_xmac_qsend_packet[20,20]
 bmd 462 2
 contiki_rimeaddr_rimeaddr_set_node_addr[9,8]
-bmd 463 1
+bmd 463 2
 contiki_shell-netfile_process_thread_shell_netfile_process[46,48]
 bmd 464 2
 contiki_mt-test_thread_main[10,9]
 bmd 465 2
 contiki_rudolph1_rudolph1_send[30,29]
-bmd 466 1
+bmd 466 2
 contiki_uaodv_fwc_lookup[42,44]
 bmd 467 2
 contiki_uip-fw_find_netif[25,26]
@@ -940,23 +940,23 @@ bmd 468 2
 contiki_route_route_get[23,24]
 bmd 469 2
 contiki_queuebuf_queuebuf_datalen[7,6]
-bmd 470 1
+bmd 470 2
 contiki_timetable-aggregate_find_aggregate[41,43]
-bmd 471 2
+bmd 471 3
 contiki_process_process_is_running[10,9]
-bmd 472 1
+bmd 472 2
 contiki_process_process_exit[7,6]
-bmd 473 1
+bmd 473 2
 contiki_libconio_z80_adjust[19,19]
 bmd 474 2
 contiki_route-discovery_insert_route[9,8]
-bmd 475 1
+bmd 475 2
 contiki_contikimac_on[10,11]
 bmd 476 2
 contiki_csma_on[8,7]
-bmd 477 1
+bmd 477 2
 contiki_packetbuf_packetbuf_dataptr[9,8]
-bmd 478 1
+bmd 478 2
 contiki_stunicast_sent_by_uc[13,13]
 bmd 479 2
 contiki_telnet_acked[24,24]
@@ -966,7 +966,7 @@ bmd 481 2
 contiki_timetable_timetable_print[39,39]
 bmd 482 2
 contiki_neighbor-discovery_neighbor_discovery_set_val[7,6]
-bmd 483 1
+bmd 483 2
 contiki_twitter_base64_encode_24bits[96,100]
 bmd 484 2
 contiki_channel_channel_set_attributes[15,15]
@@ -976,13 +976,13 @@ bmd 486 2
 contiki_rime_packet_sent[38,43]
 bmd 487 2
 contiki_multihop_multihop_resend[8,7]
-bmd 488 1
+bmd 488 2
 contiki_memb_memb_alloc[34,35]
 bmd 489 2
 contiki_framer-nullmac_create[23,23]
 bmd 490 2
 contiki_shell-http_webserver_log_file[35,34]
-bmd 491 1
+bmd 491 2
 contiki_shell-rime-unicast_process_thread_shell_unicast_send_process[113,120]
 bmd 492 3
 contiki_shell_replace_braces[26,30]
@@ -992,21 +992,21 @@ bmd 494 2
 contiki_rmh_received[51,54]
 bmd 495 2
 contiki_about_process_thread_about_process[159,168]
-bmd 496 3
+bmd 496 4
 contiki_webclient_webclient_hostname[7,6]
-bmd 497 1
+bmd 497 2
 contiki_shell-rime_shell_rime_init[38,37]
-bmd 498 1
+bmd 498 2
 contiki_packetbuf_packetbuf_hdralloc[18,19]
 bmd 499 2
 contiki_multihop_multihop_send[41,42]
 bmd 500 2
 contiki_webclient_webclient_filename[7,6]
-bmd 501 1
+bmd 501 2
 contiki_stbroadcast_recv_from_broadcast[11,11]
 bmd 502 2
 contiki_packetqueue_remove_queued_packet[25,24]
-bmd 503 1
+bmd 503 2
 contiki_shell_process_thread_shell_killall_process[12,12]
 bmd 504 2
 contiki_ctk_make_desktopmenu[30,31]
@@ -1014,33 +1014,33 @@ bmd 505 2
 contiki_broadcast-announcement_send_adv[48,50]
 bmd 506 2
 contiki_process_process_init[9,8]
-bmd 507 1
+bmd 507 2
 contiki_shell-tcpsen_telnet_timedout[13,12]
-bmd 508 1
+bmd 508 2
 contiki_uip_arp_uip_arp_arpin[149,155]
-bmd 509 2
+bmd 509 3
 contiki_uip_uip_htonl[18,17]
-bmd 510 1
+bmd 510 2
 contiki_phase_phase_update[78,87]
 bmd 511 3
 contiki_shell-netperf_timedout_ctrl[18,17]
-bmd 512 1
+bmd 512 2
 contiki_uaodv_process_thread_uaodv_process[94,104]
 bmd 513 3
 contiki_checkpoint_checkpoint_init[5,4]
-bmd 514 1
+bmd 514 2
 contiki_broadcast-announcement_broadcast_announcement_stop[17,16]
-bmd 515 1
+bmd 515 2
 contiki_lpp_register_encounter[56,59]
-bmd 516 2
+bmd 516 3
 contiki_etimer_etimer_stop[34,37]
 bmd 517 3
 contiki_tcpip_tcpip_output[9,9]
 bmd 518 2
 contiki_rime_init[15,14]
-bmd 519 1
+bmd 519 2
 contiki_packetbuf_packetbuf_totlen[10,9]
-bmd 520 1
+bmd 520 2
 contiki_collect-neighbor_collect_neighbor_link_estimate[17,17]
 bmd 521 2
 contiki_trickle_trickle_send[26,26]
@@ -1048,49 +1048,49 @@ bmd 522 2
 contiki_telnet_telnet_abort[12,12]
 bmd 523 2
 contiki_runicast_recv_from_stunicast[93,98]
-bmd 524 2
+bmd 524 3
 contiki_lpp_turn_radio_on[7,6]
-bmd 525 1
+bmd 525 2
 contiki_cxmac_send_packet[325,367]
 bmd 526 3
 contiki_shell-netperf_timedout_mesh[19,20]
 bmd 527 2
 contiki_frame802154_frame802154_parse[196,206]
-bmd 528 2
+bmd 528 3
 contiki_shell-power_process_thread_shell_powerconv_process[60,66]
 bmd 529 3
 contiki_neighbor-discovery_neighbor_discovery_open[19,18]
-bmd 530 1
+bmd 530 2
 contiki_netfloo_sent[11,11]
 bmd 531 2
 contiki_slip_slip_input_byte[85,99]
 bmd 532 3
 contiki_process_process_post_synch[10,9]
-bmd 533 1
+bmd 533 2
 contiki_uip-over-mesh_uip_over_mesh_set_gateway[9,8]
-bmd 534 1
+bmd 534 2
 contiki_process_process_post[24,24]
 bmd 535 2
 contiki_timetable_timetable_ptr[8,7]
-bmd 536 1
+bmd 536 2
 contiki_ctk_ctk_desktop_height[6,5]
-bmd 537 1
+bmd 537 2
 contiki_trickle_send[12,12]
 bmd 538 2
 contiki_print-stats_print_stats[73,72]
-bmd 539 1
+bmd 539 2
 contiki_rudolph0_send_nack[27,26]
-bmd 540 1
+bmd 540 2
 contiki_shell-blink_shell_blink_init[8,7]
-bmd 541 1
+bmd 541 2
 contiki_dhcpc_parse_options[83,90]
 bmd 542 3
 contiki_packetbuf_packetbuf_hdrptr[8,7]
-bmd 543 1
+bmd 543 2
 contiki_uip-fw_uip_fw_register[7,6]
-bmd 544 1
+bmd 544 2
 contiki_process_do_event[46,50]
-bmd 545 2
+bmd 545 3
 contiki_collect-neighbor_periodic[75,78]
 bmd 546 2
 contiki_rudolph2_timed_send[55,61]
@@ -1102,29 +1102,29 @@ bmd 549 3
 contiki_shell-powertrace_process_thread_shell_powertrace_process[48,50]
 bmd 550 3
 contiki_checkpoint_checkpoint_checkpoint[6,5]
-bmd 551 1
+bmd 551 2
 contiki_collect-link-estimate_collect_link_estimate[13,13]
 bmd 552 2
 contiki_psock_psock_readto[56,61]
 bmd 553 4
 contiki_shell-rime-sniff_sniff_packet_output[29,28]
-bmd 554 1
+bmd 554 2
 contiki_ifft_cosI[8,7]
-bmd 555 1
+bmd 555 2
 contiki_cfs-ram_cfs_close[6,5]
-bmd 556 1
+bmd 556 2
 contiki_twitter_handle_connection[8,7]
-bmd 557 1
+bmd 557 2
 contiki_packetbuf_packetbuf_is_reference[9,8]
-bmd 558 1
+bmd 558 2
 contiki_shell-wget_shell_wget_init[8,7]
-bmd 559 1
+bmd 559 2
 contiki_tcpdump_tcpdump_format[412,416]
 bmd 560 3
 contiki_csma_input_packet[7,6]
-bmd 561 1
+bmd 561 2
 contiki_profile_find_aggregate[41,43]
-bmd 562 2
+bmd 562 3
 contiki_rudolph0_recv_nack[37,39]
 bmd 563 2
 contiki_uip-fw_time_exceeded[117,118]
@@ -1142,11 +1142,11 @@ bmd 569 1
 contiki_cfs-ram_cfs_closedir[4,3]
 bmd 570 1
 contiki_twitter_handle_input[8,7]
-bmd 571 1
+bmd 571 2
 contiki_ipolite_recv[65,71]
 bmd 572 2
 contiki_shell-netfile_read_chunk[23,22]
-bmd 573 1
+bmd 573 2
 contiki_lpp_send_packet[116,120]
 bmd 574 2
 contiki_contikimac_schedule_powercycle_fixed[28,30]
@@ -1156,7 +1156,7 @@ bmd 576 2
 contiki_shell-rime-ping_timedout_mesh[4,3]
 bmd 577 1
 contiki_shell-netperf_write_chunk[8,7]
-bmd 578 1
+bmd 578 2
 contiki_process-list_update_processwindow[137,138]
 bmd 579 2
 contiki_strcasecmp_strcasecmp[36,37]
@@ -1164,21 +1164,21 @@ bmd 580 2
 contiki_slip_process_thread_slip_process[145,158]
 bmd 581 3
 contiki_ifft_sinI[20,19]
-bmd 582 1
+bmd 582 2
 contiki_shell-downloa_request_recv[60,63]
 bmd 583 2
 contiki_rudolph2_read_data[19,19]
 bmd 584 2
 contiki_timer_timer_expired[14,13]
-bmd 585 1
+bmd 585 2
 contiki_ctk_ctk_menu_remove[25,27]
 bmd 586 2
 contiki_route-discovery_send_rreq[36,35]
-bmd 587 1
+bmd 587 2
 contiki_ctimer_ctimer_expired[25,27]
 bmd 588 3
 contiki_shell-tcpsen_telnet_closed[13,12]
-bmd 589 1
+bmd 589 2
 contiki_shell-ping_send_ping[2,1]
 bmd 590 1
 contiki_process-list_process_thread_processes_process[103,113]
@@ -1188,31 +1188,31 @@ bmd 592 2
 contiki_cxmac_on[10,11]
 bmd 593 2
 contiki_ctk_ctk_icon_add[13,12]
-bmd 594 1
+bmd 594 2
 contiki_collect-neighbor_collect_neighbor_list_num[9,8]
-bmd 595 1
+bmd 595 2
 contiki_shell-netperf_sent_ctrl[10,9]
-bmd 596 1
+bmd 596 2
 contiki_chameleon-bitopt_set_bits_in_byte[23,22]
-bmd 597 1
+bmd 597 2
 contiki_ircc_ircc_init[4,3]
 bmd 598 1
 contiki_mt_mt_stop[8,7]
-bmd 599 1
+bmd 599 2
 contiki_ircc_join_channel[70,76]
 bmd 600 3
 contiki_rudolph0_recv[89,95]
-bmd 601 2
+bmd 601 3
 contiki_shell_process_thread_shell_null_process[35,39]
 bmd 602 3
 contiki_rudolph2_sent[4,3]
 bmd 603 1
 contiki_netfloo_netflood_close[7,6]
-bmd 604 1
+bmd 604 2
 contiki_ctk_ctk_widget_add[26,27]
 bmd 605 2
 contiki_compower_compower_accumulate[23,22]
-bmd 606 1
+bmd 606 2
 contiki_cxmac_powercycle_turn_radio_on[7,8]
 bmd 607 2
 contiki_webclient_newdata[33,38]
@@ -1220,9 +1220,9 @@ bmd 608 2
 contiki_announcement_announcement_listen[7,7]
 bmd 609 2
 contiki_psock_psock_datalen[11,10]
-bmd 610 1
+bmd 610 2
 contiki_nullmac_packet_input[7,6]
-bmd 611 1
+bmd 611 2
 contiki_phase_phase_wait[73,79]
 bmd 612 3
 contiki_cxmac_powercycle_turn_radio_off[7,8]
@@ -1234,9 +1234,9 @@ bmd 615 2
 contiki_packetqueue_packetqueue_enqueue_packetbuf[42,44]
 bmd 616 2
 contiki_ircc_ircc_msg[9,8]
-bmd 617 1
+bmd 617 2
 contiki_route-discovery_route_discovery_close[13,12]
-bmd 618 1
+bmd 618 2
 contiki_shell-netperf_recv_ctrl[1,0]
 bmd 619 0
 contiki_shell-rime-netcm_recv_trickle[39,40]
@@ -1248,59 +1248,59 @@ bmd 622 2
 contiki_framer-802154_create[132,136]
 bmd 623 2
 contiki_etimer_etimer_pending[8,7]
-bmd 624 1
+bmd 624 2
 contiki_runicast_sent_by_stunicast[53,56]
 bmd 625 2
 contiki_shell-powertrace_shell_powertrace_init[10,9]
-bmd 626 1
+bmd 626 2
 contiki_polite-announcement_adv_packet_received[50,50]
 bmd 627 2
 contiki_ctk_widget_redraw[37,43]
 bmd 628 3
 contiki_shell_shell_init[48,47]
-bmd 629 1
+bmd 629 2
 contiki_shell-downloa_request_timedout[19,18]
-bmd 630 1
+bmd 630 2
 contiki_nullmac_off[9,8]
-bmd 631 1
+bmd 631 2
 contiki_contikimac_turn_off[18,18]
 bmd 632 2
 contiki_broadcast_broadcast_close[7,6]
-bmd 633 1
+bmd 633 2
 contiki_chameleon-raw_input[109,117]
-bmd 634 2
+bmd 634 3
 contiki_uaodv_fwc_add[30,29]
-bmd 635 1
+bmd 635 2
 contiki_polite_polite_send[33,34]
 bmd 636 2
 contiki_webclient_webclient_mimetype[7,6]
-bmd 637 1
+bmd 637 2
 contiki_telnet_telnet_app[68,79]
 bmd 638 3
 contiki_lpp_remove_encounter[20,19]
-bmd 639 1
+bmd 639 2
 contiki_shell_killall[24,26]
 bmd 640 2
 contiki_shell-wget_webclient_connected[14,13]
-bmd 641 1
+bmd 641 2
 contiki_shell-time_repeat_print_usage[15,14]
-bmd 642 1
+bmd 642 2
 contiki_rudolph0_rudolph0_version[8,7]
-bmd 643 1
+bmd 643 2
 contiki_shell_process_thread_shell_exit_process[12,12]
 bmd 644 2
 contiki_shell-netperf_process_thread_shell_netperf_process[666,739]
-bmd 645 4
+bmd 645 5
 contiki_stbroadcast_stbroadcast_open[13,12]
-bmd 646 1
+bmd 646 2
 contiki_powertrace_powertrace_print[323,323]
 bmd 647 2
 contiki_shell-power_printpower[14,13]
-bmd 648 1
+bmd 648 2
 contiki_mt_mt_exec[13,13]
 bmd 649 2
 contiki_shell-wget_webclient_timedout[15,14]
-bmd 650 1
+bmd 650 2
 contiki_uaodv_send_rerr[35,35]
 bmd 651 2
 contiki_shell-rime-unicast_process_thread_shell_unicast_recv_process[27,30]
@@ -1308,11 +1308,11 @@ bmd 652 3
 contiki_shell-vars_process_thread_shell_vars_process[42,44]
 bmd 653 2
 contiki_lpp_init[22,21]
-bmd 654 1
+bmd 654 2
 contiki_httpd-cfs_handle_connection[13,13]
 bmd 655 2
 contiki_nullmac_send_packet[9,8]
-bmd 656 1
+bmd 656 2
 contiki_uaodv-rt_uaodv_rt_lookup[14,15]
 bmd 657 2
 contiki_ctk_make_windowbuttons[65,65]
@@ -1324,51 +1324,51 @@ bmd 660 2
 contiki_serial-line_process_thread_serial_line_process[72,81]
 bmd 661 4
 contiki_packetbuf_packetbuf_clear[9,8]
-bmd 662 1
+bmd 662 2
 contiki_stbroadcast_send[20,20]
 bmd 663 2
 contiki_shell-rime-sniff_input_sniffer[11,11]
 bmd 664 2
 contiki_packetbuf_packetbuf_compact[33,35]
-bmd 665 2
+bmd 665 3
 contiki_collect_collect_depth[7,6]
-bmd 666 1
+bmd 666 2
 contiki_ircc_ircc_actionmsg[9,8]
-bmd 667 1
+bmd 667 2
 contiki_chameleon-bitopt_set_bits[79,86]
 bmd 668 2
 contiki_broadcast-announcement_broadcast_announcement_init[21,20]
-bmd 669 1
+bmd 669 2
 contiki_lpp_send_stream_probe[7,6]
-bmd 670 1
+bmd 670 2
 contiki_rudolph1_dropped_ipolite[4,3]
 bmd 671 1
 contiki_collect_collect_purge[21,20]
-bmd 672 1
+bmd 672 2
 contiki_uaodv_uaodv_request_route_to[42,44]
-bmd 673 2
+bmd 673 3
 contiki_broadcast-announcement_send_timer[17,17]
 bmd 674 2
 contiki_crc16_crc16_add[20,19]
-bmd 675 1
+bmd 675 2
 contiki_neighbor-discovery_neighbor_discovery_start[13,12]
-bmd 676 1
+bmd 676 2
 contiki_psock_psock_generator_send[61,68]
 bmd 677 4
 contiki_energest_energest_type_time[5,4]
-bmd 678 1
+bmd 678 2
 contiki_chameleon-bitopt_get_bits_in_byte[24,23]
-bmd 679 1
+bmd 679 2
 contiki_checkpoint_checkpoint_rollback[6,5]
-bmd 680 1
+bmd 680 2
 contiki_uip-over-mesh_uip_over_mesh_set_net[18,17]
-bmd 681 1
+bmd 681 2
 contiki_autostart_autostart_exit[15,15]
 bmd 682 2
 contiki_packetbuf_packetbuf_datalen[5,4]
-bmd 683 1
+bmd 683 2
 contiki_collect_retransmit_not_sent_callback[12,11]
-bmd 684 1
+bmd 684 2
 contiki_uip_arp_uip_arp_out[261,269]
 bmd 685 3
 contiki_chameleon_chameleon_parse[16,16]
@@ -1386,33 +1386,33 @@ bmd 691 3
 contiki_energest_energest_init[4,3]
 bmd 692 1
 contiki_dhcpc_add_req_options[20,19]
-bmd 693 1
+bmd 693 2
 contiki_shell-netperf_construct_next_stream_echo[16,16]
 bmd 694 2
 contiki_shell-rime-debug_recv_uc[24,23]
-bmd 695 1
+bmd 695 2
 contiki_cxmac_cxmac_init[17,16]
-bmd 696 1
+bmd 696 2
 contiki_dhcpc_add_end[8,7]
-bmd 697 1
+bmd 697 2
 contiki_dhcpc_add_req_ipaddr[19,18]
-bmd 698 1
+bmd 698 2
 contiki_rucb_acked[18,18]
 bmd 699 2
 contiki_powertrace_add_packet_stats[49,52]
-bmd 700 2
+bmd 700 3
 contiki_list_list_push[13,12]
-bmd 701 1
+bmd 701 2
 contiki_ircc_parse_whitespace[13,13]
 bmd 702 2
 contiki_collect-neighbor_collect_neighbor_list_best[30,31]
 bmd 703 2
 contiki_timetable_timetable_init[11,10]
-bmd 704 1
+bmd 704 2
 contiki_collect-neighbor_collect_neighbor_list_new[20,19]
-bmd 705 1
+bmd 705 2
 contiki_stimer_stimer_restart[7,6]
-bmd 706 1
+bmd 706 2
 contiki_hc_hc_init[4,3]
 bmd 707 1
 contiki_route-discovery_rrep_packet_received[62,64]
@@ -1428,7 +1428,7 @@ bmd 712 2
 contiki_webclient_webclient_get[40,41]
 bmd 713 2
 contiki_lpp_on[7,6]
-bmd 714 1
+bmd 714 2
 contiki_ringbuf_ringbuf_get[28,28]
 bmd 715 2
 contiki_contikimac_turn_on[21,21]
@@ -1438,13 +1438,13 @@ bmd 717 2
 contiki_rudolph1_sent_ipolite[4,3]
 bmd 718 1
 contiki_uiplib_uiplib_ipaddrconv[48,55]
-bmd 719 3
+bmd 719 4
 contiki_rudolph0_rudolph0_force_restart[9,8]
-bmd 720 1
+bmd 720 2
 contiki_shell-reboot_shell_reboot_init[8,7]
-bmd 721 1
+bmd 721 2
 contiki_lpp_listen_callback[6,5]
-bmd 722 1
+bmd 722 2
 contiki_packetbuf_packetbuf_attr_clear[27,28]
 bmd 723 2
 contiki_rudolph0_read_new_datapacket[24,24]
@@ -1456,7 +1456,7 @@ bmd 726 3
 contiki_collect-neighbor_collect_neighbor_init[1,0]
 bmd 727 0
 contiki_uip_uip_add_rcv_nxt[29,28]
-bmd 728 1
+bmd 728 2
 contiki_mtarch_mtarch_stop[4,3]
 bmd 729 1
 contiki_webserver-nogui_process_thread_webserver_nogui_process[30,33]
@@ -1466,45 +1466,45 @@ bmd 731 2
 contiki_contikimac_powercycle_turn_radio_off[6,6]
 bmd 732 2
 contiki_chameleon-bitopt_get_bits[70,77]
-bmd 733 2
+bmd 733 3
 contiki_shell-tcpsen_telnet_newdata[15,14]
-bmd 734 1
+bmd 734 2
 contiki_packetqueue_packetqueue_first[11,10]
-bmd 735 1
+bmd 735 2
 contiki_chameleon_chameleon_hdrsize[9,8]
-bmd 736 1
+bmd 736 2
 contiki_ctk_window_new[75,79]
 bmd 737 2
 contiki_packetbuf_packetbuf_reference_ptr[6,5]
-bmd 738 1
+bmd 738 2
 contiki_rudolph2_rudolph2_stop[11,10]
-bmd 739 1
+bmd 739 2
 contiki_process_process_start[28,30]
-bmd 740 2
+bmd 740 3
 contiki_queuebuf_queuebuf_addr[10,9]
-bmd 741 1
+bmd 741 2
 contiki_calc_add_to_input[18,18]
 bmd 742 2
 contiki_tcpdump_s[11,10]
-bmd 743 1
+bmd 743 2
 contiki_csma_transmit_queued_packet[22,23]
-bmd 744 2
+bmd 744 3
 contiki_shell-rime_process_thread_shell_send_process[89,95]
 bmd 745 3
 contiki_shell-netperf_process_incoming_packet[36,35]
-bmd 746 1
+bmd 746 2
 contiki_packetbuf_packetbuf_addr[11,10]
-bmd 747 1
+bmd 747 2
 contiki_collect_enqueue_dummy_packet[46,46]
 bmd 748 2
 contiki_ctk_ctk_mode_set[5,4]
-bmd 749 1
+bmd 749 2
 contiki_cfs-ram_cfs_open[33,36]
 bmd 750 2
 contiki_ctk_switch_menu_item[50,54]
 bmd 751 2
 contiki_shell-vars_shell_vars_init[12,11]
-bmd 752 1
+bmd 752 2
 contiki_mtarch_mtarch_pstop[4,3]
 bmd 753 1
 contiki_collect_collect_set_sink[39,40]
@@ -1512,7 +1512,7 @@ bmd 754 2
 contiki_route_route_flush_all[17,17]
 bmd 755 2
 contiki_uip-fw_uip_fw_default[5,4]
-bmd 756 1
+bmd 756 2
 contiki_framer-802154_parse[71,76]
 bmd 757 3
 contiki_shell-udpsen_process_thread_shell_udpsend_process[138,149]
@@ -1522,21 +1522,21 @@ bmd 759 2
 contiki_httpd-cfs_handle_output[107,117]
 bmd 760 4
 contiki_collect-neighbor_collect_neighbor_list[7,6]
-bmd 761 1
+bmd 761 2
 contiki_framer-802154_is_broadcast_addr[24,26]
 bmd 762 2
 contiki_uip-over-mesh_uip_over_mesh_set_gateway_netif[5,4]
-bmd 763 1
+bmd 763 2
 contiki_shell-netfile_write_chunk[10,9]
-bmd 764 1
+bmd 764 2
 contiki_ctk_switch_open_menu[48,53]
 bmd 765 3
 contiki_cxmac_off[12,15]
-bmd 766 2
+bmd 766 3
 contiki_contikimac_input_packet[116,127]
 bmd 767 3
 contiki_shell-netfile_process_thread_shell_recvnetfile_process[43,48]
-bmd 768 3
+bmd 768 4
 contiki_rudolph2_dropped[4,3]
 bmd 769 1
 contiki_tcpdump_n[38,41]
@@ -1548,23 +1548,23 @@ bmd 772 2
 contiki_collect_node_packet_received[237,254]
 bmd 773 3
 contiki_dhcpc_send_discover[24,23]
-bmd 774 1
+bmd 774 2
 contiki_psock_buf_bufto[52,57]
 bmd 775 3
 contiki_tcpip_process_thread_tcpip_process[46,49]
 bmd 776 3
 contiki_netfloo_netflood_cancel[7,6]
-bmd 777 1
+bmd 777 2
 contiki_route_route_remove[13,12]
-bmd 778 1
+bmd 778 2
 contiki_shell-udpsen_shell_udpsend_init[8,7]
-bmd 779 1
+bmd 779 2
 contiki_phase_phase_init[17,16]
-bmd 780 1
+bmd 780 2
 contiki_tcpip_tcpip_uipcall[39,43]
 bmd 781 3
 contiki_ircc_ircc_list[7,6]
-bmd 782 1
+bmd 782 2
 contiki_contikimac_powercycle_turn_radio_on[6,6]
 bmd 783 2
 contiki_csma_send_packet[77,81]
@@ -1572,17 +1572,17 @@ bmd 784 2
 contiki_ctk_switch_focus_widget[57,67]
 bmd 785 3
 contiki_ircc_parse_user[15,14]
-bmd 786 1
+bmd 786 2
 contiki_route_route_set_lifetime[5,4]
-bmd 787 1
+bmd 787 2
 contiki_ctk_menus_input[50,56]
-bmd 788 2
+bmd 788 3
 contiki_profile_profile_episode_end[38,41]
 bmd 789 2
 contiki_shell-rime-netcm_process_thread_shell_netcmd_process[57,58]
 bmd 790 2
 contiki_shell-netperf_print_local_stats[203,202]
-bmd 791 1
+bmd 791 2
 contiki_phase_find_neighbor[27,28]
 bmd 792 2
 contiki_queuebuf_queuebuf_free[29,30]
@@ -1590,45 +1590,45 @@ bmd 793 2
 contiki_calc_operand2_to_input[63,64]
 bmd 794 2
 contiki_rudolph1_send_nack[24,23]
-bmd 795 1
+bmd 795 2
 contiki_shell-ping_shell_ping_init[8,7]
-bmd 796 1
+bmd 796 2
 contiki_csma_free_queued_packet[33,34]
 bmd 797 2
 contiki_shell-rime-netcm_shell_rime_netcmd_init[17,16]
-bmd 798 1
+bmd 798 2
 contiki_rudolph1_format_data[31,30]
-bmd 799 1
+bmd 799 2
 contiki_packetbuf_packetbuf_attr_copyto[18,17]
-bmd 800 1
+bmd 800 2
 contiki_shell-netperf_read_chunk[28,30]
 bmd 801 2
 contiki_etimer_etimer_adjust[10,9]
-bmd 802 1
+bmd 802 2
 contiki_collect-link-estimate_collect_link_estimate_update_rx[4,3]
 bmd 803 1
 contiki_neighbor-discovery_send_timer[18,18]
 bmd 804 2
 contiki_phase_send_packet[27,26]
-bmd 805 1
+bmd 805 2
 contiki_rudolph1_send_next_packet[44,45]
 bmd 806 2
 contiki_shell-tcpsen_telnet_sent[5,4]
-bmd 807 1
+bmd 807 2
 contiki_mmem_mmem_init[7,6]
-bmd 808 1
+bmd 808 2
 contiki_abc_abc_input[10,9]
-bmd 809 1
+bmd 809 2
 contiki_shell-netperf_construct_next_packet[28,28]
 bmd 810 2
 contiki_neighbor-discovery_neighbor_discovery_close[13,12]
-bmd 811 1
+bmd 811 2
 contiki_shell_shell_quit[13,12]
-bmd 812 1
+bmd 812 2
 contiki_rs232_process_thread_rs232_process[54,59]
 bmd 813 3
 contiki_shell-rime-ping_shell_rime_ping_init[16,15]
-bmd 814 1
+bmd 814 2
 contiki_process_do_poll[22,23]
 bmd 815 2
 contiki_uip-neighbor_uip_neighbor_lookup[12,12]
@@ -1636,21 +1636,21 @@ bmd 816 2
 contiki_webserver-nogui_webserver_log[4,3]
 bmd 817 1
 contiki_channel_channel_open[11,10]
-bmd 818 1
+bmd 818 2
 contiki_mtarch_mtarch_init[4,3]
 bmd 819 1
 contiki_list_list_length[16,16]
 bmd 820 2
 contiki_shell-rime_recv_collect[62,64]
-bmd 821 2
+bmd 821 3
 contiki_shell_find_pipe[31,35]
 bmd 822 3
 contiki_psock_psock_send[37,41]
 bmd 823 4
 contiki_rmh_rmh_open[13,12]
-bmd 824 1
+bmd 824 2
 contiki_ctk_ctk_window_new[11,10]
-bmd 825 1
+bmd 825 2
 contiki_mesh_data_packet_forward[33,34]
 bmd 826 2
 contiki_list_list_tail[21,22]
@@ -1662,41 +1662,41 @@ bmd 829 2
 contiki_shell-irc_ircc_text_output[32,32]
 bmd 830 2
 contiki_stunicast_stunicast_set_timer[12,11]
-bmd 831 1
+bmd 831 2
 contiki_uip-split_uip_split_output[130,132]
 bmd 832 2
 contiki_neighbor-discovery_set_timers[30,29]
-bmd 833 1
+bmd 833 2
 contiki_announcement_announcement_remove_value[16,16]
 bmd 834 2
 contiki_ircc_handle_connection[138,161]
-bmd 835 5
+bmd 835 6
 contiki_packetqueue_packetqueue_len[10,9]
-bmd 836 1
+bmd 836 2
 contiki_shell-checkpoint_process_thread_shell_rollback_process[40,41]
 bmd 837 2
 contiki_rime_rime_output[21,21]
 bmd 838 2
 contiki_shell_shell_input[41,44]
-bmd 839 2
+bmd 839 3
 contiki_shell_process_thread_help_command_process[39,40]
 bmd 840 2
 contiki_httpd-cfs_httpd_appcall[112,122]
-bmd 841 2
+bmd 841 3
 contiki_webclient_parse_headers[128,140]
 bmd 842 3
 contiki_cxmac_register_encounter[44,47]
-bmd 843 2
+bmd 843 3
 contiki_lpp_restart_dutycycle[17,16]
-bmd 844 1
+bmd 844 2
 contiki_slip_rxbuf_init[8,7]
-bmd 845 1
+bmd 845 2
 contiki_mt_mt_init[5,4]
-bmd 846 1
+bmd 846 2
 contiki_announcement_announcement_set_value[20,20]
 bmd 847 2
 contiki_ircc_ircc_join[12,11]
-bmd 848 1
+bmd 848 2
 contiki_cxmac_cschedule_powercycle[17,18]
 bmd 849 2
 contiki_rudolph1_write_data[35,36]
@@ -1706,9 +1706,9 @@ bmd 851 2
 contiki_dhcpc_msg_for_me[55,60]
 bmd 852 3
 contiki_dhcpc_create_msg[91,90]
-bmd 853 1
+bmd 853 2
 contiki_tcpip_eventhandler[98,112]
-bmd 854 2
+bmd 854 3
 contiki_shell-netperf_memcpy_misaligned[30,32]
 bmd 855 2
 contiki_rudolph2_rudolph2_send[47,47]
@@ -1716,35 +1716,35 @@ bmd 856 2
 contiki_route-discovery_route_discovery_discover[20,20]
 bmd 857 2
 contiki_ctk_ctk_desktop_width[6,5]
-bmd 858 1
+bmd 858 2
 contiki_rucb_timedout[11,11]
 bmd 859 2
 contiki_mtarch_mtarch_stack_usage[22,23]
 bmd 860 2
 contiki_powertrace_output_sniffer[6,5]
-bmd 861 1
+bmd 861 2
 contiki_collect_send_packet[20,19]
-bmd 862 1
+bmd 862 2
 contiki_packetbuf_packetbuf_set_datalen[5,4]
-bmd 863 1
+bmd 863 2
 contiki_contikimac_duty_cycle[5,4]
-bmd 864 1
+bmd 864 2
 contiki_mt_mt_exit[8,7]
-bmd 865 1
+bmd 865 2
 contiki_xmac_detect_ack[60,66]
 bmd 866 2
 contiki_powertrace_sniffprint[44,43]
-bmd 867 1
+bmd 867 2
 contiki_elfloader_seek_read[13,12]
-bmd 868 1
+bmd 868 2
 contiki_sicslowmac_on[8,7]
-bmd 869 1
+bmd 869 2
 contiki_route_route_init[17,16]
-bmd 870 1
+bmd 870 2
 contiki_program-handler_process_thread_program_handler_process[75,84]
 bmd 871 3
 contiki_ircc_ircc_appcall[36,40]
-bmd 872 2
+bmd 872 3
 contiki_collect-neighbor_collect_neighbor_list_get[25,26]
 bmd 873 2
 contiki_nullmac_init[4,3]
@@ -1764,7 +1764,7 @@ bmd 880 2
 contiki_shell-time_process_thread_shell_repeat_server_process[72,83]
 bmd 881 4
 contiki_csma_init[9,8]
-bmd 882 1
+bmd 882 2
 contiki_autostart_autostart_start[16,16]
 bmd 883 2
 contiki_shell-rime_process_thread_shell_packetize_process[1,0]
@@ -1772,13 +1772,13 @@ bmd 884 0
 contiki_powertrace_powertrace_sniff[21,22]
 bmd 885 2
 contiki_shell-rime-debug_recv_broadcast[24,23]
-bmd 886 1
+bmd 886 2
 contiki_mt-test_thread_func[17,17]
 bmd 887 2
 contiki_shell-run_shell_run_init[8,7]
-bmd 888 1
+bmd 888 2
 contiki_ctimer_ctimer_init[12,11]
-bmd 889 1
+bmd 889 2
 contiki_ctimer_ctimer_stop[20,20]
 bmd 890 2
 contiki_uip-fw_fwcache_register[60,62]
@@ -1790,7 +1790,7 @@ bmd 893 2
 contiki_netfloo_netflood_send[34,34]
 bmd 894 2
 contiki_shell-base64_shell_base64_init[8,7]
-bmd 895 1
+bmd 895 2
 contiki_ctk_activate_menu[42,44]
 bmd 896 3
 contiki_lpp_off[12,12]
@@ -1800,33 +1800,33 @@ bmd 898 2
 contiki_contikimac_schedule_powercycle[36,38]
 bmd 899 2
 contiki_chameleon-bitopt_unpack_header[100,106]
-bmd 900 2
+bmd 900 3
 contiki_mtarch_mtarch_exec[7,6]
-bmd 901 1
+bmd 901 2
 contiki_ircc_ircc_connect[20,20]
 bmd 902 2
 contiki_powertrace_output_printsniffer[1,0]
 bmd 903 0
 contiki_ringbuf_ringbuf_elements[17,16]
-bmd 904 1
+bmd 904 2
 contiki_collect_set_keepalive_timer[28,28]
 bmd 905 2
 contiki_collect_handle_ack[118,125]
 bmd 906 2
 contiki_psock_psock_init[21,20]
-bmd 907 1
+bmd 907 2
 contiki_shell-sendtest_shell_sendtest_init[16,15]
-bmd 908 1
+bmd 908 2
 contiki_shell-netperf_setup_sending[12,11]
-bmd 909 1
+bmd 909 2
 contiki_nullrdc-noframer_packet_input[7,6]
-bmd 910 1
+bmd 910 2
 contiki_timetable-aggregate_timetable_aggregate_print_categories[48,48]
 bmd 911 2
 contiki_uip-over-mesh_uip_over_mesh_send[155,163]
 bmd 912 3
 contiki_etimer_etimer_restart[9,8]
-bmd 913 1
+bmd 913 2
 contiki_abc_abc_sent[13,13]
 bmd 914 2
 contiki_hc_hc_inflate[76,77]
@@ -1834,39 +1834,39 @@ bmd 915 2
 contiki_broadcast_sent_by_abc[13,13]
 bmd 916 2
 contiki_nullmac_on[8,7]
-bmd 917 1
+bmd 917 2
 contiki_nullradio_init[5,4]
-bmd 918 1
+bmd 918 2
 contiki_about_about_quit[9,8]
-bmd 919 1
+bmd 919 2
 contiki_shell-http_shell_httpd_init[8,7]
-bmd 920 1
+bmd 920 2
 contiki_uip-neighbor_uip_neighbor_update[10,10]
 bmd 921 2
 contiki_tinysample_process_thread_tiny_process[42,45]
 bmd 922 3
 contiki_httpd-cfs_handle_input[102,111]
-bmd 923 3
+bmd 923 4
 contiki_packetbuf_packetbuf_attr_copyfrom[18,17]
-bmd 924 1
+bmd 924 2
 contiki_mesh_mesh_open[23,22]
-bmd 925 1
+bmd 925 2
 contiki_stimer_stimer_remaining[12,11]
-bmd 926 1
+bmd 926 2
 contiki_shell-http_webserver_log[12,11]
-bmd 927 1
+bmd 927 2
 contiki_timer_timer_remaining[12,11]
-bmd 928 1
+bmd 928 2
 contiki_polite_polite_open[13,12]
-bmd 929 1
+bmd 929 2
 contiki_csma_packet_sent[93,101]
-bmd 930 2
+bmd 930 3
 contiki_polite_polite_cancel[14,14]
 bmd 931 2
 contiki_xmac_powercycle[80,91]
 bmd 932 4
 contiki_stunicast_stunicast_send[9,8]
-bmd 933 1
+bmd 933 2
 contiki_announcement_announcement_heard[30,32]
 bmd 934 2
 contiki_webclient_senddata[108,109]
@@ -1882,7 +1882,7 @@ bmd 939 2
 contiki_elfloader_find_local_symbol[79,84]
 bmd 940 3
 contiki_rime_rime_sniffer_add[8,7]
-bmd 941 1
+bmd 941 2
 contiki_uip-fw_ipaddr_maskcmp[33,34]
 bmd 942 2
 contiki_ctimer_ctimer_reset[21,21]
@@ -1890,37 +1890,37 @@ bmd 943 2
 contiki_announcement_announcement_register[26,26]
 bmd 944 2
 contiki_uip-over-mesh_send_data[9,8]
-bmd 945 1
+bmd 945 2
 contiki_queuebuf_queuebuf_to_packetbuf[54,55]
 bmd 946 2
 contiki_shell-coffee_shell_coffee_init[8,7]
-bmd 947 1
+bmd 947 2
 contiki_shell-tcpsen_shell_tcpsend_init[8,7]
-bmd 948 1
+bmd 948 2
 contiki_rimeaddr_rimeaddr_copy[15,15]
 bmd 949 2
 contiki_rudolph2_rudolph2_close[7,6]
-bmd 950 1
+bmd 950 2
 contiki_ifft_ilog2[13,13]
 bmd 951 2
 contiki_uaodv-rt_uaodv_rt_lru[16,16]
 bmd 952 2
 contiki_abc_abc_close[7,6]
-bmd 953 1
+bmd 953 2
 contiki_ircc_parse_prefix[21,22]
 bmd 954 2
 contiki_uip-fw_uip_fw_periodic[18,19]
 bmd 955 2
 contiki_tcpip_tcpip_input[11,10]
-bmd 956 1
+bmd 956 2
 contiki_lpp_num_packets_to_send[7,6]
-bmd 957 1
+bmd 957 2
 contiki_queuebuf_queuebuf_init[12,11]
-bmd 958 1
+bmd 958 2
 contiki_shell-rime-debug-runicast_process_thread_shell_runicast_process[124,131]
 bmd 959 3
 contiki_ctk_ctk_menu_new[17,16]
-bmd 960 1
+bmd 960 2
 contiki_mtarch_mtarch_start[30,30]
 bmd 961 2
 contiki_slip_slip_write[37,39]
@@ -1930,23 +1930,23 @@ bmd 963 2
 contiki_packetqueue_packetqueue_dequeue[29,29]
 bmd 964 2
 contiki_shell-irc_ircc_connected[12,11]
-bmd 965 1
+bmd 965 2
 contiki_ctk_ctk_dialog_open[6,5]
-bmd 966 1
+bmd 966 2
 contiki_uip-fw_uip_fw_init[11,11]
 bmd 967 2
 contiki_queuebuf_queuebuf_attr[10,9]
-bmd 968 1
+bmd 968 2
 contiki_lpp_channel_check_interval[5,4]
-bmd 969 1
+bmd 969 2
 contiki_uaodv_send_rrep[38,37]
-bmd 970 1
+bmd 970 2
 contiki_nullradio_receiving_packet[5,4]
-bmd 971 1
+bmd 971 2
 contiki_shell-rime-sniff_sniff_attributes_output[57,56]
-bmd 972 1
+bmd 972 2
 contiki_nullradio_prepare[5,4]
-bmd 973 1
+bmd 973 2
 contiki_dhcpc_parse_msg[45,47]
 bmd 974 2
 contiki_uaodv_uaodv_bad_dest[33,33]
@@ -1956,7 +1956,7 @@ bmd 976 2
 contiki_timetable-aggregate_timetable_aggregate_compute_categories[87,92]
 bmd 977 3
 contiki_trickle_timer_callback[7,6]
-bmd 978 1
+bmd 978 2
 contiki_xmac_schedule_powercycle[15,15]
 bmd 979 2
 contiki_process_call_process[34,38]
@@ -1964,33 +1964,33 @@ bmd 980 3
 contiki_process_process_poll[16,18]
 bmd 981 3
 contiki_etimer_etimer_reset[9,8]
-bmd 982 1
+bmd 982 2
 contiki_timetable-aggregate_timetable_aggregate_reset[22,22]
 bmd 983 2
 contiki_rucb_rucb_send[24,23]
-bmd 984 1
+bmd 984 2
 contiki_mesh_route_timed_out[20,21]
 bmd 985 2
 contiki_urlconv_urlconv_init[22,22]
 bmd 986 2
 contiki_collect_node_packet_sent[39,40]
-bmd 987 2
+bmd 987 3
 contiki_cfs-ram_cfs_readdir[5,4]
-bmd 988 1
+bmd 988 2
 contiki_stunicast_stunicast_open[13,12]
-bmd 989 1
+bmd 989 2
 contiki_chameleon_chameleon_create[18,18]
 bmd 990 2
 contiki_twitter_process_thread_twitter_process[84,95]
 bmd 991 3
 contiki_route-discovery_route_discovery_open[22,21]
-bmd 992 1
+bmd 992 2
 contiki_dhcpc_dhcpc_init[34,34]
 bmd 993 2
 contiki_shell-downloa_request_sent[8,7]
-bmd 994 1
+bmd 994 2
 contiki_cxmac_channel_check_interval[5,4]
-bmd 995 1
+bmd 995 2
 contiki_sicslowmac_send_packet[117,121]
 bmd 996 2
 contiki_shell_command_kill[20,20]
@@ -1998,11 +1998,11 @@ bmd 997 2
 contiki_shell-irc_process_thread_shell_irc_process[96,103]
 bmd 998 4
 contiki_uip_uip_process[1452,1591]
-bmd 999 7
+bmd 999 8
 contiki_trickle_recv[61,63]
 bmd 1000 2
 contiki_etimer_etimer_set[10,9]
-bmd 1001 1
+bmd 1001 2
 contiki_route-discovery_send_rrep[39,39]
 bmd 1002 2
 contiki_frame802154_frame802154_create[154,158]
@@ -2010,23 +2010,23 @@ bmd 1003 2
 contiki_collect_collect_send[114,119]
 bmd 1004 2
 contiki_shell-sendtest_print_usage[14,13]
-bmd 1005 1
+bmd 1005 2
 contiki_shell-text_process_thread_shell_size_process[49,53]
 bmd 1006 3
 contiki_powertrace_powertrace_stop[8,7]
-bmd 1007 1
+bmd 1007 2
 contiki_queuebuf_queuebuf_dataptr[28,29]
 bmd 1008 2
 contiki_rudolph0_rudolph0_stop[7,6]
-bmd 1009 1
+bmd 1009 2
 contiki_profile_profile_aggregate_compute_detailed[68,70]
 bmd 1010 2
 contiki_rucb_recv[81,85]
-bmd 1011 2
+bmd 1011 3
 contiki_shell-text_shell_text_init[20,19]
-bmd 1012 1
+bmd 1012 2
 contiki_packetbuf_packetbuf_hdrlen[6,5]
-bmd 1013 1
+bmd 1013 2
 contiki_neighbor-discovery_adv_packet_sent[4,3]
 bmd 1014 1
 contiki_ircc_part_channel[70,76]
@@ -2038,15 +2038,15 @@ bmd 1017 2
 contiki_collect-neighbor_collect_neighbor_list_find[26,27]
 bmd 1018 2
 contiki_uip_arch_uip_tcpchksum[5,4]
-bmd 1019 1
+bmd 1019 2
 contiki_shell-checkpoint_shell_checkpoint_init[13,12]
-bmd 1020 1
+bmd 1020 2
 contiki_stbroadcast_stbroadcast_cancel[8,7]
-bmd 1021 1
+bmd 1021 2
 contiki_collect-neighbor_collect_neighbor_update_rtmetric[10,10]
 bmd 1022 2
 contiki_shell-wget_webclient_closed[15,14]
-bmd 1023 1
+bmd 1023 2
 contiki_uip_arp_uip_arp_update[111,121]
 bmd 1024 3
 contiki_collect-neighbor_collect_neighbor_list_add[85,94]
@@ -2054,11 +2054,11 @@ bmd 1025 3
 contiki_shell-http_process_thread_shell_httpd_process[30,33]
 bmd 1026 3
 contiki_packetbuf_packetbuf_set_attr[10,9]
-bmd 1027 1
+bmd 1027 2
 contiki_hc_hc_compress[71,79]
-bmd 1028 2
+bmd 1028 3
 contiki_csma_off[9,8]
-bmd 1029 1
+bmd 1029 2
 contiki_rudolph2_write_data[41,43]
 bmd 1030 2
 contiki_cxmac_cpowercycle[71,81]
@@ -2068,11 +2068,11 @@ bmd 1032 1
 contiki_uaodv-rt_uaodv_rt_lookup_any[28,30]
 bmd 1033 3
 contiki_shell-ps_shell_ps_init[8,7]
-bmd 1034 1
+bmd 1034 2
 contiki_shell-netperf_recv_broadcast[13,14]
 bmd 1035 2
 contiki_shell-rime-debug_shell_rime_debug_init[28,27]
-bmd 1036 1
+bmd 1036 2
 contiki_shell-power_process_thread_shell_energy_process[51,51]
 bmd 1037 2
 contiki_tcpip_tcp_listen[23,24]
@@ -2082,13 +2082,13 @@ bmd 1039 2
 contiki_shell-downloa_process_thread_shell_download_process[135,142]
 bmd 1040 3
 contiki_mt_mt_remove[5,4]
-bmd 1041 1
+bmd 1041 2
 contiki_energest_energest_flush[4,3]
 bmd 1042 1
 contiki_uaodv_sendto[16,15]
-bmd 1043 1
+bmd 1043 2
 contiki_rudolph1_rudolph1_close[10,9]
-bmd 1044 1
+bmd 1044 2
 contiki_etimer_etimer_next_expiration_time[12,12]
 bmd 1045 2
 contiki_chameleon-raw_hdrsize[28,30]
@@ -2100,7 +2100,7 @@ bmd 1048 5
 contiki_uip_uip_listen[18,19]
 bmd 1049 2
 contiki_rucb_rucb_open[21,20]
-bmd 1050 1
+bmd 1050 2
 contiki_xmac_input_packet[121,131]
 bmd 1051 3
 contiki_rmh_timedout[4,3]
@@ -2110,11 +2110,11 @@ bmd 1053 2
 contiki_stunicast_recv_from_uc[12,12]
 bmd 1054 2
 contiki_sicslowmac_init[10,9]
-bmd 1055 1
+bmd 1055 2
 contiki_shell-downloa_write_chunk[23,24]
 bmd 1056 2
 contiki_trickle_set_timer[10,9]
-bmd 1057 1
+bmd 1057 2
 contiki_mesh_mesh_send[17,17]
 bmd 1058 2
 contiki_shell-text_process_thread_shell_echo_process[25,25]
@@ -2122,21 +2122,21 @@ bmd 1059 2
 contiki_uip-fw-drv_process_thread_uip_fw_process[22,24]
 bmd 1060 2
 contiki_queuebuf_queuebuf_update_attr_from_packetbuf[10,9]
-bmd 1061 1
+bmd 1061 2
 contiki_shell-netperf_print_remote_stats[119,118]
-bmd 1062 1
+bmd 1062 2
 contiki_mtarch_mtarch_switch[5,4]
-bmd 1063 1
+bmd 1063 2
 contiki_shell_process_thread_shell_server_process[76,85]
 bmd 1064 3
 contiki_cxmac_turn_on[8,7]
-bmd 1065 1
+bmd 1065 2
 contiki_contikimac_contikimac_debug_print[5,4]
-bmd 1066 1
+bmd 1066 2
 contiki_ipolite_ipolite_send[48,52]
 bmd 1067 3
 contiki_nullradio_off[5,4]
-bmd 1068 1
+bmd 1068 2
 contiki_stunicast_stunicast_send_stubborn[31,32]
 bmd 1069 2
 contiki_uaodv-rt_uaodv_rt_add[54,55]
@@ -2146,11 +2146,11 @@ bmd 1071 2
 contiki_uip_arp_uip_arp_init[17,17]
 bmd 1072 2
 contiki_collect_collect_parent[7,6]
-bmd 1073 1
+bmd 1073 2
 contiki_ctk_ctk_dialog_new[9,8]
-bmd 1074 1
+bmd 1074 2
 contiki_shell-netperf_shell_netperf_init[48,47]
-bmd 1075 1
+bmd 1075 2
 contiki_shell_process_thread_shell_kill_process[65,71]
 bmd 1076 3
 contiki_frame802154_field_len[55,59]
@@ -2158,21 +2158,21 @@ bmd 1077 2
 contiki_ctk_ctk_menu_add[25,27]
 bmd 1078 2
 contiki_ctk_ctk_mode_get[5,4]
-bmd 1079 1
+bmd 1079 2
 contiki_stimer_stimer_set[9,8]
-bmd 1080 1
+bmd 1080 2
 contiki_shell-netstat_process_thread_shell_netstat_process[26,27]
 bmd 1081 2
 contiki_shell-rime-debug-runicast_shell_rime_debug_runicast_init[16,15]
-bmd 1082 1
+bmd 1082 2
 contiki_sicslowmac_channel_check_interval[5,4]
-bmd 1083 1
+bmd 1083 2
 contiki_rtimer_rtimer_init[5,4]
-bmd 1084 1
+bmd 1084 2
 contiki_psock_buf_bufdata[71,72]
 bmd 1085 2
 contiki_rudolph0_rudolph0_open[27,26]
-bmd 1086 1
+bmd 1086 2
 contiki_broadcast-announcement_new_announcement[12,12]
 bmd 1087 2
 contiki_netfloo_recv_from_ipolite[88,94]
@@ -2180,13 +2180,13 @@ bmd 1088 3
 contiki_collect-link-estimate_collect_link_estimate_num_estimates[11,11]
 bmd 1089 2
 contiki_memb_memb_init[25,24]
-bmd 1090 1
+bmd 1090 2
 contiki_netfloo_dropped[11,11]
 bmd 1091 2
 contiki_random_random_rand[7,6]
-bmd 1092 1
+bmd 1092 2
 contiki_collect-neighbor_collect_neighbor_rtmetric_link_estimate[12,11]
-bmd 1093 1
+bmd 1093 2
 contiki_uip_uip_connect[111,120]
 bmd 1094 3
 contiki_httpd-cfs_send_headers[106,116]
@@ -2200,57 +2200,57 @@ bmd 1098 2
 contiki_dhcpc_handle_dhcp[276,313]
 bmd 1099 6
 contiki_timer_timer_restart[7,6]
-bmd 1100 1
+bmd 1100 2
 contiki_shell-checkpoint_process_thread_shell_checkpoint_process[56,57]
 bmd 1101 2
 contiki_uip-over-mesh_gateway_announce_recv[9,9]
 bmd 1102 2
 contiki_shell-netperf_sample_power_profile[21,20]
-bmd 1103 1
+bmd 1103 2
 contiki_shell-tweet_shell_tweet_init[8,7]
-bmd 1104 1
+bmd 1104 2
 contiki_tcpip_tcpip_poll_tcp[11,10]
-bmd 1105 1
+bmd 1105 2
 contiki_uaodv_handle_incoming_rreq[224,242]
 bmd 1106 3
 contiki_shell-rime-debug-runicast_timedout_ruc[18,17]
-bmd 1107 1
+bmd 1107 2
 contiki_cfs-ram_cfs_remove[5,4]
-bmd 1108 1
+bmd 1108 2
 contiki_broadcast-announcement_broadcast_announcement_beacon_interval[7,6]
-bmd 1109 1
+bmd 1109 2
 contiki_rudolph2_rudolph2_open[17,16]
-bmd 1110 1
+bmd 1110 2
 contiki_collect_update_parent[62,65]
 bmd 1111 2
 contiki_packetbuf_packetbuf_hdrreduce[12,12]
 bmd 1112 2
 contiki_unicast_unicast_send[11,10]
-bmd 1113 1
+bmd 1113 2
 contiki_ipolite_send[22,23]
 bmd 1114 2
 contiki_shell-time_process_thread_shell_repeat_process[152,166]
-bmd 1115 4
+bmd 1115 5
 contiki_timetable-aggregate_timetable_aggregate_compute_detailed[60,62]
-bmd 1116 2
+bmd 1116 3
 contiki_nullradio_send[10,9]
-bmd 1117 1
+bmd 1117 2
 contiki_sicslowmac_is_broadcast_addr[24,26]
 bmd 1118 2
 contiki_shell-rime-sendcm_process_thread_shell_sendcmd_process[103,106]
 bmd 1119 3
 contiki_announcement_announcement_init[6,5]
-bmd 1120 1
+bmd 1120 2
 contiki_packetqueue_packetqueue_init[13,12]
-bmd 1121 1
+bmd 1121 2
 contiki_route-discovery_timeout_handler[12,12]
 bmd 1122 2
 contiki_packetbuf_packetbuf_hdr_remove[7,6]
-bmd 1123 1
+bmd 1123 2
 contiki_ctk_do_redraw_all[87,95]
-bmd 1124 2
+bmd 1124 3
 contiki_trickle_run_trickle[72,78]
-bmd 1125 3
+bmd 1125 4
 contiki_rudolph1_handle_data[75,81]
 bmd 1126 2
 contiki_shell-netperf_construct_next_echo[13,13]
@@ -2258,69 +2258,69 @@ bmd 1127 2
 contiki_broadcast-announcement_adv_packet_sent[4,3]
 bmd 1128 1
 contiki_collect-neighbor_collect_neighbor_rtmetric[7,6]
-bmd 1129 1
+bmd 1129 2
 contiki_uaodv_handle_incoming_packet[20,23]
 bmd 1130 2
 contiki_shell-power_shell_power_init[16,15]
-bmd 1131 1
+bmd 1131 2
 contiki_program-handler_program_handler_add[25,25]
 bmd 1132 2
 contiki_shell_shell_set_time[6,5]
-bmd 1133 1
+bmd 1133 2
 contiki_xmac_register_encounter[44,47]
-bmd 1134 2
+bmd 1134 3
 contiki_psock_data_is_sent_and_acked[59,64]
 bmd 1135 3
 contiki_stbroadcast_stbroadcast_set_timer[12,11]
-bmd 1136 1
+bmd 1136 2
 contiki_xmac_xmac_set_announcement_radio_txpower[4,3]
 bmd 1137 1
 contiki_shell-downloa_read_chunk[27,28]
 bmd 1138 2
 contiki_uip_uip_setipid[5,4]
-bmd 1139 1
+bmd 1139 2
 contiki_mtarch_mtarch_remove[4,3]
 bmd 1140 1
 contiki_ircc_parse[24,26]
 bmd 1141 2
 contiki_collect_bump_advertisement[8,7]
-bmd 1142 1
+bmd 1142 2
 contiki_collect-neighbor_collect_neighbor_tx[14,13]
-bmd 1143 1
+bmd 1143 2
 contiki_powertrace_powertrace_start[12,11]
-bmd 1144 1
+bmd 1144 2
 contiki_collect-link-estimate_collect_link_estimate_update_tx[34,37]
 bmd 1145 2
 contiki_ctk_ctk_window_redraw[25,29]
-bmd 1146 2
+bmd 1146 3
 contiki_shell-netperf_finalize_stats[12,11]
-bmd 1147 1
+bmd 1147 2
 contiki_ctk_unfocus_widget[21,22]
 bmd 1148 2
 contiki_etimer_etimer_request_poll[8,7]
-bmd 1149 1
+bmd 1149 2
 contiki_lpp_dutycycle[102,114]
 bmd 1150 5
 contiki_nullradio_transmit[5,4]
-bmd 1151 1
+bmd 1151 2
 contiki_rimeaddr_rimeaddr_cmp[20,21]
 bmd 1152 2
 contiki_mesh_data_packet_received[21,22]
 bmd 1153 2
 contiki_lpp_remove_queued_old_packet_callback[8,7]
-bmd 1154 1
+bmd 1154 2
 contiki_energest_energest_type_set[4,3]
 bmd 1155 1
 contiki_ircc_ircc_quit[7,6]
-bmd 1156 1
+bmd 1156 2
 contiki_route-discovery_rreq_packet_received[49,51]
 bmd 1157 2
 contiki_shell-base64_process_thread_shell_dec64_process[92,98]
 bmd 1158 3
 contiki_nullrdc-noframer_channel_check_interval[5,4]
-bmd 1159 1
+bmd 1159 2
 contiki_serial-line_serial_line_init[17,16]
-bmd 1160 1
+bmd 1160 2
 contiki_csma_default_timebase[13,13]
 bmd 1161 2
 contiki_powertrace_input_printsniffer[1,0]
@@ -2330,47 +2330,47 @@ bmd 1163 2
 contiki_telnet_telnet_connect[15,15]
 bmd 1164 2
 contiki_profile_profile_init[13,12]
-bmd 1165 1
+bmd 1165 2
 contiki_packetbuf_packetbuf_reference[7,6]
-bmd 1166 1
+bmd 1166 2
 contiki_uip-debug_uip_debug_ipaddr_print[24,23]
-bmd 1167 1
+bmd 1167 2
 contiki_collect_proactive_probing_callback[74,80]
 bmd 1168 3
 contiki_ctk_ctk_dialog_close[6,5]
-bmd 1169 1
+bmd 1169 2
 contiki_shell-netperf_print_usage[54,53]
-bmd 1170 1
+bmd 1170 2
 contiki_shell-tcpsen_send_line[35,36]
 bmd 1171 2
 contiki_contikimac_send_packet[285,322]
 bmd 1172 3
 contiki_broadcast_broadcast_open[18,17]
-bmd 1173 1
+bmd 1173 2
 contiki_shell-tweet_process_thread_tweet_process[41,43]
 bmd 1174 3
 contiki_xmac_off[12,15]
-bmd 1175 2
+bmd 1175 3
 contiki_powertrace_process_thread_powertrace_process[46,49]
 bmd 1176 3
 contiki_shell-blink_process_thread_shell_blink_process[1,0]
 bmd 1177 0
 contiki_rudolph1_rudolph1_open[27,26]
-bmd 1178 1
+bmd 1178 2
 contiki_powertrace_add_stats[46,47]
 bmd 1179 2
 contiki_uaodv-rt_uaodv_rt_init[10,9]
-bmd 1180 1
+bmd 1180 2
 contiki_rudolph2_format_data[30,29]
-bmd 1181 1
+bmd 1181 2
 contiki_shell-wget_webclient_aborted[15,14]
-bmd 1182 1
+bmd 1182 2
 contiki_collect_send_keepalive[20,22]
 bmd 1183 2
 contiki_shell-netfile_shell_netfile_init[21,20]
-bmd 1184 1
+bmd 1184 2
 contiki_trickle_trickle_open[24,23]
-bmd 1185 1
+bmd 1185 2
 contiki_ircc_parse_params[21,22]
 bmd 1186 2
 contiki_lpp_detect_ack[60,66]
@@ -2384,15 +2384,15 @@ bmd 1190 1
 contiki_frame802154_addr_len[15,16]
 bmd 1191 2
 contiki_nullmac_channel_check_interval[5,4]
-bmd 1192 1
+bmd 1192 2
 contiki_rudolph1_rudolph1_stop[8,7]
-bmd 1193 1
+bmd 1193 2
 contiki_calc_clear_input[12,12]
 bmd 1194 2
 contiki_chameleon_chameleon_init[5,4]
-bmd 1195 1
+bmd 1195 2
 contiki_elfloader_relocate_section[190,203]
-bmd 1196 3
+bmd 1196 4
 contiki_ctk_textentry_input[133,153]
 bmd 1197 3
 contiki_shell-memdebug_process_thread_shell_peek_process[56,58]
@@ -2408,9 +2408,9 @@ bmd 1202 1
 contiki_nullrdc-noframer_send_packet[22,22]
 bmd 1203 2
 contiki_list_list_init[6,5]
-bmd 1204 1
+bmd 1204 2
 contiki_nullradio_read[5,4]
-bmd 1205 1
+bmd 1205 2
 contiki_list_list_pop[16,16]
 bmd 1206 2
 contiki_ircc_handle_input[330,361]
@@ -2418,11 +2418,11 @@ bmd 1207 5
 contiki_collect_retransmit_callback[23,23]
 bmd 1208 2
 contiki_ircc_parse_command[15,14]
-bmd 1209 1
+bmd 1209 2
 contiki_tcpip_tcp_attach[9,8]
-bmd 1210 1
+bmd 1210 2
 contiki_xmac_turn_on[21,20]
-bmd 1211 1
+bmd 1211 2
 contiki_shell-ps_process_thread_shell_ps_process[45,46]
 bmd 1212 2
 contiki_telnet_senddata[33,34]
@@ -2430,39 +2430,39 @@ bmd 1213 2
 contiki_packetqueue_packetqueue_queuebuf[10,10]
 bmd 1214 2
 contiki_urlconv_urlconv_tofilename[142,166]
-bmd 1215 3
+bmd 1215 4
 contiki_packetbuf_packetbuf_copyfrom[20,20]
 bmd 1216 2
 contiki_announcement_announcement_register_observer_callback[5,4]
-bmd 1217 1
+bmd 1217 2
 contiki_shell-rime-sendcm_recv_uc[39,40]
 bmd 1218 2
 contiki_shell-base64_base64_add_char[70,74]
 bmd 1219 2
 contiki_slip_slip_set_input_callback[5,4]
-bmd 1220 1
+bmd 1220 2
 contiki_webclient_webclient_init[4,3]
 bmd 1221 1
 contiki_uip_arp_uip_arp_timer[39,42]
 bmd 1222 2
 contiki_nullrdc_init[5,4]
-bmd 1223 1
+bmd 1223 2
 fuzix_regexp_regrepeat[83,91]
 bmd 1224 3
 fuzix_timer_rdtime32[12,11]
-bmd 1225 1
+bmd 1225 2
 fuzix_pwent_endpwent[10,10]
 bmd 1226 2
 fuzix_vfprintf_vfprintf[338,383]
 bmd 1227 6
 fuzix_cfmakeraw_cfmakeraw[22,21]
-bmd 1228 1
+bmd 1228 2
 fuzix_syscall_fs__close[10,9]
-bmd 1229 1
+bmd 1229 2
 fuzix_devtty_tty_setup[39,42]
 bmd 1230 2
 fuzix_err_warnx[12,11]
-bmd 1231 1
+bmd 1231 2
 fuzix_process_wakeup[27,29]
 bmd 1232 2
 fuzix_filesys_oft_alloc[26,27]
@@ -2472,7 +2472,7 @@ bmd 1234 3
 fuzix_utent_endutent[10,10]
 bmd 1235 2
 fuzix_pause_pause[7,6]
-bmd 1236 1
+bmd 1236 2
 fuzix_syscall_fs__stat[24,24]
 bmd 1237 2
 fuzix_filesys_uf_alloc_n[24,25]
@@ -2480,27 +2480,27 @@ bmd 1238 2
 fuzix_tmpnam_tmpnam[63,67]
 bmd 1239 3
 fuzix_syscall_proc__getppid[9,8]
-bmd 1240 1
+bmd 1240 2
 fuzix_putenv_putenv[109,121]
 bmd 1241 3
 fuzix_tcsetattr_tcsetattr[18,19]
 bmd 1242 2
 fuzix_cfspee_cfsetispeed[8,7]
-bmd 1243 1
+bmd 1243 2
 fuzix_stricmp_stricmp[45,49]
 bmd 1244 3
 fuzix_err_vwarnc[9,8]
-bmd 1245 1
+bmd 1245 2
 fuzix_bankfixe_pagemap_alloc[21,22]
 bmd 1246 2
 fuzix_ltostr_ultoa[11,10]
-bmd 1247 1
+bmd 1247 2
 fuzix_setvbuf_setvbuf[65,71]
 bmd 1248 2
 fuzix_getpass_getpass[49,51]
 bmd 1249 2
 fuzix_devio_bawrite[8,7]
-bmd 1250 1
+bmd 1250 2
 fuzix_ran_rand[46,48]
 bmd 1251 2
 fuzix_syscall_fs2_chdiroot_op[20,20]
@@ -2516,13 +2516,13 @@ bmd 1256 2
 fuzix_start_fstabinit[14,14]
 bmd 1257 2
 fuzix_setjmp_longjmp[5,4]
-bmd 1258 1
+bmd 1258 2
 fuzix_inode_doclose[46,49]
 bmd 1259 2
 fuzix_strncasecmp_strncasecmp[38,41]
 bmd 1260 3
 fuzix_process_timer_interrupt[86,97]
-bmd 1261 2
+bmd 1261 3
 fuzix_gmtime___tm_conv[179,193]
 bmd 1262 3
 fuzix_syscall_exec__execve[294,314]
@@ -2534,15 +2534,15 @@ bmd 1265 2
 fuzix_devtty_tty_putc[15,16]
 bmd 1266 2
 fuzix_sleep_div10quicki[21,20]
-bmd 1267 1
+bmd 1267 2
 fuzix_se_quit[6,5]
-bmd 1268 1
+bmd 1268 2
 fuzix_vt_plot_char[10,9]
-bmd 1269 1
+bmd 1269 2
 fuzix_devio_d_close[22,22]
 bmd 1270 2
 fuzix_devtty_keydecode[82,100]
-bmd 1271 2
+bmd 1271 3
 fuzix_syscall_fs__sync[30,32]
 bmd 1272 2
 fuzix_regexp_reg[135,149]
@@ -2552,13 +2552,13 @@ bmd 1274 5
 fuzix_filesys_i_free[40,43]
 bmd 1275 3
 fuzix_se_advance[283,318]
-bmd 1276 4
+bmd 1276 5
 fuzix_rewin_rewind[13,12]
-bmd 1277 1
+bmd 1277 2
 fuzix_vt_cursor_on[12,11]
-bmd 1278 1
+bmd 1278 2
 fuzix_filesys_isdevice[9,8]
-bmd 1279 1
+bmd 1279 2
 fuzix_se_compile[298,333]
 bmd 1280 3
 fuzix_devtty_tty_interrupt[11,11]
@@ -2566,7 +2566,7 @@ bmd 1281 2
 fuzix_syscall_fs2__utime[84,89]
 bmd 1282 4
 fuzix_err_errc[14,13]
-bmd 1283 1
+bmd 1283 2
 fuzix_process_psleep[46,49]
 bmd 1284 2
 fuzix_syscall_other__profil[49,50]
@@ -2574,11 +2574,11 @@ bmd 1285 2
 fuzix_syscall_fs2__chown[20,20]
 bmd 1286 2
 fuzix_clock_gettime_div10quickm[30,29]
-bmd 1287 1
+bmd 1287 2
 fuzix_filesys_baddev[9,8]
-bmd 1288 1
+bmd 1288 2
 fuzix_devio_no_close[5,4]
-bmd 1289 1
+bmd 1289 2
 fuzix_fgetgrent_fgetgrent[13,13]
 bmd 1290 2
 fuzix_sleep_sleep[27,27]
@@ -2586,33 +2586,33 @@ bmd 1291 2
 fuzix_vt_cursor_off[7,7]
 bmd 1292 2
 fuzix_vt_scroll_up[8,7]
-bmd 1293 1
+bmd 1293 2
 fuzix_syscall_other__uadmin[24,27]
 bmd 1294 3
 fuzix_perror_perror[23,23]
 bmd 1295 2
 fuzix_syscall_fs_stcpy[36,35]
-bmd 1296 1
+bmd 1296 2
 fuzix_swap_swapper[8,7]
-bmd 1297 1
+bmd 1297 2
 fuzix_regexp_regmatch[262,316]
 bmd 1298 4
 fuzix_execv_execv[9,8]
-bmd 1299 1
+bmd 1299 2
 fuzix_syscall_fs2__acct[7,6]
-bmd 1300 1
+bmd 1300 2
 fuzix_devices_device_init[6,5]
-bmd 1301 1
+bmd 1301 2
 fuzix_syscall_proc__geteuid[7,6]
-bmd 1302 1
+bmd 1302 2
 fuzix_devio_bdwrite[29,29]
 bmd 1303 2
 fuzix_execvp_execvp[11,10]
-bmd 1304 1
+bmd 1304 2
 fuzix_syscall_other__rmdir[97,104]
 bmd 1305 3
 fuzix_filesys_super[8,7]
-bmd 1306 1
+bmd 1306 2
 fuzix_syscall_proc__setgid[28,29]
 bmd 1307 2
 fuzix_regsub_regsub[96,112]
@@ -2622,9 +2622,9 @@ bmd 1309 3
 fuzix_devf_fd_transfer[119,129]
 bmd 1310 3
 fuzix_confstr_confstr[6,5]
-bmd 1311 1
+bmd 1311 2
 fuzix_difftime_difftime[74,73]
-bmd 1312 1
+bmd 1312 2
 fuzix_filesys_filename[45,48]
 bmd 1313 3
 fuzix_se_Memcmp[20,21]
@@ -2660,19 +2660,19 @@ bmd 1328 2
 fuzix_getopt_getopt[93,104]
 bmd 1329 3
 fuzix_scanf_scanf[15,14]
-bmd 1330 1
+bmd 1330 2
 fuzix_asctime_asctime[13,13]
 bmd 1331 2
 fuzix_usermem_uput[18,18]
 bmd 1332 2
 fuzix_syscall_proc__setpgrp[11,10]
-bmd 1333 1
+bmd 1333 2
 fuzix_getpw_getpw[46,48]
 bmd 1334 2
 fuzix_main_map_init[4,3]
 bmd 1335 1
 fuzix_ltostr___ultostr[40,43]
-bmd 1336 2
+bmd 1336 3
 fuzix_main_rtc_secs[12,12]
 bmd 1337 2
 fuzix_getpwnam_getpwnam[34,37]
@@ -2682,49 +2682,49 @@ bmd 1339 3
 fuzix___getgrent___getgrent[148,160]
 bmd 1340 3
 fuzix_index_index[8,7]
-bmd 1341 1
+bmd 1341 2
 fuzix_tty_tty_hangup[26,25]
-bmd 1342 1
+bmd 1342 2
 fuzix_process_exec_or_die[13,12]
-bmd 1343 1
+bmd 1343 2
 fuzix_tcflush_tcflush[9,8]
-bmd 1344 1
+bmd 1344 2
 fuzix_devio_cdwrite[24,24]
 bmd 1345 2
 fuzix_vt_escout[89,103]
-bmd 1346 2
+bmd 1346 3
 fuzix_isatty_isatty[20,21]
 bmd 1347 2
 fuzix_syscall_fs2__chmod[20,20]
 bmd 1348 2
 fuzix_xitoa__itoa[8,7]
-bmd 1349 1
+bmd 1349 2
 fuzix_devh_hd_waitdrq[9,9]
 bmd 1350 2
 fuzix_calloc_calloc[18,18]
 bmd 1351 2
 fuzix_bcmp_bcmp[9,8]
-bmd 1352 1
+bmd 1352 2
 fuzix_swap_swapin[30,30]
 bmd 1353 2
 fuzix_cfree_cfree[6,5]
-bmd 1354 1
+bmd 1354 2
 fuzix_usermem_uputw[16,16]
 bmd 1355 2
 fuzix_cfspee_cfsetospeed[8,7]
-bmd 1356 1
+bmd 1356 2
 fuzix_filesys_getinode[52,57]
 bmd 1357 3
 fuzix_fprintf_fprintf[13,12]
-bmd 1358 1
+bmd 1358 2
 fuzix_err_verrc[11,10]
-bmd 1359 1
+bmd 1359 2
 fuzix_devio_tmpbuf[16,15]
-bmd 1360 1
+bmd 1360 2
 fuzix_usermem_ugetc[15,15]
 bmd 1361 2
 fuzix_creat_creat[9,8]
-bmd 1362 1
+bmd 1362 2
 fuzix_ctype_toupper[16,16]
 bmd 1363 2
 fuzix_se_command[2,1]
@@ -2740,7 +2740,7 @@ bmd 1368 3
 fuzix_filesys_deflock[30,31]
 bmd 1369 2
 fuzix_syscall_proc__sigdisp[37,41]
-bmd 1370 2
+bmd 1370 3
 fuzix_lsearch_lfind[22,23]
 bmd 1371 2
 fuzix_se_dosub[111,120]
@@ -2756,7 +2756,7 @@ bmd 1376 2
 fuzix_syscall_fs__ioctl[44,47]
 bmd 1377 2
 fuzix_regexp_regcomp[118,129]
-bmd 1378 2
+bmd 1378 3
 fuzix_gettimeofday_gettimeofday[19,20]
 bmd 1379 2
 fuzix_fgets_fgets[53,58]
@@ -2764,9 +2764,9 @@ bmd 1380 3
 fuzix_syscall_fs2__chroot[25,26]
 bmd 1381 2
 fuzix_devio_kputunum[59,58]
-bmd 1382 1
+bmd 1382 2
 fuzix_main_platform_idle[5,4]
-bmd 1383 1
+bmd 1383 2
 fuzix_getopt_Err[17,17]
 bmd 1384 2
 fuzix_process_pwake[12,12]
@@ -2774,7 +2774,7 @@ bmd 1385 2
 fuzix_filesys_blk_alloc[89,96]
 bmd 1386 3
 fuzix_tty_tty_outproc[10,9]
-bmd 1387 1
+bmd 1387 2
 fuzix_malloc___search_chunk[56,62]
 bmd 1388 3
 fuzix_regexp_regtry[30,31]
@@ -2790,7 +2790,7 @@ bmd 1393 2
 fuzix_clock_gettime_clock_gettime[39,40]
 bmd 1394 2
 fuzix_tcgetattr_tcgetattr[9,8]
-bmd 1395 1
+bmd 1395 2
 fuzix_ctype_tolower[16,16]
 bmd 1396 2
 fuzix_tty_tty_ioctl[90,102]
@@ -2800,7 +2800,7 @@ bmd 1398 3
 fuzix_se_address[1,0]
 bmd 1399 0
 fuzix_bcopy_bcopy[8,7]
-bmd 1400 1
+bmd 1400 2
 fuzix_strdup_strdup[19,19]
 bmd 1401 2
 fuzix_devh_hd_xfer[17,18]
@@ -2810,9 +2810,9 @@ bmd 1403 2
 fuzix_rewin_fseek[67,76]
 bmd 1404 3
 fuzix_vt_clear_lines[15,14]
-bmd 1405 1
+bmd 1405 2
 fuzix_err_warnc[12,11]
-bmd 1406 1
+bmd 1406 2
 fuzix_stdio0___stdio_close_all[25,25]
 bmd 1407 2
 fuzix_devtty_tty_writeready[14,15]
@@ -2824,11 +2824,11 @@ bmd 1410 2
 fuzix_utsname_uname[54,57]
 bmd 1411 3
 fuzix_filesys_getmode[8,7]
-bmd 1412 1
+bmd 1412 2
 fuzix_clock_clock[13,12]
-bmd 1413 1
+bmd 1413 2
 fuzix_timer_inittod[6,5]
-bmd 1414 1
+bmd 1414 2
 fuzix_swap_swapvictim[49,57]
 bmd 1415 2
 fuzix_syscall_exec_bload[62,65]
@@ -2838,7 +2838,7 @@ bmd 1417 2
 fuzix_regexp_regatom[268,299]
 bmd 1418 4
 fuzix_swap_swapwrite[19,18]
-bmd 1419 1
+bmd 1419 2
 fuzix_perror_wr2[17,17]
 bmd 1420 2
 fuzix_devio_d_ioctl[31,33]
@@ -2850,13 +2850,13 @@ bmd 1423 3
 fuzix_syscall_fs__dup[41,42]
 bmd 1424 2
 fuzix_atexit_atexit[9,8]
-bmd 1425 1
+bmd 1425 2
 fuzix_devio_bread[39,42]
 bmd 1426 2
 fuzix_syscall_fs2__access[58,61]
 bmd 1427 2
 fuzix_malloc___insert_chunk[104,116]
-bmd 1428 3
+bmd 1428 4
 fuzix_strtol_strtol[33,35]
 bmd 1429 2
 fuzix_devlpr_lpr_write[23,24]
@@ -2864,17 +2864,17 @@ bmd 1430 2
 fuzix_error_strerror[109,120]
 bmd 1431 3
 fuzix_vsscanf_vsscanf[15,14]
-bmd 1432 1
+bmd 1432 2
 fuzix_se_listto[146,160]
-bmd 1433 2
+bmd 1433 3
 fuzix_ltostr___ltostr[20,22]
 bmd 1434 2
 fuzix_ungetc_ungetc[42,45]
 bmd 1435 2
 fuzix_regerror_regerror[14,13]
-bmd 1436 1
+bmd 1436 2
 fuzix_vt_scroll_down[8,7]
-bmd 1437 1
+bmd 1437 2
 fuzix_free_free[64,73]
 bmd 1438 3
 fuzix_tty_tty_carrier_drop[12,12]
@@ -2882,7 +2882,7 @@ bmd 1439 2
 fuzix_syscall_fs__getdirent[16,16]
 bmd 1440 2
 fuzix_syscall_proc__getgid[7,6]
-bmd 1441 1
+bmd 1441 2
 fuzix_fflush_fflush[105,119]
 bmd 1442 3
 fuzix_putgetch__getchar[16,16]
@@ -2890,13 +2890,13 @@ bmd 1443 2
 fuzix_remove_remove[21,23]
 bmd 1444 2
 fuzix_rindex_rindex[8,7]
-bmd 1445 1
+bmd 1445 2
 fuzix_strnicmp_strnicmp[50,55]
 bmd 1446 3
 fuzix_fgetc_fgetc[56,59]
 bmd 1447 3
 fuzix_vprintf_vprintf[11,10]
-bmd 1448 1
+bmd 1448 2
 fuzix_devio_kputnum[12,12]
 bmd 1449 2
 fuzix_start_create_init[42,42]
@@ -2906,25 +2906,25 @@ bmd 1451 2
 fuzix_syscall_fs_dup_op[28,28]
 bmd 1452 2
 fuzix_vt_vt_ioctl[55,62]
-bmd 1453 2
+bmd 1453 3
 fuzix_syscall_proc__getpid[8,7]
-bmd 1454 1
+bmd 1454 2
 fuzix_filesys_newfstab[20,21]
 bmd 1455 2
 fuzix_filesys_i_ref[9,8]
-bmd 1456 1
+bmd 1456 2
 fuzix_putgetch__putchar[12,11]
-bmd 1457 1
+bmd 1457 2
 fuzix_regexp_regoptail[20,22]
-bmd 1458 2
+bmd 1458 3
 fuzix_nanosleep_clock_nanosleep[110,121]
 bmd 1459 3
 fuzix_localtim_localtime[13,12]
-bmd 1460 1
+bmd 1460 2
 fuzix_devf_fd_read[9,8]
-bmd 1461 1
+bmd 1461 2
 fuzix_pathconf_fpathconf[7,6]
-bmd 1462 1
+bmd 1462 2
 fuzix_devio_putdigit[13,14]
 bmd 1463 2
 fuzix_start_bufinit[17,17]
@@ -2936,19 +2936,19 @@ bmd 1466 3
 fuzix_itoa_itoa[33,35]
 bmd 1467 2
 fuzix_bankfixe_pagemap_add[10,9]
-bmd 1468 1
+bmd 1468 2
 fuzix_utent_setutent[30,34]
 bmd 1469 3
 fuzix_devf_fd_write[9,8]
-bmd 1470 1
+bmd 1470 2
 fuzix_err_errx[14,13]
-bmd 1471 1
+bmd 1471 2
 fuzix_syscall_fs2_chown_op[27,28]
 bmd 1472 2
 fuzix_timer_wrtime[15,14]
-bmd 1473 1
+bmd 1473 2
 fuzix_filesys_wr_inode[41,40]
-bmd 1474 1
+bmd 1474 2
 fuzix_se_match[78,89]
 bmd 1475 3
 fuzix_fputc_fputc[63,72]
@@ -2962,11 +2962,11 @@ bmd 1479 2
 fuzix_ltoa__ltoa[18,19]
 bmd 1480 2
 fuzix_start_bootdevice[40,45]
-bmd 1481 2
+bmd 1481 3
 fuzix_gethostname_gethostname[30,31]
 bmd 1482 2
 fuzix_devh_DISCARDSEG[5,4]
-bmd 1483 1
+bmd 1483 2
 fuzix_strtol_strtoul[107,122]
 bmd 1484 3
 fuzix_readlink_readlink[20,20]
@@ -2978,7 +2978,7 @@ bmd 1487 2
 fuzix_syscall_fs__dup2[51,54]
 bmd 1488 3
 fuzix_se_cmdline[130,146]
-bmd 1489 3
+bmd 1489 4
 fuzix_crypt_crypt[130,137]
 bmd 1490 2
 fuzix_filesys_i_alloc[111,122]
@@ -2988,23 +2988,23 @@ bmd 1492 2
 fuzix_process_load_average[39,40]
 bmd 1493 2
 fuzix_syscall_proc__kill[76,87]
-bmd 1494 3
+bmd 1494 4
 fuzix_ctime_ctime[9,8]
-bmd 1495 1
+bmd 1495 2
 fuzix_devtty_keyproc[64,72]
-bmd 1496 2
+bmd 1496 3
 fuzix_devio_bdread[29,29]
 bmd 1497 2
 fuzix_se_selected[88,102]
-bmd 1498 2
+bmd 1498 3
 fuzix_syscall_proc__getuid[8,7]
-bmd 1499 1
+bmd 1499 2
 fuzix_bzero_bzero[8,7]
-bmd 1500 1
+bmd 1500 2
 fuzix_utent_pututline[38,40]
 bmd 1501 2
 fuzix_cfspee_cfgetospeed[8,7]
-bmd 1502 1
+bmd 1502 2
 fuzix_getcw_search_dir[96,107]
 bmd 1503 3
 fuzix_strcasestr_strcasestr[35,37]
@@ -3026,19 +3026,19 @@ bmd 1511 3
 fuzix_lstat_lstat[24,24]
 bmd 1512 2
 fuzix_printf_printf[15,14]
-bmd 1513 1
+bmd 1513 2
 fuzix_filesys_oft_deref[23,24]
 bmd 1514 2
 fuzix_syscall_proc__times[30,29]
-bmd 1515 1
+bmd 1515 2
 fuzix_timer_timer_expired[9,8]
-bmd 1516 1
+bmd 1516 2
 fuzix_killpg_killpg[18,19]
 bmd 1517 2
 fuzix_err_err[14,13]
-bmd 1518 1
+bmd 1518 2
 fuzix_gmtime_gmtime[17,16]
-bmd 1519 1
+bmd 1519 2
 fuzix_syscall_fs__write[32,33]
 bmd 1520 2
 fuzix_usermem_uputc[16,16]
@@ -3046,7 +3046,7 @@ bmd 1521 2
 fuzix_filesys_kn_open[149,171]
 bmd 1522 3
 fuzix_devlpr_lpr_close[5,4]
-bmd 1523 1
+bmd 1523 2
 fuzix_strsep_strsep[23,24]
 bmd 1524 2
 fuzix_execl__findPath[80,90]
@@ -3054,15 +3054,15 @@ bmd 1525 3
 fuzix_usermem_ugetw[15,15]
 bmd 1526 2
 fuzix_err_warn[12,11]
-bmd 1527 1
+bmd 1527 2
 fuzix_filesys_srch_mt[31,33]
 bmd 1528 3
 fuzix_atexit___do_exit[20,20]
 bmd 1529 2
 fuzix_devio_zerobuf[11,10]
-bmd 1530 1
+bmd 1530 2
 fuzix_sscanf_sscanf[15,14]
-bmd 1531 1
+bmd 1531 2
 fuzix_setbuffer_setbuffer[43,44]
 bmd 1532 2
 fuzix_filesys_freeblk[37,39]
@@ -3082,11 +3082,11 @@ bmd 1539 2
 fuzix_se_readout[96,101]
 bmd 1540 2
 fuzix_process_ptab_alloc[73,82]
-bmd 1541 2
+bmd 1541 3
 fuzix_filesys_ch_link[116,129]
 bmd 1542 3
 fuzix_devio_nxio_open[7,6]
-bmd 1543 1
+bmd 1543 2
 fuzix_fputs_fputs[42,44]
 bmd 1544 2
 fuzix_devsys_sys_write[37,41]
@@ -3106,7 +3106,7 @@ bmd 1551 2
 fuzix_syscall_fs2__fchdir[22,22]
 bmd 1552 2
 fuzix_vt_char_addr[9,8]
-bmd 1553 1
+bmd 1553 2
 fuzix_usermem_uzero[16,16]
 bmd 1554 2
 fuzix_syscall_fs2__fchmod[16,16]
@@ -3124,21 +3124,21 @@ bmd 1560 3
 fuzix_start_fuzix_main[134,139]
 bmd 1561 2
 fuzix_syscall_proc__alarm[17,16]
-bmd 1562 1
+bmd 1562 2
 fuzix_devio_kprintf[69,78]
 bmd 1563 3
 fuzix_execl_execl[11,10]
-bmd 1564 1
+bmd 1564 2
 fuzix_devices_validdev[9,9]
 bmd 1565 2
 fuzix_tty_tty_read[123,137]
-bmd 1566 4
+bmd 1566 5
 fuzix_devio_no_rdwr[7,6]
-bmd 1567 1
+bmd 1567 2
 fuzix_syscall_proc__stime[34,36]
 bmd 1568 3
 fuzix_vt_vtoutput[50,57]
-bmd 1569 2
+bmd 1569 3
 fuzix_se_substitute[44,48]
 bmd 1570 3
 fuzix_syscall_exec_wargs[60,64]
@@ -3148,25 +3148,25 @@ bmd 1572 3
 fuzix_timer_set_timer_duration[18,18]
 bmd 1573 2
 fuzix_syscall_fs__umask[12,11]
-bmd 1574 1
+bmd 1574 2
 fuzix_err_vwarnx[9,8]
-bmd 1575 1
+bmd 1575 2
 fuzix_regexp_regc[14,14]
 bmd 1576 2
 fuzix_devsys_sys_ioctl[32,34]
 bmd 1577 3
 fuzix_devio_brelse[8,7]
-bmd 1578 1
+bmd 1578 2
 fuzix_raise_raise[9,8]
-bmd 1579 1
+bmd 1579 2
 fuzix_err_verr[11,10]
-bmd 1580 1
+bmd 1580 2
 fuzix_filesys_fmount[58,62]
 bmd 1581 3
 fuzix_syscall_exec_rargs[48,50]
 bmd 1582 3
 fuzix_main_DISCARDSEG[5,4]
-bmd 1583 1
+bmd 1583 2
 fuzix_regexp_regtail[38,40]
 bmd 1584 2
 fuzix_syscall_proc__time[48,49]
@@ -3178,27 +3178,27 @@ bmd 1587 2
 fuzix_ttyname_ttyname[86,93]
 bmd 1588 3
 fuzix_abort_abort[21,20]
-bmd 1589 1
+bmd 1589 2
 fuzix_pathconf_pathconf[7,6]
-bmd 1590 1
+bmd 1590 2
 fuzix___getpwent___getpwent[149,169]
-bmd 1591 3
+bmd 1591 4
 fuzix_filesys_uf_alloc[7,6]
-bmd 1592 1
+bmd 1592 2
 fuzix_devlpr_lpr_open[5,4]
-bmd 1593 1
+bmd 1593 2
 fuzix_devio_insq[38,39]
 bmd 1594 2
 fuzix_devio_kputhex[19,18]
-bmd 1595 1
+bmd 1595 2
 fuzix_mkfifo_mkfifo[10,9]
-bmd 1596 1
+bmd 1596 2
 fuzix_devio_uninsq[38,39]
 bmd 1597 2
 fuzix_main_pagemap_init[8,7]
-bmd 1598 1
+bmd 1598 2
 fuzix_exit_exit[8,7]
-bmd 1599 1
+bmd 1599 2
 fuzix_process_doexit[110,116]
 bmd 1600 2
 fuzix_devtty_trstty_close[11,11]
@@ -3220,7 +3220,7 @@ bmd 1608 2
 fuzix_devio_remq[37,38]
 bmd 1609 2
 fuzix_localtim_r_localtime_r[9,8]
-bmd 1610 1
+bmd 1610 2
 fuzix_gets_puts[37,39]
 bmd 1611 2
 fuzix_devh_hd_probe[136,147]
@@ -3230,11 +3230,11 @@ bmd 1613 2
 fuzix_utimes_utimes[26,26]
 bmd 1614 2
 fuzix_filesys_i_open[129,143]
-bmd 1615 3
+bmd 1615 4
 fuzix_syscall_fs2__getfsys[34,35]
 bmd 1616 2
 fuzix_asctime_hit[11,10]
-bmd 1617 1
+bmd 1617 2
 fuzix_utent_getutent[26,28]
 bmd 1618 2
 fuzix_devsys_sys_read[64,69]
@@ -3244,11 +3244,11 @@ bmd 1620 2
 fuzix_regexp_regnode[21,21]
 bmd 1621 2
 fuzix_process_panic[11,10]
-bmd 1622 1
+bmd 1622 2
 fuzix_regexp_regbranch[49,54]
 bmd 1623 3
 fuzix_devio_no_open[5,4]
-bmd 1624 1
+bmd 1624 2
 fuzix_se_rhscomp[44,48]
 bmd 1625 3
 fuzix_strto_strtod[158,171]
@@ -3258,7 +3258,7 @@ bmd 1627 3
 fuzix_fgetpwent_fgetpwent[13,13]
 bmd 1628 2
 fuzix_syscall_proc___exit[10,9]
-bmd 1629 1
+bmd 1629 2
 fuzix_pathconf__pathconf[29,38]
 bmd 1630 2
 fuzix_bankfixe_pagemap_free[20,20]
@@ -3268,7 +3268,7 @@ bmd 1632 2
 fuzix_tty_tty_write[90,102]
 bmd 1633 3
 fuzix_vt_vtinit[11,10]
-bmd 1634 1
+bmd 1634 2
 fuzix_free___mini_malloc[26,28]
 bmd 1635 2
 fuzix_syscall_fs2__uname[48,48]
@@ -3284,7 +3284,7 @@ bmd 1640 1
 fuzix_ltoa__ultoa[24,24]
 bmd 1641 2
 fuzix_stat_statfix[52,51]
-bmd 1642 1
+bmd 1642 2
 fuzix_filesys_getdev[39,41]
 bmd 1643 2
 fuzix_inode_readi[170,188]
@@ -3294,57 +3294,57 @@ bmd 1645 2
 fuzix_utent_getutline[24,27]
 bmd 1646 3
 fuzix_ran_srand[17,16]
-bmd 1647 1
+bmd 1647 2
 fuzix_getpass__getchar[19,19]
 bmd 1648 2
 fuzix_vfscanf_vfscanf[587,668]
 bmd 1649 6
 fuzix_wait_wait[9,8]
-bmd 1650 1
+bmd 1650 2
 fuzix_vt_clear_across[14,13]
-bmd 1651 1
+bmd 1651 2
 fuzix_cfspee_cfgetispeed[8,7]
-bmd 1652 1
+bmd 1652 2
 fuzix_assert___errput[10,9]
-bmd 1653 1
+bmd 1653 2
 fuzix_syscall_proc__waitpid[131,146]
-bmd 1654 3
+bmd 1654 4
 fuzix_bankfixe_pagemap_realloc[9,9]
 bmd 1655 2
 fuzix_syscall_proc__getegid[7,6]
-bmd 1656 1
+bmd 1656 2
 fuzix_bankfixe_pagemap_mem_used[10,9]
-bmd 1657 1
+bmd 1657 2
 fuzix_process_chksigs[67,75]
 bmd 1658 3
 fuzix_syscall_fs__unlink[44,46]
 bmd 1659 2
 fuzix_assert___assert[29,28]
-bmd 1660 1
+bmd 1660 2
 fuzix_setjmp_setjmp[5,4]
-bmd 1661 1
+bmd 1661 2
 fuzix_devh_hd_write[9,8]
-bmd 1662 1
+bmd 1662 2
 fuzix_devio_no_ioctl[7,6]
-bmd 1663 1
+bmd 1663 2
 fuzix_tty_tty_inproc[192,221]
 bmd 1664 3
 fuzix_gmtime_r_gmtime_r[13,12]
-bmd 1665 1
+bmd 1665 2
 fuzix_err_verrx[11,10]
-bmd 1666 1
+bmd 1666 2
 fuzix_utent_utmpname[7,7]
 bmd 1667 2
 fuzix_sprintf_sprintf[20,19]
-bmd 1668 1
+bmd 1668 2
 fuzix_setenv_setenv[122,131]
 bmd 1669 3
 fuzix_syscall_proc__setuid[31,32]
 bmd 1670 2
 fuzix_filesys_devnum[7,6]
-bmd 1671 1
+bmd 1671 2
 fuzix_syscall_fs2__open[211,235]
-bmd 1672 3
+bmd 1672 4
 fuzix_clock_getres_clock_getres[22,23]
 bmd 1673 2
 fuzix_setenv_unsetenv[32,34]
@@ -3356,15 +3356,15 @@ bmd 1676 2
 fuzix_devtty_kbd_interrupt[10,11]
 bmd 1677 2
 fuzix_vscanf_vscanf[11,10]
-bmd 1678 1
+bmd 1678 2
 fuzix_mm_uputsys[24,24]
 bmd 1679 2
 fuzix_fsetpos_fsetpos[11,10]
-bmd 1680 1
+bmd 1680 2
 fuzix_se_cmdcomp[1,0]
 bmd 1681 0
 fuzix_execl_execlp[13,12]
-bmd 1682 1
+bmd 1682 2
 fuzix_devh_hd_open[28,31]
 bmd 1683 3
 fuzix_memccpy_memccpy[19,20]
@@ -3374,9 +3374,9 @@ bmd 1685 2
 fuzix_filesys_magic[12,12]
 bmd 1686 2
 fuzix_se_resolve[45,48]
-bmd 1687 2
+bmd 1687 3
 fuzix_timer_rdtime[15,14]
-bmd 1688 1
+bmd 1688 2
 fuzix_filesys_f_trunc[45,45]
 bmd 1689 2
 fuzix_syscall_fs__fstat[21,21]
@@ -3392,21 +3392,21 @@ bmd 1694 2
 fuzix_se_initget[14,14]
 bmd 1695 2
 fuzix_devio_clrq[16,15]
-bmd 1696 1
+bmd 1696 2
 fuzix_se_gettext[52,59]
 bmd 1697 3
 fuzix_tty_tty_echo[13,13]
 bmd 1698 2
 fuzix_frea_fread[86,95]
-bmd 1699 2
+bmd 1699 3
 fuzix_swap_swapread[19,18]
-bmd 1700 1
+bmd 1700 2
 fuzix_syscall_proc__signal[74,82]
 bmd 1701 3
 fuzix_devio_putdigit0[10,9]
-bmd 1702 1
+bmd 1702 2
 fuzix_devh_hd_read[9,8]
-bmd 1703 1
+bmd 1703 2
 fuzix_fclose_fclose[64,71]
 bmd 1704 3
 fuzix_swap_swapmap_add[16,16]
@@ -3418,9 +3418,9 @@ bmd 1707 2
 fuzix_main_platform_interrupt[15,16]
 bmd 1708 2
 fuzix_syscall_fs_unlinki[40,42]
-bmd 1709 2
+bmd 1709 3
 fuzix_utent_getutid[43,53]
-bmd 1710 3
+bmd 1710 4
 fuzix_filesys_getperm[32,34]
 bmd 1711 2
 fuzix_process_sgrpsig[20,21]
@@ -3434,33 +3434,33 @@ bmd 1715 3
 fuzix_regexp_regnext[33,35]
 bmd 1716 2
 fuzix_filesys_blk_free[50,52]
-bmd 1717 2
+bmd 1717 3
 fuzix_syscall_exec_close_on_exec[20,21]
 bmd 1718 2
 fuzix_tty_tty_putc_wait[22,23]
 bmd 1719 2
 fuzix_gethostname_openhostname[11,10]
-bmd 1720 1
+bmd 1720 2
 fuzix_stat_stat[18,18]
 bmd 1721 2
 fuzix_ltostr_ltoa[11,10]
-bmd 1722 1
+bmd 1722 2
 fuzix_stat_fstat[18,18]
 bmd 1723 2
 fuzix_clock_settime_clock_settime[20,21]
 bmd 1724 2
 fuzix_fscanf_fscanf[13,12]
-bmd 1725 1
+bmd 1725 2
 fuzix_time_time[18,18]
 bmd 1726 2
 fuzix_tty_tty_erase[13,12]
-bmd 1727 1
+bmd 1727 2
 fuzix_syscall_other__umount[84,91]
 bmd 1728 3
 fuzix_nanosleep_nanosleep[10,9]
-bmd 1729 1
+bmd 1729 2
 fuzix_err_vwarn[9,8]
-bmd 1730 1
+bmd 1730 2
 fuzix_cfspee_cfsetspeed[16,16]
 bmd 1731 2
 fuzix_inode_writei[160,175]
@@ -3470,21 +3470,21 @@ bmd 1733 3
 fuzix_se_ycomp[83,96]
 bmd 1734 3
 fuzix_syscall_fs2__flock[123,136]
-bmd 1735 3
+bmd 1735 4
 fuzix_strlcpy_strlcat[22,22]
 bmd 1736 2
 fuzix_filesys_i_deref[63,72]
 bmd 1737 3
 fuzix_syscall_fs_updoff[17,16]
-bmd 1738 1
+bmd 1738 2
 fuzix_tcflow_tcflow[6,5]
-bmd 1739 1
+bmd 1739 2
 fuzix_revoke_frevoke[9,8]
-bmd 1740 1
+bmd 1740 2
 fuzix_ftell_ftell[17,17]
 bmd 1741 2
 fuzix_devices_DISCARDSEG[5,4]
-bmd 1742 1
+bmd 1742 2
 fuzix_devf_fd_open[11,11]
 bmd 1743 2
 fuzix_qsort__nqsort[148,159]
@@ -3492,7 +3492,7 @@ bmd 1744 3
 fuzix_devh_hd_transfer[160,173]
 bmd 1745 3
 fuzix_gets_gets[48,52]
-bmd 1746 2
+bmd 1746 3
 fuzix_filesys_fs_tab_get[20,21]
 bmd 1747 2
 fuzix_syscall_fs2__mknod[83,88]
@@ -3508,25 +3508,25 @@ bmd 1752 2
 shrystone_dhry_1_Proc_3[16,16]
 bmd 1753 2
 shrystone_dhry_2_Func_2[43,48]
-bmd 1754 2
+bmd 1754 3
 shrystone_dhry_2_Proc_7[9,8]
-bmd 1755 1
+bmd 1755 2
 shrystone_dhry_1_Proc_2[18,19]
 bmd 1756 2
 shrystone_dhry_1_Proc_5[6,5]
-bmd 1757 1
+bmd 1757 2
 shrystone_dhry_1_main[534,539]
 bmd 1758 2
 shrystone_portme_init[21,20]
-bmd 1759 1
+bmd 1759 2
 shrystone_portme_clock[13,12]
-bmd 1760 1
+bmd 1760 2
 shrystone_dhry_2_Proc_8[47,47]
 bmd 1761 2
 shrystone_dhry_1_Proc_1[52,52]
 bmd 1762 2
 shrystone_dhry_1_Proc_4[10,9]
-bmd 1763 1
+bmd 1763 2
 shrystone_dhry_2_Func_1[11,11]
 bmd 1764 2
 shrystone_portme_putchar[9,9]
@@ -3538,15 +3538,15 @@ bmd 1767 2
 whetstone_whetstone_PA[77,77]
 bmd 1768 2
 whetstone_whetstone_P3[28,27]
-bmd 1769 1
+bmd 1769 2
 whetstone_whetstone_main[453,468]
 bmd 1770 2
 whetstone_portme_clock[13,12]
-bmd 1771 1
+bmd 1771 2
 whetstone_whetstone_P0[23,22]
-bmd 1772 1
+bmd 1772 2
 whetstone_portme_init[21,20]
-bmd 1773 1
+bmd 1773 2
 whetstone_portme_putchar[9,9]
 bmd 1774 2
 coremark_core_state_ee_isdigit[17,17]
@@ -3560,13 +3560,13 @@ bmd 1778 2
 coremark_core_state_core_init_state[88,100]
 bmd 1779 2
 coremark_core_portme_portable_init[7,6]
-bmd 1780 1
+bmd 1780 2
 coremark_core_portme_get_time[7,6]
-bmd 1781 1
+bmd 1781 2
 coremark_core_list_join_core_list_insert_new[35,36]
 bmd 1782 2
 coremark_core_matrix_matrix_mul_vect[40,41]
-bmd 1783 2
+bmd 1783 3
 coremark_core_state_core_bench_state[112,119]
 bmd 1784 2
 coremark_core_portme_putchar[9,9]
@@ -3574,13 +3574,13 @@ bmd 1785 2
 coremark_core_list_join_core_list_init[123,125]
 bmd 1786 2
 coremark_core_portme_time_in_secs[10,9]
-bmd 1787 1
+bmd 1787 2
 coremark_core_portme_init[21,20]
-bmd 1788 1
+bmd 1788 2
 coremark_core_matrix_core_bench_matrix[28,27]
-bmd 1789 1
+bmd 1789 2
 coremark_core_list_join_cmp_complex[17,16]
-bmd 1790 1
+bmd 1790 2
 coremark_core_matrix_core_init_matrix[98,101]
 bmd 1791 2
 coremark_core_matrix_matrix_mul_const[32,33]
@@ -3590,44 +3590,44 @@ bmd 1793 2
 coremark_core_list_join_cmp_idx[31,31]
 bmd 1794 2
 coremark_core_list_join_core_list_remove[19,18]
-bmd 1795 1
+bmd 1795 2
 coremark_core_util_crcu32[15,14]
-bmd 1796 1
+bmd 1796 2
 coremark_core_util_check_data_types[5,4]
-bmd 1797 1
+bmd 1797 2
 coremark_core_util_get_seed_32[34,38]
-bmd 1798 2
+bmd 1798 3
 coremark_core_portme_stop_time[6,5]
-bmd 1799 1
+bmd 1799 2
 coremark_core_matrix_matrix_mul_matrix_bitextract[63,65]
-bmd 1800 2
+bmd 1800 3
 coremark_core_util_crc16[9,8]
-bmd 1801 1
+bmd 1801 2
 coremark_core_matrix_matrix_sum[52,55]
-bmd 1802 2
+bmd 1802 3
 coremark_core_matrix_matrix_add_const[26,27]
 bmd 1803 2
 coremark_core_portme_clock[13,12]
-bmd 1804 1
+bmd 1804 2
 coremark_core_list_join_core_list_find[39,43]
 bmd 1805 3
 coremark_core_portme_portable_fini[6,5]
-bmd 1806 1
+bmd 1806 2
 coremark_core_list_join_calc_func[83,88]
 bmd 1807 2
 coremark_core_list_join_core_bench_list[140,148]
 bmd 1808 2
 coremark_core_list_join_copy_info[12,11]
-bmd 1809 1
+bmd 1809 2
 coremark_core_matrix_matrix_test[69,68]
-bmd 1810 1
+bmd 1810 2
 coremark_core_matrix_matrix_mul_matrix[52,54]
-bmd 1811 2
+bmd 1811 3
 coremark_core_portme_start_time[6,5]
-bmd 1812 1
+bmd 1812 2
 coremark_core_state_core_state_transition[177,202]
 bmd 1813 3
 coremark_core_list_join_core_list_undo_remove[17,16]
-bmd 1814 1
+bmd 1814 2
 coremark_core_list_join_core_list_reverse[16,16]
 bmd 1815 2
