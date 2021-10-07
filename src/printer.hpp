@@ -299,8 +299,7 @@ namespace boost{
 
 	template<class G, class U>
 	void put(boost::property_map<treedec::grtdprinter<G>, vertex_all_t>& m,
-		 	long unsigned int& v,
-			property<treedec::bag_t, std::vector<U> > const& p)
+		 size_t v, property<treedec::bag_t, std::vector<U> > const& p)
 	{
 		auto& b=bag(v, m._g);
 		for(auto i : p.m_value){
