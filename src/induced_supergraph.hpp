@@ -332,7 +332,7 @@ private:
 					}else{ untested();
 						++_leaf;
 					}
-				}else if(!_s.is_before_(*_current, *_leaf)){ untested();
+				}else if(!_s.is_before_(*_current, *_leaf)){
 					trace2("b4", *_current, *_leaf); //  *_current=6  *_leaf=7
 					return;
 				}else{ untested();
@@ -647,19 +647,19 @@ public:
 	degreelists_marker(size_type n, VertexIndexMap id)
 	  : marks(n, 0), id(id) {
 	}
-	void mark_need_update(Vertex i) { untested();
+	void mark_need_update(Vertex i) {
 		marks[get(id, i)] = 1;
 	}
-	bool need_update(Vertex i) const { untested();
+	bool need_update(Vertex i) const {
 		return marks[get(id, i)] == 1;
 	}
-	bool outmatched_or_done(Vertex i) const { untested();
+	bool outmatched_or_done(Vertex i) const {
 		return marks[get(id, i)] == -1;
 	}
 	void mark(Vertex i) { untested();
 		marks[get(id, i)] = -1;
 	}
-	void unmark(Vertex i) { untested();
+	void unmark(Vertex i) {
 		marks[get(id, i)] = 0;
 	}
 
@@ -684,23 +684,23 @@ public:
 		  , numbering(_numbering)
 		  , neighbor_elements(&n_e)
 		  , id(id)
-	{ untested();
+	{
 	}
 
 	bool operator()(edge_t e)
-	{ untested();
+	{
 		vertex_t dist = boost::target(e, *g);
 		if (marker->is_tagged(dist)){ untested();
 			trace1("delete", dist);
 			return true;
-		}else{ untested();
+		}else{
 		}
 		marker->mark_tagged(dist);
-		if (numbering.is_numbered(dist)) { untested();
+		if (numbering.is_numbered(dist)) {
 			neighbor_elements->push(get(id, dist));
 			trace1("delete2", dist);
 			return true;
-		}else{ untested();
+		}else{
 #ifdef COUNT
 			++_cnt;
 			assert( dist != boost::source(e, *g));
@@ -919,7 +919,7 @@ public:
 		}
 		return _numbering.is_numbered(a);
 	}
-	bool is_before_(vertex_descriptor a, vertex_descriptor b) const{ untested();
+	bool is_before_(vertex_descriptor a, vertex_descriptor b) const{
 		assert(a == find_parent(a));
 		assert(b == find_parent(b));
 		return _numbering.is_before(a, b);
@@ -936,7 +936,7 @@ public:
 		return _numbering.is_after(aa, bb);
 	}
 
-	unsigned eliminate_vertex(vertex_descriptor c) { untested();
+	unsigned eliminate_vertex(vertex_descriptor c) {
 		// switch degree.
 
 		_marker.clear();
@@ -949,7 +949,7 @@ public:
 		_numbering.increment(_supernode_size[c]);
 		assert(_numbering.is_numbered(c));
 
-		if(_d.size()){ untested();
+		if(_d.size()){
 			size_type deg = _d[c];
 			update_degrees(c, deg);
 		}else{ untested();
@@ -1085,7 +1085,7 @@ public:
 	}
 
 public:
-	void cleanup_mark_n(vertex_descriptor c) { untested();
+	void cleanup_mark_n(vertex_descriptor c) {
 		auto element_neighbor = _work_space.make_stack();
 
 		// Create two function objects for edge removal
@@ -1103,15 +1103,15 @@ public:
 		auto cnt = p.cnt();
 #endif
 
-		while (!element_neighbor.empty()) { untested();
+		while (!element_neighbor.empty()) {
 			// element absorb
 			size_type e_id = element_neighbor.top();
 			vertex_descriptor element = get(_index_vertex_map, e_id);
 			auto ii = boost::adjacent_vertices(element, _g);
-			for(; ii.first!=ii.second; ++ii.first) { untested();
+			for(; ii.first!=ii.second; ++ii.first) {
 				vertex_descriptor i_node = *ii.first;
-				if (_marker.is_tagged(i_node)){ untested();
-				}else if( !_numbering.is_numbered(i_node)) { untested();
+				if (_marker.is_tagged(i_node)){
+				}else if( !_numbering.is_numbered(i_node)) {
 					_marker.mark_tagged(i_node);
 
 					// add node to newly created clique
@@ -1123,14 +1123,14 @@ public:
 		}
 	} // cleanup_n
 private:
-	void eliminate_n(vertex_descriptor c) { untested();
+	void eliminate_n(vertex_descriptor c) {
 		auto p2 = _marker.make_predicate(_g);
 
 		auto vv = boost::adjacent_vertices(c, _g);
-		for(; vv.first!=vv.second; ++vv.first) { untested();
+		for(; vv.first!=vv.second; ++vv.first) {
 			vertex_descriptor v_node = *vv.first;
 			if (_degree_lists_marker.need_update(v_node)){ untested();
-			}else if(!_degree_lists_marker.outmatched_or_done(v_node)) { untested();
+			}else if(!_degree_lists_marker.outmatched_or_done(v_node)) {
 				// degreelists.remove(v_node);
 			}else{ untested();
 			}
@@ -1149,7 +1149,7 @@ private:
 				_numbering.indistinguishable(v_node, c);
 				_marker.mark_done(v_node);
 				_degree_lists_marker.mark(v_node);
-			} else { untested();
+			} else {
 			  	// not indistinguishable nodes
 				//
 				// what if already v_node->c **?
@@ -1219,7 +1219,7 @@ private:
 	}
 
 	// single bmd::update
-	void update_degrees(vertex_descriptor current, size_type& min_degree) { untested();
+	void update_degrees(vertex_descriptor current, size_type& min_degree) {
 		trace1("update", current);
 		assert(_numbering.is_numbered(current));
 		size_type min_degree0 = min_degree + delta + 1;
@@ -1231,19 +1231,19 @@ private:
 		auto qxlist = _work_space.make_stack();
 
 		auto ci = boost::adjacent_vertices(current, _g);
-		for (; ci.first != ci.second; ++ci.first) { untested();
+		for (; ci.first != ci.second; ++ci.first) {
 			auto i_node = *ci.first;
 			trace2("update", i_node, _supernode_size[i_node]);
 			const size_type i_id = get(boost::vertex_index, _g, i_node);
-			if (_supernode_size[i_node] >= 0) { untested();
+			if (_supernode_size[i_node] >= 0) {
 				deg0 += _supernode_size[i_node];
 				_marker.mark_multiple_tagged(i_node);
 
 				if (!_degree_lists_marker.need_update(i_node)) { untested();
 					// not getting here? not outmatching yet?
-				}else if (boost::out_degree(i_node, _g) == 2){ untested();
+				}else if (boost::out_degree(i_node, _g) == 2){
 					q2list.push(i_id);
-				}else{ untested();
+				}else{
 					qxlist.push(i_id);
 				}
 			}else{ untested();
@@ -1252,7 +1252,7 @@ private:
 		}
 
 		// neighbors of current that need update.
-		while (!q2list.empty()) { untested();
+		while (!q2list.empty()) {
 			const size_type u_id = q2list.top();
 			trace2("q2", u_id, _numbering.is_numbered(u_id));
 
@@ -1264,7 +1264,7 @@ private:
 				trace1("outmatched", u_node);
 				q2list.pop();
 				continue;
-			}else{ untested();
+			}else{
 			}
 
 			_marker.increment_tag();
@@ -1276,22 +1276,22 @@ private:
 				// why would this be reachable?
 				++nu;
 				neighbor = *nu;
-			}else{ untested();
+			}else{
 			}
 
 			// walk cliques? anchored at neighbor
-			if (_numbering.is_numbered(neighbor)) { untested();
+			if (_numbering.is_numbered(neighbor)) {
 				trace2("walk", u_id, neighbor);
 				auto ii = boost::adjacent_vertices(neighbor, _g);
-				for(; ii.first!=ii.second; ++ii.first) { untested();
+				for(; ii.first!=ii.second; ++ii.first) {
 					auto i_node = *ii.first;
 
-					if (i_node == u_node){ untested();
+					if (i_node == u_node){
 					}else if ( _supernode_size[i_node] <= 0){ untested();
-					}else if (!_marker.is_tagged(i_node)) { untested();
+					}else if (!_marker.is_tagged(i_node)) {
 						_marker.mark_tagged(i_node);
 						deg += _supernode_size[i_node];
-					}else if (!_degree_lists_marker.need_update(i_node)) { untested();
+					}else if (!_degree_lists_marker.need_update(i_node)) {
 						// nothing to do.
 					}else if (0 && boost::out_degree(i_node, _g) == 2) { untested();
 						// is indistinguishable
@@ -1301,13 +1301,13 @@ private:
 					 	_numbering.indistinguishable(i_node, u_node);
 					 	_marker.mark_done(i_node);
 						_degree_lists_marker.mark(i_node);
-					} else { untested();
+					} else {
 						// is outmatched
 						trace1("outmatch?", i_node);
 						// _degree_lists_marker.mark(i_node);
 					}
 				}
-			}else{ untested();
+			}else{
 				deg += _supernode_size[neighbor];
 			}
 
@@ -1317,14 +1317,14 @@ private:
 			// degreelists[deg].push(u_node);
 			// u_id has been pushed back into degreelists
 			_degree_lists_marker.unmark(u_node);
-			if (min_degree > deg){ untested();
+			if (min_degree > deg){
 				min_degree = deg;
-			}else{ untested();
+			}else{
 			}
 			q2list.pop();
 		} // while (!q2list.empty())
 
-		while (!qxlist.empty()) { untested();
+		while (!qxlist.empty()) {
 			const size_type u_id = qxlist.top();
 			// neighbor of the eliminated node, or adjacent supernode
 			auto u_node = get(_index_vertex_map, u_id);
@@ -1334,30 +1334,30 @@ private:
 				trace1("outmatched", u_node);
 				qxlist.pop();
 				continue;
-			}else{ untested();
+			}else{
 			}
 			_marker.increment_tag();
 			deg = deg0;
 			auto ii = boost::adjacent_vertices(u_node, _g);
-			for(; ii.first!=ii.second; ++ii.first) { untested();
+			for(; ii.first!=ii.second; ++ii.first) {
 				auto i_node = *ii.first;
 				if (_marker.is_tagged(i_node)){ untested();
 					continue;
-				}else{ untested();
+				}else{
 				}
 				_marker.mark_tagged(i_node);
 
-				if (_numbering.is_numbered(i_node)) { untested();
+				if (_numbering.is_numbered(i_node)) {
 					auto jj = boost::adjacent_vertices(i_node, _g);
-					for(; jj.first!=jj.second; ++jj.first) { untested();
+					for(; jj.first!=jj.second; ++jj.first) {
 						auto j_node = *jj.first;
 						if (_marker.is_not_tagged(j_node)) { itested();
 							_marker.mark_tagged(j_node);
 							deg += _supernode_size[j_node];
-						}else{ untested();
+						}else{
 						}
 					}
-				} else{ untested();
+				} else{
 					deg += _supernode_size[i_node];
 				}
 			} // for adjacent vertices of u_node
@@ -1368,9 +1368,9 @@ private:
 			// degreelists[deg].push(u_node);
 			// u_id has been pushed back into degreelists
 			_degree_lists_marker.unmark(u_node);
-			if (min_degree > deg){ untested();
+			if (min_degree > deg){
 				min_degree = deg;
-			}else{ untested();
+			}else{
 			}
 			qxlist.pop();
 		} // while (!qxlist.empty())
@@ -1421,7 +1421,7 @@ private:
 template<class G, class M, class D>
 void eliminate_vertex( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		 treedec::Supergraph<G, M, D>& g)
-{ untested();
+{
 	g.eliminate_vertex(v);
 	// return true?
 }
@@ -1727,7 +1727,7 @@ num_edges(treedec::Supergraph<G, M, D> const& g)
 template<class G, class M, class D>
 typename treedec::Supergraph<G, M, D>::vertex_range
 vertices(treedec::Supergraph<G, M, D> const& g)
-{ untested();
+{
 	return g.vertices();
 }
 
@@ -1753,7 +1753,7 @@ template<class G, class M, class D>
 typename treedec::Supergraph<G, M, D>::vertices_size_type
 out_degree( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		 treedec::Supergraph<G, M, D> const& g)
-{ untested();
+{
 	return g.out_degree(v);
 }
 

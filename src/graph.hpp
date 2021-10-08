@@ -115,7 +115,7 @@ void make_clique(B nIt1, E nEnd, G_t &G, typename treedec::graph_callback<G_t>* 
 
 template<typename nIter_t, typename G_t>
 void make_clique(nIter_t nIter, G_t &G, treedec::graph_callback<G_t>* cb=NULL)
-{ untested();
+{
     typename boost::graph_traits<G_t>::adjacency_iterator nIt1, nEnd;
     boost::tie(nIt1, nEnd) = nIter;
     make_clique(nIt1, nEnd, G, cb);
