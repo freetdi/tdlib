@@ -32,7 +32,7 @@
 #include "graph_util.hpp"
 
 #include <gala/boost.h>
-#include <gala/td.h>
+// #include <gala/td.h>
 #include "graph_gala.hpp"
 
 // #include "status.hpp"

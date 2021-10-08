@@ -1125,7 +1125,7 @@ void gc_treedec_to_ordering(std::vector<std::vector<int> > &V, std::vector<unsig
     make_tdlib_decomp(T, V, E);
 
     std::vector<boost::graph_traits<TD_graph_t>::vertex_descriptor> elim_ordering_;
-    treedec::treedec_to_ordering<TD_graph_t, TD_tree_dec_t>(T, elim_ordering_);
+    treedec::treedec_to_ordering(T, elim_ordering_);
 
     elim_ordering.resize(elim_ordering_.size());
     for(unsigned int i = 0; i < elim_ordering_.size(); i++){
