@@ -44,7 +44,7 @@ public:
                     unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
          _degs(baseclass::_g)
-    { untested();
+    {
     }
 
     minDegree(G_t &G, bool ignore_isolated_vertices)
@@ -59,7 +59,7 @@ public:
     }
 #endif
 
-    void initialize(){ untested();
+    void initialize(){
         auto zerodegbag1=MOVE(_degs.detach_bag(0));
         BOOST_AUTO(it, zerodegbag1.begin());
 
@@ -67,7 +67,7 @@ public:
             for(; it!=zerodegbag1.end(); ++it){ untested();
                 (*baseclass::_o)[baseclass::_i++] = *it;
             }
-        }else{ untested();
+        }else{
             baseclass::_num_vert -= zerodegbag1.size();
         }
 
@@ -100,11 +100,11 @@ public:
         _degs.flush();
     }
 
-    void postprocessing(){ untested();
+    void postprocessing(){
         auto zerodegbag=MOVE(_degs.detach_bag(0));
         BOOST_AUTO(it, zerodegbag.begin());
 
-        for(; it!=zerodegbag.end(); ++it){ untested();
+        for(; it!=zerodegbag.end(); ++it){
             (*baseclass::_o)[baseclass::_i++] = *it;
         }
     }

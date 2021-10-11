@@ -302,7 +302,7 @@ namespace boost{
 		 size_t v, property<treedec::bag_t, std::vector<U> > const& p)
 	{
 		auto& b=bag(v, m._g);
-		for(auto i : p.m_value){ untested();
+		for(auto i : p.m_value){
 			treedec::push(b, i);
 		}
 	}

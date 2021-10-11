@@ -345,12 +345,12 @@ public:
 //        return _vals[pos].value();
 //    }
 public: // O(1) neighbor stuff.
-    void mark(vertex_descriptor v){ untested();
+    void mark(vertex_descriptor v){
         auto idmap = boost::get(boost::vertex_index, _g);
         auto pos = boost::get(idmap, v);
         _neigh_marker.mark(pos);
     }
-    void clear_marker(){ untested();
+    void clear_marker(){
         _neigh_marker.clear();
     }
     // for n \in neigbors(c):

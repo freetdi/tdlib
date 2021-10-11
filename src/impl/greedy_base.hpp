@@ -28,6 +28,10 @@
 #include "../generic_elimination_search_overlay.hpp"
 #include "../induced_subgraph.hpp"
 
+#ifdef DEBUG_FILL
+#include "../graph_util.hpp"
+#endif
+
 namespace treedec{
 
 namespace impl{
@@ -265,6 +269,20 @@ public:
     virtual void eliminate(vertex_descriptor){ unreachable(); }
     virtual void postprocessing(){ untested(); }
 
+#ifdef DEBUG_FILL
+private: // debugging
+    virtual size_t fill_cached_(vertex_descriptor) const{
+        unreachable();
+        return -1ul;
+    }
+    virtual bool fill_cached_is_lb_(vertex_descriptor) const{
+        unreachable();
+        return false;
+    }
+#endif
+
+public:
+
     // greedy_base::
     void do_it(){
         trace3("greedy_base::do_it", _i, _num_vert, _numbering.total());
@@ -279,7 +297,7 @@ public:
         }
 
         assert(_o);
-        O_t& elim_vertices = *_o;
+        O_t& o = *_o;
 
 #ifndef NDEBUG
         check(_g);
@@ -287,12 +305,13 @@ public:
 
         initialize();
         _o->resize(_num_vert);
-        assert(elim_vertices.size() == _num_vert);
-        vertex_descriptor c;
+//        assert(elim_vertices.size() == _num_vert);
+        vertex_descriptor c = 0;
         // assert(_num_vert == vertices_left());
 
         auto cnt = _num_vert;
 
+        trace2("main loop", _num_vert, c);
         while(next(c)){
             trace2("greedy. next is", _i, c);
 
@@ -304,28 +323,56 @@ public:
             }
 #endif
 
-            elim_vertices[_i] = c;
+            o[_i] = c;
 
-            if(boost::out_degree(c, _subgraph)>_ub_tw){
+            size_t degc = boost::out_degree(c, _subgraph);
+            if(degc > _ub_tw){
                 _ub_tw = boost::out_degree(c, _subgraph);
             }else{
             }
 
             // assert(bags_i);?!
-
-            eliminate(c);
-            --cnt;
-            // assert(cnt == vertices_left());
-
-            assert(_numbering.total()==_i+1);
-
-#if 0
-            if(!_t){ untested();
-                _current_N->clear();
+#ifdef DEBUG_FILL
+            typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+            marker_type debug_marker(_num_vert);
+            std::vector<vertex_descriptor> c_neigh;
+            {
+                auto cr = boost::adjacent_vertices(c, _subgraph);
+                for(; cr.first!=cr.second; ++cr.first){
+                    auto n = *cr.first;
+                    auto me = treedec::count_missing_edges(n, debug_marker, _subgraph);
+                    trace4("DEBUG_FILL pre-elim", n, fill_cached_(n), fill_cached_is_lb_(n), me);
+                    if(fill_cached_is_lb_(n)){
+                        assert(me >= fill_cached_(n));
+                    }else{
+                        assert(me == fill_cached_(n));
+                    }
+                    c_neigh.push_back(*cr.first);
+                }
+                assert(c_neigh.size()==degc);
             }
 #endif
+            eliminate(c);
+
+#ifdef DEBUG_FILL
+            {
+                for(auto n : c_neigh){
+                    auto me = treedec::count_missing_edges(n, debug_marker, _subgraph);
+                    trace4("DEBUG_FILL post-elim", n, fill_cached_(n), fill_cached_is_lb_(n), me);
+                    if(fill_cached_is_lb_(n)){
+                        assert(me >= fill_cached_(n));
+                    }else{
+                        assert(me == fill_cached_(n));
+                    }
+                }
+                assert(c_neigh.size()==degc);
+            }
+#endif
+            --cnt;
+//            assert(cnt == vertices_left());//?
 
             ++_i;
+            assert(_numbering.total()==_i);
         }
 
         // BUG

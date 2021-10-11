@@ -33,24 +33,30 @@ namespace treedec{
 namespace impl{
 namespace detail{
 
-template<class G, class O>
+template<class G, class O, class F>
 class eliminated_before{
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename boost::property_map< G, boost::vertex_index_t >::const_type::value_type vertex_index_type;
 public:
-    explicit eliminated_before(vertex_descriptor c, O const& num, G const& g)
-        : _c(c), _numbering(num), _g(g) { untested();
+    explicit eliminated_before(vertex_descriptor c, O const& num, G const& g, F& f)
+        : _c(c), _numbering(num), _g(g), _fill(f) {
     }
     template<class E>
-    bool operator()(E const& e) const{ untested();
+    bool operator()(E const& e) const{
         auto t = boost::target(e, _g);
         trace2("b4", t, _c);
-        return _numbering.is_before(t, _c);
+        if( _numbering.is_before(t, _c)){
+            return true;
+        }else{
+            _fill.mark(t);
+            return false;
+        }
     }
 private:
     vertex_descriptor _c;
     O const& _numbering;
     G const& _g;
+    F& _fill;
 };
 
 }
@@ -66,7 +72,12 @@ public: //types
     typedef O O_t; //?
     typedef typename directed_view_select<G_t>::type D_t;
     typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
+#ifdef DEBUG
+    typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+    marker_type _debug_marker;
+#endif
     typedef greedy_base<G_t, O_t, CFGT> baseclass;
+    typedef typename baseclass::numbering_type numbering_type;
     typedef typename baseclass::vertex_descriptor vertex_descriptor;
     // BUG:: use CFGT::fill or fallback to current fill
     typedef typename fill_chooser<typename baseclass::subgraph_type>::type fill_type;
@@ -94,6 +105,10 @@ public: //types
 public: // construct
     fillIn(G_t const &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
+#ifdef DEBUG
+        later.
+        _debug_marker(boost::num_vertices(g)),
+#endif
           _fill(baseclass::_subgraph, boost::num_vertices(g))
     { untested();
 //        boost::print_graph(g);
@@ -101,6 +116,9 @@ public: // construct
     }
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
+#ifdef DEBUG
+        _debug_marker(boost::num_vertices(g)),
+#endif
           _fill(baseclass::_subgraph, boost::num_vertices(g))
     {
 //        boost::print_graph(g);
@@ -114,6 +132,15 @@ public: // construct
     { untested();
 //        boost::print_graph(g);
     }
+#ifdef DEBUG_FILL
+private: // debugging
+    size_t fill_cached_(vertex_descriptor v) const override {
+        return _fill.get_value(v);
+    }
+    bool fill_cached_is_lb_(vertex_descriptor v) const override {
+        return _fill.is_lb(v);
+    }
+#endif
 
 public: // implementation
     using baseclass::_min;
@@ -135,7 +162,7 @@ public: // implementation
             // todo: what do we know about lower bound?
             auto p = _fill.pick_min(0, -1u, true);
             c = p.first;
-            trace2("next picked", c, _min);
+            trace2("next picked", c, p.second);
 
             if(_min<0){
                 // 
@@ -149,26 +176,36 @@ public: // implementation
 
     using baseclass::_g;
     using baseclass::_numbering;
-    using baseclass::numbering_type;
+//    using baseclass::_fill;
     // TODO more useful specialisation?
     // ... finish minDegree, then lets see.
     // fillIn::
-    void eliminate(typename baseclass::vertex_descriptor c){ untested();
+    void eliminate(typename baseclass::vertex_descriptor c){
+
+        assert( _fill.get_value(c) == _min);
 
         long fill_c = _min;
         trace2("elim", vertices_left(), _degree[c]);
         trace2("elim", _fill.max_fill(), _fill.is_lb(c) );
+        trace2("degree", boost::out_degree(c, baseclass::_g), _degree[c]);
 
-#ifndef NDEBUG
-        // check_vertex(c);
+#ifdef DEBUG
+        check_vertex(c);
+        auto me = treedec::count_missing_edges(c, _debug_marker, baseclass::_g);
+        trace3("DEBUG", me, _min, c);
+        assert(me==_min);
 #endif
+        // assert(_min<=baseclass::_num_vert); // no!
 
         /// _min is fill(v).
         // use remove_out_edge_if?
-        _fill.mark_neighbours(c, _min); // relevant in q_decrement
-                                       // different marker
-        detail::eliminated_before<D_t, typename baseclass::numbering_type> P(c, _numbering, _g);
+        //_fill.mark_neighbours(c, _min); // relevant in q_decrement ?
+                                          // different marker
+        _fill.clear_marker();
+        detail::eliminated_before<D_t, numbering_type, fill_type> P(c, _numbering, _g, _fill);
         boost::remove_out_edge_if(c, P, _g);
+
+        assert( boost::out_degree(c, baseclass::_g) ==  _degree[c]);
 
         // bug: idmap!
         auto degc = baseclass::_degreemap[c];
@@ -176,7 +213,7 @@ public: // implementation
         assert(fill_c<=long(degc*(degc-1)));
 
         _numbering.put(c);
-        _numbering.increment();
+        _numbering.increment(); // remove c from _subgraph
 
         { // make clique
             // todo?: faster special cases for small numbers?!
@@ -187,9 +224,9 @@ public: // implementation
             assert(baseclass::_num_edges >= degc);
             baseclass::_num_edges -= degc;
             trace3("c...", c, fill_c, degc);
-            auto p=boost::adjacent_vertices(c, baseclass::_subgraph);
+            auto p = boost::adjacent_vertices(c, _g);
             for(; p.first!=p.second; ++p.first){
-                auto n=*p.first;
+                auto n = *p.first;
 
                 baseclass::_marker.clear();
                 // count overlap with c neighbourhood
@@ -199,24 +236,25 @@ public: // implementation
                         baseclass::_marker, n, baseclass::_subgraph,
                         _fill.marked() );
 #else
-// template<class M, typename V, class G, class P>
-// size_t mark_neighbours_c(M& marker, V v, G const& g, P const& p /*bug*/)
-    size_t overlap=0;
-{
-    auto& g = baseclass::_subgraph;
-    auto& p = _fill.marked();
-    auto pp=boost::adjacent_vertices(n, g); // ???
-    for(; pp.first!=pp.second; ++pp.first){
-        baseclass::_marker.mark(*pp.first);
-        if(p(*pp.first)){
-            ++overlap;
-        }else{
-        }
-    }
-}
+                // template<class M, typename V, class G, class P>
+                // size_t mark_neighbours_c(M& marker, V v, G const& g, P const& p /*bug*/)
+                size_t overlap=0;
+                {
+                    auto& p = _fill.marked(); // neighbours of c
+                    auto pp = boost::adjacent_vertices(n, _g); // ???
+                    for(; pp.first!=pp.second; ++pp.first){
+                        auto nn = *pp.first;
+                        baseclass::_marker.mark(nn);
+                        // assert(nn!=c); // was: _subgraph.
+                        if(p(nn)){
+                            ++overlap;
+                        }else{
+                        }
+                    }
+                }
 #endif
 
-                long degn=baseclass::_degreemap[n];
+                long degn = baseclass::_degreemap[n];
                 auto const fill_n=_fill.get_value(n);
                 trace5("------------> ", n, degn, fill_n, degc, overlap);
                 assert(overlap<size_t(degn));
@@ -227,6 +265,8 @@ public: // implementation
 
                 trace5("DC?", fill_n, fill_c, degc, overlap, degn);
                 trace5("DC?", c, n, DC, DN, _fill.is_lb(n));
+                assert(DC>=0);
+                assert(DN>=0);
 
                 long offset = - long(fill_c);
 #if 0
@@ -240,7 +280,7 @@ public: // implementation
                 if(DC){
                     offset = - long(fill_c);
 //                    offset -= overlap*DC + (DC-1)*DC/2
-                    offset -= DN; // no more need to connect edges behind
+                    offset -= DN; // no more need to connect edges behind c
 //                    offset = - long(fill_n); // TODO
                     trace4("DC", n, fill_n, offset, _fill.is_lb(n));
 
@@ -253,12 +293,13 @@ public: // implementation
                     trace6("noDC, shift", n, fill_c, fill_n, offset, DN, DC);
                     _fill.shift(n, offset);
                 }
+                trace3("--- done -->", n, _fill.get_value(n), _fill.is_lb(n));
 
                 ///q.first=next;
 
                 // iterate {n2,n} \subset 1-neighborhood
                 // n2 < n... add edges to previously visited n2 only
-                auto q = adjacent_vertices(c, _subgraph);
+                auto q = boost::adjacent_vertices(c, _g);
                 for(; q.first!=p.first; ++q.first){
 //                for(; q.first!=q.second; ++q.first) // careful!
                     auto n2=*q.first;
@@ -284,7 +325,7 @@ public: // implementation
                             if(!baseclass::_marker.is_marked(*r.first)){
                                 // not neighbour of n
                             }else{
-                                trace3("--common neigh", n, n2, *r.first);
+                                // trace3("--common neigh", n, n2, *r.first);
                                 assert(*r.first!=n);
                                 assert(*r.first!=n2);
                                 _fill.decrement_fill(*r.first);
@@ -310,7 +351,7 @@ public: // implementation
                 --baseclass::_degreemap[n];
                 trace2("incomplete n (missing edges)", n, baseclass::_degreemap[n]);
                 degn = baseclass::_degreemap[n];
-            } // n
+            } // neighbor loop
         }
         trace2("elimd", c, baseclass::_num_edges);
         treedec::check(_subgraph);
@@ -359,7 +400,7 @@ public: // implementation
 private: // debugging
     void check_vertex(vertex_descriptor c) {
         size_t k=0;
-        for(auto p=boost::adjacent_vertices(c, _subgraph); p.first!=p.second; ++p.first){
+        for(auto p = boost::adjacent_vertices(c, _subgraph); p.first!=p.second; ++p.first){
             ++k;
         }
         assert(k==baseclass::_degreemap[c]);
@@ -375,12 +416,12 @@ private: // debugging
             auto q=boost::adjacent_vertices(n, _subgraph);
             for(; q.first!=q.second; ++q.first){
                 auto n2=*q.first;
-                trace1("neigh", n2);
+//                trace1("neigh", n2);
                 --degn;
             }
-            trace2("check", n, degn);
             assert(!degn);
         }
+        trace1("checked", c);
     }
 private:
     fill_type _fill;
