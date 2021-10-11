@@ -26,7 +26,7 @@
 // treedec::impl::bmdo<sg_dvv16> A(g16, _elimord);
 
 #include "marker.hpp"
-#include "impl/greedy_heuristic.hpp"
+#include "impl/fill_in.hpp"
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <vector>

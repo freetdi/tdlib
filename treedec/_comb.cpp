@@ -24,7 +24,7 @@
 #include "induced_subgraph.hpp"
 #include "elimination_orderings.hpp"
 #include "marker.hpp"
-#include "impl/greedy_heuristic.hpp"
+#include "impl/fill_in.hpp"
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <vector>

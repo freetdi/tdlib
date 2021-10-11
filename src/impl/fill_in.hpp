@@ -16,11 +16,10 @@
 // Foundation, 51 Franklin Street - Suite 500, Boston, MA 02110-1335, USA.
 //
 //
-//
-// greedy heuristics
+// fill in heuristic
 
-#ifndef TREEDEC_GREEDY_HEURISTIC_HPP
-#define TREEDEC_GREEDY_HEURISTIC_HPP
+#ifndef TREEDEC_FILL_IN_HPP
+#define TREEDEC_FILL_IN_HPP
 
 #ifndef TREEDEC_ELIMINATION_ORDERINGS_HPP
 #error "not intended to be used like that."
@@ -31,90 +30,7 @@
 #include "obsolete_greedy_base.hpp"
 
 namespace treedec{
-
 namespace impl{
-
-template <typename G_t, template<class G, class...> class CFG=algo::default_config>
-class minDegree : public greedy_heuristic_base<G_t, CFG>{
-public:
-    typedef greedy_heuristic_base<G_t, CFG> baseclass;
-
-    typedef typename deg_chooser<G_t>::type degs_type;
-
-    minDegree(G_t &g,
-                    unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
-        : baseclass(g, ub, ignore_isolated_vertices),
-         _degs(baseclass::_g)
-    {
-    }
-
-    minDegree(G_t &G, bool ignore_isolated_vertices)
-        : baseclass(G, -1u, ignore_isolated_vertices),
-          _degs(baseclass::_g)
-    {
-    }
-
-#if 0 // base
-    void get_elimination_ordering(){ untested();
-        // incomplete()
-    }
-#endif
-
-    void initialize(){
-        auto zerodegbag1=MOVE(_degs.detach_bag(0));
-        BOOST_AUTO(it, zerodegbag1.begin());
-
-        if(!baseclass::_iiv){
-            for(; it!=zerodegbag1.end(); ++it){
-                (*baseclass::_o)[baseclass::_i++] = *it;
-            }
-        }else{
-            baseclass::_num_vert -= zerodegbag1.size();
-        }
-
-        baseclass::_min = 1;
-    }
-
-    void next(typename baseclass::vertex_descriptor &c){
-        if(baseclass::_min>1){
-            --baseclass::_min;
-        }
-
-        boost::tie(c, baseclass::_min) = _degs.pick_min(baseclass::_min, baseclass::_num_vert);
-    }
-
-    // md::
-    void eliminate(typename baseclass::vertex_descriptor v){
-        typename baseclass::adjacency_iterator I, E;
-        for(boost::tie(I, E) = boost::adjacent_vertices(v, baseclass::_g); I!=E; ++I){
-            assert(*I!=v); // no self loops...
-            typename baseclass::vertex_descriptor w=*I;
-            _degs.unlink(w);
-        }
-
-        baseclass::_current_N->resize(boost::out_degree(v, baseclass::_g));
-
-        make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N);
-
-        redegree(NULL, baseclass::_g, *baseclass::_current_N, _degs);
-        _degs.unlink(v, baseclass::_min);
-        _degs.flush();
-    }
-
-    void postprocessing(){
-        auto zerodegbag=MOVE(_degs.detach_bag(0));
-        BOOST_AUTO(it, zerodegbag.begin());
-
-        for(; it!=zerodegbag.end(); ++it){
-            (*baseclass::_o)[baseclass::_i++] = *it;
-        }
-    }
-
-private:
-    degs_type _degs;
-
-}; // minDegree
-
 namespace detail{
 
 template<class G, class O>
@@ -472,107 +388,6 @@ private:
 }; // fillIn
 
 } // impl
-
-namespace obsolete {
-// the fillIn heuristic.
-template <typename G_t, template<class G, class...> class CFGT_t=algo::default_config>
-class fillIn : public treedec::impl::greedy_heuristic_base<G_t, CFGT_t>{
-public: //types
-    typedef treedec::impl::greedy_heuristic_base<G_t, CFGT_t> baseclass;
-    typedef typename treedec::obsolete::FILL<G_t> fill_type;
-
-    struct fill_update_cb : public graph_callback<G_t>{
-        typedef typename baseclass::vertex_descriptor vertex_descriptor;
-
-        fill_update_cb(fill_type* d, G_t const& g) :
-            _fill(d), G(g){}
-
-        void operator()(vertex_descriptor v){
-            _fill->q_eval(v);
-        }
-        void operator()(vertex_descriptor s, vertex_descriptor t) {
-            assert(s < t); // likely not. is this necessary below?
-            // e has just been inserted.
-            BOOST_AUTO(cni, common_out_edges(s, t, G));
-            BOOST_AUTO(i, cni.first);
-            BOOST_AUTO(e, cni.second);
-            for(; i!=e; ++i){
-                assert(*i != s);
-                assert(*i != t);
-    //            no. maybe theres only half an edge.
-    //            assert(boost::edge(boost::source(edg, G), *i, G).second);
-    //            assert(boost::edge(boost::target(edg, G), *i, G).second);
-
-                // BUG: *i might be within 1-neighborhood.
-                _fill->q_decrement(*i);
-            }
-        }
-    private:
-        fill_type* _fill;
-        G_t const& G;
-    }; // update_cb
-
-public: // construct
-    fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
-        : baseclass(g, ub, ignore_isolated_vertices),
-         _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    {
-    }
-
-    fillIn(G_t &G, bool ignore_isolated_vertices, unsigned ub=-1u)
-        : baseclass(G, ub, ignore_isolated_vertices),
-          _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    {
-    }
-
-public: // implementation
-    void initialize(){
-        typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
-        for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
-            if(boost::out_degree(*vIt, baseclass::_g) == 0){
-                if(!baseclass::_iiv){
-                    (*baseclass::_o)[baseclass::_i++] = *vIt;
-                }
-                else{
-                    --baseclass::_num_vert;
-                }
-            }
-        }
-    }
-
-    // obs::fillIn::
-    void next(typename baseclass::vertex_descriptor &c){
-        _fill.check();
-        boost::tie(c, baseclass::_min) = _fill.pick_min(0, -1, true);
-        _fill.check();
-    }
-
-    // obs::fillIn::
-    void eliminate(typename baseclass::vertex_descriptor v){
-        _fill.mark_neighbors(v, baseclass::_min);
-
-        baseclass::_current_N->resize(boost::out_degree(v, baseclass::_g));
-
-        make_clique_and_detach(v, baseclass::_g, *baseclass::_current_N, &_cb);
-
-        _fill.unmark_neighbours(*baseclass::_current_N);
-    }
-
-    void postprocessing(){
-        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){
-            auto v = _fill.pick_min(0, 0, true).first;
-            (*baseclass::_o)[baseclass::_i] = v;
-        }
-    }
-
-private:
-    fill_type _fill;
-    fill_update_cb _cb;
-
-}; // fillIn
-
-} // obsolete
-
 } // treedec
 
 #endif // guard

@@ -65,13 +65,16 @@
 #include "skeleton.hpp"
 #include "treedec.hpp"
 #include "treedec_copy.hpp"
+#include "impl/min_degree.hpp"
+#include "impl/fill_in_obsolete.hpp"
+#include "impl/fill_in.hpp"
 
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
 # include "minimum_degree_ordering.hpp"
 # define HAVE_MINDEGREE_FORK
 #endif
 
-#include "impl/greedy_heuristic.hpp"
+// #include "impl/greedy_heuristic.hpp"
 
 #ifdef HAVE_GALA_GRAPH_H
 #include <gala/sfinae.h>
