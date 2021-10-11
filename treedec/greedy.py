@@ -13,6 +13,12 @@ def fi(g):
 		return tg._fi_balsvd(g)
 	elif isinstance(g, G._balsvu):
 		return tg._fi_balsvu(g)
+	elif isinstance(g, G._gsgvvu16):
+		return tg._fi_gsgvvu16(g)
+	elif isinstance(g, G._gsgvvu32):
+		return tg._fi_gsgvvu32(g)
+	elif isinstance(g, G._gsgvvu64):
+		return tg._fi_gsgvvu64(g)
 	else:
 		raise ValueError("fi: can't handle " + str(g))
 

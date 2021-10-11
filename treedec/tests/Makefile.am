@@ -13,6 +13,7 @@ PY_TESTS = \
 	excut_0.py \
 	exta_0.py \
 	fi_0.py \
+	fi_1.py \
 	fi_dimacs.py \
 	order0.py \
 	pp_dimacs.py \
