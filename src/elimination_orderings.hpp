@@ -900,7 +900,7 @@ public:
     }
 
     template<class TT>
-    void get_tree_decomposition(TT& t){
+    void get_tree_decomposition(TT&){
         incomplete();
     }
 

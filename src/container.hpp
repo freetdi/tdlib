@@ -21,7 +21,7 @@
 #define TREEDEC_CONTAINER_HPP
 
 // #include "config.h" // not yet
-#include "container_traits.hpp"
+#include "bits/container_bits.hpp"
 
 #ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
 #include <tlx/container/btree_set.hpp>

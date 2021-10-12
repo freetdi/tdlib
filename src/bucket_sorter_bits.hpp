@@ -2,7 +2,7 @@
 #ifndef TREEDEC_BUCKET_SORTER_BITS_HPP
 #define TREEDEC_BUCKET_SORTER_BITS_HPP
 
-#include "container_traits.hpp"
+#include "container.hpp"
 #include "bucket_sorter.hpp"
 
 namespace treedec {

@@ -12,7 +12,6 @@ pkginclude_HEADERS = \
   combinations.hpp \
   config_traits.hpp \
   container.hpp \
-  container_traits.hpp \
   convenience.hpp \
   copy.hpp \
   degree_config.hpp \

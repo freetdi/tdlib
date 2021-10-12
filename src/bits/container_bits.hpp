@@ -15,22 +15,20 @@
 // Foundation, 51 Franklin Street - Suite 500, Boston, MA 02110-1335, USA.
 //
 
-// container access. FIXME: these are not traits.
-
-#ifndef TREEDEC_CONTAINER_TRAITS_HPP
-#define TREEDEC_CONTAINER_TRAITS_HPP
+#ifndef TREEDEC_CONTAINER_BITS_HPP
+#define TREEDEC_CONTAINER_BITS_HPP
 
 #include <vector>
 #include <assert.h>
 #include <set>
 #include <algorithm> // sort
-#include "trace.hpp"
+#include "../trace.hpp"
 
-namespace treedec{//
+namespace treedec{
 
-namespace detail{//
+namespace detail{
     template<class C, class X=void>
-    struct container_iter{//
+    struct container_iter{
         // front, back: create copies. use (r)begin if you need references.
         static typename C::value_type front(C const& c)
         { untested();
@@ -76,7 +74,7 @@ namespace detail{//
         }
     }; // access
     template<class C, class X=void>
-    struct container_inspect{//
+    struct container_inspect{
         template<class E>
         static bool contains(C const& c, E e)
         {
@@ -116,7 +114,7 @@ namespace detail{//
           c.insert(e);
         }
         // sort. no-op for some containers
-        static void insert(C& c) { untested();
+        static void sort(C&) { untested();
             incomplete();
         }
     };

@@ -458,10 +458,9 @@ public: // construct
     PP_FI_TM(G_in const& g)
       : algo::draft::algo1("pp_fi_tm"),
        _g(new G),
-       _low_tw(-1),
-       _own_g(true) {
+       _own_g(true),
+       _low_tw(-1) {
         boost::copy_graph(g, *_g);
-        _low_tw = -1;
     }
     ~PP_FI_TM() {
         if(_own_g){

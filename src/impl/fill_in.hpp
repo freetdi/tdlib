@@ -415,7 +415,7 @@ private: // debugging
 
             auto q=boost::adjacent_vertices(n, _subgraph);
             for(; q.first!=q.second; ++q.first){
-                auto n2=*q.first;
+//                auto n2=*q.first;
 //                trace1("neigh", n2);
                 --degn;
             }

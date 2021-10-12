@@ -41,7 +41,7 @@
 #include "lower_bounds.hpp"
 #include "treedec.hpp"
 #include "overlay.hpp"
-#include "container_traits.hpp"
+#include "container.hpp"
 
 #ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
 #include <tlx/container/btree_set.hpp>

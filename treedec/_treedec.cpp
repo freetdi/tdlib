@@ -55,13 +55,6 @@ struct set2listp {
   }
 };
 
- PyObject* treedec_get_bag_test(unsigned i)
-{
-    return py::incref(py::make_tuple(0, 0).ptr());
-}
-
-
-
 namespace detail{
 
 #if 0

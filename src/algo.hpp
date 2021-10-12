@@ -103,7 +103,7 @@ public: // results. to be reimplemnted.
         return 0;
     }
     template<class O>
-    void get_elimination_ordering(O& o) const{
+    void get_elimination_ordering(O&) const{
         unreachable();
     }
 //for now
