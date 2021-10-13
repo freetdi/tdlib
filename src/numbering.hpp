@@ -55,12 +55,13 @@ public:
 private:
 	NUMBERING_1(const NUMBERING_1&){ unreachable(); }
 public:
-	// resoncsturct numbering from order and sns
+	// reconstruct numbering from order and sns
 	template<class C, class S>
 	NUMBERING_1(G_t const& /*g*/, idmap_type idm, C const& data, S const& sns)
-	    : _current(0),
-		   _data(data.size()),
-	      _idmap(idm)
+	  : _current(0)
+	  , _data(data.size())
+	  , _idmap(idm)
+	  , _number(data.size())
 	{
 		for(unsigned i=0; i<data.size(); ++i){
 			if(sns[i]>0){
@@ -72,15 +73,18 @@ public:
 		}
 	}
 	NUMBERING_1(G_t const& g, idmap_type idm)
-	    : _current(0),
-		   _data(boost::num_vertices(g)),
-	      _idmap(idm)
+	  : _current(0)
+	  , _data(boost::num_vertices(g))
+     , _idmap(idm)
+	  , _number(boost::num_vertices(g))
 	{
 		increment();
 	}
 	NUMBERING_1(G_t const& g)
-	    : _current(0), _data(boost::num_vertices(g)),
-	      _idmap(idmap_type(g, boost::vertex_index) )
+	  : _current(0)
+	  , _data(boost::num_vertices(g))
+	  , _idmap(idmap_type(g, boost::vertex_index) )
+	  , _number(boost::num_vertices(g))
 	{
 		trace1("NUMBERING_1", _data.size());
 		if(boost::num_vertices(g)){
@@ -175,6 +179,9 @@ public:
 	void indistinguishable(vertex_descriptor i, vertex_descriptor j) {
 		auto idx = get(_idmap, i);
 		_data[idx] = -value_type(get(_idmap, j) + 1) /*offset?*/;
+
+		assert(idx<_number.size());
+		_number[idx] = _current; // keep track of introduction...
 	}
 	value_type get_position(vertex_descriptor v) const{
 //		trace2("NUMBERING hack", v, sizeof(value_type));
@@ -423,9 +430,11 @@ public:
 private:
 	value_type _current;
 	ORD_FLAGS _ord_mode{oFlatten};
-public: // BUG
 	container_type _data;
 	idmap_type _idmap;
+private:
+	// container_type _parent; // ?
+	container_type _number;
 };
 
 } // draft

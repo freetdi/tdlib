@@ -1475,6 +1475,36 @@ Supergraph<G, N, D> const make_supergraph(G const& g, N const& n, D const& d, S 
 
 namespace draft{
 
+template<class V, class N, class O, class S, class P>
+void visit_bag(V v, N const& num, O const& ordering, S const& sns, P& visitor)
+{
+//	auto const& num = s.numbering();
+// auto s = g.supernode_size(v);
+	auto s = sns[v];
+//
+	auto p = num.get_position(v);
+
+	bool descend = visitor(v);
+	if(s<0){
+		s = -s;
+	}else{
+		--s;
+	}
+
+	if(descend){
+		trace2("descend", v, s);
+		for(auto h=1; h<=s; ){
+			auto w = ordering[p+h];
+			visit_bag(w, num, ordering, sns, visitor);
+			auto cs = sns[w];
+			assert(cs<=0);
+			h -= cs;
+			++h;
+		}
+	}else{
+	}
+}
+
 template <typename G, typename O, class T, class S>
 void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
 {

@@ -15,6 +15,9 @@ check_PROGRAMS = \
 	inline \
 	iter0 \
 	iter1 \
+	numbering0 \
+	numbering1 \
+	numbering2 \
 	graph \
 	pp \
 	pp0 \
