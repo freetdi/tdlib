@@ -2,6 +2,7 @@
 pkgincludebitsdir = ${pkgincludedir}/bits
 pkgincludebits_HEADERS = \
 	any_iterator.hpp \
+	container_bits.hpp \
 	detail/any_iterator_abstract_base.hpp \
 	detail/any_iterator_metafunctions.hpp \
 	detail/any_iterator_wrapper.hpp \

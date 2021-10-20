@@ -1,7 +1,6 @@
 
 pkgincludeimpldir = ${pkgincludedir}/impl
 pkgincludeimpl_HEADERS = \
-	container_bits.hpp \
 	fill_in.hpp \
 	fill_in_obsolete.hpp \
 	min_degree.hpp \
