@@ -61,8 +61,12 @@ AM_CXXFLAGS = -O0 -g
 treedec:
 	-ln -sf $(top_srcdir)/src treedec
 
-all-local:
-	-${LN_S} ${srcdir}/ref .
+all-local: | ${PWD}/ref
+
+#if VPATH_BUILD
+${PWD}/ref: $(srcdir)/ref
+	${LN_S} ${srcdir}/ref .
+#endif
 
 EXTRA_DIST = \
 	MakeList \
