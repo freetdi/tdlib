@@ -20,7 +20,10 @@
 #ifndef GRAPH_PY_HPP
 #define GRAPH_PY_HPP
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
 #include <boost/graph/graph_traits.hpp>
 #include "graph_traits.hpp"
 #include "treedec_traits.hpp"
