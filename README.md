@@ -1,0 +1,133 @@
+# treedec
+
+**treedec** provides tree decomposition algorithms.
+
+A tree decomposition of a simple, loopless, undirected graph G is a tree T
+with bags at its nodes containing vertices from G. The usual conditions apply.
+By convention, a tree is an acyclic graph with exactly one connected component.
+The bagsize of T is the size of the biggest bag, which is a notion for the
+(width of T) + 1.
+
+There is work in progress, so this description should be understood as
+normative. Deviations from conventions stated here are considered bugs.
+
+## Prerequisites
+
+- boost (tested with >=1.62)
+- a C++ compiler with reasonable C++ support
+
+Optional:
+
+- Python/Cython (disable with `--without-python`)
+- gala headers; will be detected, if available, by configure
+  (need `libboost_graph` in that case)
+
+## The interface
+
+A tree decomposition algorithm is a class template
+```C++
+template<class G, template<class G_, class ...> class C>
+class ALGORITHM{
+[..]
+};
+```
+where `G` is a graph and `C` is a config object. A graph is expected to come
+with a boost graph interface. There are some extra implicit assumptions,
+which the graph data structure may or may not enforce.
+
+An algorithm has (should have) a constructor taking `G&` and a constructor
+taking `const G&`. You should expect the argument to be modified, unless it's
+`const`, i.e. make sure to cast to `const` reference, if this is not desired.
+
+An algorithm also provides
+```C++
+T get_tree_decomposition() const;
+template<class TT>
+void get_tree_decomposition(TT&) const;
+```
+which is meant to work with `treedecomposition` types (see below).
+
+In namespace `treedec` we currently have (needs verification)
+```C++
+prep::*        // preprocessing
+he::fill_in    // fillIn heuristic
+he::min_degree // minDegree heuristic
+he::thorup     // thorups heuristic
+ex::ta         // tamakis algorithm
+ex::cutset     // exact algorithm
+comb::PP_FI    // preprocessing + fill_in
+comb::PP_FI_TM // preprocessing + fill_in + triangulation
+comb::ex17     // PACE 17 exact (pp + tamaki)
+```
+
+## Graph types
+
+A graph is expected to be a model of `AdjacencyGraph`, but without self loops
+and without parallel edges. It needs to be undirected.
+Some algorithms support graphs that model `BidirectionalGraph`. These graphs
+must not contain more than one edge for any two vertices, as accessed through
+`boost::edges`.
+
+## Configuration objects
+
+Config objects can control some of the algorithm behaviour, such as
+
+- statistics generation,
+- debug output,
+- signalling,
+- selection of subalgorithm, subroutine and data structure.
+
+The default, `algo::cfg_default`, is a sensible choice, if you don't care.
+
+(TODO: more on config objects)
+
+## Tree decompositions
+
+A tree decomposition is an undirected graph in the above sense
+with a vertex property of access type `treedec::bag_t`. Sometimes
+bidirectional graphs also work. In that case, the edges of the
+tree decomposition must be oriented away from a root vertex. 
+
+The expected models are
+```C++
+#include <treedec/treedec_traits.hpp>
+typedef std::vector<vertex_descriptor> bag_container_type;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::property<treedec::bag_t, bag_container_type> > T;
+```
+or
+```C++
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
+        boost::property<treedec::bag_t, bag_container_type> > T;
+```
+where `vertex_descriptor` must be compatible with the graph to be decomposed.
+
+It is possible to use custom tree decomposition types, such as with bundled
+properties. If you have a graph
+```C++
+struct mybundle{
+   std::set<unsigned> bag; // must be "bag" right now.
+   [..]
+};
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                              mybundle> my_td_type;
+```
+you can make bags accessible from treedec using
+```C++
+TREEDEC_TREEDEC_BAG_TRAITS(my_td_type, bag);
+```
+
+## tdecomp
+
+An example driver. Reads in `.gr` files (PACE style) and ejects `.td`.
+Supports several algorithms. These can be switched on individually,
+using options such as `--pp`, `--fi`, `--ppfi`, `--ex17`. Selected
+algorithms run in parallel, some heuristics permit interruption
+using a `TERM` signal. In the interrupted case, the best currently known
+decomposition is printed.
+
+Example:
+```console
+$ tdecomp --fi < my_graph.gr > my_decomposition.td
+$ td-validate my_graph.gr my_decomposition.td
+```
