@@ -39,6 +39,7 @@
 #undef trace3
 #undef trace4
 #undef trace5
+#undef trace6
 
 #ifdef DO_TRACE
 #define trace0(s) ( std::cerr << "@#@" << (s) << "\n")
