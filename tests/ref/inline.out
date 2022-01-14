@@ -1,4 +1,5 @@
 ==test graph==
+vertices:21
 0 --> 1 13 7 8 
 1 --> 14 2 9 
 2 --> 10 3 8 
@@ -22,6 +23,7 @@
 20 --> 
 ====
 PP+FI+TM
+incomplete ./treedec/combinations.hpp:483:get_elimination_ordering
 0 --> 17 18 19 20 
 1 --> 
 2 --> 
@@ -66,6 +68,27 @@ PP+FI+TM
 19: 19
 20: 20
 FI
+o[0] = 17
+o[1] = 18
+o[2] = 19
+o[3] = 20
+o[4] = 16
+o[5] = 9
+o[6] = 6
+o[7] = 15
+o[8] = 4
+o[9] = 12
+o[10] = 0
+o[11] = 2
+o[12] = 10
+o[13] = 14
+o[14] = 8
+o[15] = 5
+o[16] = 11
+o[17] = 1
+o[18] = 7
+o[19] = 3
+o[20] = 13
 0 --> 
 1 --> 
 2 --> 
@@ -110,6 +133,7 @@ FI
 19: 3 13
 20: 13
 thorup
+incomplete ./treedec/thorup.hpp:390:get_elimination_ordering
 0 --> 1 
 1 --> 2 
 2 --> 3 
@@ -156,6 +180,27 @@ thorup
 20: 0 2 3 8 9 10 14
 21: 0 1 2 9 14
 FI
+o[0] = 17
+o[1] = 18
+o[2] = 19
+o[3] = 20
+o[4] = 16
+o[5] = 9
+o[6] = 6
+o[7] = 15
+o[8] = 4
+o[9] = 12
+o[10] = 0
+o[11] = 2
+o[12] = 10
+o[13] = 14
+o[14] = 8
+o[15] = 5
+o[16] = 11
+o[17] = 1
+o[18] = 7
+o[19] = 3
+o[20] = 13
 0 --> 
 1 --> 
 2 --> 
@@ -200,6 +245,7 @@ FI
 19: 3 13
 20: 13
 PP+MD
+incomplete ./treedec/combinations.hpp:135:get_elimination_ordering
 0 --> 17 18 19 20 
 1 --> 
 2 --> 
@@ -244,6 +290,7 @@ PP+MD
 19: 19
 20: 20
 ppta
+incomplete ./treedec/exact_base.hpp:126:get_elimination_ordering
 0 --> 1 11 12 13 14 
 1 --> 2 10 
 2 --> 3 4 5 
@@ -276,6 +323,7 @@ ppta
 13: 19
 14: 20
 PP+FI
+incomplete ./treedec/combinations.hpp:424:get_elimination_ordering
 0 --> 16 18 19 20 21 
 1 --> 
 2 --> 

@@ -423,7 +423,6 @@ public: // algo interface
     void get_elimination_ordering(O&) const{
         incomplete();
     }
-
 private:
     G& g(){return *_g;};
 

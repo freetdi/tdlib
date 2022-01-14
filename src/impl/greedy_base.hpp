@@ -174,7 +174,7 @@ protected: // implementation
                     // eliminate isolated vertices first
                     (*_o)[_i++] = *p.first;
                     _numbering.put(*p.first);
-                    _numbering.increment(); // TODO. possibly unnecessary.
+                    _numbering.increment();
                 }else{
                     // just ignore them, so they don't show up in the order
                     assert(_num_vert);
@@ -184,6 +184,7 @@ protected: // implementation
             }else{
             }
         }
+        trace1("initialised", _numbering.total());
         assert(checksum==_num_edges*2);
     }
 
@@ -204,13 +205,19 @@ public:
         for(auto x: *_o){
             trace1("order", x);
         }
-        auto p=boost::vertices(_g);
+        auto p = boost::vertices(_g);
         for(; p.first!=p.second; ++p.first){
             if(_numbering.is_numbered(*p.first)){
                 trace2("numbered", *p.first, _numbering.get_position(*p.first));
             }
         }
 #endif
+
+        if(!_iiv){
+            assert(_o->size() == boost::num_vertices(_g));
+            // assert(_numbering.total() == boost::num_vertices(_g)); no. numbering is bags only
+        }else{ untested();
+        }
 
         typedef treedec::draft::SKELETON<D_t, numbering_type, O_t> skeleton_type;
         skeleton_type skel(_g, _numbering, *_o);
@@ -219,6 +226,8 @@ public:
         trace1("skel?", _numbering.total());
         treedec::detail::skeleton_helper<D_t, T, skeleton_type, numbering_type>
             S(_g, t, skel, _numbering);
+
+        trace1("pre td?", boost::num_vertices(t));
         S.do_it();
         trace1("td?", boost::num_vertices(t));
     }
@@ -243,24 +252,32 @@ public:
 
     template<class O>
     void get_elimination_ordering(O& o) const{
-		 if(_i){
-		 }else{untested();
-		 }
-		 // incomplete(); inefficient perhaps
+        if(!_iiv){
+            assert(_i==boost::num_vertices(_g));
+            assert(_o->size()==boost::num_vertices(_g));
+        //     assert(_i==_numbering.total()); no. _numbering numbers bags only.
+            // o.resize(boost::num_vertices(_g));
+            assign(o, *_o);
+        }else{untested();
+            o.resize(_i);
+            incomplete(); //??
+        }
+        // incomplete(); inefficient perhaps
 
-        o.resize(_i);
-        trace2("get_elimination_ordering", _i, _numbering.total());
-        assert(_i==_numbering.total()); // for now.
-        auto p = boost::vertices(_g);
-
-        for(; p.first!=p.second; ++p.first){
-            if(_numbering.is_numbered(*p.first)){
-                auto pos = _numbering.get_position(*p.first);
-                assert(pos<o.size());
-                o[pos] = _idmap[*p.first];
-                assert(o[pos] == (*_o)[pos]);
-            }else{ untested();
-            }
+        // ???
+//        auto p = boost::vertices(_g);
+//        for(; p.first!=p.second; ++p.first){
+//            if(_numbering.is_numbered(*p.first)){
+//                auto pos = _numbering.get_position(*p.first);
+//                assert(pos<o.size());
+//                o[pos] = _idmap[*p.first];
+//                assert(o[pos] == (*_o)[pos]);
+//            }else{ untested();
+//            }
+//        }
+        if(!_iiv){
+            assert(_i==boost::num_vertices(_g));
+        }else{untested();
         }
     }
 
@@ -285,7 +302,6 @@ public:
 
     // greedy_base::
     void do_it(){
-        trace3("greedy_base::do_it", _i, _num_vert, _numbering.total());
         check(_g);
 
         timer_on();
@@ -307,10 +323,12 @@ public:
         _o->resize(_num_vert);
 //        assert(elim_vertices.size() == _num_vert);
         vertex_descriptor c = 0;
-        // assert(_num_vert == vertices_left());
 
-        auto cnt = _num_vert;
+        // assert(_num_vert == vertices_left()); // no. have already removed isolated nodes.
 
+        // auto cnt = _num_vert;
+
+        trace3("greedy_base::do_it", _i, _num_vert, _numbering.total());
         trace2("main loop", _num_vert, c);
         while(next(c)){
             trace2("greedy. next is", _i, c);
@@ -368,9 +386,6 @@ public:
                 assert(c_neigh.size()==degc);
             }
 #endif
-            --cnt;
-//            assert(cnt == vertices_left());//?
-
             ++_i;
             assert(_numbering.total()==_i);
         }
@@ -404,7 +419,7 @@ protected:
     bool _own_g{false};
 
     vertices_size_type _ub_in;
-    bool _iiv;
+    bool _iiv{false};
     size_t _i;
     unsigned _min;
 

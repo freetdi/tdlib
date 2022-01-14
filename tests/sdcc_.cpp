@@ -82,6 +82,12 @@ static void do_it(G const& g_){
 	tree_dec_t t;
 	A B(g);
 	B.do_it();
+	std::vector<unsigned> o;
+	B.get_elimination_ordering(o);
+	unsigned j=0;
+	for(auto i : o){
+		std::cout << "o[" << j++ << "] = " << i << "\n";
+	}
 	B.get_tree_decomposition(t);
 	boost::print_graph(t);
 	//assert(treedec::get_bagsize(t) == 3);
@@ -124,7 +130,8 @@ int main()
 //	boost::copy_graph(h, g);
 //	boost::add_vertex(g);
 
-	std::cout << "==test graph==\n";
+	std::cout << "==test graph==\n"
+	          << "vertices:" << boost::num_vertices(g) << "\n";
 	boost::print_graph(g);
 	std::cout << "====\n";
 

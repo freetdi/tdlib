@@ -366,6 +366,10 @@ public: // implementation
     using baseclass::_subgraph;
     void postprocessing(){
         trace2("post", _i, baseclass::_num_vert);
+        if(!baseclass::_iiv){
+            assert(boost::num_vertices(_g) == baseclass::_num_vert);
+        }else{
+        }
         if(_i == baseclass::_num_vert){ untested();
             unreachable(); //?
             // no nodes at all?!
@@ -386,15 +390,27 @@ public: // implementation
             (*_o)[baseclass::_i++] = w;
             baseclass::_numbering.put(w);
             baseclass::_numbering.increment();
+            auto x = _subgraph.adjacent_vertices(w);
+            for(;x.first!=x.second;++x.first){
+                trace1("last node neigh", *x.first);
+            }
 
-            for(; _i < baseclass::_num_vert; ++_i){ untested();
+            for(; _i < baseclass::_num_vert; ++_i){
                 auto v = _fill.pick_min(0, 0, true).first;
 //                treedec::add_edge(w, v, baseclass::_g); already there.
                 assert(_i < _o->size());
                 (*_o)[baseclass::_i] = v;
             }
         }
-        assert(baseclass::_i == baseclass::_num_vert);
+
+        if(!baseclass::_iiv){
+            assert(baseclass::_i == _o->size());
+            assert(baseclass::_i == baseclass::_num_vert);
+            assert(baseclass::_i == boost::num_vertices(_g));
+
+            // assert(baseclass::_i == _numbering.total()); for some reason, numbering numbers the bags only.
+        }else{
+        }
     }
 
 private: // debugging

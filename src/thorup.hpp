@@ -385,6 +385,12 @@ public:
 	size_t get_bagsize() const{
 		return treedec::get_bagsize(_t);
 	}
+	template<class O>
+	void get_elimination_ordering(O&) const{
+		incomplete();
+	}
+
+	// get_elimination_ordering?
 	std::shared_ptr<const std::vector<unsigned> > get_elimord() const{
 		return std::make_shared<const std::vector<unsigned> > (_o);
 	}

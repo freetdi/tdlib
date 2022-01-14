@@ -68,8 +68,6 @@ public: // construct
     }
 public:
     size_t size() const{
-        trace2("skeleton::size", _n.total(), _o.size());
-        assert(_n.total() == _o.size());
         return _n.total();
         return _o.size();
     }
