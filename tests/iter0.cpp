@@ -63,10 +63,10 @@ int main()
 
 			++cmpi;
 		}
+		std::cout << k << "\n";
 		std::cout << "========\n";
 
 		{
-			incomplete();
 			auto R = make_components_range(g);
 			auto& cmpi = R.first;
 

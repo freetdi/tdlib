@@ -22,7 +22,7 @@ int main()
 	T t;
 	a.get_tree_decomposition(t);
 
-	incomplete();
+	std::cout << "incomplete: dead_simple.cpp " << __LINE__ << "\n";
 	// treedec::nice::nicify(t); ouch, segfault.
 
 	assert(treedec::is_valid_treedecomposition(g,t));

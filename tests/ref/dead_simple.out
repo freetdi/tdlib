@@ -1,2 +1,2 @@
-incomplete ../../tests/dead_simple.cpp:25:main
+incomplete: dead_simple.cpp 25
 cycle has treewidth <= 2

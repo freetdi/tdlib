@@ -64,11 +64,12 @@ treedec:
 all-local: | ${PWD}/ref
 
 #if VPATH_BUILD
-${PWD}/ref: $(srcdir)/ref
+${PWD}/ref: | $(srcdir)/ref
 	${LN_S} ${srcdir}/ref .
 #endif
 
 EXTRA_DIST = \
+	${TESTS:%=ref/%.out} \
 	MakeList \
 	bucket_sorter_2u.cpp \
 	g.h sdcc_.cpp g_19.h

@@ -65,7 +65,7 @@ PP+FI+TM
 18: 18
 19: 19
 20: 20
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 FI
 0 <--> 20 
 1 <--> 20 
@@ -110,7 +110,7 @@ FI
 18: 3 7 13
 19: 3 13
 20: 13
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 thorup
 0 <--> 1 
 1 <--> 0 2 
@@ -157,7 +157,7 @@ thorup
 19: 0 3 4 8 9 10 14 15
 20: 0 2 3 8 9 10 14
 21: 0 1 2 9 14
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 FI
 0 <--> 20 
 1 <--> 20 
@@ -202,7 +202,7 @@ FI
 18: 3 7 13
 19: 3 13
 20: 13
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 PP+MD
 0 <--> 8 17 18 19 20 
 1 <--> 9 
@@ -247,7 +247,7 @@ PP+MD
 18: 18
 19: 19
 20: 20
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 ppta
 0 <--> 1 11 12 13 14 
 1 <--> 2 0 10 
@@ -280,7 +280,7 @@ ppta
 12: 18
 13: 19
 14: 20
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105
 PP+FI
 0 <--> 16 18 19 20 21 
 1 <--> 8 
@@ -327,4 +327,4 @@ PP+FI
 19: 18
 20: 19
 21: 20
-incomplete ../../tests/sdcc_.cpp:105:do_it
+sdcc_ do_it 105

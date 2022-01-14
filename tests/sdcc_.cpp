@@ -102,7 +102,7 @@ static void do_it(G const& g_){
 	treedec::nice::nicify(t);
 	assert(treedec::is_valid_treedecomposition(g, t));
 #else
-	incomplete();
+	std::cout << "sdcc_ do_it " << __LINE__ << "\n";
 #endif
 }
 
