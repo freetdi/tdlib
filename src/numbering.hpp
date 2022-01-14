@@ -194,15 +194,13 @@ public:
 	}
 
 	template<class O, class S>
-	void get_ordering(O& ord, S& sns, ORD_FLAGS o=oDefault) { untested();
+	void get_ordering(O& ord, S& sns, ORD_FLAGS o=oDefault) {
 		switch(o){
 		case oDefault:
 			return get_ordering(ord, sns, _ord_mode);
 		case oFlatten:
-			untested();
 			return get_ordering_(ord, sns);
 		case oTree:
-			untested();
 			return get_ordering2(ord, sns);
 		case oAuto:
 			incomplete();
@@ -366,7 +364,7 @@ private:
 			assert(ord[chld]<0);
 
 			auto p = - ord[chld] - 1;
-			while ( ord[p] < 0 ) { untested();
+			while ( ord[p] < 0 ) {
 				auto nup = ord[p]; // go up.
 				trace3("trace", i, p, chld);
 				ord[p] = chld; // leave trace
@@ -391,7 +389,7 @@ private:
 					// assert(s==sns[i]);
 					trace2("bp leaf", i, sns[i]);
 					break;
-				}else{ untested();
+				}else{
 					// assert(_data[chld] == sns[chld]); // no.
 					trace5("bp noleaf", chld, p, i, sns[chld], ord[p]);
 					ord[chld] = ord[p] + 1;

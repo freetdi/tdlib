@@ -70,15 +70,15 @@ void test1()
 
 	visitor1 v1;
 	std::cout << "--1\n";
-	treedec::draft::visit_bag(1, num, ord, sns, v1);
+	treedec::draft::visit_supernode(1, num, ord, sns, v1);
 	std::cout << "--2\n";
-	treedec::draft::visit_bag(2, num, ord, sns, v1);
+	treedec::draft::visit_supernode(2, num, ord, sns, v1);
 	std::cout << "--3\n";
-	treedec::draft::visit_bag(3, num, ord, sns, v1);
+	treedec::draft::visit_supernode(3, num, ord, sns, v1);
 	std::cout << "--4\n";
-	treedec::draft::visit_bag(4, num, ord, sns, v1);
+	treedec::draft::visit_supernode(4, num, ord, sns, v1);
 	std::cout << "--5\n";
-	treedec::draft::visit_bag(5, num, ord, sns, v1);
+	treedec::draft::visit_supernode(5, num, ord, sns, v1);
 }
 
 int main()

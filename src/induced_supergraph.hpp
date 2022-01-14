@@ -258,9 +258,9 @@ public: // assign
 private:
 	void update_leaf(){
 		while(_current!=_end){
-			if(*_current>=_s._supernode_size.size()){ untested();
+			if(*_current>=_s.supernode_sizes().size()){ untested();
 				break;
-			}else if(_s._supernode_size[*_current]>0){
+			}else if(_s.supernode_size(*_current)>0){
 				break;
 			}else{
 				++_current;
@@ -299,9 +299,9 @@ private:
 			while(_current!=_end){
 				if(_marker && _marker->is_marked(*_current)){ untested();
 					++_current;
-				}else if(*_current>=_s._supernode_size.size()){ untested();
+				}else if(*_current>=_s.supernode_sizes().size()){ untested();
 					break;
-				}else if(_s._supernode_size[*_current]>0){
+				}else if(_s.supernode_size(*_current)>0){
 					// filter out indistinguishables?
 					break;
 				}else{ untested();
@@ -525,6 +525,19 @@ private:
 			}else if(get<0>(_q.front()) == get<1>(_q.front())){
 				trace0("dfs pop...");
 				_q.pop_front();
+
+			//	if(_q.empty()){ untested();
+			//	}else{ untested();
+			//		auto c = current();
+			//		// c can't be in this bag, because it is already gone.
+			//		if(!_marker){ untested();
+			//		}else if(_marker->is_marked(c)){ untested();
+			//		}else{ untested();
+			//			_marker->mark(c);
+			//			trace1("bag iter mark", c);
+			//		}
+			//		++get<0>(_q.front());
+			//	}
 #if 0
 			}else if(_s.supernode_size(current()) <= 0
 					&& _s.find_parent(current()) == base()
@@ -535,16 +548,21 @@ private:
 				//++get<0>(_q.front());
 				break;
 #endif
-			}else if(_marker && _marker->is_marked(current())){ untested();
+			}else if(_marker && _marker->is_marked(current())){
+				trace1("skip marked", current());
 				++get<0>(_q.front());
-			}else if(  current_base() != current() &&
+			}else if( !_numbering.is_numbered(current())){
+				break;
+			}else if( !_numbering.is_mode_tree() &&
+				  	current_base() != current() &&
 					_numbering.is_before(_s.find_parent(current()), _s.find_parent(current_base()))
 					// !_numbering.is_before(_s.find_parent(current_base()), _s.find_parent(current()))
 			      &&  _numbering.is_before(_s.find_parent(current()), base()) 
 			      ){
 				auto c = current();
-//				c= _s.find_parent(c);
-				trace4("skip??", c, base(), current_base(), _q.size());
+
+				trace2("pred", _s.find_parent(current()), _s.find_parent(current_base()));
+				trace4("pred", c, base(), current_base(), _q.size());
 				trace1("push1", c);
 
 				//if(base()==5844){ untested();
@@ -552,20 +570,20 @@ private:
 				//}
 				if(!_marker){
 				}else if(_marker->is_marked(c)){ untested();
-				}else{
-					_marker->mark(c);
+				}else{ untested();
+					_marker->mark(c); // bug.
+					trace1("bag iter mark", c);
 				}
 				push_back_range(c);
-
-				// c can't be in this bag, because it is already gone.
 				++get<0>(_q.front());
+
 			}else if(current() == current_base()){ untested();
 				trace1("skip1", current());
 				++get<0>(_q.front());
 			}else if(current() == base()){
 				trace1("skip2", current());
 				++get<0>(_q.front());
-			}else if( _numbering.is_before(_s.find_parent(current()), base()) ) {
+			}else if( !_numbering.is_mode_tree() && _numbering.is_before(_s.find_parent(current()), base()) ) {
 				trace1("skip3", current());
 				// assert(_s.supernode_size(current())>0);
 				++get<0>(_q.front());
@@ -629,10 +647,9 @@ typename detail::sn_iter<G>::sn_range
 template<class G, class N>
 typename detail::bag_iter<G, N>::sn_range
    make_bag_range( typename G::vertex_descriptor v,
-			         G const& g,
-			         N const& n,
-                  typename detail::bag_iter<G, N>::scratch_type* s=nullptr,
-						typename G::marker_type* m=nullptr)
+                   G const& g, N const& n,
+                   typename detail::bag_iter<G, N>::scratch_type* s=nullptr,
+                   typename G::marker_type* m=nullptr)
 {
 	return std::make_pair(
 	  detail::bag_iter<G, N>(v, g, n, s, m),
@@ -670,16 +687,16 @@ private:
 
 
 // predicateRemoveEdge1
-template < class Graph, class MarkerP, class NumberD, class Stack,
+template < class G, class MarkerP, class NumberD, class Stack,
   class VertexIndexMap >
 class remove_and_collect {
-	typedef typename boost::graph_traits< Graph >::vertex_descriptor vertex_t;
-	typedef typename boost::graph_traits< Graph >::edge_descriptor edge_t;
+	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_t;
+	typedef typename boost::graph_traits<G>::edge_descriptor edge_t;
 
 public:
-	remove_and_collect(Graph& _g, MarkerP& _marker, NumberD const& _numbering,
+	remove_and_collect(G const& g, MarkerP& _marker, NumberD const& _numbering,
 			Stack& n_e, VertexIndexMap id)
-		: g(&_g)
+		: _g(g)
 		  , marker(&_marker)
 		  , numbering(_numbering)
 		  , neighbor_elements(&n_e)
@@ -687,15 +704,19 @@ public:
 	{
 	}
 
-	bool operator()(edge_t e)
-	{
-		vertex_t dist = boost::target(e, *g);
+	bool operator()(edge_t e) {
+		vertex_t dist = boost::target(e, _g);
 		if (marker->is_tagged(dist)){ untested();
 			trace1("delete", dist);
 			return true;
 		}else{
 		}
 		marker->mark_tagged(dist);
+#if 0
+		if (_g.supernode_size(dist)<=0) { untested();
+			// carry it along (yikes).
+		}else 
+#endif
 		if (numbering.is_numbered(dist)) {
 			neighbor_elements->push(get(id, dist));
 			trace1("delete2", dist);
@@ -703,7 +724,7 @@ public:
 		}else{
 #ifdef COUNT
 			++_cnt;
-			assert( dist != boost::source(e, *g));
+			assert( dist != boost::source(e, _g));
 #endif
 		}
 		return false;
@@ -716,7 +737,7 @@ public:
 #endif
 
 private:
-	Graph* g;
+	G const& _g;
 	MarkerP* marker;
 	NumberD const& numbering;
 	Stack* neighbor_elements;
@@ -885,21 +906,23 @@ public:
 		return _d[v] + 1; // bug. idmap??
 	}
 	vertex_descriptor find_parent(vertex_descriptor v_) const{ itested();
-		if(v_ < _supernode_size.size()){ itested();
+		if(_numbering.is_mode_tree()){
+			return _numbering.find_parent(v_, _supernode_size);
+		}else if(v_ < _supernode_size.size()){
 			long v = v_;
 		//	return _numbering.find_parent(v);
-			while(_supernode_size[v] <= 0){ itested();
-				trace3("parent", v, _supernode_size[v], _numbering.get_position(v));
+			while(_supernode_size[v] <= 0){ untested();
+//				trace3("parent", v, _supernode_size[v], _numbering.get_position(v));
 				// v = _numbering.get_position(v);
-				v = - _supernode_size[v];
+				v = - _supernode_size[v]; // this one seems valid during sg2tree.
 
 				if(v==0 && _supernode_size[v]==0){
-					break; // HACK
+					assert(false); //how??
 				}else{
 				}
 				//assert(v == - _supernode_size[v_]); // really?
 				assert(v>=0);
-				trace3("parent2", v, _supernode_size[v], _numbering.get_position(v));
+//				trace3("parent2", v, _supernode_size[v], _numbering.get_position(v));
 			}
 			return v;
 		}else{ untested();
@@ -970,13 +993,14 @@ public:
 
 		trace1("sg cme", c);
 		marker.clear();
-		marker.set_multiple_tag(0);
-		marker.assert_clear();
-		marker.assert_mclear();
+//		marker.set_multiple_tag(0);
+//		marker.assert_clear();
+//		marker.assert_mclear();
 
 		auto buf = _work_space.make_stack();
 
 		size_t degv = _supernode_size[c]-1;
+		assert(degv>=0);
 
 		assert(!marker.is_done(c));
 		marker.mark(c); // BUG
@@ -1000,7 +1024,7 @@ public:
 				assert(n != c);
 				buf.push(n);
 				marker.mark(n);
-				assert(_supernode_size[n]);
+				assert(_supernode_size[n]>0);
 				degv += _supernode_size[n];
 			}else if(marker.is_done(n)) { untested();
 				assert(_supernode_size[n]<=0);
@@ -1036,6 +1060,7 @@ public:
 			size_type nn = buf.top();
 
 			// maximum missing edges at nn
+			assert(_supernode_size[nn]>0);
 			diff_t deg = d - _supernode_size[nn];
 			size_t nnedg = _supernode_size[nn] * (_supernode_size[nn]-1);
 			nnedg += 2* _supernode_size[nn] * (_supernode_size[c]-1);
@@ -1385,6 +1410,10 @@ public:
 		assert(i < _supernode_size.size());
 		return _supernode_size[i];
 	}
+	sns_type const& supernode_sizes() const { itested();
+		// HACK // remove later.
+		return _supernode_size;
+	}
 	G const& g() const {
 		return _g;
 	}
@@ -1476,11 +1505,12 @@ Supergraph<G, N, D> const make_supergraph(G const& g, N const& n, D const& d, S 
 namespace draft{
 
 template<class V, class N, class O, class S, class P>
-void visit_bag(V v, N const& num, O const& ordering, S const& sns, P& visitor)
+void visit_supernode(V v, N const& num, O const& ordering, S const& sns, P& visitor)
 {
 //	auto const& num = s.numbering();
 // auto s = g.supernode_size(v);
 	auto s = sns[v];
+	trace2("visit", v, s);
 //
 	auto p = num.get_position(v);
 
@@ -1491,11 +1521,12 @@ void visit_bag(V v, N const& num, O const& ordering, S const& sns, P& visitor)
 		--s;
 	}
 
+	trace1("visit", descend);
 	if(descend){
-		trace2("descend", v, s);
 		for(auto h=1; h<=s; ){
 			auto w = ordering[p+h];
-			visit_bag(w, num, ordering, sns, visitor);
+			trace3("visit", v, s, w);
+			visit_supernode(w, num, ordering, sns, visitor);
 			auto cs = sns[w];
 			assert(cs<=0);
 			h -= cs;
@@ -1505,12 +1536,59 @@ void visit_bag(V v, N const& num, O const& ordering, S const& sns, P& visitor)
 	}
 }
 
-template <typename G, typename O, class T, class S>
-void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
+template<class B, class M, class N, class V>
+struct pusher{
+	pusher(B& b, M& m, N const& n, V c)
+	  : _b(b), _m(m), _n(n), _c(c) {
+	}
+	bool operator()(V v) { untested();
+		trace1("push", v);
+		if(_m.is_marked(v)){ untested();
+			return false;
+		}else if(_root != v && !_n.introduced(v, _c)){ untested();
+			// not yet part of the sn.
+			//
+			// BUG: also applies to the subroot.
+			// but the subroot always exists.
+			trace2("push does not exist", v, _c);
+			return false;
+		}else{ untested();
+			push(_b, v);
+			if(_edg == -1){
+				_edg = v;
+			}else if(_n.is_before(v, _edg)){
+				_edg = v;
+			}else{
+			}
+			_m.mark(v);
+			return true;
+		}
+	}
+	B& _b;
+	M& _m;
+	N const& _n;
+	V _c;
+	V _edg{-1};
+	V _root{-1};
+};
+
+template<class B, class M, class N, class V>
+pusher<B, M, N, V> make_pusher(B& bag, M& marker, N const& numbering, V c)
 {
-//    typedef typename boost::property_map<G, boost::vertex_index_t>::type::value_type vertex_index_type;
-    size_t num_vert = o.size();
+	return pusher<B, M, N, V>(bag, marker, numbering, c);
+}
+
+template <typename G, typename O, class T>
+void tree_from_sg_tree(G &s, O const& o, T& t, size_t bagsize)
+{
+
+	auto sns = s.supernode_sizes(); // HACK
+	size_t num_vert = o.size();
+	for(unsigned i=0; i<num_vert; ++i){
+		trace2("tree_from_sg_tree", i, sns[i]);
+	}
     auto const& num = s.numbering();
+	 assert(num.is_mode_tree());
 
     if(num_vert == 0){ untested();
         boost::add_vertex(t);
@@ -1526,7 +1604,8 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
             int oi = o[i];
             long w = sns[oi];
 
-            if(w > 0){
+				// if sns.is_root(w)) ..
+            if(w > 0) {
                 trace6("bag prep", w, i, oi, sns[oi], o.size(), nb.size());
                 nbi[oi] = nb.size();
 
@@ -1557,64 +1636,235 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
 			  s._marker.unmark(i);
 		  }
 
+			// for (auto x : o){
+			// 	trace1("ord...", x);
+			// }
         for(unsigned i = 0; i < nb.size(); ++i){
             s._marker.clear();
-
+            s._marker.assert_clear();
             int oi = o[nb[i]];
+
+				auto dd = boost::adjacent_vertices(oi, s._g);
+				for(; dd.first!=dd.second; ++dd.first){
+					trace2("bag contents _g...", oi, *dd.first);
+				}
+
             //assert(i+1 == boost::num_vertices(t));
             auto& b = boost::get(treedec::bag_t(), t, i);
 
             trace3("bag contents start...", i, oi, sns[oi]);
             // TODO: don't use o;
-            // TODO: include with s.bag_vertices(oi)?
-#if 0
-            unsigned pos = nb[i];
-            auto w = sns[oi];
-            while(w>0){ untested();
-                trace3("... opush?", i, pos, o[pos]);
-                assert(pos < o.size());
-                push(b, o[pos]);
-                s._marker.mark(o[pos]);
-                ++pos;
-                --w;
-                w = 0;
-            }
-#else
-            push(b, oi);
-#endif
+				auto p = make_pusher(b, s._marker, num, oi);
+				assert(num.is_mode_tree());
 
-            trace4("==== bag contents rest...", i, oi, sns[oi], num.get_position(oi));
-            trace1("==== bag contents rest...", num.is_numbered(oi));
-            auto bb = s.bag_vertices(oi, &s._marker);
-            for(; bb.first!=bb.second; ++bb.first){
+				auto pos = num.get_position(oi);
+				assert(unsigned(o[pos]) == unsigned(oi));
+				assert(sns[oi]>0);
+
+				visit_supernode(oi, num, o, sns, p);
+
+				{
+					trace4("==== bag contents rest...", i, oi, sns[oi], num.get_position(oi));
+					trace1("==== bag contents rest...", num.is_numbered(oi));
+				}
+				p._edg = -1;
+
+//				push(b, 998);
+				auto bb = boost::adjacent_vertices(oi, s._g);
+				for(; bb.first!=bb.second; ++bb.first){ untested();
 					long v = *bb.first;
-//					if(oi==5844){ untested();
-//						std::cerr << "c DEBUG " << oi << " " << v << " " << num.get_position(v) << "\n";
-//					}
-                trace2("... bag contents", v, sns[v]);
-                trace1("... bag contents", num.get_position(v));
-                assert(sns[v] <= 0 || !num.is_before(v, oi));
+					assert(num.is_before(oi, v));
 
-#if 0
-                if( s._marker.is_done(v)){ untested();
-						 //BUG
-						 s._marker.unmark(v);
-						 trace1("undone marker", v);
-					 }else{ untested();
+					trace4("... bag contents", v, sns[v], oi, num.get_position(v));
+					if(s._marker.is_marked(v)){
+						trace2("marked", i, v);
+						// incomplete(); why?
+					}else{
+						p._root = v;
+						visit_supernode(v, num, o, sns, p);
+					}
+
+            } // neigh(oi)
+
+				if(i<edges.size()){
+					edges[i] = nbi[p._edg];
+				}else{
+					// last bag.
+				}
+        } // bag loop
+
+        // invert edge direction?
+        for(unsigned i = 0; i < edges.size(); ++i){
+            trace3("edg", i, nb[i], edges[i]);
+            boost::add_edge(i, edges[i], t);
+        }
+
+//        trace4("edg", boost::num_edges(t), boost::num_vertices(t), nb.size(), edges.size());
+//        assert(boost::num_edges(t) +1 == boost::num_vertices(t));
+
+        for(unsigned i = 0; i < num_vert-nodes_left; i++){ untested();
+            auto& b=boost::get(treedec::bag_t(), t, i);
+//            assert(b.size());
+            treedec::sort(b); // bug in check_tree_decomp, need sorted bags...
+        }
+    }
+} // tree_from_sg
+
+template <typename G, typename O, class T, class S>
+void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
+{
+//    typedef typename boost::property_map<G, boost::vertex_index_t>::type::value_type vertex_index_type;
+//
+//	boost::print_graph(s._g, std::cerr);
+	size_t num_vert = o.size();
+    auto const& num = s.numbering();
+	 bool tree = num.is_mode_tree();
+	 if(tree){ untested();
+		 return tree_from_sg_tree(s, o, t, bagsize);
+	 }else{ untested();
+	 }
+
+    if(num_vert == 0){ untested();
+        boost::add_vertex(t);
+    }else{
+        assert(num_vert == o.size());
+        O iOlocal;
+
+        std::vector<unsigned> nb; // which positions in o correspond to bags?
+        std::vector<long> nbi(num_vert, -1ul);
+        std::vector<long> nbe(num_vert, -1ul);
+
+        for(unsigned i=0; i<num_vert; ++i){
+            int oi = o[i];
+            long w = sns[oi];
+
+				// if sns.is_root(w)) ..
+            if(w > 0) {
+                trace6("bag prep", w, i, oi, sns[oi], o.size(), nb.size());
+                nbi[oi] = nb.size();
+
+                for(int y=0; y<w; ++y){
+						 assert(i+y<o.size());
+						 nbi[o[i+y]] = nb.size();
+                }
+
+                nbe[nb.size()] = oi;
+                nb.push_back(i);
+            }else{
+                trace3("nobag", i, oi, sns[oi]);
+            }
+        }
+
+        auto nodes_left = o.size();
+
+        trace2("loop done", nodes_left, num_vert);
+        assert(! boost::num_vertices(t));
+
+        std::vector<unsigned> edges(nb.size()-1, -1u);
+
+			//boost::add_vertex(t);
+		  t = T(nb.size());
+        treedec::set_bagsize(t, bagsize);
+
+        for(unsigned i = 0; i < num_vert; ++i){
+			  s._marker.unmark(i);
+		  }
+
+			// for (auto x : o){
+			// 	trace1("ord...", x);
+			// }
+        for(unsigned i = 0; i < nb.size(); ++i){
+            s._marker.clear();
+            s._marker.assert_clear();
+						assert(!s._marker.is_marked(7));
+            int oi = o[nb[i]];
+
+				auto dd = boost::adjacent_vertices(oi, s._g);
+				for(; dd.first!=dd.second; ++dd.first){
+					trace2("bag contents neigh...", oi, *dd.first);
+				}
+
+            //assert(i+1 == boost::num_vertices(t));
+            auto& b = boost::get(treedec::bag_t(), t, i);
+
+            trace3("bag contents start...", i, oi, sns[oi]);
+            // TODO: don't use o;
+				if(tree&&0){
+					auto pos = num.get_position(oi);
+					assert(unsigned(o[pos]) == unsigned(oi));
+					assert(sns[oi]>0);
+					for(auto p=0; p<sns[oi]; ++p ){
+						auto w = o[p+pos];
+						trace2("extra contents...", oi, w);
+						assert(!s._marker.is_marked(7));
+						if(s._marker.is_marked(w)){
+						}else{
+							trace1("bag contents mark...", w);
+							s._marker.mark(w);
+							// no need to look for edges
+							// ... the nodes were already gone
+							push(b, w);
+						}
+					}
+				}else{
+					push(b, oi);
+				}
+				// TODO: also push others.
+
+				trace4("==== bag contents rest...", i, oi, sns[oi], num.get_position(oi));
+				trace1("==== bag contents rest...", num.is_numbered(oi));
+				auto bb = s.bag_vertices(oi, &s._marker);
+				for(; bb.first!=bb.second; ++bb.first){
+					long v = *bb.first;
+                trace3("... bag contents", v, sns[v], oi);
+                trace1("... bag contents", num.get_position(v));
+                if(sns[v]<=0){
+						 // just collect it?
+					 } else if(num.is_before(v, oi)){
+						 trace2("... before?", v, oi);
+						 // assert(false); //???
+						 continue;
+					 }else{
 					 }
-#endif
+                assert(sns[v] <= 0 || !num.is_before(v, oi));
                 if( s._marker.is_marked(v)){
 						 trace2("marked", i, v);
                     // incomplete();
                 }else{
+
+						  if(tree){
+							  auto h = sns[v];
+							  trace2("unpack", v, h);
+							  if(h==0){ untested();
+							  }else if(h<0){untested();
+								  h = 1 - h;
+							  }else{
+								  h = -1;
+							  }
+							  auto pos = num.get_position(v);
+							  assert(long(o[pos]) == long(v));
+
+							  for(auto p=0; p<h; ++p) { untested();
+								  assert(long(p+pos) < long(o.size()));
+								  auto w = o[p+pos];
+								  trace2("extra contents...", v, w);
+								  if(s._marker.is_marked(w)){ untested();
+								  }else{ untested();
+									  s._marker.mark(w);
+									  push(b, w);
+								  }
+							  }
+						  }else{
+								  if(s._marker.is_marked(v)){ untested();
+								  }else{ untested();
+									  s._marker.mark(v);
+								  }
+								  push(b, v);
+						  }
                     s._marker.mark(v);
+					 }
+					 {
                     auto pv = s.find_parent(v);
-
-                    assert(!num.is_before(pv, oi));
-                    // assert(num.is_before(oi, pv)); no.
-
-                    trace4("... push", oi, v, sns[v], pv);
-                    push(b, v);
 
                     assert(v>=0);
                     assert(pv<sns.size());
@@ -1643,7 +1893,7 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
                         trace4("edg upd", nbi[pv], pv,  nbe[edges[i]], edges[i]);
                         assert(pv<nbi.size());
                         if(v>=long(nbi.size())){ untested();
-                        }else if(i==nbi[v]){ untested();
+                        }else if(i==nbi[v]){
                         }else if(nbi[v] < long(nb.size())){
                             edges[i] = nbi[v];
 									trace2("edg again??", i, edges[i]);
@@ -1671,7 +1921,7 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
                 auto w = nbe[i];
 
                 // omitted during mass elimination.
-                // tmp hack
+                // tmp hack, still needed?
                 if(boost::edge(v, w, *s._g).second){ untested();
                 }else{
                     trace2("extra edg", v, w);
@@ -1682,7 +1932,8 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
         } // bag loop
 
         // invert edge direction?
-        for(unsigned i = 0; i < edges.size(); ++i){
+        for(unsigned i = 0; i < edges.size(); ++i){ untested();
+				assert(edges[i] < num_vert);
             trace3("edg", i, nb[i], edges[i]);
             boost::add_edge(i, edges[i], t);
         }
@@ -1735,7 +1986,7 @@ struct property_map<treedec::Supergraph<G, M, D>, T> {
 template<class G, class M, class D>
 typename property_map<typename treedec::Supergraph<G, M, D>::wrapped_type,
                       boost::vertex_index_t>::const_type
-get(vertex_index_t, treedec::Supergraph<G, M, D> const& g)
+get(boost::vertex_index_t, treedec::Supergraph<G, M, D> const& g)
 {
 	return get(vertex_index, *g);
 }
