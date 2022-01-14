@@ -65,6 +65,7 @@
 #include "skeleton.hpp"
 #include "treedec.hpp"
 #include "treedec_copy.hpp"
+#include "elim_util.hpp"
 #include "impl/min_degree.hpp"
 #include "impl/fill_in_obsolete.hpp"
 #include "impl/fill_in.hpp"
@@ -122,51 +123,6 @@ typename boost::graph_traits<G_t>::vertices_size_type
 }
 
 namespace draft{
-
-template<class G, class O>
-class io_smaller_than{
-    typedef typename boost::property_map< G, boost::vertex_index_t >::const_type::value_type vertex_index_type;
-public:
-    explicit io_smaller_than(size_t k, O const& o, G const& g) : _k(k), _o(o), _g(g) {
-    }
-    template<class E>
-    bool operator()(E const& e) const{
-        auto t = boost::target(e, _g);
-        auto idm = boost::get(boost::vertex_index, _g);
-        if(idm[_o[t]] < _k){
-            return true;
-        }else{
-            return false;
-        }
-    }
-private:
-    vertex_index_type _k;
-    O const& _o;
-    G const& _g;
-};
-
-template<class N>
-class mapped_order{
-public:
-    mapped_order(N const& n):_n(n){}
-
-    template<class V, class W>
-    bool operator()(V const& a, W const& b) const{
-        return _n[a] < _n[b];
-    }
-private:
-    N const& _n;
-};
-
-template<class I, class N, class G, class O, class M>
-void cleanup_bmdo(I j, N const& numbering, G& g, O const&, M const& my_numbering_order)
-{
-    io_smaller_than<G, O> P(numbering[j], numbering, g);
-    vertex_descriptor_G b(j);
-    boost::remove_out_edge_if(b, P, g);
-
-    std::sort(g->vertices()[j].begin(), g->vertices()[j].end(), my_numbering_order);
-}
 
 template <typename G, typename O_t, class T>
 void inplace_bmdo_tree(G &g, O_t const& O, T& t, size_t bagsize, O_t const& io_)

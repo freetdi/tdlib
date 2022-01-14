@@ -18,6 +18,7 @@ pkginclude_HEADERS = \
   degree.hpp \
   directed_view.hpp \
   dynamicCR.hpp \
+  elim_util.hpp \
   elimination_orderings.hpp \
   error.hpp \
   exact_base.hpp \
