@@ -134,9 +134,10 @@ private:
         container_type;
     // typedef typename container_type::iterator iterator;
     // typedef typename container_type::const_iterator const_iterator;
-    typedef typename boost::graph_traits<G_t>::vertices_size_type fill_t;
+    typedef typename boost::graph_traits<G_t>::edges_size_type fill_t;
+    typedef long /* signed_type<fill_t>? */ offset_t;
 private:
-    size_t max_missing_edges() const {
+    fill_t max_missing_edges() const {
         // BUG: ask CFG
         size_t nv=_vals.size();
         long mm = nv * nv;
@@ -300,7 +301,7 @@ public:
     }
 
 
-    void shift(vertex_descriptor v, long /*?*/ offset) {
+    void shift(vertex_descriptor v, offset_t offset) {
         auto idmap = boost::get(boost::vertex_index, _g);
         auto pos = boost::get(idmap, v);
         auto& value = _vals[pos].value();
@@ -587,8 +588,8 @@ private:
     idmap_type _vi;
 //private: // later.
     std::vector<status_t> _vals;
-    size_t _min_bucket{0};
-    size_t _max_fill;
+    fill_t _min_bucket{0};
+    fill_t _max_fill;
     container_type _fill;
 
 //    mutable std::set<vertex_descriptor> _eval_queue;
