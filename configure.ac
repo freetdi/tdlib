@@ -21,6 +21,23 @@ if test "X$enable_debug" = "Xno" ; then
 else
    AC_MSG_RESULT([yes])
    enable_debug=yes
+   enable_develop=yes
+fi
+],
+[
+   AC_MSG_RESULT([no])
+   enable_debug=no
+])
+
+AC_MSG_CHECKING([if develop code should be compiled in])
+AC_ARG_ENABLE([develop],
+[AS_HELP_STRING([--enable-develop],[Enable building of develop code. [[default: disabled]]])],
+[
+if test "X$enable_develop" = "Xno" ; then
+   AC_MSG_RESULT([no])
+else
+   AC_MSG_RESULT([yes])
+   enable_develop=yes
 fi
 ],
 [
@@ -160,9 +177,13 @@ AC_C_INLINE
 
 # Checks for library functions.
 
-if test "$enable_debug" = "yes" ; then
+if test "$enable_develop" = "yes" ; then
 	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
-	CXXFLAGS="$CXXFLAGS -Wall -Wextra -O0 -g -pedantic"
+	CXXFLAGS="$CXXFLAGS -Wall -Wextra -pedantic"
+fi
+
+if test "$enable_debug" = "yes" ; then
+	CXXFLAGS="$CXXFLAGS -O0 -g"
 else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
