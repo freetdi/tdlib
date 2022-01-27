@@ -120,34 +120,22 @@ inline size_t count_missing_edges(
     return missing_edges;
 } // count_missing_edges
 
-// same but use marker.
-template <typename G_t, class MARKER>
-inline size_t count_missing_edges(
-        const typename boost::graph_traits<G_t>::vertex_descriptor v,
-		  MARKER& marker, G_t const &g)
-{
-	size_t e = 0;
-	marker.clear();
-	auto pp = boost::adjacent_vertices(v, g);
-	for(; pp.first!=pp.second; ++pp.first){
-		marker.mark(*pp.first);
+
+template<class G>
+class MissingEdgeCounter{
+	typedef typename boost::graph_traits<G>::edges_size_type count_t;
+	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_t;
+public:
+	explicit MissingEdgeCounter(G const& g) : _g(g) { }
+
+public:
+	count_t cme(vertex_t v){
+		return count_missing_edges(v, _g);
 	}
 
-	pp = boost::adjacent_vertices(v, g);
-	for(; pp.first!=pp.second; ++pp.first){
-		auto q = boost::adjacent_vertices(*pp.first, g);
-		for(; q.first!=q.second; ++q.first){
-			if(marker.is_marked(*q.first)){
-				++e;
-			}else{
-			}
-		}
-	}
-
-	size_t d = boost::out_degree(v, g);
-	assert(!(e%2));
-	return (d*(d-1) - e)/2;
-} // count_missing_edges
+private:
+	G const& _g;
+};
 
 // return value: true - vertex removed
 //              false - vertex isolated

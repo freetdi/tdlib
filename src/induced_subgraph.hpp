@@ -24,6 +24,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/graph/vertex_and_edge_range.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include "graph_util.hpp"
 
 // graph const&+member_pred const&=induced subgraph.
 //
@@ -37,6 +38,7 @@ public:
 	typedef void vertex_bundled; // incomplete
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 	typedef typename boost::graph_traits<G>::vertices_size_type vertices_size_type;
+	typedef typename boost::graph_traits<G>::edges_size_type edges_size_type;
 	typedef typename boost::graph_traits<G>::adjacency_iterator all_adj_it;
 	typedef typename boost::graph_traits<G>::vertex_iterator all_vert_it;
 	typedef G wrapped_type;
@@ -91,7 +93,7 @@ private:
 	G const& _g;
 	M const _m; // for now.
 	D const _d; // for now.
-};
+}; // INDUCED_SUBGRAPH_1
 
 } //treedec
 
@@ -150,5 +152,63 @@ out_degree( typename treedec::INDUCED_SUBGRAPH_1<G, M, D>::vertex_descriptor v,
 }
 
 } // boost
+
+namespace treedec {
+namespace detail {
+
+template <typename G_t, class MARKER>
+inline size_t count_missing_edges(
+        const typename boost::graph_traits<G_t>::vertex_descriptor v,
+		  MARKER& marker, G_t const &g)
+{
+	size_t e = 0;
+	marker.clear();
+	auto pp = boost::adjacent_vertices(v, g);
+	for(; pp.first!=pp.second; ++pp.first){
+		marker.mark(*pp.first);
+	}
+
+	pp = boost::adjacent_vertices(v, g);
+	for(; pp.first!=pp.second; ++pp.first){
+		auto q = boost::adjacent_vertices(*pp.first, g);
+		for(; q.first!=q.second; ++q.first){
+			if(marker.is_marked(*q.first)){
+				++e;
+			}else{
+			}
+		}
+	}
+
+	size_t d = boost::out_degree(v, g);
+	assert(!(e%2));
+	return (d*(d-1) - e)/2;
+} // count_missing_edges
+
+}
+
+template<class G_in, class M, class D>
+class MissingEdgeCounter<INDUCED_SUBGRAPH_1<G_in, M, D> > {
+private:
+	typedef typename treedec::INDUCED_SUBGRAPH_1<G_in, M, D> G;
+	typedef typename G::edges_size_type count_t;
+	typedef typename G::vertex_descriptor vertex_t;
+	typedef typename G::vertices_size_type vertices_size_type;
+	typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
+public:
+	explicit MissingEdgeCounter(G const& g)
+	  : _g(g)
+	  , _neigh_marker(g.num_vertices()) { }
+
+public:
+	count_t cme(vertex_t v){ untested();
+		return detail::count_missing_edges(v, _neigh_marker, _g);
+	}
+
+private:
+	G const& _g;
+	marker_type _neigh_marker;
+};
+
+} // treedec
 
 #endif

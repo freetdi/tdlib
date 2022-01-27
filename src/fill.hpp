@@ -70,6 +70,7 @@ public: // types
     typedef typename CFG::bag_type bag_type;
     typedef typename bag_type::iterator bag_iterator;
     typedef typename boost::property_map<G_t, boost::vertex_index_t>::const_type idmap_type;
+    typedef typename treedec::MissingEdgeCounter<G_t> mec_t;
 private: // types
     class status_t{
     public: // types
@@ -155,7 +156,8 @@ public: // construct
                _max_fill+1, // number of buckets.
                boost::make_iterator_property_map(&_vals[0], _vi, size_type()),
                _vi),
-         _neigh_marker(nv)
+         _neigh_marker(nv),
+         _mec(g)
     {
         assert(_fill.size() == _max_fill+1);
         if(init_){
@@ -194,8 +196,7 @@ public:
                     // bypass init. already found a nt. clique
                     q_eval(v); //later.
                 }else{
-                    // BUG: does not work without neigh_marker.
-                    missing_edges = treedec::count_missing_edges(v, _neigh_marker, g);
+                    missing_edges = _mec.cme(v);
                     trace3("init reg", v, deg, missing_edges);
                     reg(v, missing_edges);
                     assert(_vals[pos]==missing_edges);
@@ -247,7 +248,7 @@ public:
     } // reg
 public:
     // called on 2 neighbours that are not 1 neighbour
-    void decrement_fill(const vertex_descriptor v) {
+    void decrement_fill(const vertex_descriptor v) { untested();
         auto idmap=boost::get(boost::vertex_index, _g);
         auto pos=boost::get(idmap, v);
         if(_neigh_marker.is_marked(pos)){
@@ -345,12 +346,12 @@ public:
 //        return _vals[pos].value();
 //    }
 public: // O(1) neighbor stuff.
-    void mark(vertex_descriptor v){
+    void mark(vertex_descriptor v){ untested();
         auto idmap = boost::get(boost::vertex_index, _g);
         auto pos = boost::get(idmap, v);
         _neigh_marker.mark(pos);
     }
-    void clear_marker(){
+    void clear_marker(){ untested();
         _neigh_marker.clear();
     }
     // for n \in neigbors(c):
@@ -430,9 +431,7 @@ private:
             auto pos = boost::get(idmap, f);
 
             if(_vals[pos].is_lb()) { untested();
-                // BUG: does not work without neigh_marker.
-                auto me = treedec::count_missing_edges(f, _neigh_marker, _g);
-                // auto me = treedec::count_missing_edges(f, _g);
+                auto me = _mec.cme(f);
                 trace2("fill done count", f, me);
                 if(me<=req_fill){ untested();
                     assert(me==req_fill);
@@ -508,11 +507,13 @@ public: // picking
         assert(lower==0); // for now.
 
 #ifdef DEBUG_FILL
+        MissingEdgeCounter<G_t> debug_counter(_g);
+
         for(unsigned b=0; b<=_max_fill; ++b){ itested();
             assert(b < _fill.size());
             auto bucket_min = _fill[b];
             for(auto x : bucket_min){
-                auto me = treedec::count_missing_edges(x, _g); // _neigh_marker, _g);
+                auto me = debug_counter.cme(x);
                 trace4("check", b, x, _vals[x], me);
                 assert(b<=me);
                 if(b<=_vals[x]){
@@ -646,7 +647,9 @@ private:
     typedef std::vector<vertex_descriptor> eq_t;
 //    mutable eq_t _eval_queue;
 
+    // BUG: _neigh_marker not needed with supergraph
     marker_type _neigh_marker; // used in pick_min and in eliminate
+    mec_t _mec;
 }; // FILL
 
 } // pending

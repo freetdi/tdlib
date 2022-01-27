@@ -352,13 +352,14 @@ public:
             // assert(bags_i);?!
 #ifdef DEBUG_FILL
             typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
-            marker_type debug_marker(_num_vert);
+            // marker_type debug_marker(_num_vert);
+            MissingEdgeCounter<subgraph_type> debug_counter(_subgraph);
             std::vector<vertex_descriptor> c_neigh;
             {
                 auto cr = boost::adjacent_vertices(c, _subgraph);
                 for(; cr.first!=cr.second; ++cr.first){
                     auto n = *cr.first;
-                    auto me = treedec::count_missing_edges(n, debug_marker, _subgraph);
+                    auto me = debug_counter.cme(n) ;// , debug_marker, _subgraph);
                     trace4("DEBUG_FILL pre-elim", n, fill_cached_(n), fill_cached_is_lb_(n), me);
                     if(fill_cached_is_lb_(n)){
                         assert(me >= fill_cached_(n));
@@ -374,10 +375,13 @@ public:
 
 #ifdef DEBUG_FILL
             {
+                MissingEdgeCounter<subgraph_type> debug_counter(_subgraph);
                 for(auto n : c_neigh){
-                    auto me = treedec::count_missing_edges(n, debug_marker, _subgraph);
+                    auto me = debug_counter.cme(n);
                     trace4("DEBUG_FILL post-elim", n, fill_cached_(n), fill_cached_is_lb_(n), me);
-                    if(fill_cached_is_lb_(n)){
+                    if(_numbering.is_numbered(n)){
+                        // gone, because eliminated.
+                    }else if(fill_cached_is_lb_(n)){
                         assert(me >= fill_cached_(n));
                     }else{
                         assert(me == fill_cached_(n));
