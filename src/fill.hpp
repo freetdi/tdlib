@@ -102,7 +102,7 @@ private: // types
             // TODO: negative value indicates LB?
             _lb = x;
         }
-        void set_lb(size_t v) {
+        void set_lb(size_t v) { untested();
             _value = v;
             _lb = true;
         }
@@ -134,15 +134,14 @@ private:
         container_type;
     // typedef typename container_type::iterator iterator;
     // typedef typename container_type::const_iterator const_iterator;
-    typedef typename boost::graph_traits<G_t>::edges_size_type fill_t;
-    typedef long /* signed_type<fill_t>? */ offset_t;
+    typedef typename std::make_unsigned<
+                          typename boost::graph_traits<G_t>::edges_size_type
+                          >::type fill_t;
+    typedef typename std::make_signed<fill_t>::type offset_t;
 private:
     fill_t max_missing_edges() const {
         // BUG: ask CFG
-        size_t nv=_vals.size();
-        long mm = nv * nv;
-        mm = boost::num_edges(*_g);
-//        CFG::message(1, "FI max missing: %ld\n", mm);
+        auto mm = boost::num_edges(*_g); // treedec::num_edges?
         return mm;
     }
 public: // construct
@@ -158,6 +157,7 @@ public: // construct
                _vi),
          _neigh_marker(nv)
     {
+        assert(_fill.size() == _max_fill+1);
         if(init_){
             // bug
             init(g);
@@ -196,7 +196,6 @@ public:
                 }else{
                     // BUG: does not work without neigh_marker.
                     missing_edges = treedec::count_missing_edges(v, _neigh_marker, g);
-                    // missing_edges = treedec::count_missing_edges(v, g);
                     trace3("init reg", v, deg, missing_edges);
                     reg(v, missing_edges);
                     assert(_vals[pos]==missing_edges);
@@ -296,7 +295,7 @@ public:
             _fill.update(v);
         }
     }
-    void prefer(const vertex_descriptor& v) {
+    void prefer(const vertex_descriptor& v) { untested();
         _fill.update_front(v);
     }
 
@@ -309,7 +308,7 @@ public:
         if(offset >= 0){
 //            trace2("positive ", v, offset);
             value += offset;
-        }else if(long(value) < -offset){
+        }else if(long(value) < -offset){ untested();
             trace2("zero pad ", v, offset);
             value = 0;
             _fill.update(v); // why?
@@ -319,7 +318,7 @@ public:
             value += offset;
             if(value>=_max_fill){ itested();
                // still gt ..
-            }else{
+            }else{ itested();
                 _fill.update(v);
             }
         }
@@ -391,6 +390,32 @@ private:
 //    }
 
     template<class B>
+    vertex_descriptor find_min_in_bucket(B const& b) {
+        fill_t min = -1;
+        auto idmap = boost::get(boost::vertex_index, _g);
+        assert(!b.empty());
+        vertex_descriptor ret = *b.begin();
+
+        for(vertex_descriptor v : b){ untested();
+            auto pos = boost::get(idmap, v);
+            auto value = _vals[pos].value();
+            if(value < min) { untested();
+                min = value;
+                ret = v;
+            }
+        }
+
+        auto pos = boost::get(idmap, ret);
+        if(_vals[pos].is_lb()) { untested();
+            incomplete();
+        }else{ untested();
+        }
+
+        return ret;
+
+    }
+
+    template<class B>
     typename B::const_iterator find_in_bucket(B const& b, size_t req_fill){
         // look out for a node with fill in bucket b.
         // nodes in bucket b are
@@ -398,25 +423,24 @@ private:
         //  - of fill > req_fill => update (move to bucket)
         //  - only lb => recompute.
 
+        auto idmap = boost::get(boost::vertex_index, _g);
+
         while(!b.empty()){
             auto f = b.front();
-            auto idmap = boost::get(boost::vertex_index, _g);
             auto pos = boost::get(idmap, f);
 
-            if(_vals[pos].is_lb()){
+            if(_vals[pos].is_lb()) { untested();
                 // BUG: does not work without neigh_marker.
                 auto me = treedec::count_missing_edges(f, _neigh_marker, _g);
                 // auto me = treedec::count_missing_edges(f, _g);
                 trace2("fill done count", f, me);
-                if(me==req_fill){
+                if(me<=req_fill){ untested();
+                    assert(me==req_fill);
 #ifdef DEBUG
          //           _vals[pos].set_lb(false);
 #endif
                     trace2("lb in Q confirmed", pos, me);
                     return b.begin();
-                }else if(me<req_fill){ untested();
-                    trace4("fewer edges", pos, me, req_fill, _vals[pos]);
-                    assert("wrong fill" && 0);
                 }else if(me>_max_fill){ untested();
                     trace4("lb in Q max", pos, me, _vals[pos].value(), _vals[pos].is_lb() );
                     _vals[pos].set_value(_max_fill);
@@ -424,10 +448,14 @@ private:
                     _vals[pos].set_value(me);
                     trace5("lb in Q max", pos, me, _vals[pos].value(), _vals[pos].is_lb(), _max_fill );
 
+#ifndef NDEBUG
+                    assert(_max_fill < _fill.size());
                     for(auto x : _fill[_max_fill]){ untested();
                         trace1("found", x);
                     }
-                }else{
+#endif
+                }else{ untested();
+                    // req_fill < me <= _max_fill
                     trace2("lb in Q new", pos, me);
                     _vals[pos].set_value(me);
                     _fill.update(f);
@@ -436,8 +464,20 @@ private:
                 trace3("found ex in Q", pos, _vals[pos], req_fill);
                 assert(_vals[pos].value() == req_fill);
                 return b.begin();
+            //}else if(_vals[pos].value()>_max_fill){ untested();
+            //    return b.begin();
             }else{
-                _fill.update(f);
+                trace3("rebucket", f, _vals[pos], req_fill);
+
+                auto value = _vals[pos].value();
+
+                if(value > _max_fill){ untested();
+                    _vals[pos].set_value(_max_fill);
+                    _fill.update(f);
+                    _vals[pos].set_value(value);
+                }else{
+                    _fill.update(f);
+                }
             }
         }
         return b.end();
@@ -468,7 +508,8 @@ public: // picking
         assert(lower==0); // for now.
 
 #ifdef DEBUG_FILL
-        for(unsigned b=0; b<=_max_fill; ++b){
+        for(unsigned b=0; b<=_max_fill; ++b){ itested();
+            assert(b < _fill.size());
             auto bucket_min = _fill[b];
             for(auto x : bucket_min){
                 auto me = treedec::count_missing_edges(x, _g); // _neigh_marker, _g);
@@ -488,15 +529,18 @@ public: // picking
             assert(_fill[min_fill].empty());
         }
 #else
-        unsigned min_fill=_min_bucket;
+        unsigned min_fill = _min_bucket;
 #endif
 
-        bool found=false;
+        bool found = false;
         vertex_descriptor c;
+        assert(min_fill < _fill.size());
+        assert(max_fill() < _fill.size());
 
 //        trace2("================ next elim?", min_fill, _max_fill);
-        while (!found) {
+        while (!found) { itested();
             assert(min_fill<_max_fill);
+            assert(min_fill < _fill.size());
 
             auto bucket_min = _fill[min_fill];
             auto it = find_in_bucket(bucket_min, min_fill);
@@ -506,7 +550,8 @@ public: // picking
                 if(min_fill==max_fill()){ untested();
                     auto bucket_min = _fill[min_fill];
                     assert(!bucket_min.empty());
-                    c = bucket_min.front();
+
+                    c = find_min_in_bucket(bucket_min);
                     found = true;
                 }else{
                 }
@@ -516,12 +561,17 @@ public: // picking
             }
         }
         auto pos = boost::get(idmap, c);
+        auto value = _vals[pos].value();
+        if(value != min_fill){
+            std::cerr << "picking out of range " << c
+                      << " " << value << " " << min_fill << "\n";
+        }else{
+        }
         trace2("================ next elim", c, _vals[pos].value());
 
         assert(treedec::is_valid(c, _g));
 
         // assert(pos<boost::num_vertices(_g)); no, if _g is a supergraph...
-        auto value = _vals[pos].value();
         (void)pos;
         if(!erase){ untested();
         }else if(value <= max_fill()){
@@ -541,7 +591,7 @@ public: // picking
         // not really. why?!
         // assert(treedec::count_missing_edges(p.first,_g) == p.second);
         return std::make_pair(c, value);
-    }
+    } // pick_min
 
 #if 0
     size_t num_nodes() const
