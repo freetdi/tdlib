@@ -9,9 +9,11 @@
 template<class G, template<class H, class ... >
                   class cfgt=treedec::algo::default_config>
 class FI_THREAD : public TWTHREAD<G, cfgt> {
+private:
+	using TWTHREAD<G, cfgt>::get_result;
 public:
     typedef cfgt<G> CFG;
-    typedef treedec::impl::fillIn<GWORKFI, treedec::algo::default_config> algo_type;
+    typedef treedec::pending::impl::fillIn<GWORKFI, cfgt> algo_type;
     typedef TWTHREAD<GWORKFI, cfgt> base;
 	 using base::_g;
 	 using base::_result;
@@ -33,7 +35,15 @@ public:
         std::cerr<< "c size " << boost::num_vertices(_work) << "\n";
 		  treedec::grtdprinter<G> P(o, _work);
 		  assert(_FI);
+#if 0 // INCOMPLETE/TODO
 		  _FI->get_tree_decomposition(P);
+#else
+			  _gsgvvu64_treedec t;
+			  _FI->get_tree_decomposition(t);
+			  size_t numbags = boost::num_vertices(t);
+			  P.head(numbags, get_result());
+			  boost::copy_graph(t, P);
+#endif
     }
 
     void run() {
@@ -82,7 +92,7 @@ template<class G,
 class SEVERAL_FI_THREAD : public TWTHREAD<G, cfgt> {
 public:
     typedef cfgt<G> CFG;
-    typedef treedec::impl::fillIn<GWORKFI, cfgt> algo_type;
+    typedef treedec::pending::impl::fillIn<GWORKFI, cfgt> algo_type;
     typedef TWTHREAD<GWORKFI, cfgt> base;
 	 using base::_g;
 	 using base::_result;

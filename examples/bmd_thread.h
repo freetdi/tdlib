@@ -18,7 +18,7 @@
 //
 //  boost min-degree thread
 //
-// use these globally?
+// BUG: use these globally
 typedef boost::property<treedec::bag_t, std::vector<uint16_t> > uint16_bag_p;
 typedef boost::property<treedec::bag_t, std::vector<uint32_t> > uint32_bag_p;
 typedef boost::property<treedec::bag_t, std::vector<uint64_t> > uint64_bag_p;
@@ -26,11 +26,13 @@ typedef boost::property<treedec::bag_t, std::vector<uint64_t> > uint64_bag_p;
 // #define tree_directedness_ boost::bidirectionalS //  broken?
 #define tree_directedness_ boost::undirectedS
 
+// BUG: not here
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               tree_directedness_, uint16_bag_p> _gsgvvu16_treedec;
-
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               tree_directedness_, uint32_bag_p> _gsgvvu32_treedec;
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                              tree_directedness_, uint64_bag_p> _gsgvvu64_treedec;
 
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class BMD_THREAD : public TWTHREAD<G, cfgt> {
