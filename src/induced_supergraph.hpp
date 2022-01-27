@@ -1456,7 +1456,7 @@ void eliminate_vertex( typename treedec::Supergraph<G, M, D>::vertex_descriptor 
 }
 
 template<class G, class M, class D>
-typename treedec::Supergraph<G, M, D>::vertices_size_type
+typename treedec::Supergraph<G, M, D>::edges_size_type
 count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		 treedec::Supergraph<G, M, D> const& g)
 {
@@ -1464,7 +1464,7 @@ count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 }
 
 template<class G, class M, class D>
-typename treedec::Supergraph<G, M, D>::vertices_size_type
+typename treedec::Supergraph<G, M, D>::edges_size_type
 count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		 treedec::Supergraph<G, M, D> const& g, M&)
 { untested();
@@ -1474,7 +1474,7 @@ count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 }
 
 template<class G, class M, class D, class MM>
-typename treedec::Supergraph<G, M, D>::vertices_size_type
+typename treedec::Supergraph<G, M, D>::edges_size_type
 count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		MM& m, treedec::Supergraph<G, M, D> const& g)
 { untested();
@@ -1484,7 +1484,7 @@ count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 }
 
 template<class G, class M, class D>
-typename treedec::Supergraph<G, M, D>::vertices_size_type
+typename treedec::Supergraph<G, M, D>::edges_size_type
 count_missing_edges( typename treedec::Supergraph<G, M, D>::vertex_descriptor v,
 		M&, treedec::Supergraph<G, M, D>& g)
 { untested();
