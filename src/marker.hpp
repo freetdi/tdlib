@@ -94,6 +94,9 @@ public:
 	bool operator()(key_type x) const{
 		return(_tags[x] == _tide);
 	}
+	bool is_done(key_type) const {
+		return false;
+	}
 private:
 	void reset(){ untested();
 		std::fill(_tags.begin(), _tags.end(), 0);

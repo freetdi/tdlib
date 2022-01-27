@@ -1541,18 +1541,18 @@ struct pusher{
 	pusher(B& b, M& m, N const& n, V c)
 	  : _b(b), _m(m), _n(n), _c(c) {
 	}
-	bool operator()(V v) { untested();
+	bool operator()(V v) {
 		trace1("push", v);
-		if(_m.is_marked(v)){ untested();
+		if(_m.is_marked(v)){
 			return false;
-		}else if(_root != v && !_n.introduced(v, _c)){ untested();
+		}else if(_root != v && !_n.introduced(v, _c)){
 			// not yet part of the sn.
 			//
 			// BUG: also applies to the subroot.
 			// but the subroot always exists.
 			trace2("push does not exist", v, _c);
 			return false;
-		}else{ untested();
+		}else{
 			push(_b, v);
 			if(_edg == -1){
 				_edg = v;
@@ -1671,7 +1671,7 @@ void tree_from_sg_tree(G &s, O const& o, T& t, size_t bagsize)
 
 //				push(b, 998);
 				auto bb = boost::adjacent_vertices(oi, s._g);
-				for(; bb.first!=bb.second; ++bb.first){ untested();
+				for(; bb.first!=bb.second; ++bb.first){
 					long v = *bb.first;
 					assert(num.is_before(oi, v));
 
@@ -1719,7 +1719,7 @@ void tree_from_sg(G &s, O const& o, T& t, size_t bagsize, S const& sns)
 	size_t num_vert = o.size();
     auto const& num = s.numbering();
 	 bool tree = num.is_mode_tree();
-	 if(tree){ untested();
+	 if(tree){
 		 return tree_from_sg_tree(s, o, t, bagsize);
 	 }else{ untested();
 	 }

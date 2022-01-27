@@ -12,6 +12,9 @@ check_PROGRAMS = \
 	custom_td \
 	dead_simple \
 	elim0 \
+	fill_in0 \
+	fill_in1 \
+	fill_in2 \
 	inline \
 	iter0 \
 	iter1 \

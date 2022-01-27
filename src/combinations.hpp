@@ -400,7 +400,7 @@ public: // algo interface
 
             // BUG, somehow need to cast CFGT to ppconfig
             // "message" is getting lost here, need pp_cfg+CFGT
-            impl::preprocessing<G> A(g());
+            treedec::impl::preprocessing<G> A(g());
             A.set_treewidth(_low_tw, -1u);
             A.do_it();
 
@@ -498,7 +498,7 @@ public: // algo interface
 #if 0
         treedec::preprocessing(g(), bags, _low_tw);
 #else
-            impl::preprocessing<G> A(g());
+            treedec::impl::preprocessing<G> A(g());
             A.set_treewidth(_low_tw, -1u);
             A.do_it();
             A.get_bags(bags);

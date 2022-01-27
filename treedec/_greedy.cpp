@@ -22,6 +22,7 @@
 #include "graph_py.hpp"
 #include "directed_view.hpp"
 #include "induced_subgraph.hpp"
+#include "induced_supergraph.hpp"
 #include "elimination_orderings.hpp"
 // treedec::impl::bmdo<sg_dvv16> A(g16, _elimord);
 

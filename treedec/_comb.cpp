@@ -19,6 +19,7 @@
 
 #include "boost_compat.h"
 #include <boost/graph/graph_traits.hpp>
+#include "induced_supergraph.hpp"
 #include "graph_py.hpp"
 #include "directed_view.hpp"
 #include "induced_subgraph.hpp"

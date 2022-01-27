@@ -68,6 +68,7 @@
 #include "elim_util.hpp"
 #include "impl/min_degree.hpp"
 #include "impl/fill_in_obsolete.hpp"
+#include "impl/fill_in_sg.hpp"
 #include "impl/fill_in.hpp"
 
 #ifndef MINIMUM_DEGREE_ORDERING_HPP
@@ -463,7 +464,7 @@ namespace impl{
 template<class G, class T, class X=void>
 struct bmdo_{
     template<class D, class O, class N>
-    static void gtd(D const& g, O o, T& t, size_t, N const& numbering){
+    static void gtd(D const& g, O const& o, T& t, size_t, N& numbering){ untested();
         // ordering_to_treedec(_g, *_o, t);
         treedec::draft::vec_ordering_to_tree(g, o, t, &numbering);
     }

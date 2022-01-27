@@ -1,0 +1,150 @@
+
+#define DEBUG_FILL
+
+#include <boost/graph/graphviz.hpp>
+#include <boost/property_map/property_map.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include "graph_traits.hpp"
+// #include "treedec_traits.hpp"
+
+#include <gala/cbset.h>
+#include <gala/td.h>
+#include <gala/boost.h>
+#include <treedec/directed_view.hpp>
+
+
+#include "induced_supergraph.hpp"
+#include "elimination_orderings.hpp"
+#include <gala/graph.h>
+
+#include <stdarg.h>
+#include <stdio.h>
+
+#define assert_symmetric(g) { \
+    unsigned i=0; \
+    auto E=boost::edges(g); \
+    for(;E.first!=E.second; ++E.first){ \
+        ++i;\
+        assert( boost::edge(boost::source(*E.first, g), \
+                    boost::target(*E.first, g),g).second); \
+        assert( boost::edge(boost::target(*E.first, g), \
+                    boost::source(*E.first, g),g).second); \
+    }\
+    trace1("symmetric", i); \
+}
+
+template<class G>
+struct uvv_config : gala::graph_cfg_default<G> {
+    static constexpr bool is_directed=false; // TODO: add "false" test.
+    static constexpr bool force_simple=true;
+    static constexpr bool force_loopless=true; // not used yet?
+    // static constexpr bool force_symmetric=true; // meaninngless (undirected)
+    // typedef tdDEGS<G> degs_type; // obsolete.
+};
+//typedef gala::graph<std::vector, std::vector, unsigned, uvv_config> graph_t;
+typedef gala::graph<std::vector, std::vector, unsigned> graph_t;
+//typedef typename treedec::graph_traits<graph_t>::treedec_type T;
+
+template<class X, class ... rest>
+struct algo_config : treedec::algo::default_config<X, rest...>{
+    static void message(int badness, const char* fmt, ...) { itested();
+        if (badness >= bLOG){
+            char buffer[2048] = "c ";
+            va_list arg_ptr;
+            va_start(arg_ptr,fmt);
+            vsprintf(buffer+2,fmt,arg_ptr);
+            va_end(arg_ptr);
+            std::cout << buffer;
+        }else{
+        }
+    }
+};
+
+typedef treedec::pending::impl::fillIn<graph_t, algo_config> algo_type;
+
+template<class A, class G>
+void biedge(A a, A b, G& g)
+{
+	boost::add_edge(a,b,g);
+	boost::add_edge(b,a,g);
+}
+
+void rect(int n, int m)
+{
+	graph_t g(n*m);
+
+	std::vector<std::pair<int, int>> edges;
+	// making edges of graph representing rect n by n
+	for (int x = 0; x < n; x++) {
+		for (int y = 0; y < m; y++) {
+			if (x < n - 1){
+				biedge(x + y * n, x + 1 + y * n, g);
+			}else{
+			}
+			if (y < m - 1){
+				biedge(x + y * n, x + (y + 1) * n, g);
+			}else{
+			}
+		}
+	}
+	assert_symmetric(g);
+	graph_t h(g);
+
+	auto i = boost::edges(g);
+	auto k=0;
+	for(; i.first!=i.second; ++i.first){
+		++k;
+		trace2("grid rect", boost::source(*i.first, g), boost::target(*i.first, g));
+	}
+	trace2("dbg", k, n);
+	assert(k == (n) * (m-1) + (m) * (n-1));
+
+//	auto j = boost::adjacent_vertices(4, g);
+//	for(; j.first!=j.second; ++j.first){
+//		trace1("grid", *j.first);
+//	}
+
+	auto vi = boost::vertices(g);
+	for(; vi.first!=vi.second; ++vi.first){
+		unsigned d = boost::degree(*vi.first, g);
+		trace2("grid", *vi.first, d);
+	}
+
+	algo_type a(g);
+
+	a.do_it();
+	std::cout << "grid rect " << n << "x" << m << " fi " << a.get_bagsize() << "\n";
+
+	// hack. use sets as bags, bug in is_valid_treedecomposition
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                              boost::undirectedS> G;
+typedef typename treedec::graph_traits<G>::treedec_type T;
+
+	T t;
+	a.get_tree_decomposition(t);
+
+	trace2("gotit", treedec::get_bagsize(t), a.get_bagsize());
+	if(treedec::get_bagsize(t) == a.get_bagsize()){
+	}else{
+		incomplete();
+	}
+	assert(treedec::is_valid_treedecomposition(h, t));
+}
+
+int main(int, char**)
+{
+	rect(4, 3);
+	rect(3, 3);
+	rect(2, 3);
+	rect(2, 2);
+	rect(4, 3);
+	rect(2, 1);
+	rect(5, 4);
+	rect(3, 2);
+	rect(7, 6);
+	rect(8, 7);
+	rect(6, 7);
+	rect(10, 9);
+	rect(50, 49);
+//	rect(100, 99);
+}

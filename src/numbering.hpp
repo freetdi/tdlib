@@ -146,9 +146,19 @@ public:
 
 	template<class S>
 	vertex_descriptor find_parent(vertex_descriptor v, S const& sns) const{ itested();
-		while(sns[v] <= 0){ untested();
+		auto id = get(_idmap, v);
+		if(id >= _parent.size()){
+		}else if(_parent[id]!=vertex_descriptor(-1)){ untested();
+			return _parent[id];
+		}else{
+		}
+		while(sns[v] <= 0){
 			trace3("fp", v, short(_data[v]), sns[v]);
-			v = - _data[v] - 1;
+			assert(v<_data.size());
+			v = - _data[get(_idmap, v)] - 1;
+			trace1("fp... ", v);
+			assert(v>=0);
+			assert(v<=sns.size());
 		}
 		return v;
 	}
@@ -182,6 +192,15 @@ public:
 
 		assert(idx<_number.size());
 		_number[idx] = _current; // keep track of introduction...
+	}
+	// v has been introduced before c was eliminated.
+	// aka v has been merged already
+	bool introduced(vertex_descriptor v, vertex_descriptor c) const{
+		assert(_data[get(_idmap, c)]);
+		trace2("introduced", v, c);
+		trace2("introduced", _number[v], _data[c]);
+		return _number[get(_idmap, v)] == 0
+			    || value_type(_number[get(_idmap, v)]) >= value_type(_data[get(_idmap, c)]);
 	}
 	value_type get_position(vertex_descriptor v) const{
 //		trace2("NUMBERING hack", v, sizeof(value_type));
@@ -308,9 +327,27 @@ private:
 
 		// collect the permutation info
 		auto n = _data.size();
+		_parent.resize(n);
+		for(auto& p : _parent){
+			p = vertex_descriptor(-1);
+		}
+		assert(_parent[0] == vertex_descriptor(-1));
 		typedef long diff_t;
 		unsigned long i;
 		trace1("get_ordering2", n);
+		for (i = 0; i < n; ++i) {
+			trace5("go2", i, _parent[i], sns[i], _data[i], _number[i]);
+		}
+
+		// store parents
+		for (i = 0; i < n; ++i) {
+			if(sns[i]<=0){
+				assert(i<_parent.size());
+				_parent[i] = find_parent(i, sns);
+				trace4("parent init", i, _parent[i], sns[i], -_data[i] - 1);
+			}else{
+			}
+		}
 
 		// collect root nodes.
 		for (i = 0; i < n; ++i) {
@@ -327,17 +364,14 @@ private:
             _data[i] = value_type(- _data[i] - 1); // final position of node i
             ord[i] = _data[i] + 1; // position of next block underneath.
 				// at least 1. so ord>0 indicates "allocated"
-			}else if ( size == 0 ) {
-				// leaf node, controlled by some other node.
-				ord[i] = - ( ovt(std::numeric_limits<value_type>::max()) - _data[i] ) - 1; // parent
-				assert(ord[i]<0);
-				_data[i] = 1 - sns[i]; // memory size
 			} else {
 				assert(size!=1);
 				ord[i] = - ( ovt(std::numeric_limits<value_type>::max()) - _data[i] ) - 1; // parent of i
 				assert(ord[i]<0);
 				_data[i] = 1 - sns[i]; // memory size
+
 			}
+			/// store parent in sns?
 		}
 
 		for (i = 0; i < n; ++i) {
@@ -431,7 +465,7 @@ private:
 	container_type _data;
 	idmap_type _idmap;
 private:
-	// container_type _parent; // ?
+	container_type _parent; // ?
 	container_type _number;
 };
 

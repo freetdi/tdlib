@@ -27,6 +27,7 @@
 #include "../skeleton.hpp"
 #include "../generic_elimination_search_overlay.hpp"
 #include "../induced_subgraph.hpp"
+#include "../induced_supergraph.hpp"
 
 #ifdef DEBUG_FILL
 #include "../graph_util.hpp"
@@ -78,6 +79,7 @@ public:
     };
     typedef sgm member_pred_type;
     // TODO: alternative subgraph with edge deletion
+    typedef Supergraph<D_t, numbering_type, degree_type> supergraph_type; // degreemap??
     typedef INDUCED_SUBGRAPH_1<D_t, member_pred_type, degreemap_type> subgraph_type;
     typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iterator;
     typedef typename std::vector<vertex_descriptor> bag_t;
@@ -105,6 +107,7 @@ protected: // construct/destruct
                                                      _idmap,
                                                      vertices_size_type())),
         _subgraph(_g, member_pred_type(_numbering), _degreemap),
+        _supergraph(_g, _numbering, _degree), // BUG: degrees initialised twice.
         _marker(boost::num_vertices(_g))
     {
         trace2("greedy_base", _num_vert, _num_edges);
@@ -439,6 +442,7 @@ protected:
     degree_type _degree;
     degreemap_type _degreemap;
     subgraph_type _subgraph;
+    supergraph_type _supergraph;
     marker_type _marker; // here? recheck: need another marker in fill?
     std::vector<vertex_descriptor> _zeroes;
 }; // greedy_base

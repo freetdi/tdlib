@@ -200,7 +200,7 @@ public:
 	  , _neigh_marker(g.num_vertices()) { }
 
 public:
-	count_t cme(vertex_t v){ untested();
+	count_t cme(vertex_t v){
 		return detail::count_missing_edges(v, _neigh_marker, _g);
 	}
 

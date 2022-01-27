@@ -1,0 +1,70 @@
+c done. max fill=0
+done clique 1 fi 1
+c merge 0 (1) into 1 (1)
+c next 1. degree 1, fill 0, sns 2
+c done. max fill=0
+done clique 2 fi 2
+c merge 0 (1) into 2 (1)
+c merge 1 (1) into 2 (2)
+c next 2. degree 2, fill 0, sns 3
+c done. max fill=0
+done clique 3 fi 3
+c merge 0 (1) into 5 (1)
+c merge 1 (1) into 5 (2)
+c merge 2 (1) into 5 (3)
+c merge 3 (1) into 5 (4)
+c merge 4 (1) into 5 (5)
+c next 5. degree 5, fill 0, sns 6
+c done. max fill=0
+done clique 6 fi 6
+c merge 0 (1) into 9 (1)
+c merge 1 (1) into 9 (2)
+c merge 2 (1) into 9 (3)
+c merge 3 (1) into 9 (4)
+c merge 4 (1) into 9 (5)
+c merge 5 (1) into 9 (6)
+c merge 6 (1) into 9 (7)
+c merge 7 (1) into 9 (8)
+c merge 8 (1) into 9 (9)
+c next 9. degree 9, fill 0, sns 10
+c done. max fill=0
+done clique 10 fi 10
+c merge 0 (1) into 14 (1)
+c merge 1 (1) into 14 (2)
+c merge 2 (1) into 14 (3)
+c merge 3 (1) into 14 (4)
+c merge 4 (1) into 14 (5)
+c merge 5 (1) into 14 (6)
+c merge 6 (1) into 14 (7)
+c merge 7 (1) into 14 (8)
+c merge 8 (1) into 14 (9)
+c merge 9 (1) into 14 (10)
+c merge 10 (1) into 14 (11)
+c merge 11 (1) into 14 (12)
+c merge 12 (1) into 14 (13)
+c merge 13 (1) into 14 (14)
+c next 14. degree 14, fill 0, sns 15
+c done. max fill=0
+done clique 15 fi 15
+c merge 0 (1) into 19 (1)
+c merge 1 (1) into 19 (2)
+c merge 2 (1) into 19 (3)
+c merge 3 (1) into 19 (4)
+c merge 4 (1) into 19 (5)
+c merge 5 (1) into 19 (6)
+c merge 6 (1) into 19 (7)
+c merge 7 (1) into 19 (8)
+c merge 8 (1) into 19 (9)
+c merge 9 (1) into 19 (10)
+c merge 10 (1) into 19 (11)
+c merge 11 (1) into 19 (12)
+c merge 12 (1) into 19 (13)
+c merge 13 (1) into 19 (14)
+c merge 14 (1) into 19 (15)
+c merge 15 (1) into 19 (16)
+c merge 16 (1) into 19 (17)
+c merge 17 (1) into 19 (18)
+c merge 18 (1) into 19 (19)
+c next 19. degree 19, fill 0, sns 20
+c done. max fill=0
+done clique 20 fi 20

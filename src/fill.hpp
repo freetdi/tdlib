@@ -248,7 +248,7 @@ public:
     } // reg
 public:
     // called on 2 neighbours that are not 1 neighbour
-    void decrement_fill(const vertex_descriptor v) { untested();
+    void decrement_fill(const vertex_descriptor v) {
         auto idmap=boost::get(boost::vertex_index, _g);
         auto pos=boost::get(idmap, v);
         if(_neigh_marker.is_marked(pos)){
@@ -309,7 +309,7 @@ public:
         if(offset >= 0){
 //            trace2("positive ", v, offset);
             value += offset;
-        }else if(long(value) < -offset){ untested();
+        }else if(long(value) < -offset){
             trace2("zero pad ", v, offset);
             value = 0;
             _fill.update(v); // why?
@@ -346,12 +346,12 @@ public:
 //        return _vals[pos].value();
 //    }
 public: // O(1) neighbor stuff.
-    void mark(vertex_descriptor v){ untested();
+    void mark(vertex_descriptor v){
         auto idmap = boost::get(boost::vertex_index, _g);
         auto pos = boost::get(idmap, v);
         _neigh_marker.mark(pos);
     }
-    void clear_marker(){ untested();
+    void clear_marker(){
         _neigh_marker.clear();
     }
     // for n \in neigbors(c):
@@ -430,10 +430,10 @@ private:
             auto f = b.front();
             auto pos = boost::get(idmap, f);
 
-            if(_vals[pos].is_lb()) { untested();
+            if(_vals[pos].is_lb()) {
                 auto me = _mec.cme(f);
                 trace2("fill done count", f, me);
-                if(me<=req_fill){ untested();
+                if(me<=req_fill){
                     assert(me==req_fill);
 #ifdef DEBUG
          //           _vals[pos].set_lb(false);
@@ -453,7 +453,7 @@ private:
                         trace1("found", x);
                     }
 #endif
-                }else{ untested();
+                }else{
                     // req_fill < me <= _max_fill
                     trace2("lb in Q new", pos, me);
                     _vals[pos].set_value(me);
