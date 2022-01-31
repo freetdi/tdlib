@@ -527,7 +527,7 @@ int predicate_collect_overlap<G,M,F>::mcount_overlap(E const& e) const
 		if(_g.supernode_size(t)<0){
 		}else if(_g.is_numbered(t)){
 		}else if(_fill_marker.is_multiple_tagged(t)){
-		}else if ( operator()(p, false) <= 0){
+		}else if (!operator()(p, false)){
 			// indicate nodelete.
 			ret = -50;
 		}else{ untested();
