@@ -170,7 +170,7 @@ enum mag_t{
 // fixme: move to other compilation unit
 #include <stdarg.h>
 #include <stdio.h>
-int errorlevel=bLOG;
+int errorlevel = bPICKY;
 template<class X=balu_t, class ... rest>
 struct grtd_algo_config : treedec::algo::default_config<X, rest...>{
     static void message(int badness, const char* fmt, ...) {
