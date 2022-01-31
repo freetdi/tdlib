@@ -126,139 +126,139 @@ public:
 	{ itested();
 	}
 
-	 template<class E>
-    bool operator()(E e, bool do_cliques=true) const {
-        auto& marker = _g._marker;
-        auto s = boost::source(e, *_g);
-        auto t = boost::target(e, *_g);
+	template<class E>
+	bool operator()(E e, bool do_cliques=true) const {
+		auto& marker = _g._marker;
+		auto s = boost::source(e, *_g);
+		auto t = boost::target(e, *_g);
 
-		  trace5("p2 oc?", s, t, do_cliques, _g.is_numbered__(t), _only_cliques);
-		  if(!do_cliques){
-			 // assert(_g.is_numbered(s)); no. mmark doesn't filter (should?)
-        }else if (_g.is_numbered__(t)){
-		  }else{
-			  _only_cliques = false;
-			  trace5("p2 oc", s, t, do_cliques, _g.is_numbered__(t), _only_cliques);
-			 // assert(!_g.is_numbered(t));
-		  }
-        int reason = 0;
-        if (_c == t){
-			  if(do_cliques){
-				  reason = 99;
-			  }else{ untested();
-				  unreachable();
-				  assert(false);
-				  reason = -99;
-			  }
-		  }else if(is_covered(t)) {
-			  if(do_cliques){
-				  reason = 5;
-			  }else{ untested();
-				  // before/after?
-				  reason = -5;
-			  }
+		trace5("p2 oc?", s, t, do_cliques, _g.is_numbered__(t), _only_cliques);
+		if(!do_cliques){
+			// assert(_g.is_numbered(s)); no. mmark doesn't filter (should?)
+		}else if (_g.is_numbered__(t)){
+		}else{
+			_only_cliques = false;
+			trace5("p2 oc", s, t, do_cliques, _g.is_numbered__(t), _only_cliques);
+			// assert(!_g.is_numbered(t));
+		}
+		int reason = 0;
+		if (_c == t){
+			if(do_cliques){
+				reason = 99;
+			}else{ untested();
+				unreachable();
+				assert(false);
+				reason = -99;
+			}
+		}else if(is_covered(t)) {
+			if(do_cliques){
+				reason = 5;
+			}else{ untested();
+				// before/after?
+				reason = -5;
+			}
 //        }else if (tree & supernode_size(t) <= 0 ){
-        }else if (_g.is_numbered_(t)){
-			  if(do_cliques){
-				  assert(marker.is_extra(s)); // must be in N(c)...
-				  marker.mark_multiple_tagged(s);
+		}else if (_g.is_numbered_(t)){
+			if(do_cliques){
+				assert(marker.is_extra(s)); // must be in N(c)...
+				marker.mark_multiple_tagged(s);
 
-				  reason = mmark_clique(e);
+				reason = mmark_clique(e);
 
 #ifndef NDEBUG
-				  if(reason<=0){
-					  trace2("not dropping clique", s, t);
-					  auto vv = boost::adjacent_vertices(t, *_g);
-					  for(;vv.first != vv.second; ++vv.first){
-						  auto n= *vv.first;
-						  trace4(" --- ndc", s, t, n, _g.is_numbered(n));
-					  }
+				if(reason<=0){
+					trace2("not dropping clique", s, t);
+					auto vv = boost::adjacent_vertices(t, *_g);
+					for(;vv.first != vv.second; ++vv.first){
+						auto n= *vv.first;
+						trace4(" --- ndc", s, t, n, _g.is_numbered(n));
+					}
 
-				  }else{
-					  trace3("dropping clique", s, t, reason);
-					  auto vv = boost::adjacent_vertices(t, *_g);
-					  for(;vv.first != vv.second; ++vv.first){
-						  auto n= *vv.first;
-						  trace4(" --- dc", s, t, n, _g.is_numbered(n));
-					  }
-				  }
+				}else{
+					trace3("dropping clique", s, t, reason);
+					auto vv = boost::adjacent_vertices(t, *_g);
+					for(;vv.first != vv.second; ++vv.first){
+						auto n= *vv.first;
+						trace4(" --- dc", s, t, n, _g.is_numbered(n));
+					}
+				}
 #endif
-				  if(dc2){
-				  }else{ untested();
-					  reason = -21;
-				  }
-			  }else{ untested();
-				  reason = 19;
-			  }
-		  }else if (marker.is_extra(t)){
-			  // N(c) is extra
-			  assert(!_g.is_numbered(t));
-           assert(marker.is_tagged(t));
+				if(dc2){
+				}else{ untested();
+					reason = -21;
+				}
+			}else{ untested();
+				reason = 19;
+			}
+		}else if (marker.is_extra(t)){
+			// N(c) is extra
+			assert(!_g.is_numbered(t));
+			assert(marker.is_tagged(t));
 
-				// extra < multi.
-			  // need tag to identify missing edges.
-			  trace2("p2 multitag", s, t);
-			  marker.mark_multiple_tagged(t);
-			  reason = 19;
-        }else if (marker.is_multiple_tagged(t)){
+			// extra < multi.
+			// need tag to identify missing edges.
+			trace2("p2 multitag", s, t);
+			marker.mark_multiple_tagged(t);
+			reason = 19;
+		}else if (marker.is_multiple_tagged(t)){
 			  unreachable();
 			  // already been here.
 			  reason = 41;
 
-        }else if (marker.is_tagged(t)){
-			  // not in N(c), already been here
-			  reason = 42;
-		  }else{
-			  // untagged. just count.
-			  marker.mark_tagged(t);
-			  assert(_g.supernode_size(t)>0);
-			  trace2("p2 found dn", s, t);
+		}else if (marker.is_tagged(t)){
+			// not in N(c), already been here
+			reason = 42;
+		}else{
+			// untagged. just count.
+			marker.mark_tagged(t);
+			assert(_g.supernode_size(t)>0);
+			trace2("p2 found dn", s, t);
 
-			  assert(!_g.is_numbered(t));
-			  assert(!marker.is_multiple_tagged(t));
-			  assert(!marker.is_extra(t));
-			  _cn += _g.supernode_size(t);
-			  reason = -12;
-        }
+			assert(!_g.is_numbered(t));
+			assert(!marker.is_multiple_tagged(t));
+			assert(!marker.is_extra(t));
+			_cn += _g.supernode_size(t);
+			reason = -12;
+		}
 
-		  trace6("p2 delete", s, t, reason, do_cliques, _g.is_numbered__(t), _only_cliques);
-        return reason>0;
-    }
+		trace6("p2 delete", s, t, reason, do_cliques, _g.is_numbered__(t), _only_cliques);
+		return reason>0;
+	}
 
-    bool only_cliques() const{
-        return _only_cliques;
-    }
-    size_t cnt() const{
-        return _cn;
-    }
+	bool only_cliques() const{
+		return _only_cliques;
+	}
+	size_t cnt() const{
+		return _cn;
+	}
 
-	 // debugging?
-    void reset() const{
-		 _cn = 0;
-		 _stack_hack.clear();
-		 _only_cliques = true;
-	 }
+	// debugging?
+	void reset() const{
+		_cn = 0;
+		_stack_hack.clear();
+		_only_cliques = true;
+	}
 
 private:
 	template<class E>
 	int mmark_clique(E const&) const;
 
 	bool is_covered(vertex_descriptor t) const{
-		  if(tree){
-			  return _g.supernode_size(t) <= 0;
-		  }else{
-			  return _g.supernode_size(t) <= 0;
-		  }
+		if(tree){
+			return _g.supernode_size(t) <= 0;
+		}else{
+			return _g.supernode_size(t) <= 0;
+		}
 	}
 
 private:
-    G const& _g;
-	 M& _fill_marker;
-    size_t& _cn{0};
-	 vertex_descriptor _c;
-	 bool& _only_cliques;
+	G const& _g;
+	M& _fill_marker;
+	size_t& _cn{0};
+	vertex_descriptor _c;
+	bool& _only_cliques;
 public:
-	  std::vector<vertex_descriptor>& _stack_hack;
+	std::vector<vertex_descriptor>& _stack_hack;
 }; // predicate_scan_neigh
 
 
@@ -567,21 +567,22 @@ private:
 	// typedef typename baseclass::VertexIndexMap VertexIndexMap;
 	typedef typename boost::property_map<G, boost::vertex_index_t>::type VertexIndexMap;
 public: //types
-    typedef O O_t; //?
-    typedef G G_t; //?
-    typedef typename baseclass::vertex_descriptor vertex_descriptor;
-    typedef typename directed_view_select<G_t>::type D_t;
-    typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
+	typedef O O_t; //?
+	typedef G G_t; //?
+	typedef typename baseclass::vertex_descriptor vertex_descriptor;
+	typedef typename directed_view_select<G_t>::type D_t;
+	typedef typename boost::graph_traits<D_t>::vertices_size_type vertices_size_type;
    // typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
-	 typedef long diff_t;
-	 typedef Marker< diff_t, vertex_descriptor, VertexIndexMap > marker_type;
-//    marker_type _fill_marker;
-    typedef typename baseclass::numbering_type numbering_type;
-    // BUG:: use CFGT::fill or fallback to current fill
-    typedef typename fill_chooser<typename baseclass::supergraph_type>::type fill_type;
+	typedef long diff_t;
+	typedef Marker< diff_t, vertex_descriptor, VertexIndexMap > marker_type;
+	//    marker_type _fill_marker;
+	typedef typename baseclass::numbering_type numbering_type;
+	// BUG:: use CFGT::fill or fallback to current fill
+	typedef typename fill_chooser<typename baseclass::supergraph_type>::type fill_type;
 
-    std::set<vertex_descriptor> debug_fill(vertex_descriptor c) {
-        std::set<vertex_descriptor> c_neigh;
+#ifdef DEBUG_FILL
+	std::set<vertex_descriptor> debug_fill(vertex_descriptor c) {
+		std::set<vertex_descriptor> c_neigh;
 #ifndef NDEBUG
 //        typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 //        marker_type _debug_marker(_num_vert);
@@ -622,8 +623,9 @@ public: //types
         //                assert(c_neigh.size()==degc);
 
 #endif
-        return c_neigh;
-    }
+		return c_neigh;
+	}
+#endif
 	void debug_fill2(unsigned degc, std::set<vertex_descriptor> const& c_neigh, vertex_descriptor c) {
 //		typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
 		bool wrong=false;
@@ -742,56 +744,56 @@ private: // debugging
     }
 
 public: // implementation
-    using baseclass::_min;
-    using baseclass::_o;
-    using baseclass::_num_edges;
-    using baseclass::_num_vert;
-    using baseclass::_degree; // bug?
-    using baseclass::_ub_tw;
-    using baseclass::vertices_left;
-    using baseclass::timer_on;
-    using baseclass::timer_off;
-    typedef typename baseclass::supergraph_type supergraph_type;
-	 typedef detail::predicate_collect_overlap<supergraph_type, marker_type, fill_type> p_coll_overlap;
-	 typedef detail::predicate_scan_neigh<supergraph_type, marker_type> p_scan_nc;
+	using baseclass::_min;
+	using baseclass::_o;
+	using baseclass::_num_edges;
+	using baseclass::_num_vert;
+	using baseclass::_degree; // bug?
+	using baseclass::_ub_tw;
+	using baseclass::vertices_left;
+	using baseclass::timer_on;
+	using baseclass::timer_off;
+	typedef typename baseclass::supergraph_type supergraph_type;
+	typedef detail::predicate_collect_overlap<supergraph_type, marker_type, fill_type> p_coll_overlap;
+	typedef detail::predicate_scan_neigh<supergraph_type, marker_type> p_scan_nc;
 
-    void do_it(){
-        _numbering.init(1); // HACK.
+	void do_it(){
+		_numbering.init(1); // HACK.
 
-		  if(tree){
-			  _numbering.set_mode_tree();
-		  }else{
-		  }
+		if(tree){
+			_numbering.set_mode_tree();
+		}else{
+		}
 
-        check(_g);
-        _fill.init(_g);
+		check(_g);
+		_fill.init(_g);
 
-        timer_on();
+		timer_on();
 
-        if(!_num_vert){ untested();
-            timer_off();
-            return;
-        }else{
-        }
+		if(!_num_vert){ untested();
+			timer_off();
+			return;
+		}else{
+		}
 
-        assert(_o);
+		assert(_o);
 //        O_t& o = *_o;
 
 #ifndef NDEBUG
-        check(_g);
+		check(_g);
 #endif
 
-        baseclass::initialize();
-		  {
-			  // used in initialise
-			  _supergraph._marker.increment_tag();// ?
-			  _supergraph._marker.assert_clear();// ?
-		  }
-        _o->resize(_num_vert);
-        assert(_o->size() == _num_vert);
-        vertex_descriptor c = 0;
+		baseclass::initialize();
+		{
+			// used in initialise
+			_supergraph._marker.increment_tag();// ?
+			_supergraph._marker.assert_clear();// ?
+		}
+		_o->resize(_num_vert);
+		assert(_o->size() == _num_vert);
+		vertex_descriptor c = 0;
 
-        while(next(c)){
+		while(next(c)){
 				assert(supernode_size(c)>0);
 				assert(!_supergraph.is_numbered(c));
 
@@ -804,11 +806,11 @@ public: // implementation
 
 #ifdef DEBUG_FILL
 				_supergraph._marker.assert_clear();// no. N(c) is marked (why?)
-            trace2("DEBUG_FILL pre elim", c, fill_cached_(c));
-            auto me = _supergraph.count_missing_edges(c, &_debug_marker);
-            trace3("DEBUG_FILL c elim", fill_cached_(c), fill_cached_is_lb_(c), me);
-            assert( me == fill_cached_(c) );
-            auto c_neigh = debug_fill(c);
+				trace2("DEBUG_FILL pre elim", c, fill_cached_(c));
+				auto me = _supergraph.count_missing_edges(c, &_debug_marker);
+				trace3("DEBUG_FILL c elim", fill_cached_(c), fill_cached_is_lb_(c), me);
+				assert( me == fill_cached_(c) );
+				auto c_neigh = debug_fill(c);
 				_supergraph._marker.increment_tag();// ?
 
 				auto ww = boost::adjacent_vertices(c, _supergraph);
@@ -819,19 +821,19 @@ public: // implementation
 				}
 #endif
 
-            _numbering.put(c); // here??
+				_numbering.put(c); // here??
 
-            if(_numbering.all_done(_supergraph.supernode_size(c))){ untested();
-                _numbering.increment(_supergraph.supernode_size(c));
-                break;
-            }else{
-            }
+				if(_numbering.all_done(_supergraph.supernode_size(c))){ untested();
+					_numbering.increment(_supergraph.supernode_size(c));
+					break;
+				}else{
+				}
 
 				_supergraph._marker.assert_clear();// no. N(c) is marked (why?)
 
-            eliminate(c);
+				eliminate(c);
 
-            auto degc = boost::out_degree(c, _g);
+				auto degc = boost::out_degree(c, _g);
 				auto sns = supernode_size(c);
 				assert(sns);
 
@@ -850,7 +852,7 @@ public: // implementation
 				size_t real_degc = sns-1;
             auto bb = boost::adjacent_vertices(c, _g);
 			  // 	_supergraph.bag_vertices(c); not initialised yet.
-            for(; bb.first!=bb.second; ++bb.first){
+				for(; bb.first!=bb.second; ++bb.first){
 					auto i = *bb.first;
 					if(_marker.is_done(i)){
 					}else if(_marker.is_tagged(i)){ untested();
@@ -867,7 +869,7 @@ public: // implementation
 						_marker.mark_tagged(i);
 					}
 				}
-            trace4("gone", c, _numbering.get_position(c), degc, real_degc);
+				trace4("gone", c, _numbering.get_position(c), degc, real_degc);
 
 				CFG::message(bLOG, "next %d. degree %d, fill %d, sns %d\n", c, real_degc, f, sns);
 
@@ -876,9 +878,9 @@ public: // implementation
 				}else{
 				}
 
-            if (_numbering.all_done()){
-                break;
-            }else{
+				if (_numbering.all_done()){
+					break;
+				}else{
 					// tidy up marker?
 					_supergraph._marker.set_tag_as_multiple_tag(); // catch up.
 					_supergraph._marker.increment_tag();           // drop
@@ -898,94 +900,93 @@ public: // implementation
 					//assert(cnt == vertices_left());
 
 					++_i;
-            }
-        } // next loop
+				}
+		} // next loop
 
-        // BUG
-        trace2("done loop", _i, _num_vert);
+		// BUG
+		trace2("done loop", _i, _num_vert);
 
         // add one more node maybe.
         // should list remaining clique, not implemented
-        postprocessing();
+		postprocessing();
 
-        timer_off();
+		timer_off();
 
-		  CFG::message(bDEBUG, "done. max fill=%d\n", _max_fill);
+		CFG::message(bDEBUG, "done. max fill=%d\n", _max_fill);
 
 //		  boost::print_graph(_g);
 
-    } // do_it
+	} // do_it
 
-    using baseclass::_numbering;
+	using baseclass::_numbering;
     // fillIn::
-    bool next(typename baseclass::vertex_descriptor &c){
+	bool next(typename baseclass::vertex_descriptor &c){
+		trace3("next loop", c, _num_edges, vertices_left());
+		if(_numbering.all_done()){
+			return false;
+		}else{
+			// todo: what do we know about lower bound?
+			auto p = _fill.pick_min(0, -1u, true);
+			_supergraph._marker.increment_tag(); // may have used cme.
+			_supergraph._marker.assert_clear();
 
-        trace3("next loop", c, _num_edges, vertices_left());
+			c = p.first;
+			trace2("next picked", c, p.second);
 
-        if(_numbering.all_done()){
-            return false;
-        }else{
-            // todo: what do we know about lower bound?
-            auto p = _fill.pick_min(0, -1u, true);
-				_supergraph._marker.increment_tag(); // may have used cme.
-				_supergraph._marker.assert_clear();
+			if(_min<0){ untested();
+				// 
+			}else{
+			}
 
-            c = p.first;
-            trace2("next picked", c, p.second);
+			_min = p.second; // the fill of c.
+			return true;
+		}
+	}
 
-            if(_min<0){ untested();
-                // 
-            }else{
-            }
+	using baseclass::_g;
+	using baseclass::_degreemap;
+	using baseclass::_subgraph;
+	using baseclass::_supergraph;
+	typedef typename supergraph_type::marker_type sg_marker_type;
 
-            _min = p.second; // the fill of c.
-            return true;
-        }
-    }
-
-    using baseclass::_g;
-    using baseclass::_degreemap;
-    using baseclass::_subgraph;
-    using baseclass::_supergraph;
-    typedef typename supergraph_type::marker_type sg_marker_type;
-
-    // update a neighbor of c.
-    void update_fill_n(typename baseclass::vertex_descriptor n ) {
-		 incomplete();
-        auto& marker = _supergraph._marker;
-        assert(!_numbering.is_numbered(n));
-        //            assert(marker.is_marked(n)); not yet.
-        // assert(fill_cached_is_lb_(n) || marker.is_done(n));
+	// update a neighbor of c.
+	void update_fill_n(typename baseclass::vertex_descriptor n ) {
+		incomplete();
+		auto& marker = _supergraph._marker;
+		assert(!_numbering.is_numbered(n));
+		//            assert(marker.is_marked(n)); not yet.
+		// assert(fill_cached_is_lb_(n) || marker.is_done(n));
 
 #if 0
         // also correct? probably not
         auto mm = boost::adjacent_vertices(n, _g);
 #else
-        auto mm = boost::adjacent_vertices(n, _supergraph);
+		auto mm = boost::adjacent_vertices(n, _supergraph);
 #endif
-        for(; mm.first!=mm.second; ++mm.first){ untested();
-            auto m = *mm.first;
-            trace2("qeval 2?", n, m);
-//            assert(m!=c);
-            if(marker.is_done(m)){ untested();
-                //mass elim?
-            }else{ untested();
-            }
-            if(marker.is_marked(m)){ untested();
-            }else if(_numbering.is_numbered(m)){ untested();
-                // updated from the other side if needed?
-            }else{ untested();
-                assert(m!=n);
-                marker.mark(m);
-                _fill.shift(m, minlong );
-                _fill.q_eval(m);
-                trace2("qeval 2", n, m);
-                assert(fill_cached_is_lb_(m));
-            }
-        }
+		for(; mm.first!=mm.second; ++mm.first){ untested();
+			auto m = *mm.first;
+			trace2("qeval 2?", n, m);
+			//            assert(m!=c);
+			if(marker.is_done(m)){ untested();
+				//mass elim?
+			}else{ untested();
+			}
+			if(marker.is_marked(m)){ untested();
+			}else if(_numbering.is_numbered(m)){ untested();
+				// updated from the other side if needed?
+			}else{ untested();
+				assert(m!=n);
+				marker.mark(m);
+				_fill.shift(m, minlong );
+				_fill.q_eval(m);
+				trace2("qeval 2", n, m);
+				assert(fill_cached_is_lb_(m));
+			}
+		}
 
-    }
-    void q_fill_update(typename baseclass::vertex_descriptor c ) { untested();
+	}
+#ifdef Q_SHIFT
+	void q_fill_update(typename baseclass::vertex_descriptor c ) { untested();
         auto& marker = _supergraph._marker;
         trace1("q_fill_update", c);
         assert(_numbering.is_numbered(c));
@@ -1035,31 +1036,34 @@ public: // implementation
         }
 #endif
         marker.set_tag_as_multiple_tag();
-    }
-    void cleanup_mark_fill(vertex_descriptor c) {
-        auto element_neighbor = _supergraph._work_space.make_stack();
+	} // q_fill_update
+#endif
 
-        // Create two function objects for edge removal
-        typedef typename supergraph_type::Workspace::stack WorkStack;
-        detail::remove_and_collect<supergraph_type, sg_marker_type,
-            typename supergraph_type::numbering_type, WorkStack,
-            typename supergraph_type::VertexIndexMap>
-            p(_supergraph, _supergraph._marker, _supergraph.numbering(), element_neighbor, get(boost::vertex_index, _g));
+	void cleanup_mark_fill(vertex_descriptor c) {
+		auto element_neighbor = _supergraph._work_space.make_stack();
 
-        // Reconstruct the adjacent node list, push element neighbor in a
-        // List.
-        trace1("rm and collect", c);
-        remove_out_edge_if(c, p, _g);
-        // during removal element neighbors are collected.
+		// Create two function objects for edge removal
+		typedef typename supergraph_type::Workspace::stack WorkStack;
+		detail::remove_and_collect<supergraph_type, sg_marker_type,
+		    typename supergraph_type::numbering_type, WorkStack,
+		    typename supergraph_type::VertexIndexMap>
+		    p(_supergraph, _supergraph._marker, _supergraph.numbering(),
+		      element_neighbor, get(boost::vertex_index, _g));
+
+		// Reconstruct the adjacent node list, push element neighbor in a
+		// List.
+		trace1("rm and collect", c);
+		remove_out_edge_if(c, p, _g);
+		// during removal element neighbors are collected.
 #ifndef NDEBUG
-		  {
-			  auto ii = boost::adjacent_vertices(c, _g);
-			  for(; ii.first!=ii.second; ++ii.first) {
-				  vertex_descriptor i = *ii.first;
-				  trace2("cleanup_mark first pass", c, i);
-				  assert(supernode_size(i) > 0);
-			  }
-		  }
+		{
+			auto ii = boost::adjacent_vertices(c, _g);
+			for(; ii.first!=ii.second; ++ii.first) {
+				vertex_descriptor i = *ii.first;
+				trace2("cleanup_mark first pass", c, i);
+				assert(supernode_size(i) > 0);
+			}
+		}
 #endif
 
 			while (!element_neighbor.empty()) {
@@ -1095,7 +1099,7 @@ public: // implementation
 				}
 				element_neighbor.pop();
 			}
-	 } // cleanup_mark_fill
+	} // cleanup_mark_fill
 
 	 // fillcollect missing forward edges. return number of existing forward edges.
 	template<class VI>
@@ -1192,7 +1196,7 @@ public: // implementation
 
 			trace2("check: p3 says", *m, DNm);
 //			trace4("fillcollect sum overlap", c, n, *m, ncoverlap);
-		  	trace6("fillcollect sum overlap", c, n, *m, overlap, DNm, DN);
+			trace6("fillcollect sum overlap", c, n, *m, overlap, DNm, DN);
 
 			assert(overlap <= DN);
 			assert(overlap <= DNm);
@@ -1233,7 +1237,7 @@ public: // implementation
 
 		trace4("fillcollect shift no disconnect", DN, c, n, _fu[n]);
 //		_fu[n] -= DN * _supergraph.supernode_size(c);
-      _marker.set_tag_as_multiple_tag();
+		_marker.set_tag_as_multiple_tag();
 
 		return num_edges_filled;
 	} // fillcollect
@@ -1476,10 +1480,8 @@ public: // implementation
 					auto n = *vv.first;
 					trace2("check: N(c)", c, n);
 					if(_supergraph._marker.is_done(n)){
-					}else if(_supergraph._marker.is_extra(n)){
-						_supergraph._marker.mark_multiple_tagged(n);
-					}else{ untested();
-						assert(false);
+					}else{
+					  	assert(_supergraph._marker.is_extra(n));
 						_supergraph._marker.mark_multiple_tagged(n);
 					}
 				}
@@ -1514,7 +1516,7 @@ public: // implementation
 					trace3("check: existing edg", c, n, mev);
 				}else if(me2){
 					assert(supernode_size(n)>0);
-				   assert(supernode_size(mev)>0);
+					assert(supernode_size(mev)>0);
 					me_check += supernode_size(n) * supernode_size(mev);
 					assert(!_supergraph._marker.is_done(mev));
 					assert(!_supergraph._marker.is_done(n));
@@ -1565,13 +1567,11 @@ public: // implementation
 			}else{
 			}
 
-			if(_supergraph.supernode_size(n) <= 0){ // !is_root?
+			if(_supergraph.supernode_size(n) <= 0){ untested();
+				// !is_root?
 				// reachable?
 			}else if (::me && boost::out_degree(n, _g) == 0) {
 				CFG::message(bLOG, "merge %d (%d) into %d (%d)\n", n, supernode_size(n), c, supernode_size(c));
-				// assert same fill?
-				//
-//				merge(n, c);
 #ifndef NDEBUG
 				auto dd = boost::out_degree(c, *_g);
 #endif
@@ -1587,11 +1587,8 @@ public: // implementation
 				_debug_marker.mark_done(n);
 #endif
 				assert(_numbering.is_numbered(n));
-
 				// needed in sg2tree..?
-
 				trace4("merged", n, c, _supergraph.supernode_size(c), _supergraph.supernode_size(n));
-
 
 #ifndef NDEBUG
 				{
@@ -1604,14 +1601,6 @@ public: // implementation
 					assert(k);
 				}
 #endif
-				//boost::add_edge(c, n, *_g); // already there?
-
-				// done_update(ww.first, vv.first);?
-//			 else if(!missing_edges_left)  untested();
-//			condition checked in fillcollect?
-//				boost::add_edge(n, c, *_g); // **
-//
-//				_marker.mark(c); // not done, because numbered.
 			}else{
 				if (boost::out_degree(n, _g) == 0) { untested();
 					CFG::message(bLOG, "no merge %d into %d\n", n, c);
@@ -1723,41 +1712,31 @@ public: // implementation
 
 	} // eliminate(c)
 
-    using baseclass::_i;
-    void postprocessing(){
-        trace2("post", _i, baseclass::_num_vert);
-		  auto const& sns = _supergraph.supernode_sizes();
-		  for(unsigned i=0; i<sns.size(); ++i){
-			  trace2("post", i, sns[i]);
-		  }
-        if(!baseclass::_iiv){
-            assert(boost::num_vertices(_g) == baseclass::_num_vert);
-        }else{ untested();
-        }
-        if(_i == baseclass::_num_vert){
-            // no nodes or so.
-            unreachable(); //?
-        }else if(0){ untested();
-            // the last node is missing, but why?
-      //       auto v = _fill.pick_min(0, 0, true).first;
-      //       (*_o)[_i++] = v;
-      //       baseclass::_numbering.put(v);
+	using baseclass::_i;
+	void postprocessing(){
+		trace2("post", _i, baseclass::_num_vert);
+		auto const& sns = _supergraph.supernode_sizes();
+		for(unsigned i=0; i<sns.size(); ++i){
+			trace2("post", i, sns[i]);
+		}
+		if(!baseclass::_iiv){
+			assert(boost::num_vertices(_g) == baseclass::_num_vert);
+		}else{ untested();
+		}
+		if(_i == baseclass::_num_vert){
+			// no nodes or so.
+			unreachable(); //?
+		}else if(0){ untested();
 
-      //       auto x = _subgraph.adjacent_vertices(v);
-      //       for(;x.first!=x.second;++x.first){ untested();
-      //           baseclass::_o->push_back(*x.first);
-      //           (*_o)[_i++] = *x.first;
-      //       }
-
-            auto w = _fill.pick_min(0, 0, true).first;
-            trace2("post", w, baseclass::_degreemap[w]);
-            (*_o)[baseclass::_i++] = w;
-            baseclass::_numbering.put(w);
-            baseclass::_numbering.increment();
-            auto x = _subgraph.adjacent_vertices(w);
-            for(;x.first!=x.second;++x.first){ untested();
-                trace1("last node neigh", *x.first);
-            }
+			auto w = _fill.pick_min(0, 0, true).first;
+			trace2("post", w, baseclass::_degreemap[w]);
+			(*_o)[baseclass::_i++] = w;
+			baseclass::_numbering.put(w);
+			baseclass::_numbering.increment();
+			auto x = _subgraph.adjacent_vertices(w);
+			for(;x.first!=x.second;++x.first){ untested();
+				trace1("last node neigh", *x.first);
+			}
 
             for(; _i < baseclass::_num_vert; ++_i){
                 auto v = _fill.pick_min(0, 0, true).first;
@@ -1765,51 +1744,51 @@ public: // implementation
                 assert(_i < _o->size());
                 (*_o)[baseclass::_i] = v;
             }
-        }else{
-            assert(_o);
-            assert(_o->size() == boost::num_vertices(_g));
-            std::vector<long> oo(_o->size()); // must be signed.
-            _numbering.get_ordering(oo, _supergraph._supernode_size);
-            *_o = O_t(oo.begin(), oo.end());
-            baseclass::_i = _o->size(); // length of the ordering used in baseclass...
-        }
+		}else{
+			assert(_o);
+			assert(_o->size() == boost::num_vertices(_g));
+			std::vector<long> oo(_o->size()); // must be signed.
+			_numbering.get_ordering(oo, _supergraph._supernode_size);
+			*_o = O_t(oo.begin(), oo.end());
+			baseclass::_i = _o->size(); // length of the ordering used in baseclass...
+		}
 
-        if(!baseclass::_iiv){
-            //assert(baseclass::_i == _o->size());
-            //assert(baseclass::_i == baseclass::_num_vert);
-            //assert(baseclass::_i == boost::num_vertices(_g));
+		if(!baseclass::_iiv){
+			//assert(baseclass::_i == _o->size());
+			//assert(baseclass::_i == baseclass::_num_vert);
+			//assert(baseclass::_i == boost::num_vertices(_g));
 
-            // assert(baseclass::_i == _numbering.total()); for some reason, numbering numbers the bags only.
-        }else{ untested();
-        }
-        trace2("post done", _i, baseclass::_num_vert);
-		  for(unsigned i=0; i<sns.size(); ++i){
-			  trace2("post", i, sns[i]);
-		  }
-    }
+			// assert(baseclass::_i == _numbering.total()); for some reason, numbering numbers the bags only.
+		}else{ untested();
+		}
+		trace2("post done", _i, baseclass::_num_vert);
+		for(unsigned i=0; i<sns.size(); ++i){
+			trace2("post", i, sns[i]);
+		}
+	}
 
-    template<class T>
-    void get_tree_decomposition(T& t){
-        assert(_o);
-        unsigned i=0;
-        for(auto oi : *_o){
-            trace3("dbg", i, oi, _numbering.get_position(i));
-            ++i;
-        }
-		  assert(treedec::is_vertex_permutation(*_o, _g));
-		  auto const& sns = _supergraph._supernode_size;
-		  for(unsigned i=0; i<sns.size(); ++i){
-			  trace2("gtd", i, sns[i]);
-		  }
+	template<class T>
+	void get_tree_decomposition(T& t){
+		assert(_o);
+		unsigned i=0;
+		for(auto oi : *_o){
+			trace3("dbg", i, oi, _numbering.get_position(i));
+			++i;
+		}
+		assert(treedec::is_vertex_permutation(*_o, _g));
+		auto const& sns = _supergraph._supernode_size;
+		for(unsigned i=0; i<sns.size(); ++i){
+			trace2("gtd", i, sns[i]);
+		}
 
-		 auto bs = 1+_ub_tw;
+		auto bs = 1+_ub_tw;
 #if 0
         tree_from_sg(_supergraph, *_o, t, bs, _supergraph._supernode_size);
 #else
        // treedec::draft::inplace_bmdo_tree(_g, *_o, t, bs, _supergraph.numbering());
 		 //
 		 // calls inplace_bmdo for on suitable graphs..
-		 treedec::draft::tree_from_sg(_supergraph, *_o, t, bs, _supergraph.numbering());
+		treedec::draft::tree_from_sg(_supergraph, *_o, t, bs, _supergraph.numbering());
 #endif
     }
 
@@ -1839,39 +1818,39 @@ private: // debugging
         }
         trace1("checked", c);
     }
-	 long supernode_size(vertex_descriptor n) const{
-		 return _supergraph.supernode_size(n);
-	 }
-	 void cherry_pick(vertex_descriptor n, size_t howmany, vertex_descriptor clique){
-		 trace3("flb", howmany, n, clique);
-		 assert(clique!=n);
-		 assert(_supergraph.is_numbered(clique));
-		 _pick_marker.increment_tag();
-		 _pick_marker.mark(n);
-		 assert(boost::out_degree(n, _g) == 1);
-		 boost::clear_out_edges(n, _g);
+	long /*vertices_size_type?*/ supernode_size(vertex_descriptor n) const{
+		return _supergraph.supernode_size(n);
+	}
+	void cherry_pick(vertex_descriptor n, size_t howmany, vertex_descriptor clique){
+		trace3("flb", howmany, n, clique);
+		assert(clique!=n);
+		assert(_supergraph.is_numbered(clique));
+		_pick_marker.increment_tag();
+		_pick_marker.mark(n);
+		assert(boost::out_degree(n, _g) == 1);
+		boost::clear_out_edges(n, _g);
 
-		 auto vv = boost::adjacent_vertices(clique, *_g);
-		 for(;vv.first != vv.second; ++vv.first){
-			 auto x = *vv.first;
-			 trace2("clique?", _supergraph._marker.is_multiple_tagged(x), _supergraph._marker.is_extra(x));
-			 trace2("clique?", x, _supergraph._marker.is_tagged(x));
-			 if(_pick_marker.is_marked(x)){
-				 trace1("pick marked", x);
-			 }else if(_supergraph.is_numbered(x)){
-				 trace1("numbered", x);
-			 }else if(!_supergraph._marker.is_multiple_tagged(x)){
-				 trace1("PICK", x);
-				 assert(howmany);
-				 boost::add_edge(n, x, *_g);
-				 _pick_marker.mark(x);
+		auto vv = boost::adjacent_vertices(clique, *_g);
+		for(;vv.first != vv.second; ++vv.first){
+			auto x = *vv.first;
+			trace2("clique?", _supergraph._marker.is_multiple_tagged(x), _supergraph._marker.is_extra(x));
+			trace2("clique?", x, _supergraph._marker.is_tagged(x));
+			if(_pick_marker.is_marked(x)){
+				trace1("pick marked", x);
+			}else if(_supergraph.is_numbered(x)){
+				trace1("numbered", x);
+			}else if(!_supergraph._marker.is_multiple_tagged(x)){
+				trace1("PICK", x);
+				assert(howmany);
+				boost::add_edge(n, x, *_g);
+				_pick_marker.mark(x);
 				 --howmany;
-			 }
-		 }
+			}
+		}
 
-		 trace1("flb", howmany);
-		 assert(howmany==0);
-	 }
+		trace1("flb", howmany);
+		assert(howmany==0);
+	}
 private:
 	unsigned _max_fill{0};
 	fill_type _fill;
