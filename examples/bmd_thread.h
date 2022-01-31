@@ -34,6 +34,9 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS,
 typedef boost::adjacency_list<boost::vecS, boost::vecS,
                               tree_directedness_, uint64_bag_p> _gsgvvu64_treedec;
 
+typedef boost::adjacency_list<boost::vecS, boost::vecS,
+                              tree_directedness_, uint64_bag_p> _gsgvvu64_treedec;
+
 template<class G, template<class H, class ... > class cfgt=treedec::algo::default_config>
 class BMD_THREAD : public TWTHREAD<G, cfgt> {
 public:

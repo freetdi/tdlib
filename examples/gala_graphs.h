@@ -51,6 +51,7 @@ struct dpvv_config : uvv_config<G> {
 
 typedef gala::graph<std::vector, std::vector, uint16_t, dpvv_config> sg_dpvv16;
 typedef gala::graph<std::vector, std::vector, uint32_t, dpvv_config> sg_dpvv32;
+typedef gala::graph<std::vector, std::vector, uint64_t, dpvv_config> sg_dpvv64;
 
 typedef gala::graph<std::vector, std::vector, uint16_t, odsvv_config> sg_odsvv16;
 

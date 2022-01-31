@@ -115,6 +115,7 @@ struct uvv_config : gala::graph_cfg_default<G> {
 };
 typedef gala::graph<std::vector, std::vector, uint16_t, uvv_config> sg_dvv16;
 typedef gala::graph<std::vector, std::vector, uint32_t, uvv_config> sg_dvv32;
+typedef gala::graph<std::vector, std::vector, uint64_t, uvv_config> sg_dvv64;
 
 
 #include <gala/boost_copy.h>
@@ -475,9 +476,11 @@ void twh(P& p, mag_t m, unsigned mask)
 
     typedef sg_dvv16 uG16;
     typedef sg_dvv32 uG32;
+    typedef sg_dvv64 uG64;
 
     typedef sg_dpvv16 G16p;
     typedef sg_dpvv32 G32p;
+    typedef sg_dpvv64 G64p;
 
 #endif
 
@@ -487,12 +490,18 @@ void twh(P& p, mag_t m, unsigned mask)
 #ifdef HAVE_GALA_GRAPH_H
     uG16 g16;
     uG32 g32;
+    uG64 g64;
     sg_odsvv16 tg;
     auto BE=raw_edges<P>(p);
     auto B=BE.first;
     auto E=BE.second;
 
-    if(m>M15){itested();
+    if(m>M31){itested();
+        G64p pg64(B, E, n, e);
+        g64 = std::move(pg64);
+
+        assert(boost::num_edges(g64)==e);
+    }else if(m>M15){itested();
         G32p pg32(B, E, n, e);
         g32 = std::move(pg32);
 
@@ -518,10 +527,11 @@ void twh(P& p, mag_t m, unsigned mask)
     incomplete();
     typedef balu_t G;
     typedef balu_t uG16;
-    typedef balu_t uG32;
+    typedef balu_t uG64;
     G g(p->begin(), p->end(), p->num_vertices(), p->num_edges());
     G& g16(g);
     G& g32(g);
+    G& g64(g);
 #endif
 /*--------------------------------------------------------------------------*/
 
@@ -531,9 +541,9 @@ void twh(P& p, mag_t m, unsigned mask)
     std::cout << "c gala on" << std::endl;
 #endif
 
-
-    if(trace){
+    if(errorlevel>=bLOG){
         std::cerr << "starting threads for " << m << " bit mode\n";
+    }else{
     }
 
 /*--------------------------------------------------------------------------*/
@@ -610,14 +620,13 @@ void twh(P& p, mag_t m, unsigned mask)
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FI
-    if(! ( mask & ( 1 << nFI ))) {
+    if(! ( mask & ( 1 << nFI ))) { untested();
     }else if( m < M16){
         reg_thread(threads, nFI, new FI_THREAD<uG16, grtd_algo_config>(g16, "FI16"));
     }else if( m < M32){ untested();
         reg_thread(threads, nFI, new FI_THREAD<uG32, grtd_algo_config>(g32, "FI32"));
     }else{ untested();
-        incomplete();
-//        threads[nFI] = new FI_THREAD<uG32>(g32, "FI32");
+        reg_thread(threads, nFI, new FI_THREAD<uG64, grtd_algo_config>(g64, "FI64"));
     }
 #endif
 /*--------------------------------------------------------------------------*/
