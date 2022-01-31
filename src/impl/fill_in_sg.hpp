@@ -143,13 +143,8 @@ public:
 		}
 		int reason = 0;
 		if (_c == t){
-			if(do_cliques){
-				reason = 99;
-			}else{ untested();
-				unreachable();
-				assert(false);
-				reason = -99;
-			}
+			assert(do_cliques);
+			reason = 99;
 		}else if(is_covered(t)) {
 			if(do_cliques){
 				reason = 5;
@@ -200,12 +195,9 @@ public:
 			trace2("p2 multitag", s, t);
 			marker.mark_multiple_tagged(t);
 			reason = 19;
-		}else if (marker.is_multiple_tagged(t)){
-			  unreachable();
-			  // already been here.
-			  reason = 41;
-
 		}else if (marker.is_tagged(t)){
+			assert(!marker.is_multiple_tagged(t));
+
 			// not in N(c), already been here
 			reason = 42;
 		}else{
@@ -279,6 +271,7 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 
 	auto vv = boost::adjacent_vertices(v, *_g);
 	vertex_descriptor which;
+
 	for(; vv.first!=vv.second; ++vv.first) {
 		auto t = *vv.first;
 		trace1("p2 mmark", t);
@@ -354,7 +347,7 @@ public:
 		auto s = boost::source(e, *_g);
 		auto t = boost::target(e, *_g);
 		trace4("overlap collect N(s)", s, t, _c, do_cliques);
-		int reason = 0;
+		int reason = 0; // don't delete.
 
 		// auto ii = _supergraph.adjacent_vertices(*t);
 		{ //
@@ -371,13 +364,8 @@ public:
 					reason = -1;
 				}
 			}else if (_fill_marker.is_multiple_tagged(t)){
+				// been there.
 				reason = 2;
-			//}else if(!_g.supernode_size(t)){ untested();
-			//	if(do_cliques){ untested();
-			//		reason = 31;
-			//	}else{ untested();
-			//		reason = -31;
-			//	}
 			}else if (tree && _g.supernode_size(t)<0){
 				  reason = -3;
 			}else if(_g.is_numbered(t)) {
@@ -462,7 +450,8 @@ public:
 				assert(long(_fill.get_value(t)) >= w);
 				_fill.shift(t, -w);
 
-			}else if(!_fill_marker.is_multiple_tagged(t)){
+			}else{
+				assert(!_fill_marker.is_multiple_tagged(t));
 
 				if(_g.supernode_size(t)==0){ untested();
 				}else if(_g.supernode_size(t)==1){
@@ -472,9 +461,6 @@ public:
 				// _g._marker.mark_tagged(t);
 				_fill_marker.mark_multiple_tagged(t);
 				reason = -17;
-			}else{ untested();
-				unreachable();
-				assert(false);
 			}
 		}
 
