@@ -71,7 +71,7 @@ namespace detail{
 // move to bits?
 template < class SignedInteger >
 class Stacks {
-	static_assert(std::is_signed<SignedInteger>::value);
+	static_assert(std::is_signed<SignedInteger>::value, "...");
 	typedef SignedInteger value_type; // why signed?
 	typedef typename std::vector< value_type >::size_type size_type;
 
@@ -935,11 +935,7 @@ public:
 		return _numbering.is_numbered(a);
 	}
 	bool is_numbered_(vertex_descriptor a) const{
-		if(a == find_parent(a)){
-		}else{ untested();
-			trace2("is_numbered_", a, _supernode_size[a]);
-			assert(0 && "is not parent");
-		}
+		assert(a == find_parent(a));
 		return _numbering.is_numbered(a);
 	}
 	bool is_before_(vertex_descriptor a, vertex_descriptor b) const{
@@ -999,8 +995,8 @@ public:
 
 		auto buf = _work_space.make_stack();
 
+		assert(_supernode_size[c]>0);
 		size_t degv = _supernode_size[c]-1;
-		assert(degv>=0);
 
 		assert(!marker.is_done(c));
 		marker.mark(c); // BUG
@@ -1657,8 +1653,7 @@ void tree_from_sg_tree(G &s, O const& o, T& t, size_t bagsize)
 				auto p = make_pusher(b, s._marker, num, oi);
 				assert(num.is_mode_tree());
 
-				auto pos = num.get_position(oi);
-				assert(unsigned(o[pos]) == unsigned(oi));
+				assert(unsigned(o[num.get_position(oi)]) == unsigned(oi));
 				assert(sns[oi]>0);
 
 				visit_supernode(oi, num, o, sns, p);

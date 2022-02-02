@@ -37,7 +37,7 @@ public:
 	  oTree,
      oAuto
 	};
-	static_assert(std::is_unsigned<T>::value);
+	static_assert(std::is_unsigned<T>::value, "...");
 	typedef typename boost::property_map<G_t, boost::vertex_index_t>::type idmap_type;
 	typedef boost::graph_traits<G_t> GraphTraits;
 	//	 typedef typename GraphTraits::vertices_size_type value_type;
@@ -230,8 +230,8 @@ private:
 	void get_ordering_(O& ord, S& supernode_by_idx) {
 
 		typedef typename O::value_type ovt;
-		static_assert(std::is_signed<ovt>::value); // BUG
-		static_assert(std::is_signed<typename S::value_type>::value); // BUG
+		static_assert(std::is_signed<ovt>::value, "..."); // BUG
+		static_assert(std::is_signed<typename S::value_type>::value, "..."); // BUG
 
 		// collect the permutation info
 		auto n = _data.size();
@@ -322,8 +322,8 @@ private:
 		auto& sns = supernode_by_idx;
 
 		typedef typename O::value_type ovt;
-		static_assert(std::is_signed<ovt>::value); // BUG
-		static_assert(std::is_signed<typename S::value_type>::value); // BUG
+		static_assert(std::is_signed<ovt>::value, "..."); // BUG
+		static_assert(std::is_signed<typename S::value_type>::value, "..."); // BUG
 
 		// collect the permutation info
 		auto n = _data.size();

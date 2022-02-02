@@ -64,6 +64,7 @@ public:
 		_size = 0;
 	}
 	void* allocate(size_t s) const{
+		(void)s;
 		assert(s==S);
 		if(_seek!=_end){
 			_seek = (void*) (intptr_t(_seek) + S);

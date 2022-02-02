@@ -253,6 +253,7 @@ public: // types
 
 		template<class DS>
 		void stuff(T const& c, T& n, DS const& d){
+			(void)c;
 			tassert(component==c); // still
 			// hmm efficient? trim here?
 			cbset::trim(n);

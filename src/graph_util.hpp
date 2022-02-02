@@ -143,7 +143,9 @@ template <typename G>
 bool eliminate_vertex(
         const typename boost::graph_traits<G>::vertex_descriptor v, G& g)
 {
+#ifndef NDEBUG
 	auto check = boost::num_vertices(g);
+#endif
 
 	auto adjv = boost::adjacent_vertices(v, g);
 

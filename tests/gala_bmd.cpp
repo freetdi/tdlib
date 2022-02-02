@@ -194,9 +194,11 @@ int main(int argc, char** argv)
 	for(auto x : o){
 		permcheck[x]=true;
 	}
+#ifndef NDEBUG
 	for(auto x : permcheck){
 		assert(x);
 	}
+#endif
 
 	int status = 0;
 	if(0){ // inefficient

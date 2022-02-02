@@ -113,7 +113,7 @@ private:
 // multicolor marker from boost/minimum_degree
 template < class SignedInteger, class Vertex, class VertexIndexMap >
 class Marker {
-	static_assert(std::is_signed<SignedInteger>::value);
+	static_assert(std::is_signed<SignedInteger>::value, "...");
 	typedef SignedInteger value_type;
 	typedef typename std::vector< value_type >::size_type size_type;
 

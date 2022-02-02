@@ -72,6 +72,7 @@ public:
             return _n.is_not_numbered(v);
         }
         sgm& operator=(const sgm& o){
+            (void)o;
             assert(&_n==&o._n);
             return *this;
         }
@@ -354,8 +355,6 @@ public:
 
             // assert(bags_i);?!
 #ifdef DEBUG_FILL
-            typedef treedec::draft::sMARKER<vertices_size_type, vertices_size_type> marker_type;
-            // marker_type debug_marker(_num_vert);
             MissingEdgeCounter<subgraph_type> debug_counter(_subgraph);
             std::vector<vertex_descriptor> c_neigh;
             {

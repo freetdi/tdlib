@@ -120,6 +120,7 @@ template<class V, class N, class G, class M>
 V deg_vector_init(V const&, N n, G const& g, M const& m)
 {
     V v(n);
+    (void)m;
 
     typename boost::graph_traits<G>::vertex_iterator I, vend;
 
@@ -536,6 +537,7 @@ private:
         }
     }
     void remove_edge(vertex_descriptor v, vertex_descriptor w){
+        (void)w;
 	assert(boost::edge(v, w, _g).second);
         assert(_numbering.is_numbered(w));
         --_degree[v];

@@ -156,8 +156,7 @@ int main(int, char**)
 	boost::copy_graph(pt, st);
 	boost::copy_graph(pt, vt);
 
-	auto N=boost::num_vertices(st);
-	assert(N==2);
+	assert(boost::num_vertices(st) == 2);
 	auto p=boost::vertices(st);
 
 	for(;p.first!=p.second; ++p.first){
