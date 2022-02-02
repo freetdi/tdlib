@@ -373,7 +373,8 @@ namespace boost {
       return stack(i, head, next.begin(), prev.begin(), tail,
                    id_to_value.begin(), id);
     }
-    unsigned size() const{ return prev.size(); }
+    // number of buckets.
+    size_t size() const{ return next.size() - (head-next.begin()); }
   protected:
     std::vector<size_type>   next;
     std::vector<size_type>   prev;
