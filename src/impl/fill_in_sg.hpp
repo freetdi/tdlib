@@ -300,9 +300,9 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 
 	 	}else if(_g.is_numbered(t)){
 		}else{
-			int o = operator()(p, false);
+			bool o = operator()(p, false);
 
-		  	if(o <= 0){
+			if(!o){
 				++count;
 				which = t;
 				ret = -17;
@@ -312,6 +312,7 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 			assert(t!=_c);
 		}
 	}
+
 	if(deref && (count==1)){
 		auto deg = boost::out_degree(v, *_g);
 		std::cout << "c deref clique " << v << "? " << deg << " " << which << "\n";
@@ -1266,6 +1267,7 @@ public: // implementation
 					n += nn;
 				}
 			}else{
+				// really? what if N(c) \subset N(N) already?
 				boost::add_edge(N, c, *_g); // **
 			}
 		}
