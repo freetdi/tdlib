@@ -78,10 +78,11 @@ public:
 			return true;
 		}else if (marker->is_tagged(t)){ untested();
 			trace2("collect delete", s, t);
+			unreachable();
 			return true;
 		}else{
+			marker->mark_tagged(t);
 		}
-		marker->mark_tagged(t);
 
 		if(tree && _g.supernode_size(t)<0){
 			trace2("collect redundant", s, t);
@@ -91,9 +92,9 @@ public:
 			trace2("collect delete numbered", s, t);
 			return true;
 		}else{
-			assert( t != boost::source(e, *_g));
+			assert( t != s );
+			return false;
 		}
-		return false;
 	}
 
 private:
@@ -141,6 +142,7 @@ public:
 			trace5("p2 oc", s, t, do_cliques, _g.is_numbered__(t), _only_cliques);
 			// assert(!_g.is_numbered(t));
 		}
+
 		int reason = 0;
 		if (_c == t){
 			assert(do_cliques);
@@ -264,6 +266,10 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 
 	auto s = boost::source(e, *_g);
 	auto v = boost::target(e, *_g);
+#ifndef NDEBUG
+	auto& marker = _g._marker;
+#endif
+	assert( marker.is_multiple_tagged(s));
 	assert(_g.is_numbered(v));
 	trace1("p2 scan", v);
 
@@ -280,17 +286,11 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 		assert(boost::source(p, *_g)==s);
 		assert(boost::target(p, *_g)==t);
 
-#ifndef NDEBUG
-		auto& marker = _g._marker;
-#endif
-
 
 	 	if(s==t){
-
 //			++count;
 //			which = t;
 //			ret = -18;
-			assert( marker.is_multiple_tagged(t));
 		}else if(_g.supernode_size(t)<=0){
 				//   marker.mark_multiple_tagged(t);
 //			++count;
@@ -299,7 +299,6 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 			//??
 
 	 	}else if(_g.is_numbered(t)){
-			// self loop?
 		}else{
 			int o = operator()(p, false);
 
@@ -565,6 +564,10 @@ public: //types
 	typedef typename baseclass::numbering_type numbering_type;
 	// BUG:: use CFGT::fill or fallback to current fill
 	typedef typename fill_chooser<typename baseclass::supergraph_type>::type fill_type;
+
+	typedef typename std::make_unsigned<
+                          typename boost::graph_traits<G>::edges_size_type
+                          >::type fill_value_t;
 
 #ifdef DEBUG_FILL
 	std::set<vertex_descriptor> debug_fill(vertex_descriptor c) {
@@ -1089,8 +1092,9 @@ public: // implementation
 
 	 // fillcollect missing forward edges. return number of existing forward edges.
 	template<class VI>
-	unsigned fillcollect(VI m, VI end, vertex_descriptor c, vertex_descriptor n, unsigned DN,
-			unsigned missing_edges_left, bool only_cliques) {
+	fill_value_t fillcollect(VI m, VI end, vertex_descriptor c, vertex_descriptor n,
+	                         vertices_size_type DN, fill_value_t missing_edges_left,
+	                         bool only_cliques) {
 		int k=0;
 		
 		p_coll_overlap p3(_supergraph, _marker, _fill, c, n);
@@ -1163,7 +1167,7 @@ public: // implementation
 			boost::remove_out_edge_if(*m, p3, *_g);
 
 			trace4("done p3", c, n, *m, p3.cnt());
-			unsigned overlap = p3.overlap();
+			vertices_size_type overlap = p3.overlap();
 			if(only_cliques){
 //				assert(!overlap);
 			}else{
@@ -1202,10 +1206,6 @@ public: // implementation
 				_me2[*m] += *m - n;
 				_me2[n] += n - *m;
 				std::swap(_me2[n], _me2[*m]);
-
-				// probably not needed, *m will be done
-				_fu[*m] += (DNm - overlap) * _supergraph.supernode_size(n);
-
 			}else{
 				_fu[*m] += (DNm - overlap) * _supergraph.supernode_size(n);
 				if(me2){
@@ -1319,7 +1319,7 @@ public: // implementation
 		std::set<vertex_descriptor> K;
 #endif
 
-		unsigned missing_edges_left = _fill.get_value(c);
+		fill_value_t missing_edges_left = _fill.get_value(c);
 		_supergraph._marker.assert_clear();
 		_supergraph._marker.mark(c);
 
@@ -1329,7 +1329,7 @@ public: // implementation
 		// todo: tag N(c) with _marker?
 		cleanup_mark_fill(c);
 
-		auto degc = boost::out_degree(c, *_g);
+		vertices_size_type degc = boost::out_degree(c, *_g);
 
 		if(1) { // raise.
 			_supergraph._marker.set_extra_tag(1+degc); // sth N(c) tags survive increments.
@@ -1453,6 +1453,7 @@ public: // implementation
 				}else{ itested();
 				}
 			}else{
+				// fill_value(n) == 0
 				// like p2, but faster
 				// (todo: omit)
 //				CFG::message(bTRACE, "nc TWIN again? %d -> %d\n", n, c);
