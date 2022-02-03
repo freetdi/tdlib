@@ -113,7 +113,7 @@ private:
 // count N(n) \ N(c)
 // runs on non-unique neighbours of n.
 // multiple-tags outbound neighbours.
-// N(c) is tagged...
+// N(c) is tagged... delete edges to N(c)
 template<class G, class M>
 class predicate_scan_neigh {
 public:
@@ -327,6 +327,8 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 		_stack_hack.push_back(which);
 		return 50;
 	}
+#else
+	(void) which;
 #endif
 
 	{
@@ -418,7 +420,7 @@ public:
 				_fill.shift(t, -w);
 
 				reason = -8;
-			}else if(_g._marker.is_extra(t)){ untested();
+			}else if(_g._marker.is_extra(t)){
 				// nodes on N(c) not reached from n.
 				// --> not interesting. still needed for subsequent scans.
 				// extra < multi.
@@ -445,7 +447,7 @@ public:
 
 			}else{
 				assert(!_fill_marker.is_multiple_tagged(t));
-				assert(_g.supernode_size(t)==0);
+				assert(_g.supernode_size(t)!=0);
 
 				_nc += _g.supernode_size(t);
 				// _g._marker.mark_tagged(t);
@@ -535,6 +537,25 @@ int predicate_collect_overlap<G,M,F>::mcount_overlap(E const& e) const
 } // predicate_collect_overlap::mcount_overlap
 
 } // impl::detail
+
+template<class V, class G>
+static void push_front_edge(V N, V c, G& g)
+{
+#if 1
+	auto f = g.out_edges(N).front();
+	g.out_edges(N).push_back(f);
+	g.out_edges(N).front() = c;
+#else
+	auto& E = g.out_edges(N);
+
+	for(auto& e : E){
+		std::swap(e,c);
+	}
+	
+	E.push_back(c);
+#endif
+}
+				//boost::add_edge(N, c, *_g); // **
 
 // the fillIn heuristic.
 template<typename G,
@@ -1235,16 +1256,18 @@ public: // implementation
 		for(; vv.first!=vv.second; ++vv.first) {
 			auto N = *vv.first;
 			if(_marker.is_done(N)){
+				// assert(!boost::out_degree(N, *_g)); // no.
 			}else if(_me2[N]){
+				assert(boost::out_degree(N, *_g));
 				auto n = N;
 //				boost::add_edge(c, n, *_g); // **
 				n += _me2[N];
 				_me2[N] = 0;
-				boost::add_edge(N, c, *_g); // **
+				push_front_edge(N, c, *_g);
 				while(_me2[n]){
 					if(_marker.is_done(n)){ untested();
-						// still need it in the bag?
-						boost::add_edge(c, n, *_g); // **
+						// BUG: still need it in the bag?
+						boost::add_edge(c, n, *_g);
 					}else{
 						_marker.mark_done(n);
 						CFG::message(bLOG, "elim %d: merge %d into %d\n", c, n, N);
@@ -1267,7 +1290,8 @@ public: // implementation
 					n += nn;
 				}
 			}else{
-				boost::add_edge(N, c, *_g); // **
+				assert(boost::out_degree(N, *_g));
+				push_front_edge(N, c, *_g);
 			}
 		}
 
@@ -1302,6 +1326,7 @@ public: // implementation
 		}
 		trace3("merged", tree, _supergraph._supernode_size[N], _supergraph._supernode_size[n]);
 
+		// TODO: mark_done(n)?
 	}
 
 
@@ -1572,7 +1597,7 @@ public: // implementation
 				merge_vertices(n, c);
 
 				_supergraph._marker.mark_done(n);
-				_marker.mark_done(n); // really?
+				_marker.mark_done(n); // avoid in sort_out_me2
 				_fill.remove(n);
 #ifndef NDEBUG
 				_debug_marker.mark_done(n);
