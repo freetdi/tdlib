@@ -153,12 +153,14 @@ public:
 			if(do_cliques){
 				reason = 5;
 			}else{ untested();
+			  unreachable();
 				// before/after?
 				reason = -5;
 			}
 //        }else if (tree & supernode_size(t) <= 0 ){
 		}else if (_g.is_numbered_(t)){
-			if(do_cliques){
+			assert(do_cliques);
+			{
 				assert(marker.is_extra(s)); // must be in N(c)...
 				marker.mark_multiple_tagged(s);
 
@@ -186,8 +188,6 @@ public:
 				}else{ untested();
 					reason = -21;
 				}
-			}else{ untested();
-				reason = 19;
 			}
 		}else if (marker.is_extra(t)){
 			// N(c) is extra
@@ -214,6 +214,7 @@ public:
 			assert(!marker.is_multiple_tagged(t));
 			assert(!marker.is_extra(t));
 			_cn += _g.supernode_size(t);
+			++_rcn;
 			reason = -12;
 		}
 
@@ -227,10 +228,18 @@ public:
 	size_t cnt() const{
 		return _cn;
 	}
+	size_t rcnt() const{
+		return _rcn;
+	}
+	size_t rcl() const{
+		return _rcl;
+	}
 
 	// debugging?
 	void reset() {
 		_cn = 0;
+		_rcn = 0;
+		_rcl = 0;
 		//_ncc = 0;
 #ifdef DEREF
 		_stack_hack.clear();
@@ -254,6 +263,8 @@ private:
 	G const& _g;
 	M& _fill_marker;
 	mutable vertices_size_type _cn{0};
+	mutable vertices_size_type _rcn{0};
+	mutable vertices_size_type _rcl{0};
 	vertex_descriptor _c;
 	mutable bool _only_cliques;
 public:
@@ -281,11 +292,14 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 	trace1("p2 scan", v);
 
 	int count = 0;
+	unsigned rcl = 0;
 
 	auto vv = boost::adjacent_vertices(v, *_g);
 	vertex_descriptor which;
+	auto& marker = _g._marker;
 
 	for(; vv.first!=vv.second; ++vv.first) {
+		++rcl;
 		auto t = *vv.first;
 		trace1("p2 mmark", t);
 
@@ -306,6 +320,37 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 			//??
 
 	 	}else if(_g.is_numbered(t)){
+#if 1
+		}else if (marker.is_extra(t)){
+			// N(c) is extra
+			assert(!_g.is_numbered(t));
+			assert(marker.is_tagged(t));
+
+			// extra < multi.
+			// need tag to identify missing edges.
+			trace2("p2 multitag", s, t);
+			marker.mark_multiple_tagged(t);
+			//ret = 19;
+		}else if (marker.is_tagged(t)){
+			assert(!marker.is_multiple_tagged(t));
+
+			// not in N(c), already been here
+			//ret = 42;
+		}else{
+			// untagged. just count.
+			marker.mark_tagged(t);
+			assert(_g.supernode_size(t)>0);
+			trace2("p2 found dn", s, t);
+
+			assert(!_g.is_numbered(t));
+			assert(!marker.is_multiple_tagged(t));
+			assert(!marker.is_extra(t));
+			_cn += _g.supernode_size(t);
+			++_rcn;
+			ret = -12;
+		}
+
+#else
 		}else{
 			bool o = operator()(p, false);
 
@@ -318,6 +363,7 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 
 			assert(t!=_c);
 		}
+#endif
 	}
 
 #ifdef DEREF
@@ -336,6 +382,7 @@ int predicate_scan_neigh<G, M>::mmark_clique(E const& e) const
 			trace2("unlink clique", v, ret);
 		}else{
 			trace2("no unlink clique", s, v);
+			_rcl += rcl;
 		}
 		return ret;
 	}
@@ -373,14 +420,16 @@ public:
 				if(do_cliques){
 					reason = 1;
 				}else{ untested();
+					unreachable();
 					reason = -1;
 				}
 			}else if (_fill_marker.is_multiple_tagged(t)){
 				assert(do_cliques);
 				// been there.
 				reason = 2;
-			}else if (tree && _g.supernode_size(t)<0){
-				  reason = -3;
+			}else if (tree && _g.supernode_size(t)<0){ untested();
+				assert(do_cliques);
+				reason = -3;
 			}else if(_g.is_numbered(t)) {
 				assert(do_cliques);
 				{
@@ -526,11 +575,70 @@ int predicate_collect_overlap<G,M,F>::mcount_overlap(E const& e) const
 		if(_g.is_numbered(t)){
 		}else if(_fill_marker.is_multiple_tagged(t)){
 			// in N(c)?
-		}else if (!operator()(p, false)){
-			// indicate nodelete.
-			ret = -50;
-		}else{ untested();
+		}else if (_g._marker.is_multiple_tagged(t)){
+			// overlap inside N(c)
+			if(me2){
+				assert(_g.supernode_size(t)>0);
+			}else{
+				assert(_g.supernode_size(t)==1);
+			}
+			assert(_g._marker.is_extra(t));
+			trace1("p3 fu shift internal", t);
+
+			assert(_g.supernode_size(t)>=0);
+			_ncoverlap += _g.supernode_size(t);
+
+			_fill_marker.mark_multiple_tagged(t);
+
+			assert(_fill.get_value(t));
+			assert(_g.supernode_size(_c)>0);
+			assert(_g.supernode_size(_n)>=0);
+			assert(_g.supernode_size(s)>=0);
+
+			long w = _g.supernode_size(s) * _g.supernode_size(_n);
+			assert(long(_fill.get_value(t)) >= w);
+			_fill.shift(t, -w);
+
+			ret = -8;
+		}else if(_g._marker.is_extra(t)){
+			// nodes on N(c) not reached from n.
+			// --> not interesting. still needed for subsequent scans.
+			// extra < multi.
+			assert(!_fill_marker.is_multiple_tagged(t));
+
+			// delete in next go.
+			_fill_marker.mark_multiple_tagged(t);
+			ret = -5;
+		}else if(_g._marker.is_tagged(t)){
+			// external overlap
+			_fill_marker.mark_multiple_tagged(t);
+			assert(_g.supernode_size(t)>0); // for now
+
+			_overlap += _g.supernode_size(t);
+			ret = -2;
+
+			trace1("p3 fu shift", t);
+
+			assert(_g.supernode_size(_c)>0);
+			assert(_g.supernode_size(s)>=0);
+
+			auto w = _g.supernode_size(s) * _g.supernode_size(_n);
+			assert(long(_fill.get_value(t)) >= w);
+			_fill.shift(t, -w);
+
+		}else{
+			assert(!_fill_marker.is_multiple_tagged(t));
+			assert(_g.supernode_size(t)!=0);
+
+			_nc += _g.supernode_size(t);
+			// _g._marker.mark_tagged(t);
+			_fill_marker.mark_multiple_tagged(t);
+			ret = -17;
 		}
+
+		// }else if (!operator()(p, false)){
+		// 	// indicate nodelete.
+		// 	ret = -50;
 
 	}
 	return ret;
@@ -867,7 +975,8 @@ public: // implementation
 			  // 	_supergraph.bag_vertices(c); not initialised yet.
 				for(; bb.first!=bb.second; ++bb.first){
 					auto i = *bb.first;
-					if(_marker.is_done(i)){
+					if(_marker.is_done(i)){ untested();
+						// unreachable(); // no. why?
 					}else if(_marker.is_tagged(i)){ untested();
 					}else if(tree){
 						if(supernode_size(i) < 0){ untested();
@@ -1443,6 +1552,11 @@ public: // implementation
 				DN = p2.cnt();
 				trace3("check: p2 says", n, DN, p2.only_cliques());
 
+				if(p2.rcl() > 4* p2.rcnt()){
+					CFG::message(bLOG, "scan %d: deg %d cnt %d rcnt %d same %d, clique sum %d\n", n, boost::out_degree(n,_g),
+							p2.cnt(), p2.rcnt(), p2.cnt()==p2.rcnt(), p2.rcl());
+				}
+
 #ifndef NDEBUG
 				assert(_dn_debug[n] == int(DN) || _dn_debug[n] == -1);
 				_dn_debug[n] = DN;
@@ -1502,14 +1616,6 @@ public: // implementation
 				}
 			}
 
-			if(!czo){
-			}else if (_dn[n]<0){
-				CFG::message(bLOG, "czo: catch %d %d %d\n", n, DN, _dn[n]);
-				// collected from *m.
-				_fu[n] -= _dn[n] * DN;
-			}else{
-			}
-
 			_dn[n] = DN;
 
 #ifdef DO_TRACE
@@ -1550,7 +1656,7 @@ public: // implementation
 
 			trace3("done p2", c, n, boost::out_degree(n, *_g));
 
-
+#if 0 // not yet?
 			if(_supergraph.supernode_size(n) <= 0){
 			}else if (boost::out_degree(n, *_g) == 0) {
 				// n was only connected to elements in N(c)?
@@ -1583,6 +1689,7 @@ public: // implementation
 				}
 			}else{
 			}
+#endif
 
 			assert(_supergraph.supernode_size(n) > 0);
 
