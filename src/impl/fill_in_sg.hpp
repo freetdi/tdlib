@@ -1552,10 +1552,10 @@ public: // implementation
 				DN = p2.cnt();
 				trace3("check: p2 says", n, DN, p2.only_cliques());
 
-				if(p2.rcl() > 4* p2.rcnt()){
-					CFG::message(bLOG, "scan %d: deg %d cnt %d rcnt %d same %d, clique sum %d\n", n, boost::out_degree(n,_g),
-							p2.cnt(), p2.rcnt(), p2.cnt()==p2.rcnt(), p2.rcl());
-				}
+//				if(p2.rcl() > 4* p2.rcnt()){
+//					CFG::message(bLOG, "scan %d: deg %d cnt %d rcnt %d same %d, clique sum %d\n", n, boost::out_degree(n,_g),
+//							p2.cnt(), p2.rcnt(), p2.cnt()==p2.rcnt(), p2.rcl());
+//				}
 
 #ifndef NDEBUG
 				assert(_dn_debug[n] == int(DN) || _dn_debug[n] == -1);
