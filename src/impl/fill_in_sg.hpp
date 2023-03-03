@@ -445,7 +445,7 @@ public:
 
 			}else{
 				assert(!_fill_marker.is_multiple_tagged(t));
-				assert(_g.supernode_size(t)==0);
+				assert(_g.supernode_size(t));
 
 				_nc += _g.supernode_size(t);
 				// _g._marker.mark_tagged(t);
