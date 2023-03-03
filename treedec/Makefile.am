@@ -1,6 +1,9 @@
 AM_DEFAULT_SOURCE_EXT = .cpp
 instdir = $(pythondir)/treedec
 
+# TODO: ask python (what to ask?!)
+BOOST_PYTHON_LIB_SUFFIX = 311
+
 inst_PYTHON = \
 	comb.py \
 	exact.py \
@@ -25,8 +28,9 @@ inst_LTLIBRARIES = \
 
 SUBDIRS = . tests
 
-# TODO: ask python (what to ask?!)
-BOOST_PYTHON_LIBS = -lboost_python39 -lboost_numpy39
+BOOST_PYTHON_LIBS = \
+	-lboost_python${BOOST_PYTHON_LIB_SUFFIX}
+	-lboost_numpy${BOOST_PYTHON_LIB_SUFFIX}
 
 _comb_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _exact_la_LIBADD = ${BOOST_PYTHON_LIBS}
