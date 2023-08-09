@@ -14,13 +14,24 @@ normative. Deviations from conventions stated here are considered bugs.
 ## Prerequisites
 
 - boost (tested with >=1.62)
-- a C++ compiler with reasonable C++ support
+- a C++ compiler with support for c++11.
 
 Optional:
 
 - Python/Cython (disable with `--without-python`)
 - gala headers; will be detected, if available, by configure
   (need `libboost_graph` in that case)
+
+## Build process
+
+The treedec package uses an autotools based build system. See INSTALL for
+generic intructions.
+
+For developpers and git users, the bootstrap script will create the necessary
+files. After cloning the repository, type
+
+$ cd $repository_root # <= this is the directory this README file is located.
+$ ./bootstrap
 
 ## The interface
 
