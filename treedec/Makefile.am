@@ -4,27 +4,7 @@ instdir = $(pythondir)/treedec
 # TODO: ask python (what to ask?!)
 BOOST_PYTHON_LIB_SUFFIX = 311
 
-inst_PYTHON = \
-	comb.py \
-	exact.py \
-	graph.py \
-	greedy.py \
-	__init__.py \
-	lb.py \
-	order.py \
-	pp.py \
-	treedec.py
-
-inst_LTLIBRARIES = \
-	_comb.la \
-	_exact.la \
-	_graph.la \
-	_greedy.la \
-	_lb.la \
-	_misc.la \
-	_order.la \
-	_pp.la \
-	_treedec.la
+include MakeList
 
 SUBDIRS = . tests
 
