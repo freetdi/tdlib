@@ -906,7 +906,7 @@ private:
     // numbering?
     // partial numbering?
     vertex_index_map _idmap;
-    size_t _nv{-1};
+    size_t _nv{size_t(-1)};
 };
 
 //Make G a filled graph according to the provided elimination_ordering. Stores
