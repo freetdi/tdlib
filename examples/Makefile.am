@@ -35,17 +35,25 @@ endif
 
 BOOST_LIBS = -lboost_thread -lboost_system -lpthread
 
+if CLANG
+#BUG: ignore profile data.
+PROFILE_GEN =
+PROFILE_FLAGS =
+else
 PROFILE_GEN = -fprofile-generate
 PROFILE_FLAGS = -fprofile-use=.
+endif
+
 PROFILE_GRAPH = gr/h.gr
+
 TD_VALIDATE = ./td-validate
 
 COMMON_CXXFLAGS = -Os -march=native
 
 tdecompdir=$(pkglibexecdir)
 
-if !CLANG
 tdecomp_PROGRAMS = ${GALA_APPS}
+if !CLANG
 check_PROGRAMS = ${GALA_NOINST_APPS} td-validate
 endif
 
