@@ -6,6 +6,14 @@
 #include "config.h"
 #endif
 
+// TODO: include system headers
+
+#ifdef __APPLE__
+#ifdef howmany
+#undef howmany
+#endif
+#endif
+
 #if __cplusplus >= 201103L
 #define MOVE(x) std::move(x)
 #else
