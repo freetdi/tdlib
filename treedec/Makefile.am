@@ -9,7 +9,7 @@ include MakeList
 SUBDIRS = . tests
 
 BOOST_PYTHON_LIBS = \
-	-lboost_python${BOOST_PYTHON_LIB_SUFFIX}
+	-lboost_python${BOOST_PYTHON_LIB_SUFFIX} \
 	-lboost_numpy${BOOST_PYTHON_LIB_SUFFIX}
 
 _comb_la_LIBADD = ${BOOST_PYTHON_LIBS}
