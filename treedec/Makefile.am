@@ -23,7 +23,7 @@ _pp_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _treedec_la_LIBADD = ${BOOST_PYTHON_LIBS}
 
 # BUG, not here.
-AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
+AM_CXXFLAGS = -pthread \
               -fno-strict-aliasing -g -fwrapv -O2 -Wall \
               -Wformat -Werror=format-security
 
