@@ -320,7 +320,14 @@ BOOST_PYTHON_MODULE(_treedec)
 	// py::to_python_converter<const std::set<unsigned int>, set2list<unsigned int> >();
 	// https://wiki.python.org/moin/boost.python/StlContainers ?
 	py::class_<std::set<unsigned> >("set_unsigned")
+#if 0
+		doesn't compile on mac w/ clang++14, boost 1.82
 		.def("__iter__",     py::range(&std::set<unsigned>::begin, &std::set<unsigned>::end) )
+#else
+		// supposedly the same (?) c.f.
+		// https://wiki.python.org/moin/boost.python/iterator
+		.def("__iter__",     py::iterator<std::set<unsigned>>())
+#endif
 	//	.def("__iter__",     &set_wrap<std::set<unsigned>>::range )
 		.def("__repr__",     &bag_wrap<std::set<unsigned>>::repr );
 
