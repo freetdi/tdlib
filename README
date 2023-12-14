@@ -30,8 +30,13 @@ generic intructions.
 For developpers and git users, the bootstrap script will create the necessary
 files. After cloning the repository, type
 
-$ cd $repository_root # <= this is the directory this README file is located.
+$ cd $repository_root # <= the directory containing this README file.
 $ ./bootstrap
+
+Developpers are advised to build in a separate directory. For this, change to
+a new empty directory and run
+
+$ path_to_repository/configure [flags].
 
 ## The interface
 
