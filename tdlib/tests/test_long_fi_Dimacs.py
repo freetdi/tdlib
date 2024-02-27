@@ -7,8 +7,11 @@ COUNT = 82
 
 if(len(sys.argv)==2 and sys.argv[1]=="short"):
     COUNT = 6
-elif(len(sys.argv)<2 or sys.argv[1]!="long"):
-    sys.exit(77)
+elif(len(sys.argv)==2 and sys.argv[1]=="long"):
+    pass
+else:
+    COUNT = 6
+    # sys.exit(77)
 
 from graphs import *
 import Dimacs
