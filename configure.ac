@@ -205,6 +205,12 @@ AC_CONFIG_FILES([tests/Makefile])
 
 AC_OUTPUT
 
+if test -d .git; then
+	:
+else
+	echo '*' > .gitignore
+fi
+
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
