@@ -38,6 +38,10 @@ a new empty directory and run
 
 $ path_to_repository/configure [flags].
 
+## Build process (python)
+
+There is a build system for pure python environments, see python/README.
+
 ## The interface
 
 A tree decomposition algorithm is a class template
