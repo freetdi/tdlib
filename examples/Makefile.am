@@ -26,9 +26,10 @@ SUBDIRS = gr
 
 AM_DEFAULT_SOURCE_EXT = .cc
 
-if USE_GALA
+if TDECOMP
 GALA_NOINST_APPS = \
 	tdecomp-profile
+
 GALA_APPS = \
 	tdecomp
 endif

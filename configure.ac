@@ -133,10 +133,10 @@ CXXFLAGS="-std=c++11 $CXXFLAGS"
 AC_CHECK_HEADERS([boost/tuple/tuple.hpp], [],
                  AC_MSG_ERROR([could not find a boost header])
 )
-AC_CHECK_LIB([boost_system], [main], ,
-             [AC_MSG_ERROR([Unable to find Boost System library])])
-AC_CHECK_LIB([boost_thread], [main], ,
-             [AC_MSG_ERROR([Unable to find Boost Thread library])])
+
+have_boostlibs=yes
+AC_CHECK_LIB([boost_system], [main], , have_boostlibs=no)
+AC_CHECK_LIB([boost_thread], [main], , have_boostlibs=no)
 
 have_gala=no
 
@@ -170,7 +170,7 @@ AS_IF([test x"$PYTHON" != x], [
 AM_CONDITIONAL([CLANG], [test "x$ax_cv_cxx_compiler_vendor" = "xclang"])
 
 # HACK. does old automake not support nested conditionals??
-AM_CONDITIONAL([TDECOMP], [test "$have_gala" = yes -a "x$ax_cv_cxx_compiler_vendor" != "xclang"])
+AM_CONDITIONAL([TDECOMP], [test "$have_gala" = yes -a "$have_boostlibs" != no -a "x$ax_cv_cxx_compiler_vendor" != "xclang"])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -221,4 +221,5 @@ AC_MSG_RESULT([
    CXX:        $CXX
    CPPFLAGS:   $CPPFLAGS
    CXXFLAGS:   $CXXFLAGS
+   LIBS:       $LIBS
 ])
