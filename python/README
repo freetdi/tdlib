@@ -1,0 +1,57 @@
+Readme for treedec python package.
+
+1. **Prerequisite**:
+   Install gala.
+
+2. **Create a Source Distribution**:
+
+   ```
+   python setup.py sdist
+   ```
+
+   Now we have a `.tar.gz` file in the `dist` directory.
+
+3. **Parallel build**: The build process using the make command takes approximately 4.5 minutes, but utilizing the -j5 flag can significantly reduce the build time to around 1.53 minutes. On the other hand, building using setuptool in Python takes approximately 2.4 minutes and with -j 5, it takes approximately 2.2 minutes. I'm currently exploring alternative build methods to further optimize the process.
+
+   ```
+   python setup.py build -j 5
+   ```
+
+4. **Creating a Wheel Distribution**:
+
+   ```
+   pip install wheel
+   python setup.py bdist_wheel
+   ```
+
+	BUG: -j does not work with bdist_wheel. "build" first, then run bdist_wheel.
+
+   This will create a `.whl` file in the `dist` directory, which is a built package that can be installed with `pip`.
+
+# Install the package from sdist and Wheel.
+   Using tar file:
+   ```
+   pip install dist/treedec_pip-0.1.tar.gz
+   ```
+   Using Wheel:
+   ```
+   pip install dist/treedec_pip-0.1-py3-none-any.whl
+   ```
+
+
+## Testing the library.
+   Navigate to the python directory. Execute the following command to compile the library:
+   ```
+   python setup.py sdist bdist_wheel
+   ```
+   Once the wheel is created, launch the test suite by running below command:
+   ```
+   python setup.py test
+   ```
+
+
+## TODO List
+
+1. **Gala should not be a requirement for treedec project.** [ND]
+2. **All of the symlinks should be relative.** [ND]
+3. **The relevant test files such as `graph_bal0.py` etc, are not included in the tarball. These need to be added.**
