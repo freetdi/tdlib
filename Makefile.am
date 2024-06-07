@@ -40,3 +40,6 @@ EXTRA_DIST = \
 	log_compiler \
 	py_log_compiler \
 	cython.am
+
+distclean-local:
+	[ -d .git ] || rm -f .gitignore
