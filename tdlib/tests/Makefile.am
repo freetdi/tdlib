@@ -9,6 +9,7 @@ PYTHON = python3
 TESTS = $(PY_TESTS) $(LONG_TESTS)
 
 PY_TESTS = $(GALA_TESTS) \
+	38159.py
 	dclc_g5.py \
 	test_generic_search_CFG1.py \
 	test_generic_search_CFG2.py \
