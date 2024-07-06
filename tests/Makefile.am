@@ -25,6 +25,7 @@
 if USE_GALA
 GPROG = \
 	gala_bmd \
+	tr0 \
 	ta
 else
 GPROG =

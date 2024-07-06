@@ -78,7 +78,7 @@ private:
 public: // iter types
 	static constexpr unsigned node_size=sizeof(node_t);
 public: // iter types
-	struct iterNode { //
+	struct iterNode {
 		iterNode() {}
 		iterNode(NODEp a, char_type b) : cur(a), v(b){
 			lassert(b<depth());
@@ -200,7 +200,7 @@ public: // iter types
 		value_type operator*() const{ untested();
 			/// hmm better return pair?
 			lassert(_stack[_seek-1]);
-			auto block=_stack[_seek-1];
+			auto block = _stack[_seek-1];
 			lassert(block);
 			lassert(cbset::contains(block->component, back()));
 
@@ -309,18 +309,17 @@ public: // iter types
 	}; // const_iterator
 //	typedef const_iterator_<some_true> const_iterator;
 public: //iter
-	const_iterator begin(range_scratch_type r=NULL) const
-	{
+	const_iterator begin(range_scratch_type r=NULL) const {
 		return const_iterator(_root, *this, (void*)NULL, r);
 	}
 	template<typename PRED>
-	const_iterator begin(PRED const* pred, range_scratch_type r=NULL) const
-	{
+	const_iterator begin(PRED const* pred, range_scratch_type r=NULL) const {
 		return const_iterator(_root, *this, pred, r);
 	}
-	static end_iterator end(){
+	static end_iterator end() {
 		return end_iterator();
 	}
+
 protected:
 	unsigned depth() const{
 		return _depth;

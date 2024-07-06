@@ -15,13 +15,13 @@ check_PROGRAMS = \
 	fill_in0 \
 	fill_in1 \
 	fill_in2 \
+	graph \
 	inline \
 	iter0 \
 	iter1 \
 	numbering0 \
 	numbering1 \
 	numbering2 \
-	graph \
 	pp \
 	pp0 \
 	pp1 \
@@ -34,4 +34,11 @@ check_PROGRAMS = \
 	sdcc_ub_set \
 	sdcc_uu \
 	sdcc_bu \
+	supergraph0 \
+	supergraph1 \
+	vec2tree
+	tr0 \
+	tr_bs0 \
+	tr_bs1 \
+	tr_bs2 \
 	vec2tree
