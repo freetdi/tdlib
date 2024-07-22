@@ -25,7 +25,10 @@
 //    private static final boolean DEBUG = true;
 //static bool DEBUG = false;
 
+template <class G>
 class SafeSeparator {
+
+  typedef G::edge_container_type cfg_myset;
 	class LeftNode {
 		int _index;
 		int _vertex;
@@ -48,14 +51,14 @@ class SafeSeparator {
 		}
 	};
 
-  graph_t* g{nullptr};
+  G* g{nullptr};
 
   int maxSteps;
   int steps;
   std::vector<LeftNode*> leftNodes;
 //  ArrayList<RightNode> rightNodeList;
 //  ArrayList<MissingEdge> missingEdgeList;
-  myset _available;
+  cfg_myset _available;
 
 #if 0
   
@@ -63,11 +66,11 @@ class SafeSeparator {
     this.g = g;
   }
 
-  bool isSafeSeparator(myset const& separator)const {
+  bool isSafeSeparator(cfg_myset const& separator)const {
     return isSafeSeparator(separator, DEFAULT_MAX_STEPS);
   }
   
-  bool isSafeSeparator(myset const& separator, int maxSteps) const{
+  bool isSafeSeparator(cfg_myset const& separator, int maxSteps) const{
 	  incomplete();
 	  return false;
   }
@@ -586,3 +589,4 @@ class SafeSeparator {
 
 #endif
 };
+

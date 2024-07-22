@@ -93,6 +93,21 @@ public:
 		return _s.size();
 	}
 
+	
+	Block * find(myset const* key) {
+		// BUG //
+		incomplete();
+		return const_cast<Block*>(*_s.find(key));
+	}
+	Block * find(myset const& key) {
+		// BUG //
+		return const_cast<Block*>(*_s.find(key));
+	}
+
+	auto end(){
+		return *_s.end();
+	}
+
 public:
 	map_t const& s() const{return _s;}
 private:

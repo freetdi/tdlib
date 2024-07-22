@@ -8,7 +8,6 @@
 #define TR_BAG_H
 
 #include "tr_sep.h"
-
 #include <ostream>
 
 
@@ -24,21 +23,25 @@ class IODecomposer;
 template<class G>
 class Bag{
 public: // types
+	
+	typedef G::edge_container_type cfg_myset;
 	typedef Separator<G> sep_t;
 	typedef Bag<G> bag_t;
-
+	
+	
+	
 	friend class IODecomposer<G>;
 
 private: // data
 	Bag const* _parent{nullptr};
-	myset _vertices; // vertices of the paren graph?  // map?
+	cfg_myset _vertices; // vertices of the paren graph?  // map?
 	G const* _graph{nullptr};
 	unsigned _size{-1u};
 	std::vector<int> _conv;
 	std::vector<int> _inv;
 	std::vector<Bag const*> _nestedBags;
 	std::vector<sep_t*> _separators;
-	std::vector<Separator<G> const* > _incidentSeparators;
+	mutable std::vector<Separator<G> const* > _incidentSeparators;
   int _width{0}; //bs?
   int _bagsize{0}; //bs?
   int _separatorWidth;
@@ -49,7 +52,6 @@ private: // data
   //
 public:
 	int size() const{return _size;}
-
 	explicit Bag(G const& g)
 	  : _graph(&g),
 	    _size(boost::num_vertices(g)) {
@@ -63,12 +65,13 @@ public:
 		}
   }
   G const& graph() const{assert(_graph); return *_graph; }
-  myset const& vertices(){ return _vertices; }
+  cfg_myset const& vertices(){ return _vertices; }
   
-	explicit Bag(Bag const* parent, myset const& vertices)
+	explicit Bag(Bag const* parent, cfg_myset const& vertices)
 	  : _parent(parent),
 	    _vertices(vertices) {
 		_size = _vertices.size();
+		_graph = &parent->graph();
 	}
   
   void initializeForDecomposition() {
@@ -109,19 +112,19 @@ public:
 		}
 	}
   
-  Bag const& addNestedBag(myset const& _vertices) {
-    bag_t const* bag = new Bag(this, _vertices);
+  Bag& addNestedBag(cfg_myset const& _vertices) {
+    bag_t* bag = new Bag(this, _vertices);
     _nestedBags.push_back(bag);
     return *bag;
   }
 
-  Separator<G>* addSeparator(myset const& _vertices) {
+  Separator<G>* addSeparator(cfg_myset const& _vertices) {
     auto s = new Separator<G>(this, _vertices);
     _separators.push_back(s);
     return s;
   }
   
-  void addIncidentSeparator(Separator<G> const* separator) {
+  void addIncidentSeparator(const Separator<G> * separator) const {
     _incidentSeparators.push_back(separator);
   }
 
@@ -157,7 +160,7 @@ public:
 		// import separators from parent?
     for (Separator separator: _incidentSeparators) {
 //      System.out.println("filling " + separator);
-			myset convd = convert(separator._vertices, _conv);
+			cfg_myset convd = convert(separator._vertices, _conv);
 //			graph.fill(convd);
 			for(auto i=convd.begin(); i!=convd.end();){
 				auto j = i;
@@ -251,7 +254,7 @@ public:
 			 }else if (bag.nestedBags.empty()) {
 				 newIncidentBags.add(bag);
 			 }else{
-				 myset cs = convert(separator._vertices, bag->_conv);
+				 cfg_myset cs = convert(separator._vertices, bag->_conv);
 				 bag_t* nested = bag->findNestedBagContaining(cs);
 
 				 if (nested) {
@@ -311,7 +314,7 @@ public:
 //    }
   }
   
-  bag_t const* findNestedBagContaining(myset _vertices) {
+  bag_t const* findNestedBagContaining(cfg_myset _vertices) {
     for (bag_t* bag: _nestedBags) {
       if (_vertices.is_subset_of(bag._vertices)) {
         return bag;
@@ -331,16 +334,16 @@ public:
 		_vertices = convert(_vertices, _parent->_conv);
 	}
   
-   myset convert(myset const& s) const {
+   cfg_myset convert(cfg_myset const& s) const {
     return convert(s, _conv);
   }
   
 	template<class MAP>
-  myset convert(myset const& s, MAP const& conv) {
+  cfg_myset convert(cfg_myset const& s, MAP const& conv) {
     if (conv.size() < s.size()) {
 		 assert(false);
     }
-    myset result(conv.size());
+    cfg_myset result(conv.size());
     for (auto v : s){
       result.insert(conv[v]);
     }
@@ -358,7 +361,7 @@ public:
     }
     
     for (Separator separator: separators) {
-       myset const& vs = separator.vertices();
+       cfg_myset const& vs = separator.vertices();
       Bag full = null;
       for (Bag bag: separator.incidentBags) {
         if (vs.isSubset(bag._vertices)) {
@@ -406,7 +409,7 @@ public:
 			  bag.collectBagsToPack(bagsToPack, nullptr);
 			  //        System.out.println("bags to pack: " + bagsToPack);
 			  if (bagsToPack.size() >= 2) {
-				  myset vertices(boost::num_vertices(*_graph));
+				  cfg_myset vertices(boost::num_vertices(*_graph));
 				  for (bag_t* toPack: bagsToPack) {
 					  vertices.merge(toPack->_vertices);
 				  }
@@ -600,3 +603,4 @@ public:
 };
 
 #endif
+

@@ -18,8 +18,11 @@
 // This is derived from MIT licensed java code from the PACE submission
 // Copyright (c) 2017, Hisao Tamaki
 
+#ifndef TR_BS_H
+#define TR_BS_H
 #include <bit>
 #include <bitset>
+
 // #define STORE_SIZE
 
 #define MIN_NODES 2
@@ -50,42 +53,44 @@ bool eVal(void const*, V const&)
 } // detaiL
 /*--------------------------------------------------------------------------*/
 
-size_t get_size(myset const* s)
-{ itested();
-	assert(s);
-	return s->size();
-}
-size_t get_size(myset const& s)
-{ untested();
-	return s.size();
-}
 
 static const std::string spaces64 =
     "                                                                ";
 
+template<class cfg_myset>
 class KEYXS{
 	KEYXS(KEYXS const&) = delete;
 public:
-	explicit KEYXS(myset const& s) : _s(s){
+	explicit KEYXS(cfg_myset const& s) : _s(s){
 		// trace1("XS", _s);
 	}
 
 	size_t size() const{
-		return (myset::max_element + 1)/64;
+		return (cfg_myset::max_element + 1)/64;
 	}
 	ulong const& operator[](int i) const{
 //		trace3("XS", _s, i, _s.chunk(i));
 		return _s.chunk(i);
 	}
 private:
-	myset const& _s;
+	cfg_myset const& _s;
 };
 
-template<class key_type, class value_t, int MAX_CHILDREN_SIZE = 512>
+template<class key_type, class value_t,int MAX_CHILDREN_SIZE = 512>
 class BlockSieve{
 	typedef std::vector<uint64_t> long_array;
+	typedef key_type cfg_myset;
 public:
 	typedef std::vector< value_t > set_out_hack;
+	static size_t get_size(cfg_myset const* s)
+	{ itested();
+		assert(s);
+		return s->size();
+	}
+	static size_t get_size(cfg_myset const& s)
+	{ untested();
+		return s.size();
+	}
 
 private:
 	template<class label_t, class label_ft>
@@ -112,7 +117,7 @@ private:
 			return (_index == 0) && _ntz == 0;
 		}
 
-		bool isFirstInInterval() const { untested();
+		bool isFirstInInterval() const {
 			return _ntz == 0; // _ntz + _width == 64;
 		}
 
@@ -170,7 +175,7 @@ private:
 			if(isLeaf()){
 				_data._values = p._data._values;
 				p._data._values = nullptr;
-			}else{ untested();
+			}else{
 				_data._children = p._data._children;
 				p._data._children = nullptr;
 			}
@@ -189,7 +194,7 @@ private:
 				if(_data._children){
 					//delete[] _data._children;
 					free(_data._children);
-				}else{ untested();
+				}else{
 				}
 			}
 			free(_labels);
@@ -220,7 +225,7 @@ private:
 			}
 
 			//		  trace2("insert", i, value);
-			//        _values[i] = new myset(value); // eek.
+			//        _values[i] = new cfg_myset(value); // eek.
 //			_values[i] = value; // eek.
 
 #ifdef STORE_SIZE
@@ -245,7 +250,7 @@ private:
 			assert(!isLeaf());
 			assert(_data._children);
 
-			for(unsigned j = size()-1; j > i; j--){ untested();
+			for(unsigned j = size()-1; j > i; j--){
 				_data._children[j] = std::move(_data._children[j - 1]);
 			}
 			_data._children[i] = std::move(*child);
@@ -347,7 +352,7 @@ private:
 
 			return mid;
 		}
-		value_t& put(ulong bits, KEYXS const& longs, int i)  {
+		value_t& put(ulong bits, KEYXS<cfg_myset> const& longs, int i)  {
 			node_t* node = this;
 
 			value_t* ret = nullptr;
@@ -360,12 +365,12 @@ private:
 			if(isLeaf()){
 				ret = &add(bits);
 				assert(size() <= MAX_CHILDREN_SIZE);
-			}else if(isFirstInInterval()){ untested();
+			}else if(isFirstInInterval()){
 				auto p = newPath(i - 1, longs);
 				ret = p.second;
 				add(bits, p.first);
 				assert(size() <= MAX_CHILDREN_SIZE);
-			}else{ untested();
+			}else{
 				trace2("put mask", i, std::bitset<64>(getMask()));
 				trace2("put mask     ", i, std::bitset<64>(bits));
 
@@ -375,7 +380,7 @@ private:
 					auto p = newPath(i - 1, longs);
 					ret = p.second;
 					header->add(bits, p.first);
-				} else{ untested();
+				} else{
 					ret = &header->add(bits);
 				}
 
@@ -558,8 +563,8 @@ private:
 
 		// Node_::
       void filterSuperblocks( int tbs, int margin,
-				KEYXS const& longs,
-				KEYXS const& neighbors,
+				KEYXS<cfg_myset> const& longs,
+				KEYXS<cfg_myset> const& neighbors,
 				int intersects, set_out_hack& list) const{
 			assert(size()<=MAX_CHILDREN_SIZE);
 //        long mask = getMask();
@@ -612,8 +617,8 @@ private:
 
 		// Node_::
 		void filterSubblocks( int tbs, int margin,
-				KEYXS const& longs,
-				KEYXS const& neighbors,
+				KEYXS<cfg_myset> const& longs,
+				KEYXS<cfg_myset> const& neighbors,
 				int intersects, set_out_hack& list) const { untested();
 
 			assert(size()<=MAX_CHILDREN_SIZE);
@@ -821,7 +826,7 @@ public: // iter types
 			lassert(block);
 
 			assert(block.cur);
-			return *new myset(); // block;
+			return *new cfg_myset(); // block;
 		}
 		node_t const* operator->() const{ untested();
 
@@ -939,7 +944,7 @@ public:
 
 	void set_n(int n){
 		// incomplete(); // clear?
-		_last = (n - 1) / 64; // KEYXS...
+		_last = (n - 1) / 64; // KEYXS<cfg_myset>...
 		assert(!_root.size());
 		_root._index = _last;
 	}
@@ -976,19 +981,19 @@ private:
 #endif
   }
 
-  static std::pair<node_t*, value_t*> newPath(int index, KEYXS const& longs){ untested();
+  static std::pair<node_t*, value_t*> newPath(int index, KEYXS<cfg_myset> const& longs){
     auto node = new node_t(index, node_t::max_width, 0);
 
     ulong bits = 0;
     if(index < 0){ untested();
 		 assert(false);
-	 }else if(index < int(longs.size())){ untested();
+	 }else if(index < int(longs.size())){
       bits = longs[index];
     }else{ untested();
 	 }
 
 	 value_t* ref = nullptr;
-    if(index == 0){ untested();
+    if(index == 0){
       ref = &node->add(bits);
     }else{ untested();
 		auto p = newPath(index - 1, longs);
@@ -1002,10 +1007,10 @@ private:
 
 public:
   void collectSuperblocks( int tbs, int margin,
-		  myset const& component, myset const& neighbors,
+		  cfg_myset const& component, cfg_myset const& neighbors,
 		  set_out_hack& list) const{
-		KEYXS c(component);
-		KEYXS n(neighbors);
+		KEYXS<cfg_myset> c(component);
+		KEYXS<cfg_myset> n(neighbors);
     _root.filterSuperblocks(tbs, margin, c, n, 0, list);
   }
 
@@ -1022,13 +1027,13 @@ public:
     return _size;
   }
 		 void filterSuperblocks( int tbs, int margin,
-				KEYXS const& longs,
-				KEYXS const& neighbors,
+				KEYXS<cfg_myset> const& longs,
+				KEYXS<cfg_myset> const& neighbors,
 				int intersects, set_out_hack& list) const;
 
 		 void filterSubblocks( int tbs, int margin,
-				KEYXS const& longs,
-				KEYXS const& neighbors,
+				KEYXS<cfg_myset> const& longs,
+				KEYXS<cfg_myset> const& neighbors,
 				int intersects, set_out_hack& list) const;
 private:
 
@@ -1046,7 +1051,7 @@ private:
 }; // BlockSieve
 
 template<class key_type, class value_t, int MAX_CHILDREN_SIZE>
-BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::BlockSieve()
+BlockSieve<key_type, value_t ,MAX_CHILDREN_SIZE>::BlockSieve()
   : _root(0, node_t::max_width, 0)
 {
 	_last = 0;
@@ -1055,7 +1060,7 @@ BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::BlockSieve()
 
 template<class key_type, class value_t, int MAX_CHILDREN_SIZE>
 inline value_t&
-		 BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::operator[](key_type const& bs)
+		 BlockSieve<key_type, value_t,MAX_CHILDREN_SIZE>::operator[](key_type const& bs)
 {
 	KEYXS longs(bs);
 	node_t* current = &_root;
@@ -1117,7 +1122,7 @@ inline value_t&
 template<class key_type, class value_t, int MAX_CHILDREN_SIZE>
 	template<class label_t, class label_ft>
 inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
-       BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::Node_<label_t, label_ft>::resizeWidth(
+       BlockSieve<key_type, value_t , MAX_CHILDREN_SIZE>::Node_<label_t, label_ft>::resizeWidth(
        BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::Node_<label_t, label_ft>* node)
 {
 	assert(node==this);
@@ -1135,7 +1140,7 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 	if(isLeaf()){
 		old_values = _data._values;
 		_data._values = nullptr;
-	}else{ untested();
+	}else{
 		old_children = _data._children;
 		_data._children = nullptr;
 	}
@@ -1237,7 +1242,7 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 		}
 		assert(leftlabel == n1->label(j));
 
-		if(!was_leaf){ untested();
+		if(!was_leaf){
 			assert(i<old_size);
 			cc->add(rightlabel, &old_children[i]);
 			assert(!cc->isLeaf());
@@ -1255,8 +1260,10 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 
 	if(was_leaf){
 		free(old_values);
-	}else{ untested();
+	}else{
 		free(old_children);
 	}
 //	free(old_labels);
 }
+#endif
+

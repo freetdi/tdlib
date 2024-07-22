@@ -26,6 +26,7 @@
 #include "exact_ta.hpp"
 #include "util_py.hpp"
 #include "algo_py.hpp"
+#include "tr_iodec.h"
 
 namespace py = boost::python;
 using treedec::exact_ta;
@@ -49,6 +50,14 @@ typedef exact_decomposition<_balvvu, default_config, exact_ta> _ex17_balvvu;
 typedef exact_decomposition<_balsvu, default_config, exact_ta> _ex17_balsvu;
 
 
+typedef TR<_balvvu, default_config> _tr_balvvu;
+typedef TR<_balsvu, default_config> _tr_balsvu;
+// typedef TR<_trgraph> _tr_trgraph;
+
+
+
+
+
 
 BOOST_PYTHON_MODULE(_exact)
 { itested();
@@ -69,4 +78,7 @@ BOOST_PYTHON_MODULE(_exact)
 
 	COMMON_ALGO_IFACE(_ex17, _balvvu);
 	COMMON_ALGO_IFACE(_ex17, _balsvu);
+
+	COMMON_ALGO_IFACE(_tr, _balsvu);
+	COMMON_ALGO_IFACE(_tr, _balvvu);
 }

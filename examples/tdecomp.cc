@@ -32,6 +32,7 @@
 #define USE_EX17 // 64
 // pace17 heuristics
 //
+#define USE_TR
 #endif
 
 // these should work without gala

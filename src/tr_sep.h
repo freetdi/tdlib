@@ -14,15 +14,17 @@
 #include "graph_util.hpp"
 #include "iter.hpp"
 
-
 template<class G>
 class Separator { // public Bag?
+  typedef G::edge_container_type cfg_myset;
   typedef Bag<G> bag_t;
+  private:
   Bag<G> const* _parent{nullptr};
   G const* _graph;
-  myset _vertices;
+  cfg_myset _vertices;
   size_t _size;
   std::vector<bag_t const*> _incidentBags;
+  public:
   bool safe{false};
   bool unsafe{false};
   bool wall{false};
@@ -35,9 +37,9 @@ class Separator { // public Bag?
    // incidentBags = new ArrayList<>();
   }
 
- explicit Separator(bag_t const* parent, myset const& vertexSet) 
+ explicit Separator(bag_t const* parent, cfg_myset const& vertexSet) 
 	  :_parent(parent),
-    _graph ( parent->_graph) {
+    _graph (&parent->graph()) {
     _vertices = vertexSet;
     _size = vertexSet.size();
   }
@@ -66,8 +68,8 @@ class Separator { // public Bag?
 	}
   
   template<class C>
-  myset convert(myset s, C const& conv) {
-    myset result;
+  cfg_myset convert(cfg_myset s, C const& conv) {
+    cfg_myset result;
     for (auto v : s) {
       assert(conv[v] >= 0);
       result.insert(conv[v]);
@@ -117,7 +119,7 @@ class Separator { // public Bag?
     auto cmps_range = treedec::make_components_range(vert.first, vert.second, _graph, mask);
 	 for(; cmps_range.first!=cmps_range.second; ++cmps_range.first){
 		 auto comp_range=*cmps_range.first;
-		 myset compo;
+		 cfg_myset compo;
 		 assert(compo.empty());
 		 for(; comp_range.first!=comp_range.second; ++comp_range.first){
 			 compo.add(*comp_range.first);
@@ -130,12 +132,12 @@ class Separator { // public Bag?
     return true;
   }
   
-	bool isSafeComponentBySPT(myset const& component) const {
-		myset neighborSet = _graph.neighborSet(component);
-		myset rest = _graph.all.subtract(neighborSet).subtract(component);
+	bool isSafeComponentBySPT(cfg_myset const& component) const {
+		cfg_myset neighborSet = _graph.neighborSet(component);
+		cfg_myset rest = _graph.all.subtract(neighborSet).subtract(component);
 
 		for (auto v : neighborSet) {
-			myset missing = neighborSet;
+			cfg_myset missing = neighborSet;
 			missing = subtract(_graph.neighborSet[v]);
 
 			for (auto w : missing) {
@@ -148,7 +150,7 @@ class Separator { // public Bag?
 
 			if (missing.empty()) {
 			}else{
-				myset spt = shortestPathTree(v, missing, rest);
+				cfg_myset spt = shortestPathTree(v, missing, rest);
 				if (spt.empty()) {
 					return false;
 				}else{
@@ -159,17 +161,17 @@ class Separator { // public Bag?
 		return true;
 	}
 
-  myset shortestPathTree(int v, myset const& targets, myset const& available) {
-    myset aunion = available;
+  cfg_myset shortestPathTree(int v, cfg_myset const& targets, cfg_myset const& available) {
+    cfg_myset aunion = available;
 	 aunion.merge(targets);
     
-    myset reached;
+    cfg_myset reached;
     reached.insert(v);
-    myset leaves(reached);
+    cfg_myset leaves(reached);
     while (!targets.is_subset_of(reached) && !leaves.empty()) {
-      myset newLeaves;
+      cfg_myset newLeaves;
       for (auto u : leaves){
-        myset children = _graph.neighborSet[u].intersectWith(aunion).subtract(reached);
+        cfg_myset children = _graph.neighborSet[u].intersectWith(aunion).subtract(reached);
         for (auto w : children) {
           reached.insert(w);
           parentVertex[w] = u;
@@ -181,7 +183,7 @@ class Separator { // public Bag?
       leaves = newLeaves;
     }
     
-   myset spt;
+   cfg_myset spt;
 
 	if (targets.is_subset_of(reached)) {
 		for (auto u : targets){
@@ -220,3 +222,4 @@ class Separator { // public Bag?
 };
 
 #endif
+

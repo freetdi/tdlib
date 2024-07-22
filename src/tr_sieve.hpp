@@ -11,7 +11,8 @@ class LayeredSieve {
 //  int _n;
   unsigned _tbs;
 
-  typedef BlockSieve<myset, value_t, MAX_CHILDREN_SIZE> bs_t;
+	typedef key_type cfg_myset;
+  typedef BlockSieve<cfg_myset, value_t, MAX_CHILDREN_SIZE> bs_t;
   std::vector<bs_t> _sieves;
 
 public:
@@ -45,8 +46,8 @@ public:
   
 public:
 #if 1
-  value_t& put(myset const& vertices, value_t const& neighbors) {
-    int ns = get_size(neighbors);
+  value_t& put(cfg_myset const& vertices, value_t const& neighbors) {
+    int ns = BlockSieve<cfg_myset,value_t, MAX_CHILDREN_SIZE>::get_size(neighbors);
 //	 trace3("put", vertices, ns, neighbors);
 	 return put(vertices, ns, neighbors);
 //     int margin = targetWidth + 1 - ns;
@@ -55,7 +56,7 @@ public:
   }
 private:
 #endif
-  value_t& put(myset const& vertices, int neighborSize, value_t const& value) {
+  value_t& put(cfg_myset const& vertices, int neighborSize, value_t const& value) {
     int margin = _tbs - neighborSize;
 //	 assert(_tbs>=neighborSize); //?
 //    margin=0 -> i = 0
@@ -78,7 +79,7 @@ private:
   }
 
 public:
-	void collectSuperblocks(myset const& component, myset const& neighbors,
+	void collectSuperblocks(cfg_myset const& component, cfg_myset const& neighbors,
         set_out_hack& list) {
 
 		int i = 0;
@@ -110,3 +111,4 @@ public:
     return sizes;
   }
 };
+

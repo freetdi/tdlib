@@ -39,3 +39,16 @@ def ex17(g):
 #		return ex._ex17_balsvd(g)
 	else:
 		raise ValueError("ex17: can't handle " + str(g))
+
+def tr(g):
+	if isinstance(g, G._balvvu):
+		return ex._tr_balvvu(g)
+	elif isinstance(g, G._balsvu):
+		return ex._tr_balsvu(g)
+#	elif isinstance(g, G._balvvd):
+#		return ex._tr_balvvd(g)
+#	elif isinstance(g, G._balsvd):
+#		return ex._tr_balsvd(g)
+	else:
+		raise ValueError("tr: can't handle " + str(g))
+

@@ -2,16 +2,23 @@
 #include <gala/cbset.h>
 #include <gala/graph.h>
 #include <gala/boost.h>
+#include <gala/td.h>
 
 // typedef unsigned __int128 uint128_t; // GCC
 
-typedef cbset::BSET_DYNAMIC<2, uint64_t, cbset::nohowmany_t, cbset::nooffset_t, cbset::nosize_t> myset;
-template<class A, class...>
-using myset_=myset;
-typedef gala::graph<myset_, std::vector, unsigned> graph_t;
+typedef cbset::BSET_DYNAMIC<2, uint64_t, cbset::nohowmany_t, cbset::nooffset_t, cbset::nosize_t> tr_myset;
+template <class A, class...>
+using tr_myset_ = tr_myset;
+typedef gala::graph<tr_myset_, std::vector, unsigned> graph_t;
 
 #include "tr_iodec.h"
 #include "tr_bag.h"
+#include "printer.hpp"
+#include <../src/graph_traits.hpp>
+
+template<class G>
+using decomp_t = typename treedec::graph_traits<G>::treedec_type;
+typedef decomp_t<graph_t> T;
 
 int main(int argc, char** argv)
 {
@@ -47,10 +54,10 @@ int main(int argc, char** argv)
 	trace2("dbg", k, n);
 	assert(k == 2 * (n-1) * n);
 
-//	auto j = boost::adjacent_vertices(4, g);
-//	for(; j.first!=j.second; ++j.first){
-//		trace1("grid", *j.first);
-//	}
+	//	auto j = boost::adjacent_vertices(4, g);
+	//	for(; j.first!=j.second; ++j.first){
+	//		trace1("grid", *j.first);
+	//	}
 
 	auto vi = boost::vertices(g);
 	for(; vi.first!=vi.second; ++vi.first){
@@ -58,11 +65,17 @@ int main(int argc, char** argv)
 		trace2("grid", *vi.first, d);
 	}
 
+	T tt;
+
 	TR<graph_t> a(g);
 
-	a.do_it();
+	a.do_it(tt); // doesnt print the td.
 
-//	Tree t;
+	// a.store(P);
+
+	// boost::copy_graph(t, P);
+
+	//	Tree t;
 	// Graph g(edges.begin(), edges.end(), n * n);
 	// treedec::exact_decomposition_cutset(g, t);
 

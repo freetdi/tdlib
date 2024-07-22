@@ -128,16 +128,14 @@ private:
 public:
 
     EX17_THREAD(G& g, const std::string& name="EX17")
-        : base(g, name, 0), _testg(g)
-    {
+        : base(g, name, 0), _testg(g) {
         treedec::check(g);
         /// std::cerr << "orig\n";
         // rcmk(gg);
         base::go();
     }
 
-    void do_print_results(std::ostream& o)
-    {
+    void do_print_results(std::ostream& o) {
         trace2("EXR", base::_result, treedec::get_bagsize(_t));
         base::print_results_tree(o, _t);
     }
@@ -163,7 +161,7 @@ public:
         alg.try_it(_t, 0);
 
         unsigned r = treedec::get_bagsize(_t); // inefficient
-        trace1("excut done", r);
+        trace1("ex17 done", r);
         base::commit_result(r);
         base::unlock_results();
 //        kill(getpid(), SIGTERM);
