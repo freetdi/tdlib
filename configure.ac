@@ -128,7 +128,7 @@ AM_CONDITIONAL([USE_CYTHON], [test x$cython != xno] )
 AC_LANG_PUSH([C++])
 
 # unconditional c++11
-CXXFLAGS="-std=c++11 $CXXFLAGS"
+CXXFLAGS=" $CXXFLAGS"
 
 AC_CHECK_HEADERS([boost/tuple/tuple.hpp], [],
                  AC_MSG_ERROR([could not find a boost header])

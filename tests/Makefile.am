@@ -57,7 +57,7 @@ BUILT_SOURCES = treedec
 CLEANFILES = ${BUILT_SOURCES} *~
 
 AM_CPPFLAGS = -I. -I${srcdir} -I${abs_top_srcdir}/src -DTRACE_UNTESTED -UNDEBUG
-AM_CXXFLAGS = -O0 -g
+AM_CXXFLAGS = -std=c++20 -O0 -g
 
 treedec:
 	-ln -sf $(top_srcdir)/src treedec

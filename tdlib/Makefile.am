@@ -21,7 +21,7 @@ clean-local:
 
 .PHONY: clean-extra symlinks
 
-AM_CXXFLAGS = -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
+AM_CXXFLAGS = -std=c++11 -pthread -Wl,-O1 -Wl,-Bsymbolic-functions \
               -fno-strict-aliasing -g -fwrapv -O2 -Wall \
               -Wformat -Werror=format-security
 
