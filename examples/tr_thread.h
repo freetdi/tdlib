@@ -1,24 +1,11 @@
-// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> bald_t;
-//
-//
 #include <treedec/algo.hpp>
-//#include <treedec/exact_ta.hpp>
 #include <treedec/tuple_td.hpp>
 #include <gala/boost_copy.h>
 
 #include "../src/tr_iodec.h"
 #include "../src/tr_bag.h"
 
-// typedef cbset::BSET_DYNAMIC<K> BSET;
-
-// class ta_kernel_config
-// {
-//     ///...
-// };
-
-
-
-// TODO: move
+// TODO: is this needed?
 namespace treedec
 { //
 
@@ -35,9 +22,7 @@ namespace treedec
         treedec::grtdprinter<G> P(std::cerr, g);
         // auto alg = draft::exact_decomposition<G, algo::default_config, detail::exact_ta_>(g);
          a.do_it(P);
-         
     }
-
 }
 
 #include <boost/graph/cuthill_mckee_ordering.hpp>
@@ -58,7 +43,6 @@ public:
     typedef TR__GRAPH G_work;
 
 #if 1 // tr_myset workaround
-    // typedef decomp_t<TR__GRAPH> T; // BUG.
     typedef decomp_t<TR__GRAPH> T; // BUG.
 #else
     typedef decomp_t<G_work> T;
@@ -79,8 +63,6 @@ public:
     TR_THREAD(G &g, const std::string &name = "TR")
         : base(g, name, 0), _testg(g) {
         treedec::check(g);
-        /// std::cerr << "orig\n";
-        // rcmk(gg);
         base::go();
     }
 
@@ -107,11 +89,7 @@ public:
 
         // // set_bagsize(lb,-1); do_it()?!
         // // get_treedec() ...
-        // alg.try_it(_t, 0);
         TR<G> a(_work);
-        
-            //   treedec::grtdprinter<graph_t> P(std::cerr, g);
-        // auto alg = draft::exact_decomposition<G, algo::default_config, detail::exact_ta_>(g);
         a.do_it(_t);
         //  a.store(_t);
 
@@ -129,4 +107,3 @@ private:
 };
 
 // vim:ts=8:sw=4:et
-

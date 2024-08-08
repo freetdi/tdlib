@@ -51,4 +51,3 @@ def tr(g):
 #		return ex._tr_balsvd(g)
 	else:
 		raise ValueError("tr: can't handle " + str(g))
-
