@@ -29,6 +29,7 @@ AM_CXXFLAGS = -std=c++20 -pthread \
 
 AM_CPPFLAGS = @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -avoid-version
+BUILT_SOURCES = treedec
 
 EXTRA_DIST = \
 	algo_py.hpp \
@@ -38,6 +39,10 @@ EXTRA_DIST = \
 	graph_iter.hpp \
 	graph_py.hpp \
 	util_py.hpp
+
+treedec:
+	-$(LN_S) $(top_srcdir)/src $@
+
 
 clean-local:
 	rm -rf __pycache__
