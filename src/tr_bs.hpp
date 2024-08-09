@@ -353,7 +353,7 @@ private:
 			return mid;
 		}
 		value_t& put(ulong bits, KEYXS<cfg_myset> const& longs, int i)  {
-			node_t* node = this;
+			[[maybe_unused]] node_t* node = this;
 
 			value_t* ret = nullptr;
 			size_t n = size();
@@ -422,7 +422,7 @@ private:
 				ret = i - _labels;
 			}else{
 				ret = - (i - _labels + 1);
-				auto insert_pos = - ret - 1;
+				[[maybe_unused]] auto insert_pos = - ret - 1;
 				assert(ml<_labels[insert_pos]);
 			}
 
@@ -444,7 +444,7 @@ private:
 
 			assert(_width <= int(8*sizeof(label_t)));
 			ulong mask = ulong(-1) >> ( 64 - _width );
-			auto ml = (l >> _ntz) & mask;
+			[[maybe_unused]] auto ml = (l >> _ntz) & mask;
 
 			// make sure it is not there yet.
 			for(unsigned i=0; i<size(); ++i){
@@ -527,8 +527,9 @@ private:
 					}
 			  }else if(new_cap<=MIN_NODES){
 			  }else{
-				  T* old_data = data;
+				 
 #if 0
+				  T* old_data = data;
 				  data = (T*)malloc(sizeof(T) * new_cap);
 				  unsigned i=0;
 				  for(; i<new_cap; ++i){
@@ -540,7 +541,6 @@ private:
 				  free(old_data);
 #else // seems faster. works for POD
 				  data = (T*)realloc((void*)data, sizeof(T) * new_cap);
-				  unsigned i=old_cap;
 				  memset((void*)(data + old_cap),  0, sizeof(T)*(new_cap-old_cap));
 #endif
 			  }

@@ -85,8 +85,8 @@ public:
 		int i = 0;
 		int mm = 1;
 		for (auto& sieve : _sieves) {
-			int margin = (1 << i) - 1;
-			assert(margin == mm-1);
+			[[maybe_unused]] int margin = (1 << i) - 1;
+			assert( margin == mm - 1);
 			sieve.collectSuperblocks(_tbs, mm - 1, component, neighbors, list);
 			++i;
 			mm = mm << 1;
