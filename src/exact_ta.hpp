@@ -532,7 +532,7 @@ private: // here?
 			if(x[h].bi->component == component){
 				stcnt(ST_coll);
 				break;
-			}else{ untested();
+			}else{
 				h = (h + 1) % _nHash;
 			}
 		}
@@ -982,7 +982,7 @@ void exact_ta<EXTA_a>::process(BLOCK *b)
 		// delta: the verts added by saruration.
       tassert(cbset::size(nn) + _delta.size() <= _bag_size);
       registerBlock(c, nn, _delta);
-		if(_solution){ untested();
+		if(_solution){
 			break;
 		}else{
 		}
@@ -1145,7 +1145,7 @@ inline void exact_ta<EXTA_a>::make_td(TREEDEC_t& td) const
     treedec::merge(b, s);
     unsigned j = make_td(_solution, &td);
     boost::add_edge(k, j, td);
-  }else{ untested();
+  }else{
     // all in one...
     make_td(_solution, &td);
   }

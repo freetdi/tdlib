@@ -365,7 +365,7 @@ TWTt
 template<class T>
 void TWTHREAD<TWTa>::print_results_tree(std::ostream& o, T const& t, G const* g_override)
 {
-	if(g_override){
+	if(g_override){ untested();
 		// HACK/workaround. dont use.
 		outdata(t, *g_override, o);
 	}else{

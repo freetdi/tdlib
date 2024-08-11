@@ -23,12 +23,13 @@ _pp_la_LIBADD = ${BOOST_PYTHON_LIBS}
 _treedec_la_LIBADD = ${BOOST_PYTHON_LIBS}
 
 # BUG, not here.
-AM_CXXFLAGS = -pthread \
+AM_CXXFLAGS = -std=c++20 -pthread \
               -fno-strict-aliasing -g -fwrapv -O2 -Wall \
               -Wformat -Werror=format-security
 
 AM_CPPFLAGS = @PYTHON_INCLUDES@ -I$(top_srcdir)/src
 AM_LDFLAGS = -module -avoid-version
+BUILT_SOURCES = treedec
 
 EXTRA_DIST = \
 	algo_py.hpp \
@@ -38,6 +39,10 @@ EXTRA_DIST = \
 	graph_iter.hpp \
 	graph_py.hpp \
 	util_py.hpp
+
+treedec:
+	-$(LN_S) $(top_srcdir)/src $@
+
 
 clean-local:
 	rm -rf __pycache__

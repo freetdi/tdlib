@@ -27,8 +27,7 @@ SUBDIRS = gr
 AM_DEFAULT_SOURCE_EXT = .cc
 
 if TDECOMP
-GALA_NOINST_APPS = \
-	tdecomp-profile
+GALA_NOINST_APPS = # tdecomp-profile
 
 GALA_APPS = \
 	tdecomp
@@ -41,8 +40,8 @@ if CLANG
 PROFILE_GEN =
 PROFILE_FLAGS =
 else
-PROFILE_GEN = -fprofile-generate
-PROFILE_FLAGS = -fprofile-use=.
+# # # PROFILE_GEN = -fprofile-generate
+# # # PROFILE_FLAGS = -fprofile-use=.
 endif
 
 PROFILE_GRAPH = gr/h.gr
@@ -64,6 +63,7 @@ if TDECOMP
 TDECOMP_TESTS = \
 	test-bmd.sh \
 	test-fi.sh \
+	test-tr.sh \
 	test-ppfi.sh
 endif
 
@@ -84,10 +84,10 @@ GRTD_AMNAME = tdecomp-tdecomp
 GRTDP_AMNAME = tdecomp_profile-tdecomp
 
 # trial and error?!
-$(TWEX_AMNAME).o: $(TWEXP_AMNAME).gcda
-$(TWEX_AMNAME).Tpo: $(TWEXP_AMNAME).gcda
-$(GRTD_AMNAME).o: $(GRTDP_AMNAME).gcda
-$(GRTD_AMNAME).Tpo: $(GRTDP_AMNAME).gcda
+# # # $(TWEX_AMNAME).o: $(TWEXP_AMNAME).gcda
+# # # $(TWEX_AMNAME).Tpo: $(TWEXP_AMNAME).gcda
+# # # $(GRTD_AMNAME).o: $(GRTDP_AMNAME).gcda
+# # # $(GRTD_AMNAME).Tpo: $(GRTDP_AMNAME).gcda
 
 TIME=1
 
@@ -133,6 +133,7 @@ EXTRA_DIST = \
 # AM_CPPFLAGS = -I. -DTRACE_UNTESTED
 AM_CPPFLAGS = $(LOCAL_CPPFLAGS)
 # AM_CXXFLAGS = -O0 -g
+AM_CXXFLAGS = -std=c++20
 #
 $(TESTS:%=%.log): .P
 .PHONY: .P

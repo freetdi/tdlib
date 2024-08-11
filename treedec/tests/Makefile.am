@@ -12,12 +12,15 @@ PY_TESTS = \
 	graph_gala0.py \
 	excut_0.py \
 	exta_0.py \
+	extr_0.py \
 	fi_0.py \
 	fi_1.py \
 	fi_dimacs.py \
 	order0.py \
 	pp_dimacs.py \
 	pp_cfg.py \
+	tr_cfg.py \
+	ta_cfg.py \
 	misc_0.py
 
 TESTS = \

@@ -321,7 +321,7 @@ BOOST_PYTHON_MODULE(_treedec)
 	// https://wiki.python.org/moin/boost.python/StlContainers ?
 	py::class_<std::set<unsigned> >("set_unsigned")
 #if 0
-		doesn't compile on mac w/ clang++14, boost 1.82
+		does not compile on mac w/ clang++14, boost 1.82
 		.def("__iter__",     py::range(&std::set<unsigned>::begin, &std::set<unsigned>::end) )
 #else
 		// supposedly the same (?) c.f.

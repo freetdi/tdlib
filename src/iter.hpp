@@ -36,6 +36,12 @@
 
 #include "graph.hpp"
 
+#ifdef DO_TRACE
+#undef DO_TRACE
+#define DO_TRACE_
+#include "trace.hpp"
+#endif
+
 #ifndef NDEBUG
 template<class S, class T>
 size_t count_range(S i, T const& e)
@@ -2026,6 +2032,13 @@ namespace std{
         typedef typename std::forward_iterator_tag iterator_category;
     };
 }
+
+
+#ifdef DO_TRACE_
+#undef DO_TRACE_
+#define DO_TRACE
+#include "trace.hpp"
+#endif
 
 #endif
 

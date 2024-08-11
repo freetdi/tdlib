@@ -1,0 +1,16 @@
+incomplete /usr/local/include/gala/boost_copy.h:48:boost_to_gala
+incomplete /usr/local/include/gala/graph.h:1999:fill_in_edges
+_balsvu on 4 vertices with 4 edges
+_tr_balsvu 3
+0
+ 0 1 3
+1
+ 1 2 3
+_balvvu on 4 vertices with 4 edges
+_tr_balvvu bagsize 3 _balvvu_treedec with 2 bags
+[0 1 3 2]
+(0, 1)
+0
+ 0 1 3
+1
+ 1 2 3

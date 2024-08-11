@@ -65,7 +65,8 @@ enum thread_n{
     nPPMD = 11,
     nPPFI = 12,
     nPP = 13,
-    nTOTAL = 14
+    nTR = 14,
+    nTOTAL = 15
 };
 
 std::mutex best_mutex;
@@ -282,6 +283,12 @@ static void fin(volatile unsigned & finished)
 #endif
 
 #ifdef HAVE_GALA_GRAPH_H
+#ifdef USE_TR
+#include "tr_thread.h"
+#endif
+#endif
+
+#ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_FI
 #include "fi_thread.h"
 #endif
@@ -374,6 +381,7 @@ void mainloop()
         }else if(int_received){
             std::lock_guard<std::mutex> scoped_lock(best_mutex);
             std::cout << "c " << global_result << "\n";
+            untested();
             // if(! threads_running){
             //     break;
             // }else{
@@ -382,11 +390,14 @@ void mainloop()
         }
         int_received=0;
         if(!TWTHREAD_BASE::_running){
+            std::cout.flush();
             // all threads masked?
             // all threads completed (that was quick!)
             break;
         }else if(!sig_received()){
+            std::cout.flush();
             trace0("pause");
+            
             pause();
         }
         // get here after the sighandler has been executed
@@ -620,7 +631,7 @@ void twh(P& p, mag_t m, unsigned mask)
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef USE_FI
-    if(! ( mask & ( 1 << nFI ))) { untested();
+    if(! ( mask & ( 1 << nFI ))) {
     }else if( m < M16){
         reg_thread(threads, nFI, new FI_THREAD<uG16, grtd_algo_config>(g16, "FI16"));
     }else if( m < M32){ untested();
@@ -675,6 +686,17 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
+#if defined(USE_TR) && defined(HAVE_GALA_GRAPH_H)
+    if(! ( mask & ( 1 << nTR ))) {
+    }else if(m > M15){ untested();
+        // does this even make sense?
+        // maybe for very sparse graphs...
+        threads[nTR] = new TR_THREAD<uG32, grtd_algo_config>(g32, "TR_32");
+    }else{
+        threads[nTR] = new TR_THREAD<uG16, grtd_algo_config>(g16, "TR_16");
+    }
+#endif
+/*--------------------------------------------------------------------------*/
 #if defined(USE_EX) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX ))) {
     }else if(m > M16){ untested();
@@ -717,7 +739,8 @@ void twh(P& p, mag_t m, unsigned mask)
     trace0("acquiring lock");
     std::lock_guard<std::mutex> scoped_lock(best_mutex); // needed?
 
-    unsigned best_tid=find_best(threads);
+    unsigned best_tid = find_best(threads);
+    trace1("acquiring lock", best_tid);
 
     if(best_tid<threads.size()){
     grtd_algo_config<balu_t>::message(bDEBUG, "best: %s\n",
@@ -730,8 +753,8 @@ void twh(P& p, mag_t m, unsigned mask)
 
         // FIXME: no switch here.
         switch(best_tid){
-        case nSOME:
-        case nBMD:
+        case nSOME: untested();
+        case nBMD: untested();
 #ifdef HAVE_GALA_GRAPH_H // tmp hack
             // g.make_symmetric(true);
 #endif
@@ -799,6 +822,8 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nP17);
         }else if(!strncmp("--ex17", argv[i], 6)){
             mask_in |= (1<<nEX17);
+        }else if(!strncmp("--tr", argv[i], 4)){
+            mask_in |= (1<<nTR);
         }else if(!strncmp("--thorup", argv[i], 8)){ untested();
             mask_in |= (1<<nTH);
         }else if(!strncmp("--ppfitm", argv[i], 8)){ untested();
