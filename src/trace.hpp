@@ -23,8 +23,17 @@
 #undef untested
 #ifdef TRACE_UNTESTED
 #include <iostream>
+
+#ifdef TRACE_UNTESTED_ONCE
 #define untested() \
-	std::cerr << "@@# untested \n@@@:" << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"
+  { static bool x ## __LINE__; if(!x ## __LINE__){ \
+    std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+    <<":" << __func__ << "\n"; x ## __LINE__ =true;} }
+#else
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
+#endif
+
 #define untested1(x) \
 	std::cerr << "@@# untested \n###:" << x << "\n";
 #else
