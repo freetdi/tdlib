@@ -1010,22 +1010,19 @@ private:
 
 public:
 	template<class oG, class M=boost::identity_property_map>
-	TR(oG const &g, M const& m=boost::identity_property_map()) :  _g()
-	{
-		boost::copy_graph(g,_g);	}
+	TR(oG const &g, M const& m=boost::identity_property_map()) :  _g() {
+		boost::copy_graph(g,_g);
+	}
 
 	~TR(){
-                delete _td; _td = NULL;
-                delete _solution; _solution = NULL; }
+		delete _td; _td = NULL;
+		delete _solution; _solution = NULL;
+	}
 
-
-
-	template<class T> 
-	void make_td(T& td) const{
+	template<class T>
+	void make_td(T& td) const {
 		assert(_td);
 		boost::copy_graph(*_td, td);
-
-
 	}
 		
 	template<class O>

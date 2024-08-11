@@ -680,7 +680,7 @@ private:
 		typedef Node_<uint64_t, uint_fast64_t> Node64;
 		label_t* _labels{nullptr};
 
-		union { //
+		union data_t {
 		  Node64* _children;
 		  value_t* _values;
 		} _data{nullptr};
@@ -1134,17 +1134,9 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 	assert(old_size);
 	bool was_leaf = node->isLeaf();
 	std::vector<ulong> old_labels;
-	Node_* old_children;
-	value_t* old_values;
-
-	if(isLeaf()){
-		old_values = _data._values;
-		_data._values = nullptr;
-	}else{
-		old_children = _data._children;
-		_data._children = nullptr;
-	}
-	_data._children = nullptr;
+	data_t old = _data;
+	_data._values = nullptr;
+	assert(!_data._children);
 
 #ifdef STORE_SIZE
 	auto oldcard = _cardinalities; // move?
@@ -1244,13 +1236,13 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 
 		if(!was_leaf){
 			assert(i<old_size);
-			cc->add(rightlabel, &old_children[i]);
+			cc->add(rightlabel, &old._children[i]);
 			assert(!cc->isLeaf());
 		}else{
 #ifdef STORE_SIZE
 			cc->add(rightlabel, old_values[i], oldcard[i]);
 #else
-			cc->add(rightlabel) = std::move(old_values[i]);
+			cc->add(rightlabel) = std::move(old._values[i]);
 #endif
 			assert(cc->isLeaf());
 		}
@@ -1259,9 +1251,9 @@ inline void // BlockSieve<key_type, value_t, MAX_CHILDREN_SIZE>::NodeBase*
 	trace2("resize post distrib", size(), old_size);
 
 	if(was_leaf){
-		free(old_values);
+		free(old._values);
 	}else{
-		free(old_children);
+		free(old._children);
 	}
 //	free(old_labels);
 }
