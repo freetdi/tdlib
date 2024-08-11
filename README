@@ -74,6 +74,7 @@ he::fill_in    // fillIn heuristic
 he::min_degree // minDegree heuristic
 he::thorup     // thorups heuristic
 ex::ta         // tamakis algorithm
+    TR         // tamakis exact PID (without preproc)
 ex::cutset     // exact algorithm
 comb::PP_FI    // preprocessing + fill_in
 comb::PP_FI_TM // preprocessing + fill_in + triangulation

@@ -16,3 +16,16 @@
 =====
 * bugfixes and cleanup
 * pre python-transition snapshot
+
+0.9.3
+=====
+* new python bindings
+* supergraph
+* faster fill-in
+* interface cleanup
+* misc bugfixes
+
+0.9.4 (WIP)
+===========
+* initial tr algorithm
+
