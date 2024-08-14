@@ -975,7 +975,7 @@ private:
 template<class GraphType>
 struct tr_config_default : treedec::algo::default_config<GraphType> {
 	typedef typename boost::graph_traits<GraphType>::vertices_size_type vst;
-	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
+	static constexpr unsigned max_vertex_index= 8*sizeof(void*);
 };
 
 template<unsigned K, class CHUNK_T>
@@ -988,7 +988,7 @@ class TR  {
 	
 private: // types
 	typedef CFGT<G_external_t> CFG;
-	constexpr static unsigned L= 255;//CFG::max_vertex_index;	
+	constexpr static unsigned L= CFG::max_vertex_index;	
 	typedef uint64_t CHUNK_T; // pick from config?
 	constexpr static unsigned K=unsigned(L/8/sizeof(CHUNK_T)+1); // that many chunks
 	typedef bsd<K, CHUNK_T> T;
