@@ -133,9 +133,6 @@ BOOST_PYTHON_MODULE(_exact)
 	COMMON_ALGO_IFACE(_ex17, _balvvu);
 	COMMON_ALGO_IFACE(_ex17, _balsvu);
 
-	COMMON_ALGO_IFACE(_tr, _balsvu);
-	COMMON_ALGO_IFACE(_tr, _balvvu);
-
         COMMON_ALGO_IFACE(_tr_32, _balsvu);
         COMMON_ALGO_IFACE(_tr_32, _balvvu);
 
