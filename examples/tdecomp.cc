@@ -33,6 +33,7 @@
 // pace17 heuristics
 //
 #define USE_TR
+#define USE_TA
 #endif
 
 // these should work without gala
