@@ -68,7 +68,7 @@ class IODecomposer {
 
 
 	static cfg_myset neighborSet(cfg_myset const& set, G const& g) 
-	{
+{
 		cfg_myset result;
 		for (auto v : set){
 			result.merge(g.out_edges(v));
@@ -588,10 +588,7 @@ public:
 		trace2("...", tbs, _rootBag.size());
 
 			if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
-				unsigned i = boost::add_vertex(tt);
-				auto& B_ = boost::get(treedec::bag_t(),tt,i);
-				for(auto v: _rootBag.vertices()) B_.insert(v);
-				return;
+				break; 
 			}
 			
 			if (unsigned(_rootBag.size()) <= tbs) {
@@ -711,6 +708,14 @@ public:
 			_targetWidth++;
 			tbs++;
 		}
+		 if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
+                               
+                                unsigned i = boost::add_vertex(tt);
+                                auto& B_ = boost::get(treedec::bag_t(),tt,i);
+                                for(auto v: _rootBag.vertices()) B_.insert(v);
+
+                 }
+
 		return;
 	}
 private:
@@ -970,6 +975,7 @@ private:
   PMC const* _solution{nullptr};
 
   public: PMC const* solution() const { return _solution;}
+	  unsigned targetWidth() const { return _targetWidth;}
 }; // IODecomposer
 
 template<class GraphType>
@@ -1079,10 +1085,7 @@ public:
 		mtd.set_max_bs(boost::num_vertices(_g));
 		mtd.decompose(tt);
 
-		_solution = mtd.solution();
-	
-
-		_bagsize = _solution->size();
+		_bagsize = mtd.targetWidth() + 1;
 	}
 
 	void do_it(){ 
@@ -1096,7 +1099,7 @@ private:
 	G_internal_t _g;
 	
 	
-}; // IODecomposer
+}; // TR
 
 template<class G>
 inline void IODecomposer<G>::process(IBlock const* ibl)
