@@ -68,7 +68,7 @@ class IODecomposer {
 
 
 	static cfg_myset neighborSet(cfg_myset const& set, G const& g) 
-	{
+{
 		cfg_myset result;
 		for (auto v : set){
 			result.merge(g.out_edges(v));
@@ -588,10 +588,7 @@ public:
 		trace2("...", tbs, _rootBag.size());
 
 			if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
-				unsigned i = boost::add_vertex(tt);
-				auto& B_ = boost::get(treedec::bag_t(),tt,i);
-				for(auto v: _rootBag.vertices()) B_.insert(v);
-				return;
+				break; 
 			}
 			
 			if (unsigned(_rootBag.size()) <= tbs) {
@@ -711,6 +708,14 @@ public:
 			_targetWidth++;
 			tbs++;
 		}
+		 if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
+                               
+                                unsigned i = boost::add_vertex(tt);
+                                auto& B_ = boost::get(treedec::bag_t(),tt,i);
+                                for(auto v: _rootBag.vertices()) B_.insert(v);
+
+                 }
+
 		return;
 	}
 private:
@@ -970,12 +975,13 @@ private:
   PMC const* _solution{nullptr};
 
   public: PMC const* solution() const { return _solution;}
+	  unsigned targetWidth() const { return _targetWidth;}
 }; // IODecomposer
 
 template<class GraphType>
 struct tr_config_default : treedec::algo::default_config<GraphType> {
 	typedef typename boost::graph_traits<GraphType>::vertices_size_type vst;
-	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
+	static constexpr unsigned max_vertex_index= 8*sizeof(void*);
 };
 
 template<unsigned K, class CHUNK_T>
@@ -988,7 +994,7 @@ class TR  {
 	
 private: // types
 	typedef CFGT<G_external_t> CFG;
-	constexpr static unsigned L= 255;//CFG::max_vertex_index;	
+	constexpr static unsigned L= CFG::max_vertex_index;	
 	typedef uint64_t CHUNK_T; // pick from config?
 	constexpr static unsigned K=unsigned(L/8/sizeof(CHUNK_T)+1); // that many chunks
 	typedef bsd<K, CHUNK_T> T;
@@ -1079,10 +1085,7 @@ public:
 		mtd.set_max_bs(boost::num_vertices(_g));
 		mtd.decompose(tt);
 
-		_solution = mtd.solution();
-	
-
-		_bagsize = _solution->size();
+		_bagsize = mtd.targetWidth() + 1;
 	}
 
 	void do_it(){ 
@@ -1096,7 +1099,7 @@ private:
 	G_internal_t _g;
 	
 	
-}; // IODecomposer
+}; // TR
 
 template<class G>
 inline void IODecomposer<G>::process(IBlock const* ibl)

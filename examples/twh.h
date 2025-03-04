@@ -66,7 +66,8 @@ enum thread_n{
     nPPFI = 12,
     nPP = 13,
     nTR = 14,
-    nTOTAL = 15
+    nTA = 15,
+    nTOTAL = 16
 };
 
 std::mutex best_mutex;
@@ -285,6 +286,12 @@ static void fin(volatile unsigned & finished)
 #ifdef HAVE_GALA_GRAPH_H
 #ifdef USE_TR
 #include "tr_thread.h"
+#endif
+#endif
+
+#ifdef HAVE_GALA_GRAPH_H
+#ifdef USE_TA
+#include "ta_thread.h"
 #endif
 #endif
 
@@ -697,6 +704,17 @@ void twh(P& p, mag_t m, unsigned mask)
     }
 #endif
 /*--------------------------------------------------------------------------*/
+#if defined(USE_TA) && defined(HAVE_GALA_GRAPH_H)
+    if(! ( mask & ( 1 << nTA ))) {
+    }else if(m > M15){ untested();
+        // does this even make sense?
+        // maybe for very sparse graphs...
+        threads[nTA] = new TA_THREAD<uG32, grtd_algo_config>(g32, "TA_32");
+    }else{
+        threads[nTA] = new TA_THREAD<uG16, grtd_algo_config>(g16, "TA_16");
+    }
+#endif
+/*--------------------------------------------------------------------------*/
 #if defined(USE_EX) && defined(HAVE_GALA_GRAPH_H)
     if(! ( mask & ( 1 << nEX ))) {
     }else if(m > M16){ untested();
@@ -824,7 +842,9 @@ static void parseargs(int argc, char * const * argv)
             mask_in |= (1<<nEX17);
         }else if(!strncmp("--tr", argv[i], 4)){
             mask_in |= (1<<nTR);
-        }else if(!strncmp("--thorup", argv[i], 8)){ untested();
+	}else if(!strncmp("--ta", argv[i], 4)){
+            mask_in |= (1<<nTA);
+	}else if(!strncmp("--thorup", argv[i], 8)){ untested();
             mask_in |= (1<<nTH);
         }else if(!strncmp("--ppfitm", argv[i], 8)){ untested();
             mask_in |= (1<<nPPFITM);

@@ -109,7 +109,7 @@ detail::incidence_mask<S> make_incidence_mask(S& s)
 template<class GraphType>
 struct ta_config_default : treedec::algo::default_config<GraphType> {
 	typedef typename boost::graph_traits<GraphType>::vertices_size_type vst;
-	static constexpr unsigned max_vertex_index=std::numeric_limits<vst>::max();
+	static constexpr unsigned max_vertex_index= 8*sizeof(void*);
 };
 /*--------------------------------------------------------------------------*/
 template<class T, class S>
@@ -210,12 +210,33 @@ template<unsigned K, class CHUNK_T>
 using bsd=cbset::BSET_DYNAMIC<K, CHUNK_T, cbset::nohowmany_t, cbset::nooffset_t, cbset::nosize_t>;
 // using bsd=cbset::BSET_DYNAMIC<K, CHUNK_T, cbset::nohowmany_t, cbset::nooffset_t, unsigned>;
 
+constexpr unsigned vertexIndex(auto L) {
+    if (L < 32) {
+        return 31u;
+    } else if (L < 64) {
+        return 63u;
+    } else if (L < 128) {
+        return 127u;
+    } else if (L < 192) {
+        return 191u;
+    } else if (L < 256) {
+        return 255u;
+    } else if (L < 512) {
+        return 511u;
+    } else if (L < 1024){
+        return 1023u;
+    } else {
+	return 1023u;
+    	incomplete();
+    }
+}
+
 /*--------------------------------------------------------------------------*/
 template<class G, template<class G_, class ...> class CFGT=ta_config_default>
 class exact_ta : public treedec::algo::draft::algo1 {
 public: // types
 	typedef CFGT<G> CFG;
-	constexpr static unsigned L=CFG::max_vertex_index;
+	constexpr static unsigned L= vertexIndex(CFG::max_vertex_index);
 #ifdef DYNAMIC
 	typedef uint8_t CHUNK_T; // pick from config?
 	constexpr static unsigned K=unsigned(L/8/sizeof(CHUNK_T)+1); // that many chunks
@@ -1096,8 +1117,8 @@ EXTA_t
 template<class TT>
 inline void exact_ta<EXTA_a>::do_it(TT& t, unsigned& bs)
 {
-	assert(bs>1);
-
+	// fprintf(stderr, "K = %d\n", K);
+	if(bs<1) {incomplete();}
 	if(_bag_size){ untested();
 		// retrying?
 	}else{
@@ -1112,7 +1133,7 @@ inline void exact_ta<EXTA_a>::do_it(TT& t, unsigned& bs)
 EXTA_t
 inline void exact_ta<EXTA_a>::do_it(unsigned bs)
 {
-	assert(bs>1);
+	if(bs<1) {incomplete();}
 	_solution = NULL;
 	while (!_solution) {
 		try_decompose(bs);

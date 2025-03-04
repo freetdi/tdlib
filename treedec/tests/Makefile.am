@@ -20,6 +20,7 @@ PY_TESTS = \
 	pp_dimacs.py \
 	pp_cfg.py \
 	tr_cfg.py \
+	tr_1024.py \
 	ta_cfg.py \
 	misc_0.py
 

@@ -1,0 +1,3 @@
+incomplete /usr/local/include/gala/boost_copy.h:48:boost_to_gala
+tr 0 _balsvu on 1024 vertices with 1023 edges ...bagsize 2 lb 2
+tr 1 _balsvu on 1025 vertices with 1024 edges Handling for more than 1024 vertices is not implemented. Received: 1025.
