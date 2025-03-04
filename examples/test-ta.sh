@@ -3,7 +3,7 @@
 set -e -x
 
 out=$( mktemp )
-alg=--tr
+alg=--ta
 
 test() {
 	echo $alg ${srcdir}/gr/$1.gr

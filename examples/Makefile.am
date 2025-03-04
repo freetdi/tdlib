@@ -63,6 +63,7 @@ if TDECOMP
 TDECOMP_TESTS = \
 	test-bmd.sh \
 	test-fi.sh \
+	test-ta.sh \
 	test-tr.sh \
 	test-ppfi.sh
 endif
