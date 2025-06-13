@@ -652,6 +652,13 @@ private: // graph update stuff.
         // does not work like this for vectors.
         boost::clear_vertex(v, _g);
     }
+    void insert_neighbors(std::set<vertex_descriptor>& cbag, vertex_descriptor a) { untested();
+      auto p = adjacent_vertices(a);
+      for (; p.first != p.second; ++p.first) {
+        auto n = *p.first;
+        cbag.insert(n);
+      }
+    }
 #ifndef nofilter
     std::pair<adjacency_iterator_filter, adjacency_iterator_filter>
     adjacent_vertices(vertex_descriptor v) const{ untested();
@@ -1127,7 +1134,9 @@ bool preprocessing<G_t, CFG>::Cube(vertex_descriptor x)
     }
 
     std::set<vertex_descriptor> cbag;
-    assign_neighbours(cbag, a, b, c, _g);
+    insert_neighbors(cbag,a);
+    insert_neighbors(cbag,b);
+    insert_neighbors(cbag,c);
 
     if(cbag.size() != 4){ untested();
         return false;
