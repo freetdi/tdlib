@@ -45,16 +45,16 @@ public: //types
         fill_update_cb(fill_type* d, G_t const& g) :
             _fill(d), G(g){}
 
-        void operator()(vertex_descriptor v){ untested();
+        void operator()(vertex_descriptor v){
             _fill->q_eval(v);
         }
-        void operator()(vertex_descriptor s, vertex_descriptor t) { untested();
+        void operator()(vertex_descriptor s, vertex_descriptor t) {
             assert(s < t); // likely not. is this necessary below?
             // e has just been inserted.
             BOOST_AUTO(cni, common_out_edges(s, t, G));
             BOOST_AUTO(i, cni.first);
             BOOST_AUTO(e, cni.second);
-            for(; i!=e; ++i){ untested();
+            for(; i!=e; ++i){
                 assert(*i != s);
                 assert(*i != t);
     //            no. maybe theres only half an edge.
@@ -74,24 +74,24 @@ public: // construct
     fillIn(G_t &g, unsigned ub=UINT_MAX, bool ignore_isolated_vertices=false)
         : baseclass(g, ub, ignore_isolated_vertices),
          _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    { untested();
+    {
     }
 
     fillIn(G_t &G, bool ignore_isolated_vertices, unsigned ub=-1u)
         : baseclass(G, ub, ignore_isolated_vertices),
           _fill(baseclass::_g), _cb(fill_update_cb(&_fill, baseclass::_g))
-    { untested();
+    {
     }
 
 public: // implementation
-    void initialize(){ untested();
+    void initialize(){
         typename boost::graph_traits<G_t>::vertex_iterator vIt, vEnd;
         for(boost::tie(vIt, vEnd) = boost::vertices(baseclass::_g); vIt != vEnd; ++vIt){
             if(boost::out_degree(*vIt, baseclass::_g) == 0){
                 if(!baseclass::_iiv){
                     (*baseclass::_o)[baseclass::_i++] = *vIt;
                 }
-                else{ untested();
+                else{
                     --baseclass::_num_vert;
                 }
             }
@@ -116,8 +116,8 @@ public: // implementation
         _fill.unmark_neighbours(*baseclass::_current_N);
     }
 
-    void postprocessing(){ untested();
-        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){ untested();
+    void postprocessing(){
+        for(; baseclass::_i < baseclass::_num_vert; ++baseclass::_i){
             auto v = _fill.pick_min(0, 0, true).first;
             (*baseclass::_o)[baseclass::_i] = v;
         }

@@ -50,7 +50,7 @@ public:
     minDegree(G_t &G, bool ignore_isolated_vertices)
         : baseclass(G, -1u, ignore_isolated_vertices),
           _degs(baseclass::_g)
-    { untested();
+    {
     }
 
 #if 0 // base
@@ -64,7 +64,7 @@ public:
         BOOST_AUTO(it, zerodegbag1.begin());
 
         if(!baseclass::_iiv){
-            for(; it!=zerodegbag1.end(); ++it){ untested();
+            for(; it!=zerodegbag1.end(); ++it){
                 (*baseclass::_o)[baseclass::_i++] = *it;
             }
         }else{

@@ -9,7 +9,7 @@ PYTHON = python3
 TESTS = $(PY_TESTS) $(LONG_TESTS)
 
 PY_TESTS = $(GALA_TESTS) \
-	38159.py
+	38159.py \
 	dclc_g5.py \
 	test_generic_search_CFG1.py \
 	test_generic_search_CFG2.py \
@@ -89,7 +89,7 @@ all-local:
 
 SED_OUT = cat
 
-${PY_TESTS:%.py=%.py.out}: %.py.out: %.py
+${TESTS:%.py=%.py.out}: %.py.out: %.py
 	PYTHONPATH=${PYTHONPATH}:${srcdir} \
 	${PYTHON} < ${srcdir}/$*.py | ${SED_OUT} > $@; exit $${PIPESTATUS[0]}
 

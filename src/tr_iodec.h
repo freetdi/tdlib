@@ -1060,7 +1060,7 @@ public:
 	void get_tree_decomposition(T& td) {
 		return make_td(td);
 	}
-	unsigned bagsize() const{untested();
+	unsigned bagsize() const{
 		return _bagsize;
 	}
 
