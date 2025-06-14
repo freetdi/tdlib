@@ -79,6 +79,6 @@ int main(int argc, char** argv)
 	// Graph g(edges.begin(), edges.end(), n * n);
 	// treedec::exact_decomposition_cutset(g, t);
 
-	// std::cout << treedec::get_bagsize(t) << "\n";
+	std::cout << a.bagsize() << "\n";
 	return 0;
 }

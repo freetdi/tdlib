@@ -74,9 +74,9 @@ public:
 		_graph = &parent->graph();
 	}
   
-  void initializeForDecomposition() {
-    if (_graph){
-	 }else{
+  void initializeForDecomposition() { untested();
+    if (_graph){ untested();
+	 }else{ untested();
 		 assert(_parent && "graph missing?!");
 		 makeLocalGraph();
     }
@@ -87,27 +87,27 @@ public:
     _separatorWidth = 0;
   }
   
-	void attachSeparator(Separator<G> const& separator) {
+	void attachSeparator(Separator<G> const& separator) { untested();
 		// refcnt??
 		_incidentSeparators.add(&separator);
 	}
 
-  void makeRefinable() {
+  void makeRefinable() { untested();
     makeLocalGraph();
     _nestedBags.clear();
     _separators.clear();
   }
   
-	int maxNestedBagSize() const {
-		if (_nestedBags.size()){
+	int maxNestedBagSize() const { untested();
+		if (_nestedBags.size()){ untested();
 			int max = 0;
-			for (auto bag : _nestedBags) {
-				if (bag->size() > max) {
+			for (auto bag : _nestedBags) { untested();
+				if (bag->size() > max) { untested();
 					max = bag->size();
 				}
 			}
 			return max;
-		}else{
+		}else{ untested();
 			return -1;
 		}
 	}
@@ -129,44 +129,44 @@ public:
   }
 
   // import edges from parent graph.
-	void makeLocalGraph() {
+	void makeLocalGraph() { untested();
 		// when is size!=_graph.size?
 		_graph = new G(size);
 		_conv.resize(_parent.size(), INVALID_NODE);
 		_inv.resize(size); // too big? vertices_size?
     
 		int k = 0;
-		for (int v : _vertices){
+		for (int v : _vertices){ untested();
 			_conv[v] = k;
 			_inv[k++] = v; // _vertices array.
 		}
 
 //		_graph.inheritEdges(parent.graph, conv, inv);
 		auto vv = boost::vertices(_graph);
-		for (; vv.first!=vv.second; ++vv.first) {
+		for (; vv.first!=vv.second; ++vv.first) { untested();
 			auto v = *vv.first;
 			int x = _inv[v];
 			auto bb = boost::adjacent_vertices(_parent->_graph, x);
-			for (; bb.first!=bb.second; ++bb.first) {
+			for (; bb.first!=bb.second; ++bb.first) { untested();
 				int u = _conv[*bb.first];
 				assert (u != v);
-				if (u > v) {
+				if (u > v) { untested();
 					boost::add_edge(_graph, u,  v);
-				}else{
+				}else{ untested();
 				}
 			}
 		}
 
 		// import separators from parent?
-    for (Separator separator: _incidentSeparators) {
+    for (Separator separator: _incidentSeparators) { untested();
 //      System.out.println("filling " + separator);
 			cfg_myset convd = convert(separator._vertices, _conv);
 //			graph.fill(convd);
-			for(auto i=convd.begin(); i!=convd.end();){
+			for(auto i=convd.begin(); i!=convd.end();){ untested();
 				auto j = i;
 				++j;
 				auto i_ = j;
-				for(; j!=convd.end(); ++j){
+				for(; j!=convd.end(); ++j){ untested();
 					boost::add_edge(_graph, *i, *j);
 				}
 				i = i_;
@@ -174,21 +174,21 @@ public:
     }
   }
   
-   int getWidth() {
-    if (_nestedBags.empty()) {
+   int getWidth() { untested();
+    if (_nestedBags.empty()) { untested();
       return size - 1;
-    }else{
+    }else{ untested();
 	 }
     int max = 0;
-    for (Bag bag: _nestedBags) {
+    for (Bag bag: _nestedBags) { untested();
       int w = bag.getWidth();
-      if (w > max) {
+      if (w > max) { untested();
         max = w;
       }
     }
-    for (Separator separator: _separators) {
+    for (Separator separator: _separators) { untested();
       int w = separator.size(); // sic.
-      if (w > max) {
+      if (w > max) { untested();
         max = w;
       }
     }
@@ -197,7 +197,7 @@ public:
   }
   
 	// set?!
-	void computeBagSize() {
+	void computeBagSize() { untested();
 		// assumes that the bag is flat
 		// assert(is_flat); // what does it mean??
 
@@ -206,24 +206,24 @@ public:
 		_bagsize = 0;
 		_separatorWidth = 0;
 
-		if (_nestedBags.empty()){
+		if (_nestedBags.empty()){ untested();
 			_bagsize = size;
 			return;
-		}else{
-			for (Bag bag: _nestedBags) {
-				if (bag.size > _bagsize) {
+		}else{ untested();
+			for (Bag bag: _nestedBags) { untested();
+				if (bag.size > _bagsize) { untested();
 					_bagsize = bag.size;
-				}else{
+				}else{ untested();
 				}
 			}
 
-			for (Separator separator: _separators) {
-				if (separator.size > _separatorWidth) {
+			for (Separator separator: _separators) { untested();
+				if (separator.size > _separatorWidth) { untested();
 					_separatorWidth = separator.size;
 				}
 			}
 
-			if (_separatorWidth + 1 > _bagsize ) {
+			if (_separatorWidth + 1 > _bagsize ) { untested();
 				_bagsize = _separatorWidth + 1;
 			}
 		}
@@ -231,34 +231,34 @@ public:
 		_width = _bagsize - 1;
 	}
   
-   void flatten() {
-    if (_nestedBags.empty()){
+   void flatten() { untested();
+    if (_nestedBags.empty()){ untested();
       return;
-    }else{
+    }else{ untested();
 	 }
     
     validate();
-    for (Bag bag: _nestedBags) {
+    for (Bag bag: _nestedBags) { untested();
 		 bag.flatten();
     }
     validate();
 	 std::vector<sep_t*> newSeparatorList;
 
-    for (sep_t* separator: _separators) {
+    for (sep_t* separator: _separators) { untested();
 //      System.out.println(separator.incidentBags.size() + " incident bags of " + 
 //          separator);
 		 std::vector<bag_t*> newIncidentBags;
-		 for (bag_t* bag: separator._incidentBags) {
-			 if (bag.parent != this){
+		 for (bag_t* bag: separator._incidentBags) { untested();
+			 if (bag.parent != this){ untested();
 				 newIncidentBags.add(bag);
-			 }else if (bag.nestedBags.empty()) {
+			 }else if (bag.nestedBags.empty()) { untested();
 				 newIncidentBags.add(bag);
-			 }else{
+			 }else{ untested();
 				 cfg_myset cs = convert(separator._vertices, bag->_conv);
 				 bag_t* nested = bag->findNestedBagContaining(cs);
 
-				 if (nested) {
-				 }else{
+				 if (nested) { untested();
+				 }else{ untested();
 					 // error??
 					 bag->dump();
 					 std::cerr <<" does not have a bag containing " 
@@ -270,7 +270,7 @@ public:
 				 nested.addIncidentSeparator(separator);
 			 }
       }
-      if (!newIncidentBags.isEmpty()) {
+      if (!newIncidentBags.isEmpty()) { untested();
         separator.incidentBags = newIncidentBags;
         newSeparatorList.add(separator);
       }
@@ -280,19 +280,19 @@ public:
     
 	 std::vector<bag_t*> temp;
 	 std::swap(temp, _nestedBags);
-    for (bag_t* bag: temp) {
+    for (bag_t* bag: temp) { untested();
 		 assert(bag);
-		 if (bag->_nestedBags.empty()) {
+		 if (bag->_nestedBags.empty()) { untested();
 			 //        System.out.println("adding original bag " + bag._vertices);
 			 _nestedBags.push_back(bag);
-		 }else{
-			 for (bag_t* nested: bag._nestedBags) {
+		 }else{ untested();
+			 for (bag_t* nested: bag._nestedBags) { untested();
 				 //          System.out.println("inverting " + nested);
 				 nested->invert();
 				 _nestedBags.add(nested);
 				 //          System.out.println("inverted " + nested);
 			 }
-			 for (sep_t* s : bag->_separators) {
+			 for (sep_t* s : bag->_separators) { untested();
 				 //          System.out.println("inverting sep " + separator);
 				 s->invert();
 				 _separators.push_back(s);
@@ -303,85 +303,85 @@ public:
     computeBagSize();
 //    System.out.println("bag of size " + size + " flattened into " + nestedBags.size() + " bags and width " +
 //        width);
-//    for (Bag bag: nestedBags) {
+//    for (Bag bag: nestedBags) { untested();
 //      System.out.println("incident separators of " + bag._vertices);
-//      for (Separator s: bag.incidentSeparators) {
+//      for (Separator s: bag.incidentSeparators) { untested();
 //        System.out.println("  " + s._vertices);
-//        for (Bag b: s.incidentBags) {
+//        for (Bag b: s.incidentBags) { untested();
 //          System.out.println("        " + b._vertices);
 //        }
 //      }
 //    }
   }
   
-  bag_t const* findNestedBagContaining(cfg_myset _vertices) {
-    for (bag_t* bag: _nestedBags) {
-      if (_vertices.is_subset_of(bag._vertices)) {
+  bag_t const* findNestedBagContaining(cfg_myset _vertices) { untested();
+    for (bag_t* bag: _nestedBags) { untested();
+      if (_vertices.is_subset_of(bag._vertices)) { untested();
         return bag;
-      }else{
+      }else{ untested();
 		}
     }
     return nullptr;
   }
 
-   void invert() {
+   void invert() { untested();
 		assert(_parent);
 		_vertices = convert(_vertices, _parent->_inv);
 		_parent = _parent->_parent;
 	}
   
-	void convert() {
+	void convert() { untested();
 		_vertices = convert(_vertices, _parent->_conv);
 	}
   
-   cfg_myset convert(cfg_myset const& s) const {
+   cfg_myset convert(cfg_myset const& s) const { untested();
     return convert(s, _conv);
   }
   
 	template<class MAP>
-  cfg_myset convert(cfg_myset const& s, MAP const& conv) {
-    if (conv.size() < s.size()) {
+  cfg_myset convert(cfg_myset const& s, MAP const& conv) { untested();
+    if (conv.size() < s.size()) { untested();
 		 assert(false);
     }
     cfg_myset result(conv.size());
-    for (auto v : s){
+    for (auto v : s){ untested();
       result.insert(conv[v]);
     }
     return result;
   }
   
-	void* toTreeDecomposition() {
+	void* toTreeDecomposition() { untested();
 		incomplete();
 		return nullptr;
 #if 0
     computeBagSize();
     TreeDecomposition td = new TreeDecomposition(0, width, _graph);
-    for (Bag bag: nestedBags) {
+    for (Bag bag: nestedBags) { untested();
       td.addBag(bag._vertices.toArray());
     }
     
-    for (Separator separator: separators) {
+    for (Separator separator: separators) { untested();
        cfg_myset const& vs = separator.vertices();
       Bag full = null;
-      for (Bag bag: separator.incidentBags) {
-        if (vs.isSubset(bag._vertices)) {
+      for (Bag bag: separator.incidentBags) { untested();
+        if (vs.isSubset(bag._vertices)) { untested();
           full = bag;
           break;
         }
       }
  
-      if (full != null) {
+      if (full != null) { untested();
         int j = nestedBags.indexOf(full) + 1;
-        for (Bag bag: separator.incidentBags) {
+        for (Bag bag: separator.incidentBags) { untested();
 
-          if (bag != full) {
+          if (bag != full) { untested();
             td.addEdge(j, nestedBags.indexOf(bag) + 1);
           }
         }
       }
-      else {
+      else { untested();
         int j = td.addBag(separator._vertices.toArray());
-        for (Bag bag: separator.incidentBags) {
+        for (Bag bag: separator.incidentBags) { untested();
           td.addEdge(j, nestedBags.indexOf(bag) + 1);
         }
       }
@@ -392,37 +392,37 @@ public:
   }
   
 #if 0
-  void detectSafeSeparators() {
+  void detectSafeSeparators() { untested();
     ss = new SafeSeparator(graph);
-    for (Separator separator: separators) {
+    for (Separator separator: separators) { untested();
 //      separator.figureOutSafetyBySPT();
       separator.figureOutSafety(ss);
     }
   }
 #endif
   
-  void pack() {
+  void pack() { untested();
 	  std::vector<Bag*> nestedBags_uc;
-	  for (bag_t* bag: _nestedBags) {
-		  if (bag->_parent == this) {
+	  for (bag_t* bag: _nestedBags) { untested();
+		  if (bag->_parent == this) { untested();
 			  std::vector<bag_t*> bagsToPack;
 			  bag.collectBagsToPack(bagsToPack, nullptr);
 			  //        System.out.println("bags to pack: " + bagsToPack);
-			  if (bagsToPack.size() >= 2) {
+			  if (bagsToPack.size() >= 2) { untested();
 				  cfg_myset vertices(boost::num_vertices(*_graph));
-				  for (bag_t* toPack: bagsToPack) {
+				  for (bag_t* toPack: bagsToPack) { untested();
 					  vertices.merge(toPack->_vertices);
 				  }
 				  Bag packed = new Bag(this, _vertices);
 				  packed.initializeForDecomposition();
 				  packed.nestedBags = bagsToPack;
-				  for (Bag toPack: bagsToPack) {
+				  for (Bag toPack: bagsToPack) { untested();
 					  toPack.parent = packed;
 					  toPack.convert();
 				  }
 				  nestedBags_uc.push_back(packed);
 			  }
-			  else {
+			  else { untested();
 				  nestedBags_uc.push_back(bag);
 			  }
 		  }
@@ -432,30 +432,30 @@ public:
 	  // ArrayList<Separator> newSeparatorList = new ArrayList<>();
 	  std::vector<sep_t*> seplist_uc;
 
-	  for (Separator separator: _separators) {
+	  for (Separator separator: _separators) { untested();
 		  bool internal = true;
 		  bag_t* parent = nullptr;
-		  for (Bag b: separator._incidentBags) {
-			  if (b._parent == this) {
+		  for (Bag b: separator._incidentBags) { untested();
+			  if (b._parent == this) { untested();
 				  internal = false;
 				  break;
-			  } else if (!parent) {
+			  } else if (!parent) { untested();
 				  parent = b._parent;
-			  } else if (b._parent != parent) {
+			  } else if (b._parent != parent) { untested();
 				  internal = false;
 				  break;
 			  }
 		  }
-		  if (internal) {
+		  if (internal) { untested();
 			  separator.parent = parent;
 			  separator.convert();
 			  parent.separators.add(separator);
-		  }else{
+		  }else{ untested();
 			  std::vector<bag_t*> newIncidentBags;
-			  for (Bag b: separator._incidentBags) {
-				  if (b._parent == this) {
+			  for (Bag b: separator._incidentBags) { untested();
+				  if (b._parent == this) { untested();
 					  newIncidentBags.push_back(b);
-				  } else {
+				  } else { untested();
 					  newIncidentBags.push_back(b._parent);
 					  b._parent._incidentSeparators.push_back(separator);
 					  b._incidentSeparators.erase(separator);
@@ -468,55 +468,55 @@ public:
 
 	  _separators = seplist_uc;
 
-	  for (bag_t* bag: _nestedBags) {
+	  for (bag_t* bag: _nestedBags) { untested();
 		  bag->computeBagSize();
 	  }
 	  computeBagSize();
   }
   
   // Bag::
-  void collectBagsToPack(std::vector<bag_t*> list, sep_t* from) {
+  void collectBagsToPack(std::vector<bag_t*> list, sep_t* from) { untested();
     list.push_back(this);
-    for (Separator separator: _incidentSeparators) {
+    for (Separator separator: _incidentSeparators) { untested();
 //      System.out.println(" safe = " + separator.safe);
-      if (separator == from){
-		}else if( separator.safe){
-		}else if( separator.wall){
-      }else{
+      if (separator == from){ untested();
+		}else if( separator.safe){ untested();
+		}else if( separator.wall){ untested();
+      }else{ untested();
 			separator.collectBagsToPack(list,  this);
 		}
     }
   }
   
-  int countSafeSeparators() {
+  int countSafeSeparators() { untested();
     int count = 0;
-    for (Separator separator: _separators) {
-      if (separator.is_safe()) {
+    for (Separator separator: _separators) { untested();
+      if (separator.is_safe()) { untested();
         ++count;
-      }else{
+      }else{ untested();
 		}
     }
     return count;
   }
   
-  void validate() {
-    if (!_nestedBags.empty()){
+  void validate() { untested();
+    if (!_nestedBags.empty()){ untested();
 //      assert !nestedBags.isEmpty() : "no nested bags " + this; 
-      for (bag_t* b: _nestedBags) {
+      for (bag_t* b: _nestedBags) { untested();
         b->validate();
         assert(!b._vertices.empty() && "empty bag");
         assert(b._parent == this && "parent");
 //            "\n which is " + b.parent +
 //            "\n is supposed to be " + this;
       }
-      for (Separator s: _separators) {
+      for (Separator s: _separators) { untested();
         assert(!s._vertices.isEmpty() && "empty seprator ");
         assert(s._parent == this);
 //            "\n which is " + s.parent +
 //            "\n is supposed to be " + this;
       }
-      for (bag_t* b: _nestedBags) {
-        for (Separator s: b._incidentSeparators) {
+      for (bag_t* b: _nestedBags) { untested();
+        for (Separator s: b._incidentSeparators) { untested();
           assert(!s._vertices.isEmpty());
           assert(s._parent == this);
 			// : "parent of " + s + 
@@ -528,8 +528,8 @@ public:
          //  "\n is not a subset of the bag vertex set " + b._vertices;
         }
       }
-      for (sep_t* separator: _separators) {
-        for (bag_t* b : separator._incidentBags) {
+      for (sep_t* separator: _separators) { untested();
+        for (bag_t* b : separator._incidentBags) { untested();
           assert(b);
           assert(b._parent == this);
 			// : "parent of " + b + 
@@ -545,57 +545,57 @@ public:
     }
   }
   
-	void dump(std::ostream& o, std::string indent = "") {
+	void dump(std::ostream& o, std::string indent = "") { untested();
 		o << indent << "bag:" << _vertices
 		  << indent << "width = " << _width << ", conv = "
 		  //<< _conv
 		  ;
-    //if (_nestedBags != null) {
+    //if (_nestedBags != null) { untested();
 	 //}
-	 {
+	 { untested();
     //  System.out.println(indent + nestedBags.size() + " subbags:"); 
-      for (bag_t* bag: _nestedBags) {
+      for (bag_t* bag: _nestedBags) { untested();
         bag->dump(indent + "  ");
       }
-      for (auto separator: _separators) {
+      for (auto separator: _separators) { untested();
         separator->dump(indent + "  ");
       }
     }
   }
   
-	void canonicalize() {
+	void canonicalize() { untested();
 		bool moving = true;
-		while (moving = true) {
+		while (moving) { untested();
 			moving = false;
-			for (auto bag: _nestedBags) {
-				if (bag.trySplit()) {
+			for (auto bag: _nestedBags) { untested();
+				if (bag.trySplit()) { untested();
 					moving = true;
-				}else{
+				}else{ untested();
 				}
 			}
-			if (moving) {
+			if (moving) { untested();
 				flatten();
-			}else{
+			}else{ untested();
 			}
 		}
 	}
 
-	bool trySplit() {
+	bool trySplit() { untested();
 		return false;
 	}
 
-	std::ostream& print(std::ostream& o) const {
-		if (_parent){
+	std::ostream& print(std::ostream& o) const { untested();
+		if (_parent){ untested();
 			o << "bag " << _parent->indexOf(this) << ": ";
-		} else {
+		} else { untested();
 			o << "root bag : ";
 		}
 		o << _vertices;
 		return o;
 	}
 
-  int compare(Bag const& b) const {
-    if (size() != b.size()) {
+  int compare(Bag const& b) const { untested();
+    if (size() != b.size()) { untested();
       return b.size() - size();
     }
     return b._vertices.compare_int(_vertices);

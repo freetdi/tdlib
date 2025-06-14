@@ -772,7 +772,7 @@ void twh(P& p, mag_t m, unsigned mask)
         // FIXME: no switch here.
         switch(best_tid){
         case nSOME: untested();
-        case nBMD: untested();
+        case nBMD:
 #ifdef HAVE_GALA_GRAPH_H // tmp hack
             // g.make_symmetric(true);
 #endif

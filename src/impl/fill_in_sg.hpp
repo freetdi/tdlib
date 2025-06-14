@@ -418,7 +418,7 @@ public:
 				_fill.shift(t, -w);
 
 				reason = -8;
-			}else if(_g._marker.is_extra(t)){ untested();
+			}else if(_g._marker.is_extra(t)){
 				// nodes on N(c) not reached from n.
 				// --> not interesting. still needed for subsequent scans.
 				// extra < multi.
