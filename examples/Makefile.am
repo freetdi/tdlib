@@ -65,7 +65,8 @@ TDECOMP_TESTS = \
 	test-fi.sh \
 	test-ta.sh \
 	test-tr.sh \
-	test-ppfi.sh
+	test-ppfi.sh \
+	test-ex17.sh
 endif
 
 TESTS = ${TDECOMP_TESTS}

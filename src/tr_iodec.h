@@ -587,7 +587,7 @@ public:
 		while (unsigned(_targetWidth) <= unsigned(_upperBound)) {
 		trace2("...", tbs, _rootBag.size());
 
-			if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
+			if(tbs== boost::num_vertices(_graph)) { // all vertices in one bag, (clique)
 				break; 
 			}
 			
@@ -708,7 +708,7 @@ public:
 			_targetWidth++;
 			tbs++;
 		}
-		 if(tbs== boost::num_vertices(_graph)) { untested(); // all vertices in one bag, (clique)
+		 if(tbs== boost::num_vertices(_graph)) { // all vertices in one bag, (clique)
                                
                                 unsigned i = boost::add_vertex(tt);
                                 auto& B_ = boost::get(treedec::bag_t(),tt,i);

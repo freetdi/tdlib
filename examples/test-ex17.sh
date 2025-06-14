@@ -3,7 +3,7 @@
 set -e -x
 
 out=$( mktemp )
-alg=--ppfi
+alg=--ex17
 
 test() {
 	echo $alg ${srcdir}/gr/$1.gr
